@@ -1,0 +1,121 @@
+#########################################################################################
+#constants for each material
+#########################################################################################
+
+set k 1.38066e-23
+set q 1.60218e-19
+set Vt ($k*Temp/$q)
+set eps0 8.854e-14
+set kev 8.617e-5
+set VtRoom [expr $k*300.0/$q]
+global VtRoom
+set hbar 1.054571628e-34
+set egan 7.88e-13
+
+source GaN.tcl
+source AlGaN.tcl
+#source SiC.tcl
+#source AlN.tcl
+source Insulator.tcl
+source Metal.tcl
+
+
+#thermal domain
+#solution add name=Temp solve pde !negative continuous damp
+solution add name=Temp const val=300.0
+#solution add name=Impurity solve negative damp
+
+#electrical domain
+
+solution add name=DevPsi solve negative damp continuous
+solution add name=Qfp solve negative damp continuous
+solution add name=Qfn solve negative damp continuous
+
+
+
+source Continuity.tcl
+ElecContinuity GaN
+ElecContinuity AlGaN
+
+HoleContinuity GaN
+HoleContinuity AlGaN
+
+# Is the interface charge constant everwhere all the time?
+#Add interface charge
+#pdbSetString AlGaN_GaN DevPsi Equation "1.06e13"
+#pdbSetString AlGaN_GaN DevPsi Equation "6e12"
+pdbSetString AlGaN_GaN DevPsi Equation "7.0e12"
+#pdbSetString AlGaN_GaN DevPsi Equation "1.486e13"
+#pdbSetString AlGaN_GaN DevPsi Equation "-1*(1e13*log(AlN_Ratio)+3e13)"
+
+source Poisson.tcl
+Poisson AlGaN
+Poisson GaN
+InsPoisson Metal
+InsPoisson Nitride
+InsPoisson HighK
+
+# 2D Gaussian trap distribution
+set sigma 0.025
+set mean_x 0.0
+set mean_y 0.145
+set trapConc "3.68e18*exp(-((x-$mean_x)*(x-$mean_x)+(y-$mean_y)*(y-$mean_y))/(2.0*$sigma*$sigma))"
+#set trapConc 5e19
+
+if {![info exists trapEn]} { set trapEn 0.0 }
+
+if {$trapEn} {
+    #AcceptorTrap GaN $trapConc 3.0 0.025 ; #GaN bandgap is about 3.4 eV
+    #AcceptorTrap AlGaN $trapConc 3.0 0.025 ; #AlGaN bandgap is about 3.75 eV at our Al fraction
+
+    NeutralAcceptor GaN $trapConc 0.78 0.1
+    NeutralAcceptor AlGaN $trapConc 0.78 0.1
+}
+
+#Electrical Initial Conditions
+proc Initialize {} {
+    global Vt
+    sel z=300.00 name=Temp
+    solution name=Qfn val=0 const
+    solution name=Qfp val=0 const
+
+    #four components - GaN ntype, GaN ptype, AlGaN ntype, AlGaN ptype
+
+    #GaN First
+    set nc "([pdbDelayDouble GaN Elec Nc])"
+    set nv "([pdbDelayDouble GaN Hole Nv])"
+    set aff "([pdbGetDouble GaN Affinity])"
+    set Eg "([pdbGetDouble GaN Eg])"
+    sel z= abs(Doping)+1.0 name=AbsDop
+
+    #sel z = "Mater(GaN) * ((Doping>0.0) ? (-$Vt * log( AbsDop / $nc) + $aff) : 0.0)"  name=GaN_N ;# Is the fraction in the logarithm inverted?
+    #sel z = "Mater(GaN) * ((Doping<0.0) ? ($Vt * log(AbsDop / $nv) + $aff + $Eg) : 0.0)"  name=GaN_P
+
+    newton GaN eqn=Doping-Elec+Hole var=DevPsi damp=0.025
+
+    #now AlGaN
+    set nc "([pdbDelayDouble AlGaN Elec Nc])"
+    set nv "([pdbDelayDouble AlGaN Hole Nv])"
+    set aff "([pdbGetDouble AlGaN Affinity])"
+    set Eg "([pdbGetDouble AlGaN Eg])"
+
+    #sel z = "Mater(AlGaN) * ((Doping>0.0) ? (-$Vt * log(AbsDop / $nc) + $aff) : 0.0)"  name=AlGaN_N
+    #sel z = "Mater(AlGaN) * ((Doping<0.0) ? ($Vt * log(AbsDop / $nv) + $aff + $Eg) : 0.0)"  name=AlGaN_P
+
+    newton AlGaN eqn=Doping-Elec+Hole var=DevPsi damp=0.025
+    
+    #now Metal
+    InitMetal
+    
+    #sum them together
+    #sel z=GaN_N+GaN_P+AlGaN_N+AlGaN_P+MetalDevPsi+Nitride_N+Nitride_P name=DevPsi
+
+    sel z=0 name=DonorTraps
+    sel z=0.0 name=Qfn
+    sel z=0.0 name=Qfp
+    sel z=0.0 name=Impurity
+
+    device init
+    solution add name=Qfp solve negative damp continuous pde
+    solution add name=Qfn solve negative damp continuous pde
+}
