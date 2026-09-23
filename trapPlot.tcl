@@ -15,7 +15,7 @@ proc trapPlot {ivCSV bias} {
 
     set f [open $ivCSV w]
     close $f
-    set f2 [open "figures/AcceptorTrapOccupation_Vgm2.csv" w]
+    set f2 [open "figures/trapOccupation2.csv" w]
 
     for {set d 0.0} {$d < [expr 10.0 + 0.001]} {set d [expr $d+0.1]} {
         set f [open $ivCSV a]
@@ -107,4 +107,4 @@ pdbSetDouble Nitride DevPsi DampValue 0.10
 pdbSetDouble AlGaN DevPsi DampValue 0.10
 
 
-trapPlot "figures/radPlot.csv" 10
+trapPlot "figures/radPlot2.csv" 10
