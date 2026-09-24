@@ -6,76 +6,115 @@ FLOOXS (Tcl) TCAD decks for an AlGaN/GaN HEMT, plus `figures.ipynb` for plots. S
 
 ---
 
-## 0. Which machine am I on? (check first)
+## 0. How this system is set up
 
-This repo is cloned on two machines and synced through git. Run `hostname` before doing anything else.
-
-| | Workstation (Linux) | HiPerGator (`*.ufhpc`) |
-|---|---|---|
-| Repo location | `~/<repo>` | `/blue/<group>/<gatorlink>/<repo>` (never `$HOME`, quota is small) |
-| How to run FLOOXS | directly: `flooxs <driver>.tcl` | **only through `sbatch`**, never on a login node |
-| Parallel runs | **one at a time** (see §1) | many at once as a SLURM array (see §2) |
-| Display | may have X; GUI lines may work | always headless: GUI lines **must** be stripped |
-| FLOOXS source | `~/flooxs/src` | `<FILL IN: path>` |
-| Python/notebook | system `python3` kernel | `<FILL IN: module load ... / conda env>` |
-
-Machine-specific paths and modules belong in `env.hpg.sh` / `env.local.sh`, which `env.sh` sources by hostname. Don't hardcode them in drivers.
+- **You (the agent) run on Ian's workstation** (personal, off campus), inside `tmux`. Ian checks in from his laptop or phone via Remote Control. Assume he is **not watching** in real time.
+- **HiPerGator (HPG) is reached only through `ssh hpg`**, which reuses a multiplexed master connection that Ian authenticates (Duo) each morning. You cannot answer Duo.
+- **The repo exists in two places**, synced through git:
+  - Workstation: `/home/ianstafford/blue/ee1/ianstafford`, which is your working copy. Edit here.
+  - HPG: `/home/ianstafford/blue/ee1/ianstafford`. Only `git pull` there. Never edit files on HPG directly.
+- **Where things run:**
+  - Short checks (a few points, syntax tests, debugging a deck) → run locally on the workstation.
+  - Sweeps, anything more than ~3 driver runs, anything long → SLURM on HPG.
 
 ---
 
-## 1. Running on the workstation
+## 1. Progress log (required)
 
-- Run `flooxs <driver>.tcl` from the repo root (paths like `figures/...` are relative).
-- **Run one FLOOXS process at a time.** Simultaneous runs slow each other to a crawl. Chain runs in one sequential loop, and check `pgrep -x flooxs` first, because the user may be running one in the VS Code terminal.
-- Kill runs by PID. `pkill -f "<pattern>"` also matches the shell that issued it.
-- Headless runs segfault on `chart`/`plot1d`/`window`. For batch runs, copy the deck to a scratch dir and comment those lines out:
-  `sed -i 's/^window.*//; s/^\(\s*\)chart /\1#chart /'`
-- A driver point takes roughly 30-60 s. A 17-point `pulsedIV.tcl` sweep takes about 12-15 min.
+Keep `progress.md` in the repo root up to date. Ian reads it to check in, and you rely on it after context compaction or when resuming the next day. After every milestone (job submitted, job finished, result analyzed, decision made), append a dated entry with:
+- what was run: driver, lever values, SLURM job ID;
+- the result, in one or two lines with numbers;
+- what's next or what you're waiting on.
+
+When you need Ian to decide something, write it in `progress.md` **and** send a push notification. Then wait. Don't guess on physics decisions.
 
 ---
 
-## 2. Running on HiPerGator
+## 2. Talking to HPG
 
-### Hard rules
-- **Never run `flooxs`, Python sweeps, or anything heavy on a login node.** Everything goes through `sbatch`. For short interactive tests, use `srun --pty` inside an allocation.
-- Allocation: `--account=ee1`. **The QOS caps the group at 19 CPUs.** An array plus other running jobs must stay under that total, otherwise jobs sit in `QOSGrpCpuLimit` pending. Throttle arrays with `%N` (e.g. `--array=0-7%4`). Check `squeue -u $USER` before submitting.
-- **Ask before `sbatch`** for anything bigger than a single job, and before any `scancel`. Only cancel your own job IDs, never `scancel -u`.
-- Never edit files outside the repo and `/blue/<group>/<gatorlink>/`.
-
-### Environment
-FLOOXS runs from the Apptainer container. The Intel compiler is used for builds. The conda environment came from labmate stephencea. Every job script must set up the environment the same way, by sourcing `env.hpg.sh`:
+### Check the connection first
 ```bash
-# env.hpg.sh  — FILL IN exact values
-module load intel/<ver>
-module load conda  # or the correct module
-conda activate <env>
-export FLXSHOME=<path>
-export PL_LIBRARY=<path>
-FLOOXS="apptainer exec <container.sif> flooxs"
+ssh -O check hpg
 ```
-If a job fails right away with a library, `PL_LIBRARY`, or linker error, the environment is the cause, not the deck. Check `env.hpg.sh` before touching the Tcl.
+If this fails, or any `ssh hpg` command hangs or fails to authenticate: **stop, note it in `progress.md`, notify Ian, and wait.** Don't retry in a loop, and don't try to open a new connection (it would stall on Duo).
 
-### Sweeps = SLURM job arrays
-Use the existing `trapPlot.slurm` pattern. `params.txt` has one line per array task, with the parameter bundle **pipe-delimited**. Task `$SLURM_ARRAY_TASK_ID` reads line N+1.
-- Each task works in its **own copy** of the deck in `$SLURM_TMPDIR` or `results/<run>/task_<id>/`. Strip the GUI lines there (sed above). Never edit the repo copy in place.
-- Pass levers by prepending `set` lines to the copied driver. This works because every lever has an `info exists` default.
-- **Filenames from float parameters:** format them explicitly, e.g. `printf '%.2e'`, so you don't get `1.3000000000000001e-13` names. Also record the full parameter set inside each output CSV or a sidecar `params.json`.
-- Resources (starting point): `--cpus-per-task=1`, `--mem=4gb`, `--time=00:45:00` for a 17-point `pulsedIV` sweep. OOM core dumps have happened before. If a task dies with signal 9 / `oom-kill` in the `.err` file, raise `--mem`. Don't change the deck.
-- After submitting, poll with `squeue -u $USER` at reasonable intervals (≥1 min), then check every task's `.out`/`.err` for `Newton failed`, NaN, or a missing CSV. Report which tasks failed and why before plotting anything.
+### Running commands
+Non-interactive SSH doesn't load the login environment (`module`, `conda`, SLURM paths may be missing). Always use a login shell with a quoted heredoc, so nothing gets expanded on the workstation:
+```bash
+ssh hpg bash -l <<'REMOTE'
+cd /blue/ee1/ianstafford/<repo>
+git pull --ff-only
+squeue -u $USER
+REMOTE
+```
+Use a delimiter like `REMOTE`, not `EOF`, so it can't collide with heredocs inside the remote script.
+
+### HPG environment (used inside every job script)
+```bash
+module restore flooxsenv
+conda activate flooxs
+
+export FLXSHOME=/home/ianstafford/blue/ee1/ianstafford/flooxs
+export PL_LIBRARY=$(find $CONDA_PREFIX/share -maxdepth 3 -type d -name "tcl" | grep -i plplot | head -1)
+export PATH=$HOME/.local/flooxs/bin:$PATH
+
+$FLXSHOME/release/flooxs script.tcl
+```
+- The HPG binary is `$FLXSHOME/release/flooxs`. There's no container.
+- If `conda activate` fails inside a batch script, add `eval "$(conda shell.bash hook)"` before it.
+- If a job dies immediately with a library, Tcl, `PL_LIBRARY`, or plplot error, the **environment** is the problem, not the deck. Check the env block before touching Tcl.
+- Never run `flooxs` on an HPG login node. It always goes through `sbatch` (or `srun` inside an allocation).
+
+### Hard SLURM rules
+- `--account=ee1`, `--qos=<FILL IN: ee1>`.
+- **The group QOS caps at 19 CPUs total.** Check `squeue -A ee1` (other group members count too) before submitting. Throttle arrays with `%N` (e.g. `--array=0-7%4`) so jobs don't sit in `QOSGrpCpuLimit`.
+- **Ask Ian before any `sbatch`** unless he approved that specific run in the current task. **Ask before any `scancel`.** Only cancel your own job IDs, never `scancel -u`.
+- Poll with `squeue -u $USER` no more often than every 2-3 minutes. Sleep between polls; don't busy-loop.
+
+### Sweep workflow (the standard pattern)
+1. Commit the driver and the SLURM template on the workstation, then `git push`.
+2. On HPG: `git pull --ff-only`.
+3. Write `params.txt`: one line per array task, parameter bundle **pipe-delimited**. Task `$SLURM_ARRAY_TASK_ID` reads line N+1 (the `trapPlot.slurm` pattern).
+4. Each task copies the driver into its own directory `results/<YYYYMMDD>_<tag>/task_<id>/` and prepends `set <lever> <value>` lines (every lever has an `info exists` default). It then strips the GUI lines (§4) and runs there. **Never edit the repo copy in place.**
+5. Write per-task CSVs (`pulsedIV_<tag>.csv`), never the shared `figures/pulsedIV.csv`. Also write the full parameter set into a `params.json` next to each CSV.
+6. Format float parameters explicitly in names (`printf '%.2e'`), so you don't get `1.3000000000000001e-13` filenames.
+7. After the array finishes, check **every** task's `.out`/`.err` for `Newton failed`, NaN, OOM (`oom-kill`, signal 9), or a missing CSV. Use `grep`/`tail`, not `cat` on whole logs. Report failures before plotting.
+8. `rsync -av hpg:/blue/ee1/ianstafford/<repo>/results/<run>/ results/<run>/` to bring results back. Analyze and plot on the workstation.
+
+Starting resources for a 17-point `pulsedIV` run: `--cpus-per-task=1 --mem=4gb --time=00:45:00`. OOM core dumps have happened before. If a task hits OOM, raise `--mem`; don't change the deck.
 
 ---
 
-## 3. Git / sync between machines
+## 3. Running locally on the workstation
 
-- `git pull` at the start of a session. Commit and push at the end with a message naming the runs and lever values.
-- **Commit:** decks, drivers, `.slurm` templates, `params.txt`, analysis scripts, small final CSVs used in figures (e.g. `figures/pulsedIV_F.csv`), `CLAUDE.md`.
-- **Don't commit:** raw sweep directories, `.out`/`.err` logs, meshes, container images, build artifacts. These are in `.gitignore`. Move bulk results with `rsync`.
-- `GaN_modelfile_masterD` has **CRLF** line endings and must keep them. `.gitattributes` should contain `GaN_modelfile_masterD -text`. Python edits must use `open(..., newline='')`, otherwise the whole file shows as changed.
-- Commit before changing any model file (`GaN_modelfile_masterD`, `Poisson.tcl`), so the change can be diffed and reverted.
+- `flooxs <driver>.tcl` from the repo root (paths like `figures/...` are relative).
+- **Run one FLOOXS process at a time.** Simultaneous runs slow each other to a crawl. Check `pgrep -x flooxs` first, because Ian may be running one himself.
+- Kill runs by PID. `pkill -f "<pattern>"` also matches the shell that issued it.
+- A driver point takes roughly 30-60 s. A 17-point `pulsedIV.tcl` sweep takes about 12-15 min. Anything longer than one sweep goes to HPG.
+- FLOOXS source for checking behavior: `~/flooxs/src`.
 
 ---
 
-## 4. FLOOXS gotchas (learned the hard way)
+## 4. Headless runs (both machines)
+
+Headless runs segfault on `chart`/`plot1d`/`window`. You are always headless, locally and on HPG. Run a *copy* of the deck with those lines stripped:
+```bash
+sed -i 's/^window.*//; s/^\(\s*\)chart /\1#chart /'
+```
+
+---
+
+## 5. Git
+
+- Start of session: `git pull`. After meaningful changes: commit with a message naming the runs or lever values, then push.
+- **Commit:** decks, drivers, `.slurm` templates, `params.txt`, analysis scripts, `progress.md`, small final CSVs used in figures.
+- **Don't commit:** `results/` sweep directories, `.out`/`.err` logs, meshes, build artifacts (these are in `.gitignore`).
+- `GaN_modelfile_masterD` has **CRLF** line endings and must keep them. `.gitattributes` contains `GaN_modelfile_masterD -text`. Python edits must use `open(..., newline='')`.
+- Commit **before** changing any model file (`GaN_modelfile_masterD`, `Poisson.tcl`).
+
+---
+
+## 6. FLOOXS gotchas (learned the hard way)
 
 - **Tcl word splitting in `solution ... val = (...)`:** `val = (($Ntrap) * $occ)` fails with "Ambiguous or unknown parameter *". Build the expression in a variable first: `set e "..."; solution ... val = ($e)`.
 - **Constant data fields are folded into the equations at `device init`** (`src/BasePDE/ExprStore.cc:527`, `DataConst`). A field set with `sel z=0.0 name=F` becomes the literal 0 in any equation, so later `sel` updates are ignored. Initialize switch fields with a tiny spatial variation, e.g. `sel z=1.0e-30*(1.0+x*x) name=F`.
@@ -85,7 +124,7 @@ Use the existing `trapPlot.slurm` pattern. `params.txt` has one line per array t
 
 ---
 
-## 5. Trap model (Poisson.tcl)
+## 7. Trap model (Poisson.tcl)
 
 - **Sign bug (fixed in 760b388):** the old `NeutralAcceptor` put *empty* traps into Poisson as negative charge. That made trapping feed on itself, and Newton diverged into NaN at Vd≈1.5 V. The abrupt collapse in `radPlot.csv`/`radPlot1.csv` came from this bug, so only their onset and depth are targets, not the decay to 1e-9 after the collapse.
 - `IonizedAcceptor Mat Ntrap Etrap Efwhm {g 2}`: acceptors are neutral when empty and -q when filled. `IonAcceptor = Ntrap * f`, where `f` is the Fermi-Dirac occupancy at level `Econd - Etrap`, with a Gaussian energy spread via 3-point Gauss-Hermite. Poisson uses `- IonAcceptor`.
@@ -98,11 +137,11 @@ Use the existing `trapPlot.slurm` pattern. `params.txt` has one line per array t
   - `FillStep` does the same with capture after every solve.
 - `Initialize` (in `GaN_modelfile_masterD`) creates the `TrapFrozen`, `FrozenFlag` and `TeTrap` fields.
 
-**Don't change the physics to get convergence.** If a run diverges, first try solver-side fixes: a smaller Vd step, damping, or a better initial guess. Propose any change to trap physics, capture/emission, or Poisson terms to the user before making it, and explain why.
+**Don't change the physics to get convergence.** If a run diverges, first try solver-side fixes: a smaller Vd step, damping, or a better initial guess. Propose any change to trap physics, capture/emission, or Poisson terms to Ian (via `progress.md` + notification) before making it, and explain why.
 
 ---
 
-## 6. Levers
+## 8. Levers
 
 In `GaN_modelfile_masterD`, each has an `info exists` default, so a driver or array task can override it before sourcing:
 
@@ -119,15 +158,15 @@ In `GaN_modelfile_masterD`, each has an `info exists` default, so a driver or ar
 
 ---
 
-## 7. Drivers
+## 9. Drivers
 
-- `pulsedIV.tcl`: curve-tracer model and the main tool for the collapse. The device rests at `Vg_meas` (traps at steady state), then Vd is swept with `FillStep` at each point (fill-only, no emission). Levers are at the top. It writes `figures/pulsedIV.csv` with columns Vd, Id, peak Te. **The repo copy still has the original defaults (0.68 / 0.3 / 1e-13), not the tuned values below.** In array jobs, write per-task CSVs (`results/<run>/pulsedIV_<tag>.csv`), not the shared `figures/pulsedIV.csv`.
+- `pulsedIV.tcl`: curve-tracer model and the main tool for the collapse. The device rests at `Vg_meas` (traps at steady state), then Vd is swept with `FillStep` at each point (fill-only, no emission). Levers are at the top. It writes `figures/pulsedIV.csv` with columns Vd, Id, peak Te. **The repo copy still has the original defaults (0.68 / 0.3 / 1e-13), not the tuned values below.**
 - `stressFreeze.tcl`: pulsed-IV quiescent-stress model. It stresses at (VgQ, VdQ) with `HotStress`, freezes the traps, then measures Id-Vd at Vg=-2. Stress (-2,10) gave a 46% drop plus knee walkout (`figures/hotStressIV_*.csv`). The (-4,20) stress NaNs at Vd≈17.5 V during the ramp.
-- `trapPlot.tcl` / `trapPlot.slurm`: older dynamic-trap driver (Id-Vd plus trap profile), and the array-job template used for the sensitivity analysis.
+- `trapPlot.tcl` / `trapPlot.slurm`: older dynamic-trap driver (Id-Vd plus trap profile), and the array-job template to copy for new sweeps.
 
 ---
 
-## 8. Tuning results
+## 10. Tuning results
 
 All `pulsedIV.tcl` runs, Vg=-2, Vd 0-1.6 in 0.1 V steps, `trapMeanY`=0.20. Target: `radPlot1` (9.75, 19.0, 27.2, 32.0 at 0.1-0.4 V, then 0.011 at 0.5 V).
 
@@ -147,16 +186,16 @@ Trends:
 - More total trapped charge (`trapPeak` × `trapSigma`²) gives a deeper collapse, but past about 5e18 × 0.025² it pinches the channel at rest.
 - Onset Vd scales roughly as 1/√`hotTau`.
 
-**Keep this table current.** Add every completed run with its lever values and a one-line result, and commit it.
+**Keep this table current.** Add every completed run and commit it.
 
-**Next step:** run F with `hotTau` ∈ {0.6e-13, 0.5e-13, 0.4e-13} to move the onset to 0.4-0.5 V. On HiPerGator this is a 3-task array. On the workstation, run them sequentially. Then set the best values as the defaults in `pulsedIV.tcl`. Note that F's pre-collapse current is also off: 7.8 / 7.0 mA/mm at 0.1 / 0.2 V vs target 9.75 / 19.0, and it *falls* with Vd where the target rises. Pushing the onset out alone will expose that mismatch over more points. Check pre-collapse shape against target before declaring a match.
+**Next step:** run F with `hotTau` ∈ {0.6e-13, 0.5e-13, 0.4e-13} as a 3-task HPG array, to move the onset to 0.4-0.5 V. Then set the best values as the defaults in `pulsedIV.tcl`. Note that F's pre-collapse current is also off: 7.8 / 7.0 mA/mm at 0.1 / 0.2 V vs target 9.75 / 19.0, and it *falls* with Vd where the target rises. Check pre-collapse shape against target before declaring a match.
 
 ---
 
-## 9. Notebook
+## 11. Notebook and plotting
 
-`figures.ipynb` runs on a `python3` kernel (numpy/pandas/matplotlib/scipy; `jupyter_client` + `ipykernel` installed on the workstation, `nbformat`/`nbconvert` not installed). Several older cells point at `/home/staffian/banjo-wombat/...` paths that no longer exist.
+`figures.ipynb` runs on the workstation's system `python3` kernel (numpy/pandas/matplotlib/scipy; `jupyter_client` + `ipykernel` installed, `nbformat`/`nbconvert` not). Several older cells point at `/home/staffian/banjo-wombat/...` paths that no longer exist.
 
-- When adding results, append a cell and execute only it plus the setup cells (1: imports, 2: `flooxsRead`) through `jupyter_client`, so other cells' outputs are untouched. Keep the JSON as `indent=1` with a trailing newline.
+- To add results, append a cell and execute only it plus the setup cells (1: imports, 2: `flooxsRead`) through `jupyter_client`, so other cells' outputs are untouched. Keep the JSON as `indent=1` with a trailing newline.
 - `figures/pulsedIV_F.csv` is plotted against `radPlot1` in the last cell.
-- On HiPerGator, prefer a standalone plotting script, run inside a job or on the workstation after `rsync`, over editing the notebook. This avoids notebook merge conflicts between machines.
+- All plotting happens on the workstation, after `rsync`. Nothing on HPG touches the notebook.
