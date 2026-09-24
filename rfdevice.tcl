@@ -82,8 +82,6 @@ proc HEMT_Struct { } {
     #Contacts
     contact name=FP Metal xlo=[expr 0.0-$SiN_Thick-$HPD_Thick-$FP_Thick-$buf] xhi=[expr 0.0-$SiN_Thick-$HPD_Thick] ylo=[expr $Gtr+$FP_Offset-$buf] yhi=[expr $Gtr+$FP_Offset+$FP2+$buf] add depth=1.0 width=1.0
     contact name=G Metal xlo=[expr 0.0-$SiN_Thick-$buf] xhi=[expr -0.005+$buf] ylo=[expr $Gtl] yhi=[expr $Gtr] add depth=1.0 width=1.0
-    # contact name=G AlGaN xlo=[expr 0.0-$buf] xhi=0.001 ylo=[expr $Gtl+$buf] yhi=[expr $Gtr-$buf] add depth=1.0 width=1.0
-    #contact name=G Nitride xlo=[expr -0.006] xhi=-0.001 ylo=[expr $Gtl+$buf] yhi=[expr $Gtr-$buf] add depth=1.0 width=1.0
 
     set l [expr $Gtl-$SourceGate-0.125] 
     contact name=S AlGaN ylo=[expr $l-$buf] yhi=[expr $l+$buf] xlo=[expr 0.0-$buf] xhi=[expr $Al_Thick-$buf] add depth=1.0 width=1.0

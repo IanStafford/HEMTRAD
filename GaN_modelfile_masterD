@@ -8,22 +8,20 @@ set Vt ($k*Temp/$q)
 set eps0 8.854e-14
 set kev 8.617e-5
 set VtRoom [expr $k*300.0/$q]
-global VtRoom
 set hbar 1.054571628e-34
 set egan 7.88e-13
 
+# electron mobility model: static (constant) or field (doping/temperature/field dependent)
+if {![info exists mobModel]} { set mobModel static }
+
 source GaN.tcl
 source AlGaN.tcl
-#source SiC.tcl
-#source AlN.tcl
 source Insulator.tcl
 source Metal.tcl
 
 
 #thermal domain
-#solution add name=Temp solve pde !negative continuous damp
 solution add name=Temp const val=300.0
-#solution add name=Impurity solve negative damp
 
 #electrical domain
 
@@ -42,11 +40,7 @@ HoleContinuity AlGaN
 
 # Is the interface charge constant everwhere all the time?
 #Add interface charge
-#pdbSetString AlGaN_GaN DevPsi Equation "1.06e13"
-#pdbSetString AlGaN_GaN DevPsi Equation "6e12"
 pdbSetString AlGaN_GaN DevPsi Equation "7.0e12"
-#pdbSetString AlGaN_GaN DevPsi Equation "1.486e13"
-#pdbSetString AlGaN_GaN DevPsi Equation "-1*(1e13*log(AlN_Ratio)+3e13)"
 
 source Poisson.tcl
 Poisson AlGaN
@@ -70,7 +64,6 @@ set sigma $trapSigma
 set mean_x $trapMeanX
 set mean_y $trapMeanY
 set trapConc "$trapPeak*exp(-((x-$mean_x)*(x-$mean_x)+(y-$mean_y)*(y-$mean_y))/(2.0*$sigma*$sigma))"
-#set trapConc 5e19
 
 # Hot-electron trap capture (see IonizedAcceptor / HotStress in Poisson.tcl)
 if {![info exists hotEb]}   { set hotEb 0.3 }       ;# capture barrier (eV); 0 = Fermi-level occupancy
@@ -79,52 +72,23 @@ if {![info exists hotMu]}   { set hotMu 600.0 }     ;# GaN electron mobility (cm
 if {![info exists hotVsat]} { set hotVsat 1.9e7 }   ;# saturation velocity (cm/s)
 
 if {$trapEn} {
-    #AcceptorTrap GaN $trapConc 3.0 0.025 ; #GaN bandgap is about 3.4 eV
-    #AcceptorTrap AlGaN $trapConc 3.0 0.025 ; #AlGaN bandgap is about 3.75 eV at our Al fraction
-
     IonizedAcceptor GaN $trapConc $trapLevel $trapWidth
     IonizedAcceptor AlGaN $trapConc $trapLevel $trapWidth
 }
 
 #Electrical Initial Conditions
 proc Initialize {} {
-    global Vt
     sel z=300.00 name=Temp
     solution name=Qfn val=0 const
     solution name=Qfp val=0 const
 
-    #four components - GaN ntype, GaN ptype, AlGaN ntype, AlGaN ptype
-
-    #GaN First
-    set nc "([pdbDelayDouble GaN Elec Nc])"
-    set nv "([pdbDelayDouble GaN Hole Nv])"
-    set aff "([pdbGetDouble GaN Affinity])"
-    set Eg "([pdbGetDouble GaN Eg])"
-    sel z= abs(Doping)+1.0 name=AbsDop
-
-    #sel z = "Mater(GaN) * ((Doping>0.0) ? (-$Vt * log( AbsDop / $nc) + $aff) : 0.0)"  name=GaN_N ;# Is the fraction in the logarithm inverted?
-    #sel z = "Mater(GaN) * ((Doping<0.0) ? ($Vt * log(AbsDop / $nv) + $aff + $Eg) : 0.0)"  name=GaN_P
-
+    # charge-neutral initial potential in GaN, then AlGaN
     newton GaN eqn=Doping-Elec+Hole var=DevPsi damp=0.025
-
-    #now AlGaN
-    set nc "([pdbDelayDouble AlGaN Elec Nc])"
-    set nv "([pdbDelayDouble AlGaN Hole Nv])"
-    set aff "([pdbGetDouble AlGaN Affinity])"
-    set Eg "([pdbGetDouble AlGaN Eg])"
-
-    #sel z = "Mater(AlGaN) * ((Doping>0.0) ? (-$Vt * log(AbsDop / $nc) + $aff) : 0.0)"  name=AlGaN_N
-    #sel z = "Mater(AlGaN) * ((Doping<0.0) ? ($Vt * log(AbsDop / $nv) + $aff + $Eg) : 0.0)"  name=AlGaN_P
-
     newton AlGaN eqn=Doping-Elec+Hole var=DevPsi damp=0.025
     
     #now Metal
     InitMetal
-    
-    #sum them together
-    #sel z=GaN_N+GaN_P+AlGaN_N+AlGaN_P+MetalDevPsi+Nitride_N+Nitride_P name=DevPsi
 
-    sel z=0 name=DonorTraps
     # trap freeze fields: must not be spatially constant, or FLOOXS folds them
     # into the equations as fixed numbers at device init (see FreezeTraps)
     sel z=1.0e-30*(1.0+x*x) name=TrapFrozen
@@ -132,7 +96,6 @@ proc Initialize {} {
     sel z=Temp+1.0e-12*(1.0+x*x) name=TeTrap
     sel z=0.0 name=Qfn
     sel z=0.0 name=Qfp
-    sel z=0.0 name=Impurity
 
     device init
     solution add name=Qfp solve negative damp continuous pde

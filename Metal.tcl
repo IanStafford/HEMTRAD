@@ -4,10 +4,6 @@
 
 mater add name=Metal    
 
-pdbSetDouble Metal Temp Abs.Error 0.1
-pdbSetDouble Metal Temp Rel.Error 1.0e-2
-pdbSetDouble Metal Temp DampValue 10.0
-
 pdbSetDouble Metal DevPsi RelEps 1.0e12
 
 #create a procedure for ohmic contacts
@@ -72,9 +68,6 @@ if {!$pGaN} {
     # Pin holes, leave Qfn floating
     pdbSetString G Qfp Equation "Qfp+G"
     pdbSetBoolean G Qfp Fixed 1
-    #pdbSetDouble G Qfp Flux.Scale 1.602e-19
-    #set eqn "200 * 5.0e12 * grad(Qfp)"
-    #pdbSetString Metal Qfp Equation $eqn
 
 } else {
     # We treat the pGaN contact as ohmic, so we pin both holes and electrons, and use the GaN Ec for the electrostatics since we are in direct contact with the GaN.

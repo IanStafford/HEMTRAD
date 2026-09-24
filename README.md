@@ -12,20 +12,23 @@ Device simulations are run with [FLOOXS](https://www.flooxs.ece.ufl.edu/) (Flori
 - [`rfdevice.tcl`](rfdevice.tcl) — defines the field-plate/T-gate HEMT geometry, mesh, contacts, and doping (`HEMT_Struct`)
 
 **Material and physics models** (sourced by the model file, generally not run directly)
-- [`GaN.tcl`](GaN.tcl), [`AlGaN.tcl`](AlGaN.tcl), [`Insulator.tcl`](Insulator.tcl), [`Metal.tcl`](Metal.tcl) — material parameters (bandgap, affinity, mobility, effective mass, mechanical properties) for each region
-- [`Poisson.tcl`](Poisson.tcl), [`Continuity.tcl`](Continuity.tcl) — Poisson and electron/hole continuity equation definitions
+- [`GaN.tcl`](GaN.tcl), [`AlGaN.tcl`](AlGaN.tcl), [`Insulator.tcl`](Insulator.tcl), [`Metal.tcl`](Metal.tcl) — material parameters (bandgap, affinity, mobility, effective mass) for each region
+- [`Poisson.tcl`](Poisson.tcl), [`Continuity.tcl`](Continuity.tcl) — Poisson and electron/hole continuity equation definitions; `Poisson.tcl` also holds the acceptor trap model (hot-electron capture, freeze/fill-only trap memory)
 - [`GaN_modelfile_masterD`](GaN_modelfile_masterD) — top-level model file; sources the material/physics files above, sets up solution variables, interface charge, and trap distributions, and defines `Initialize`
 
 **Measurement/sweep drivers**
 - [`IV.tcl`](IV.tcl) — sweeps drain voltage at several fixed gate voltages, writes `figures/fpIV*.csv`
-- [`run_measurements.tcl`](run_measurements.tcl) — `run_measurements` proc: gate sweep at fixed Vd, and (disabled by default) a peak-field vs. Vds sweep
+- [`run_measurements.tcl`](run_measurements.tcl) — `run_measurements` proc: gate sweep at fixed Vd, plus a peak-field vs. Vds sweep when a peak-field CSV path (not `"null"`) is given
+- [`transfer.tcl`](transfer.tcl), [`fieldpeak.tcl`](fieldpeak.tcl) — call `run_measurements` for the transfer curve / peak field
 - [`trapPlot.tcl`](trapPlot.tcl) — I-V sweep with trap occupation enabled, plots trap concentration profiles across the channel
+- [`pulsedIV.tcl`](pulsedIV.tcl) — pulsed curve-tracer Id-Vd sweep with trap memory (radiation-induced current collapse); tunable trap/hot-electron levers at the top
+- [`stressFreeze.tcl`](stressFreeze.tcl) — stress at a quiescent bias, freeze the traps, then measure Id-Vd
 
 **Figures**
 - [`figures/`](figures/) — output directory for simulation CSVs (empty until simulations are run; also where experimental CSVs should be placed)
 - [`figures.ipynb`](figures.ipynb) — Python notebook that reads the simulation and experimental CSVs and generates the paper's figures
 
-> **Note:** `IV.tcl` and `trapPlot.tcl` reference `powerdevice.tcl` and `run_measurements_E.tcl`, which are not currently present in this repo. Those decks (or their replacements) need to be added/restored before those scripts will run end-to-end.
+> **Note:** `IV.tcl` sources `powerdevice.tcl`, which is not currently present in this repo. That deck (or a replacement such as `rfdevice.tcl`) needs to be added before `IV.tcl` will run.
 
 ## Generating simulation data
 

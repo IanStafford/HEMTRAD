@@ -1,9 +1,8 @@
+# Gate sweep at Vd=10V; if peakCSV isn't "null", also a peak-field vs Vds sweep.
 proc run_measurements {ivCSV peakCSV label} {
-    # Source the provided Tcl file and the GaN model file
     Initialize
     device init
 
-    if {1} {
     for {set d 0.0} {$d <10.05} {set d [expr $d+0.25]} {
     contact name=D supply=$d
     device 
@@ -13,7 +12,7 @@ proc run_measurements {ivCSV peakCSV label} {
     set f [open $ivCSV w]
     close $f
 
-    # Loop over gate voltage values from  10.0 down to -4.0 (approximately)
+    # Loop over gate voltage values from 0.0 down to -4.0 (approximately)
     # window row=1 col=2 make window declaration seperately to avoid new window for each run
     for {set g 0.0} {$g > -4.05} {set g [expr $g-0.1]} {
         contact name=G supply=$g
@@ -28,9 +27,8 @@ proc run_measurements {ivCSV peakCSV label} {
 
         chart graph=IV curve=$label xval=$g yval=$cur leg.left title= "Vd=6V"
     }
-    }
 
-    if {0} {
+    if {$peakCSV ne "null"} {
     for {set g 0.0} {$g > -4.05} {set g [expr $g-0.5]} {
         contact name=G supply=$g
         device

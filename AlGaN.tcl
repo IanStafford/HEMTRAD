@@ -36,75 +36,44 @@ pdbSetDouble AlGaN Elec beta3 7.07
 pdbSetDouble AlGaN Elec beta4 -0.86
 pdbSetDouble AlGaN Elec Nref 1e17
 
-
-set Amumin ([pdbGetDouble AlGaN Elec mumin])
-set Amumax ([pdbGetDouble AlGaN Elec mumax])
-set Alowalpha ([pdbGetDouble AlGaN Elec alpha])
-set Abeta1 ([pdbGetDouble AlGaN Elec beta1])
-set Abeta2 ([pdbGetDouble AlGaN Elec beta2])
-set Abeta3 ([pdbGetDouble AlGaN Elec beta3])
-set Abeta4 ([pdbGetDouble AlGaN Elec beta4])
-set ANref ([pdbGetDouble AlGaN Elec Nref])
-
-#build equation for low field mobility
-set Aseg1 "$Amumin*(exp(log(Temp/300)*($Abeta1)))"
-set Aseg2 "($Amumax-$Amumin)*(exp(log(Temp/300)*($Abeta2)))"
-set Aseg3 "$ANref*(exp(log(Temp/300)*($Abeta3)))"
-#set Aseg4 "abs((Doping+Acceptor+1)/$Aseg3)"
-set Aseg4 "(abs(Doping)+abs(Acceptor)+1)/$Aseg3)"
-set Aseg5 "$Alowalpha*(exp(log(Temp/300)*($Abeta4)))"
-set Aseg6 "exp(log($Aseg4)*($Aseg5))"
-set Aseg7 "1+$Aseg6"
-
-pdbSetDouble AlGaN Elec lowfldmob "($Aseg1+(($Aseg2)/($Aseg7)))"
-
-#set electron mobility via analytical expression from Farahmand for high field mobility U=0
-#pdbSetDouble AlGaN Elec lowfldmob 213.1
-pdbSetDouble AlGaN Elec alpha 6.9502
+#parameters for AlGaN high field mobility from Farahmand U=0 (hfalpha is Farahmand's alpha)
+pdbSetDouble AlGaN Elec hfalpha 6.9502
 pdbSetDouble AlGaN Elec n1 7.8138
 pdbSetDouble AlGaN Elec n2 0.7897
 pdbSetDouble AlGaN Elec Ecmob 245579.4
-pdbSetDouble AlGaN vsat 2.02e7 
-#pdbSetDouble AlGel N vsat ((2.5e7*AlN_Ratio)+(1.4e7*(1-AlN_Ratio)))
+pdbSetDouble AlGaN vsat 2.02e7
 
-#set electron mobility via analytical expression from Farahmand for high field mobility U=deltaEc
-#pdbSetDouble AlGaN Elec lowfldmob 213.1
-#pdbSetDouble AlGaN Elec alpha 3.2332
-#pdbSetDouble AlGaN Elec n1 5.3193
-#pdbSetDouble AlGaN Elec n2 1.0396
-#pdbSetDouble AlGaN Elec Ecmob 365552.9
-#pdbSetDouble AlGaN vsat 1.1219e5 
-#pdbSetDouble AlGaN vsat ((2.5e7*AlN_Ratio)+(1.4e7*(1-AlN_Ratio)))
+#Farahmand high field parameters for U=deltaEc: hfalpha 3.2332, n1 5.3193, n2 1.0396,
+#Ecmob 365552.9, vsat 1.1219e5 (low field mobility 213.1)
 
-set Alowfldmob ([pdbGetDouble AlGaN Elec lowfldmob]) 
-set Ahighalpha ([pdbGetDouble AlGaN Elec alpha])
-set An1 ([pdbGetDouble AlGaN Elec n1])
-set An2 ([pdbGetDouble AlGaN Elec n2])
-set AEcmob ([pdbGetDouble AlGaN Elec Ecmob])
-set Avsat ([pdbGetDouble AlGaN vsat])
-set AEfield "(sqrt(dot(DevPsi,DevPsi)+1.0e2))"
-set AEfield_EcRatio "($AEfield)/($AEcmob)"
+#mobModel (set in GaN_modelfile_masterD): static = constant mobility,
+#field = Farahmand low field and high field mobility
+if {$mobModel eq "field"} {
+    set Tn "(Temp/300)"
+    set N "(abs(Doping)+IonAcceptor+1.0)"
+    set mumin [pdbGetDouble AlGaN Elec mumin]
+    set mumax [pdbGetDouble AlGaN Elec mumax]
+    set seg1 "$mumin*exp(log($Tn)*([pdbGetDouble AlGaN Elec beta1]))"
+    set seg2 "($mumax-$mumin)*exp(log($Tn)*([pdbGetDouble AlGaN Elec beta2]))"
+    set Nr "([pdbGetDouble AlGaN Elec Nref]*exp(log($Tn)*([pdbGetDouble AlGaN Elec beta3])))"
+    set a "([pdbGetDouble AlGaN Elec alpha]*exp(log($Tn)*([pdbGetDouble AlGaN Elec beta4])))"
+    pdbSetDouble AlGaN Elec lowfldmob "(($seg1)+($seg2)/(1+exp(log($N/$Nr)*$a)))"
 
-set AEn1 "exp(log($AEfield_EcRatio)*($An1-1))"
-set AEn2 "exp(log($AEfield_EcRatio)*($An2))"
-
-set Anum "($Alowfldmob+($Avsat*($AEn1)/($AEcmob)))"
-set Aden "(1.0+($Ahighalpha*($AEn2))+($AEn1*$AEfield_EcRatio))"
-
-#pdbSetDouble AlGaN Elec mob $Alowfldmob
-
-#pdbSetDouble AlGaN Elec mob "($Anum)/($Aden)"
-pdbSetDouble AlGaN Elec mob 213.3
+    #Farahmand high field: mu = (mulow + vsat E^(n1-1)/Ec^n1) / (1 + hfalpha (E/Ec)^n2 + (E/Ec)^n1),
+    #E along the channel (V/cm)
+    set mulow "([pdbGetDouble AlGaN Elec lowfldmob])"
+    set Ec [pdbGetDouble AlGaN Elec Ecmob]
+    set n1 [pdbGetDouble AlGaN Elec n1]
+    set r "((abs(dot(DevPsi,y*1e-4))+1)/$Ec)"
+    set rn1m1 "exp(log($r)*($n1-1))"
+    set num "($mulow+([pdbGetDouble AlGaN vsat]*$rn1m1/$Ec))"
+    set den "(1.0+[pdbGetDouble AlGaN Elec hfalpha]*exp(log($r)*([pdbGetDouble AlGaN Elec n2]))+$rn1m1*$r)"
+    pdbSetDouble AlGaN Elec mob "($num/$den)"
+} else {
+    pdbSetDouble AlGaN Elec mob 213.3
+}
 
 pdbSetDouble AlGaN Hole mob 0.2
 
-pdbSetDouble AlGaN Temp Abs.Error 0.1
-pdbSetDouble AlGaN Temp Rel.Error 1.0e-2
-pdbSetDouble AlGaN Temp DampValue 10.0
-
 pdbSetDouble AlGaN Thermalk 0.33
 pdbSetDouble AlGaN Heatcap 2.0
-
-set eqn "((([pdbGetDouble AlGaN Heatcap]) * ddt(Temp))) - (([pdbGetDouble AlGaN Thermalk]) * (grad(Temp))) - ($q * [pdbGetDouble AlGaN Elec mob] * (Elec) * dot(Qfn,Qfn))"
-pdbSetString AlGaN Temp Equation $eqn
-
