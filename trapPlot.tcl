@@ -31,7 +31,7 @@ proc trapPlot {ivCSV bias} {
             #sel z=log10(abs(Acceptor)+1.0)
             #sel z=Acceptor
             #plot1d graph=Acceptor xv=0.018 ylab="AcceptorOccupation" title="Acceptor" name="Vds=$d"
-            sel z=log10(abs(NeutralAcceptor)+1.0)
+            sel z=log10(abs(IonAcceptor)+1.0)
 
             set pstr [peak AlGaN]
             puts "$pstr"

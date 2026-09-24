@@ -64,12 +64,18 @@ set trapConc "4e18*exp(-((x-$mean_x)*(x-$mean_x)+(y-$mean_y)*(y-$mean_y))/(2.0*$
 
 if {![info exists trapEn]} { set trapEn 0.0 }
 
+# Hot-electron trap capture (see IonizedAcceptor / HotStress in Poisson.tcl)
+if {![info exists hotEb]} { set hotEb 0.3 }       ;# capture barrier (eV); 0 = Fermi-level occupancy
+set hotTau 1.0e-13                                ;# energy relaxation time (s)
+set hotMu 600.0                                   ;# GaN electron mobility (cm2/Vs), matches GaN.tcl
+set hotVsat 1.9e7                                 ;# saturation velocity (cm/s)
+
 if {$trapEn} {
     #AcceptorTrap GaN $trapConc 3.0 0.025 ; #GaN bandgap is about 3.4 eV
     #AcceptorTrap AlGaN $trapConc 3.0 0.025 ; #AlGaN bandgap is about 3.75 eV at our Al fraction
 
-    NeutralAcceptor GaN $trapConc 0.68 0.1
-    NeutralAcceptor AlGaN $trapConc 0.68 0.1
+    IonizedAcceptor GaN $trapConc 0.68 0.1
+    IonizedAcceptor AlGaN $trapConc 0.68 0.1
 }
 
 #Electrical Initial Conditions
@@ -111,6 +117,11 @@ proc Initialize {} {
     #sel z=GaN_N+GaN_P+AlGaN_N+AlGaN_P+MetalDevPsi+Nitride_N+Nitride_P name=DevPsi
 
     sel z=0 name=DonorTraps
+    # trap freeze fields: must not be spatially constant, or FLOOXS folds them
+    # into the equations as fixed numbers at device init (see FreezeTraps)
+    sel z=1.0e-30*(1.0+x*x) name=TrapFrozen
+    sel z=1.0e-30*(1.0+x*x) name=FrozenFlag
+    sel z=Temp+1.0e-12*(1.0+x*x) name=TeTrap
     sel z=0.0 name=Qfn
     sel z=0.0 name=Qfp
     sel z=0.0 name=Impurity
