@@ -66,7 +66,7 @@ $FLXSHOME/release/flooxs script.tcl
 - Never run `flooxs` on an HPG login node. It always goes through `sbatch` (or `srun` inside an allocation).
 
 ### Hard SLURM rules
-- `--account=ee1`, `--qos=<FILL IN: ee1>`.
+- `--account=ee1`, `--qos=<ee1-b: ee1>`.
 - **The group QOS caps at 19 CPUs total.** Check `squeue -A ee1` (other group members count too) before submitting. Throttle arrays with `%N` (e.g. `--array=0-7%4`) so jobs don't sit in `QOSGrpCpuLimit`.
 - **Ask Ian before any `sbatch`** unless he approved that specific run in the current task. **Ask before any `scancel`.** Only cancel your own job IDs, never `scancel -u`.
 - Poll with `squeue -u $USER` no more often than every 2-3 minutes. Sleep between polls; don't busy-loop.
