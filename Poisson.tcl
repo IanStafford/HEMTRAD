@@ -108,7 +108,11 @@ proc IonizedAcceptor {Mat Ntrap Etrap Efwhm {g 2.0}} {
     }
     # TrapFrozen / FrozenFlag are data fields (read at solve time), so the
     # trapped charge can be switched between live and frozen without device init.
-    set IonAcceptor "FrozenFlag * TrapFrozen + (1.0 - FrozenFlag) * ($Ntrap) * $occ"
+    # When not frozen the charge is max(TrapFrozen, live): TrapFrozen is ~0 after
+    # ThawTraps (pure live occupancy), or the charge already captured during a
+    # fill-only sweep (FillStep), which the traps can't emit on that time scale.
+    set live "(($Ntrap) * $occ)"
+    set IonAcceptor "FrozenFlag * TrapFrozen + (1.0 - FrozenFlag) * 0.5 * (TrapFrozen + $live + abs(TrapFrozen - $live))"
     solution name=IonAcceptor solve $Mat const val = ($IonAcceptor)
 }
 
@@ -123,7 +127,14 @@ proc FreezeTraps {} {
 # Let the traps follow the local Fermi level again (steady state), cold electrons.
 proc ThawTraps {} {
     sel z=1.0e-30*(1.0+x*x) name=FrozenFlag
+    sel z=1.0e-30*(1.0+x*x) name=TrapFrozen
     ResetTe
+}
+
+# Record the present trapped charge as captured: from now on the traps can fill
+# further but not empty (no emission) until ThawTraps.
+proc CaptureTraps {} {
+    sel z=IonAcceptor name=TrapFrozen
 }
 
 # Local-field electron temperature, Te = T + (2/3) tau v(E) E / (k/q), with
@@ -157,4 +168,15 @@ proc HotStress {{iters 8} {w 0.5}} {
         device
         puts "HotStress iter $i peak Te(GaN) = $te K"
     }
+}
+
+# One pulse-train bias point of a fill-only sweep: iterate Te <-> device solve,
+# keeping every electron captured along the way. Returns the final peak Te.
+proc FillStep {{iters 4} {w 0.5}} {
+    for {set i 1} {$i <= $iters} {incr i} {
+        set te [UpdateTe $w]
+        device
+        CaptureTraps
+    }
+    return $te
 }

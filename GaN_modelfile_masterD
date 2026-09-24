@@ -55,27 +55,35 @@ InsPoisson Metal
 InsPoisson Nitride
 InsPoisson HighK
 
+# Trap levers: any of these can be set by the driver script before sourcing
+# this file to override the defaults.
+if {![info exists trapEn]}    { set trapEn 0.0 }
+if {![info exists trapPeak]}  { set trapPeak 4e18 }   ;# peak trap density (cm^-3)
+if {![info exists trapMeanX]} { set trapMeanX 0.0 }   ;# Gaussian center, depth (um)
+if {![info exists trapMeanY]} { set trapMeanY 0.20 }  ;# Gaussian center, lateral (um)
+if {![info exists trapSigma]} { set trapSigma 0.025 } ;# Gaussian spatial sigma (um)
+if {![info exists trapLevel]} { set trapLevel 0.68 }  ;# trap depth below Ec (eV)
+if {![info exists trapWidth]} { set trapWidth 0.1 }   ;# energy FWHM (eV)
+
 # 2D Gaussian trap distribution
-set sigma 0.025
-set mean_x 0.0
-set mean_y 0.20
-set trapConc "4e18*exp(-((x-$mean_x)*(x-$mean_x)+(y-$mean_y)*(y-$mean_y))/(2.0*$sigma*$sigma))"
+set sigma $trapSigma
+set mean_x $trapMeanX
+set mean_y $trapMeanY
+set trapConc "$trapPeak*exp(-((x-$mean_x)*(x-$mean_x)+(y-$mean_y)*(y-$mean_y))/(2.0*$sigma*$sigma))"
 #set trapConc 5e19
 
-if {![info exists trapEn]} { set trapEn 0.0 }
-
 # Hot-electron trap capture (see IonizedAcceptor / HotStress in Poisson.tcl)
-if {![info exists hotEb]} { set hotEb 0.3 }       ;# capture barrier (eV); 0 = Fermi-level occupancy
-set hotTau 1.0e-13                                ;# energy relaxation time (s)
-set hotMu 600.0                                   ;# GaN electron mobility (cm2/Vs), matches GaN.tcl
-set hotVsat 1.9e7                                 ;# saturation velocity (cm/s)
+if {![info exists hotEb]}   { set hotEb 0.3 }       ;# capture barrier (eV); 0 = Fermi-level occupancy
+if {![info exists hotTau]}  { set hotTau 1.0e-13 }  ;# energy relaxation time (s)
+if {![info exists hotMu]}   { set hotMu 600.0 }     ;# GaN electron mobility (cm2/Vs), matches GaN.tcl
+if {![info exists hotVsat]} { set hotVsat 1.9e7 }   ;# saturation velocity (cm/s)
 
 if {$trapEn} {
     #AcceptorTrap GaN $trapConc 3.0 0.025 ; #GaN bandgap is about 3.4 eV
     #AcceptorTrap AlGaN $trapConc 3.0 0.025 ; #AlGaN bandgap is about 3.75 eV at our Al fraction
 
-    IonizedAcceptor GaN $trapConc 0.68 0.1
-    IonizedAcceptor AlGaN $trapConc 0.68 0.1
+    IonizedAcceptor GaN $trapConc $trapLevel $trapWidth
+    IonizedAcceptor AlGaN $trapConc $trapLevel $trapWidth
 }
 
 #Electrical Initial Conditions
