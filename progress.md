@@ -167,3 +167,8 @@ pushes the same threshold-crossing later in Vd while keeping the depth.
 `trapPeak` ∈ {6e18, 6.5e18, 7e18, 7.5e18, 8e18}, `hotTau`=2e-14 fixed,
 `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5 - 5 tasks. Checking with
 Ian before submitting.
+
+Ian approved. Submitted **job 43298204, array 0-4 (5 tasks)**, `ee1`
+QOS idle before submit. CSVs `pulsedIV_tp<trapPeak>.csv` + `params.json`
+into `results/20260925_lateOnsetD/task_<id>/`. Polling `squeue -u
+ianstafford` every 5 min.
