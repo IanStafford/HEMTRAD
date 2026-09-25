@@ -103,3 +103,13 @@ Nothing further submitted. No pending jobs on HPG (`ee1` QOS idle). Task
 is paused, not abandoned - the `trapLevel`×`trapPeak` grid above is ready
 to go (driver already supports it via the `info-exists` overrides) once
 he says go.
+
+## 2026-09-25
+
+Checked HPG connection (`ssh -O check hpg`, master pid=11377, OK) and
+resumed. Ian approved the round B grid. Submitted:
+**job 43283546, array 0-5 (6 tasks)**, `ee1` QOS idle before submit.
+`trapLevel` ∈ {0.35, 0.45} × `trapPeak` ∈ {8e18, 1.2e19, 1.6e19},
+`hotTau`=1e-14, `trapSigma`=0.04, `hotEb`=0.5, Vd 0-4.05V in 0.15V steps.
+CSVs `pulsedIV_tl<trapLevel>_tp<trapPeak>.csv` + `params.json` into
+`results/20260925_lateOnsetB/task_<id>/`. Polling `squeue -u $USER`.
