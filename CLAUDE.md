@@ -249,6 +249,20 @@ HPG grid (trapPeak × hotTau, trapSigma=0.04 fixed):
 
 **Proposed round D:** test whether *lowering* `trapPeak` while keeping the strong `hotTau`=2e-14 heating still crosses that runaway threshold, just later in Vd - `trapPeak` ∈ {6e18, 6.5e18, 7e18, 7.5e18, 8e18}, `hotTau`=2e-14 fixed, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. 5 tasks.
 
+**Round D (job 43298204, `results/20260925_lateOnsetD/`):** `hotTau`=2e-14, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5 fixed, Vd 0-4.05V/0.15V. All 5 tasks clean, no crashes.
+
+| trapPeak | Result |
+|---|---|
+| 6e18 | peak 109.9 (Vd=1.65V) → 9.03 (Vd=2.1V), ~12.2x, recovers to 19.2 by 4.05V |
+| 6.5e18 | peak 99.9 (Vd=1.5V) → 2.53 (Vd=1.8V), ~39.5x, creeps to 6.91 by 4.05V |
+| 7e18 | peak 86.5 (Vd=1.2V) → 1.08 (Vd=1.65V), ~80x, creeps to 3.05 by 4.05V |
+| 7.5e18 | peak 75.7 (Vd=1.05V) → 0.527 (Vd=1.5V), ~144x, creeps to 1.51 by 4.05V |
+| 8e18 | peak 65.0 (Vd=0.9V) → 0.281 (Vd=1.35V), ~231x, creeps to 0.975 by 4.05V |
+
+**Clean, monotonic trend confirming the round-C hypothesis:** lowering `trapPeak` from 8e18 to 6e18 (at fixed `hotTau`=2e-14) pushes the runaway-collapse onset later (1.05V → 1.8V) *and* weakens the eventual depth (231x → 12x) at the same time - the two don't decouple along this axis alone. Onset is now within range-of-sight of 3V but depth is trading away as we get there.
+
+**Proposed round E:** push further in both directions at once - lower `trapPeak` *and* raise `hotTau` together, so the weaker charge gets more heating leverage once it does cross threshold. `trapPeak` ∈ {5e18, 5.5e18, 6e18} × `hotTau` ∈ {3e-14, 4e-14}, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. 6 tasks. (`hotTau` this high is new territory for this search, though F itself ran at 1.3e-13 without issue - the round-C crash was at *high* `trapPeak` + `hotTau` together, not `hotTau` alone, so this direction - low `trapPeak`, higher `hotTau` - looks lower-risk.)
+
 ---
 
 ## 11. Notebook and plotting

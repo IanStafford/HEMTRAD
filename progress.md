@@ -170,5 +170,20 @@ Ian before submitting.
 
 Ian approved. Submitted **job 43298204, array 0-4 (5 tasks)**, `ee1`
 QOS idle before submit. CSVs `pulsedIV_tp<trapPeak>.csv` + `params.json`
-into `results/20260925_lateOnsetD/task_<id>/`. Polling `squeue -u
-ianstafford` every 5 min.
+into `results/20260925_lateOnsetD/task_<id>/`.
+
+**Job 43298204 finished, all 5 tasks clean.** Full table in CLAUDE.md
+10b. Clean monotonic trend: lowering `trapPeak` 8e18→6e18 (at `hotTau`=
+2e-14) pushes onset later (1.05V→1.8V) but weakens depth (231x→12x) -
+the two axes don't decouple, confirms round C's hypothesis exactly.
+Best balance so far is `trapPeak`=6.5e18 (onset ~1.5-1.8V, ~39.5x) or
+7e18 (onset ~1.35-1.5V, ~80x) - getting onset further out than round C
+but still well short of 3V, and depth keeps shrinking as onset grows.
+
+Proposing round E: push `trapPeak` down *and* `hotTau` up together, so
+weaker charge still gets a strong runaway once triggered. `trapPeak` ∈
+{5e18, 5.5e18, 6e18} × `hotTau` ∈ {3e-14, 4e-14} - 6 tasks. `hotTau` this
+high hasn't been tried in this search but F itself ran at 1.3e-13 fine;
+the round-C crash was high `trapPeak` + high `hotTau` together, this is
+low `trapPeak` + higher `hotTau`, different corner. Checking with Ian
+before submitting.
