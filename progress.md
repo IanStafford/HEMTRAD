@@ -238,3 +238,13 @@ softer target; (2) the 33% crash rate is now costing real compute right
 in the region we care about - worth addressing (smaller `Vd_step` or
 more damping near the transition, solver-side per the rules) before
 another big grid, or push forward on the current driver as-is.
+
+**Ian's answers:** try `hotEb` next, and add the solver-side fix first.
+Made `pulsedIV.tcl`'s Newton damping an `info-exists` lever
+(`dampValue`, default 0.10 - unchanged behavior unless overridden).
+Round G: `Vd_step`=0.1 (was 0.15), `dampValue`=0.05 (was 0.10), plus a
+new `hotEb` sweep at 4 "late onset, weak depth" anchor points from
+round E/F (`trapPeak`/`hotTau` = 4e18/5e-14, 4.5e18/3e-14, 4.5e18/5e-14,
+5e18/3e-14) × `hotEb` ∈ {0.6, 0.7, 0.8, 0.9}, plus 2 extra at the
+best-depth control point (6e18/5e-14) × `hotEb` ∈ {0.6, 0.7} - 18
+tasks. `trapLevel`=0.35, `trapSigma`=0.04 fixed. Submitting this.

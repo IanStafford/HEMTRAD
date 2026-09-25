@@ -39,16 +39,17 @@ if {![info exists fillIters]} { set fillIters 4 }   ;# Te/solve/capture iteratio
 if {![info exists fillRelax]} { set fillRelax 0.5 } ;# Te under-relaxation per iteration
 
 if {![info exists ivCSV]} { set ivCSV "figures/pulsedIV.csv" } ;# columns: Vd, Id (mA/mm), peak Te (K)
+if {![info exists dampValue]} { set dampValue 0.10 } ;# Newton damping on Qfn/Qfp/DevPsi; smaller = more damped/stable, slower
 #==============================================
 
 source GaN_modelfile_masterD
 source rfdevice.tcl
 
-pdbSetDouble GaN Qfn DampValue 0.10
-pdbSetDouble GaN Qfp DampValue 0.10
-pdbSetDouble GaN DevPsi DampValue 0.10
-pdbSetDouble Nitride DevPsi DampValue 0.10
-pdbSetDouble AlGaN DevPsi DampValue 0.10
+pdbSetDouble GaN Qfn DampValue $dampValue
+pdbSetDouble GaN Qfp DampValue $dampValue
+pdbSetDouble GaN DevPsi DampValue $dampValue
+pdbSetDouble Nitride DevPsi DampValue $dampValue
+pdbSetDouble AlGaN DevPsi DampValue $dampValue
 
 Initialize
 device init
