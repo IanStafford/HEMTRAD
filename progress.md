@@ -112,4 +112,21 @@ resumed. Ian approved the round B grid. Submitted:
 `trapLevel` ∈ {0.35, 0.45} × `trapPeak` ∈ {8e18, 1.2e19, 1.6e19},
 `hotTau`=1e-14, `trapSigma`=0.04, `hotEb`=0.5, Vd 0-4.05V in 0.15V steps.
 CSVs `pulsedIV_tl<trapLevel>_tp<trapPeak>.csv` + `params.json` into
-`results/20260925_lateOnsetB/task_<id>/`. Polling `squeue -u $USER`.
+`results/20260925_lateOnsetB/task_<id>/`.
+
+**Job 43283546 finished, all 6 tasks clean** (no Newton failures/NaN/OOM,
+all 6 CSVs present, full 28 rows). Pulled back, analyzed. Full table in
+CLAUDE.md section 10b. Summary: `trapLevel`=0.35 is clearly better than
+0.45 or the original 0.55 - real "normal rise, then knee, then partial
+recovery" shapes instead of "no collapse" or "collapsed from the start."
+Best onset so far: `trapPeak`=8e18 gives a knee at Vd~1.5-1.8V (85.5→30.2
+mA/mm, ~2.8x, still shallow). Best depth so far: `trapPeak`=1.2e19 gives
+~10x (21.1→2.0 mA/mm) but onset is early (~0.6-0.9V). Neither is close to
+F's ~1000x, and both cases creep back up more than F did (30→52, 2→9 vs
+F's 0.006→0.018) - we're still short on total trapped charge to keep the
+channel pinched as Vd keeps rising.
+
+Proposing round C: `trapPeak` ∈ {8.5e18, 9.5e18, 1.05e19} (bracketing the
+round-B gap) × `hotTau` ∈ {1e-14, 2e-14} (more heating, for depth) at
+`trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5 - 6 tasks. Checking with
+Ian before submitting.

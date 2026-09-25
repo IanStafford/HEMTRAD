@@ -217,6 +217,21 @@ HPG grid (trapPeak × hotTau, trapSigma=0.04 fixed):
 
 **Working hypothesis for next round:** decouple those two effects with `trapLevel`. A shallower level (smaller eV, e.g. 0.35-0.45) empties out more at cold/zero-field equilibrium (per the existing trend row above), which should buy headroom to raise `trapPeak` well past 6-8e18 *without* pinching at rest, while `hotEb`/`hotTau` still control how much of that extra density gets pulled in once the channel heats up. Proposed next grid: `trapLevel` ∈ {0.35, 0.45} × `trapPeak` ∈ {8e18, 1.2e19, 1.6e19}, `hotTau` fixed at 1e-14 first (weakest tested so far that still shows any hot effect), `trapSigma`=0.04, `hotEb`=0.5. Check baseline (Vd≈0.15-0.3V) isn't already collapsed before trusting the rest.
 
+**Round B (job 43283546, `results/20260925_lateOnsetB/`):** `trapLevel` × `trapPeak` grid, `hotTau`=1e-14, `trapSigma`=0.04, `hotEb`=0.5, same Vd 0-4.05V/0.15V sweep.
+
+| trapLevel | trapPeak | Result |
+|---|---|---|
+| 0.35 | 8e18 | rises cleanly to 85.5 mA/mm (peak Vd=1.35V), knee down to 30.2 at Vd=1.8V (~2.8x drop, **onset delayed to ~1.5-1.8V**), creeps back up to 52.3 by 4.05V |
+| 0.35 | 1.2e19 | peaks 21.1 mA/mm (Vd=0.45V), drops ~10x to ~2.0 by Vd=0.75-0.9V, creeps back to 9.07 by 4.05V |
+| 0.35 | 1.6e19 | already declining by Vd=0.15V (peak only 2.76), too much charge again |
+| 0.45 | 8e18 | peaks 12.0 at Vd=0.3V, drops to 1.6-1.7 by Vd=0.6-0.9V (~7x), creeps to 5.6 by 4.05V |
+| 0.45 | 1.2e19 | already declining from the first point (peak 0.82 at Vd=0.15V), too much charge |
+| 0.45 | 1.6e19 | already fully collapsed at Vd=0.15V (peak 0.07) |
+
+`trapLevel`=0.35 clearly has more dynamic range than 0.45 or the original 0.55 - it's the first time we've gotten a real "normal rise, then knee, then partial recovery" shape instead of either "no collapse" or "collapsed from the start." But nothing here is close to F's ~1000x depth (best is ~10x, at `trapPeak`=1.2e19), and the deepest case (8e18) has the latest onset (~1.5-1.8V) but only ~2.8x depth - the sweet spot for *both* late onset and F-like depth is somewhere between these two `trapPeak` values, not yet bracketed. Also notable: all these collapses **partially recover** with rising Vd (30→52, 2→9) rather than staying collapsed like F's slow creep (0.006→0.018) - a much bigger relative recovery, suggesting we're still short of the total trapped charge needed to keep the channel pinched as Vd keeps rising.
+
+**Proposed round C:** narrow `trapPeak` between the two round-B extremes - {8.5e18, 9.5e18, 1.05e19} - crossed with `hotTau` ∈ {1e-14, 2e-14} (more heating, to deepen the collapse) at `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. 6 tasks.
+
 ---
 
 ## 11. Notebook and plotting
