@@ -263,6 +263,21 @@ HPG grid (trapPeak × hotTau, trapSigma=0.04 fixed):
 
 **Proposed round E:** push further in both directions at once - lower `trapPeak` *and* raise `hotTau` together, so the weaker charge gets more heating leverage once it does cross threshold. `trapPeak` ∈ {5e18, 5.5e18, 6e18} × `hotTau` ∈ {3e-14, 4e-14}, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. 6 tasks. (`hotTau` this high is new territory for this search, though F itself ran at 1.3e-13 without issue - the round-C crash was at *high* `trapPeak` + `hotTau` together, not `hotTau` alone, so this direction - low `trapPeak`, higher `hotTau` - looks lower-risk.)
 
+**Round E (job 43299061, `results/20260925_lateOnsetE/`):** `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5 fixed, Vd 0-4.05V/0.15V. All 6 clean, no crashes.
+
+| trapPeak | hotTau | Onset | Depth |
+|---|---|---|---|
+| 5e18 | 3e-14 | **~2.1-2.25V** (latest yet) | ~6.8x (118.9→17.5) |
+| 5e18 | 4e-14 | ~1.8-1.95V | ~25x (113.5→4.53) |
+| 5.5e18 | 3e-14 | ~1.8-1.95V | ~34.7x (111.3→3.20) |
+| 5.5e18 | 4e-14 | ~1.5-1.65V | ~115x (102.6→0.890) |
+| 6e18 | 3e-14 | ~1.5-1.65V | ~115x (98.5→0.857) |
+| 6e18 | 4e-14 | ~1.35-1.5V | **~395x** (90.1→0.228) |
+
+**Real breakthrough:** moving diagonally (lower `trapPeak`, higher `hotTau` together) beats moving along either axis alone - e.g. `trapPeak`=6e18/`hotTau`=4e-14 gives onset ~1.35-1.5V *and* ~395x depth, better on **both** counts than round D's `trapPeak`=8e18/`hotTau`=2e-14 (onset ~1.05-1.2V, ~231x). So `trapPeak` and `hotTau` aren't just redundant knobs on the same runaway threshold - going to lower charge + stronger (but still well below F's 1.3e-13) heating buys a better trade than either alone. Onset ~2.1-2.25V (at `trapPeak`=5e18/`hotTau`=3e-14) is the closest to 3V so far, though shallow there.
+
+**Proposed round F:** continue the same diagonal further out - `trapPeak` ∈ {4e18, 4.5e18, 5e18} × `hotTau` ∈ {5e-14, 6e-14}, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. 6 tasks. (Note `trapPeak`=4e18 is F's own charge, but F used `hotTau`=1.3e-13 which we know collapses far too early at 0.3V - staying at `hotTau`≤6e-14 keeps well clear of that.)
+
 ---
 
 ## 11. Notebook and plotting

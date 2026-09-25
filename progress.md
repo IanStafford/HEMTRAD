@@ -190,5 +190,18 @@ before submitting.
 
 Ian approved. Submitted **job 43299061, array 0-5 (6 tasks)**, `ee1`
 QOS idle before submit. CSVs `pulsedIV_tp<trapPeak>_ht<hotTau>.csv` +
-`params.json` into `results/20260925_lateOnsetE/task_<id>/`. Polling
-`squeue -u ianstafford` every 5 min.
+`params.json` into `results/20260925_lateOnsetE/task_<id>/`.
+
+**Job 43299061 finished, all 6 tasks clean.** Full table in CLAUDE.md
+10b. **Real breakthrough:** moving `trapPeak` down and `hotTau` up
+*together* beats moving along either axis alone -
+`trapPeak`=6e18/`hotTau`=4e-14 gives onset ~1.35-1.5V *and* ~395x depth,
+better on both counts than round D's best (`trapPeak`=8e18/`hotTau`=2e-14:
+onset ~1.05-1.2V, ~231x). Latest onset yet is `trapPeak`=5e18/`hotTau`=
+3e-14 at ~2.1-2.25V (but shallow, ~6.8x there).
+
+Proposing round F: keep pushing the same diagonal - `trapPeak` ∈
+{4e18, 4.5e18, 5e18} × `hotTau` ∈ {5e-14, 6e-14} - 6 tasks. `trapPeak`
+=4e18 is F's own charge, but staying well below F's `hotTau`=1.3e-13
+(which we know collapses at 0.3V) should keep this safely in the
+late-onset regime. Checking with Ian before submitting.
