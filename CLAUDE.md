@@ -322,6 +322,22 @@ Non-crashed / informative results:
 
 **Proposed round H:** keep lowering `trapPeak`/`hotTau` (continuing the established onset-delay direction) while tuning `hotEb` in the 0.6-0.8 range to hold depth near F's ~1000x, pushing onset further toward 3V. E.g. `trapPeak` ∈ {3e18, 3.5e18} × `hotTau` ∈ {4e-14, 5e-14, 6e-14} × `hotEb` ∈ {0.7, 0.8} - up to 18 tasks (some combos may be skipped if clearly redundant). Given the crash rate isn't fixable from the driver side, budget for ~30-55% of tasks being lost - the successful fraction has been enough to make real progress each round.
 
+**Round H results (job 43305778, `results/20260925_lateOnsetH/`):** 12/18 clean, 6 crashed (33%, back down from round G's 56% - reinforces that the crash rate is idiosyncratic per parameter point, not something our driver settings control). Best results yet:
+
+| trapPeak | hotTau | hotEb | Onset | Depth |
+|---|---|---|---|---|
+| **3e18** | **6e-14** | **0.8** | **~2.3-2.4V** | **~336x** (124.2→0.369), creeps to 2.17 by 4.05V - **latest onset with real (>100x) depth so far, and the shape (smooth rise, sharp ~336x drop, slow creep) is the closest match to F's qualitative curve yet** |
+| 3.5e18 | 6e-14 | 0.8 | ~2.0-2.1V | ~1277x (118.8→0.093), creeps to 1.10 by 4.05V - depth almost exactly matches F's ~1000x target |
+| 4e18 | 6e-14 | 0.7 | ~1.7-1.9V | ~1443x (114.3→0.079) |
+| 4e18 | 6e-14 | 0.8 | ~1.5-1.7V | ~37,500x (110.3→0.0029) - overshoots depth a lot |
+| 4e18 | 4e-14 | 0.8 | ~1.9-2.1V | ~5,676x (117.7→0.021) |
+| 3e18 | 4e-14 | 0.8 | ~2.3-2.6V | ~41x (127.2→3.08) - late but shallow |
+| 3.5e18 | 4e-14 | 0.7 | ~2.2-2.5V | ~25.6x (125.0→4.89) |
+
+**Two strong candidates now:** `trapPeak`=3e18/`hotTau`=6e-14/`hotEb`=0.8 (onset ~2.3-2.4V, ~336x - best onset match) and `trapPeak`=3.5e18/`hotTau`=6e-14/`hotEb`=0.8 (onset ~2.0-2.1V, ~1277x - best depth match). Both sit on the same `hotTau`=6e-14/`hotEb`=0.8 line; lower `trapPeak` clearly keeps buying later onset along it without the depth collapsing to near-nothing the way it did at `hotEb`=0.5.
+
+**Proposed round I:** push further along the same line - lower `trapPeak` toward {2.5e18, 2.75e18, 3e18, 3.25e18}, `hotTau` ∈ {6e-14, 7e-14}, `hotEb` ∈ {0.8, 0.85, 0.9} (skipping the 3 already-known cells), aiming to land onset closer to ~2.7-3V while keeping depth in the hundreds-x range. 18 tasks.
+
 ---
 
 ## 11. Notebook and plotting

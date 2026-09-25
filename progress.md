@@ -284,5 +284,24 @@ covered in round G) plus one extra (5e18/4e-14/0.7) - 18 tasks.
 (`Vd_step`=0.1, `dampValue`=0.05). Submitted **job 43305778, array 0-17
 (18 tasks)**, `ee1` QOS idle before submit. CSVs
 `pulsedIV_tp<trapPeak>_ht<hotTau>_eb<hotEb>.csv` + `params.json` into
-`results/20260925_lateOnsetH/task_<id>/`. Polling `squeue -u ianstafford`
-every 5 min.
+`results/20260925_lateOnsetH/task_<id>/`.
+
+**Job 43305778 finished: 12/18 clean, 6 crashed (33%, back down from
+round G's 56%)** - reinforces that the crash rate is idiosyncratic per
+point, not controlled by our driver settings. **Best results of the
+whole search:**
+- `trapPeak`=3e18/`hotTau`=6e-14/`hotEb`=0.8: **onset ~2.3-2.4V, ~336x
+  depth** (124.2→0.369, creeps to 2.17 by 4.05V) - latest onset with
+  real depth yet, and the closest overall shape match to F.
+- `trapPeak`=3.5e18/`hotTau`=6e-14/`hotEb`=0.8: onset ~2.0-2.1V, **~1277x
+  depth** (118.8→0.093) - almost exactly F's target depth.
+
+Both on the same `hotTau`=6e-14/`hotEb`=0.8 line; lower `trapPeak` keeps
+buying later onset without the depth collapsing to nothing, unlike at
+`hotEb`=0.5. Full table in CLAUDE.md 10b.
+
+Proposing round I: push further down this line - `trapPeak` ∈
+{2.5e18, 2.75e18, 3e18, 3.25e18} × `hotTau` ∈ {6e-14, 7e-14} × `hotEb`
+∈ {0.8, 0.85, 0.9} (skipping known cells) - 18 tasks, aiming for onset
+~2.7-3V with depth still in the hundreds-x range. Checking with Ian
+before submitting.
