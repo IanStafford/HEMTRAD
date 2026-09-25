@@ -276,3 +276,9 @@ depth near F's ~1000x. `trapPeak` ∈ {3e18, 3.5e18} × `hotTau` ∈
 {4e-14, 5e-14, 6e-14} × `hotEb` ∈ {0.7, 0.8} - up to 18 tasks. Given the
 crash isn't fixable from our side, budgeting for losing 30-55% of tasks
 per round going forward. Checking with Ian before submitting.
+
+Ian approved. `trapPeak` ∈ {3e18, 3.5e18, 4e18} × `hotTau` ∈
+{4e-14, 5e-14, 6e-14} × `hotEb` ∈ {0.7, 0.8} (skipping cells already
+covered in round G) plus one extra (5e18/4e-14/0.7) - 18 tasks.
+`trapLevel`=0.35, `trapSigma`=0.04, same solver settings as round G
+(`Vd_step`=0.1, `dampValue`=0.05). Submitting.
