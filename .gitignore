@@ -1,0 +1,6 @@
+results/
+*.out
+*.err
+_probe_*.tcl
+_probe_*.csv
+_probe_*.log

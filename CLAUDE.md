@@ -190,6 +190,33 @@ Trends:
 
 **Next step:** run F with `hotTau` ∈ {0.6e-13, 0.5e-13, 0.4e-13} as a 3-task HPG array, to move the onset to 0.4-0.5 V. Then set the best values as the defaults in `pulsedIV.tcl`. Note that F's pre-collapse current is also off: 7.8 / 7.0 mA/mm at 0.1 / 0.2 V vs target 9.75 / 19.0, and it *falls* with Vd where the target rises. Check pre-collapse shape against target before declaring a match.
 
+### 10b. Late-onset tuning (target: Run F's shape, but onset ~3 V instead of ~0.3 V)
+
+All runs below: Vg=-2, Vd 0-4.05 V in 0.15 V steps (coarse search resolution), `trapMeanY`=0.20, `hotEb`=0.5, `trapLevel`=0.55 (F's values). Job 43252782, `results/20260924_lateOnset/`.
+
+Local probes first (F's own trapPeak=4e18/trapSigma=0.04, hotTau only):
+| hotTau | Result |
+|---|---|
+| 1.3e-15 (naive 1/√hotTau extrapolation, 100x below F) | no collapse through Vd=4V; peak Te only 353K - heating too weak, full stop |
+| 1e-14 (10x below F) | only a shallow ~1.5x sag (42.4→28.9 mA/mm, Vd 0.75-1.25V), not dramatic |
+
+HPG grid (trapPeak × hotTau, trapSigma=0.04 fixed):
+| trapPeak | hotTau | Result |
+|---|---|---|
+| 4e18 | 1e-14 | no collapse; rises to 46.6 mA/mm by 4.05V |
+| 4e18 | 7e-15 | no collapse; rises to 66.4 mA/mm by 4.05V |
+| 4e18 | 5e-15 | no collapse; rises to 88.5 mA/mm by 4.05V |
+| 6e18 | 1e-14 | already collapsed at Vd=0.15 (2.5→0.49 mA/mm by 0.6V), not a late onset |
+| 6e18 | 7e-15 | already collapsed at Vd=0.15, same pattern |
+| 6e18 | 5e-15 | mostly flat ~3.5-4.8 mA/mm, barely any collapse |
+| 8e18 | 1e-14 | already collapsed at Vd=0.15 (channel pinched at rest) |
+| 8e18 | 7e-15 | already collapsed at Vd=0.15, same |
+| 8e18 | 5e-15 | already collapsed at Vd=0.15, same |
+
+**None of these hit the target.** trapPeak=4e18 (F's charge) never collapses once hotTau is cut enough to matter - lower hotTau trades depth for onset delay and there's no crossover before the effect just vanishes. trapPeak=6e18/8e18 (more charge, to try to restore depth) instead pinch the channel at rest (before the Vd sweep even starts, at Vd=0.15), because the *cold*, zero-field trap occupancy at `trapLevel`=0.55 eV is already large enough at that density - this has nothing to do with `hotTau`. So `trapPeak` alone can't add "hot-only" depth without also adding "always-on" depth.
+
+**Working hypothesis for next round:** decouple those two effects with `trapLevel`. A shallower level (smaller eV, e.g. 0.35-0.45) empties out more at cold/zero-field equilibrium (per the existing trend row above), which should buy headroom to raise `trapPeak` well past 6-8e18 *without* pinching at rest, while `hotEb`/`hotTau` still control how much of that extra density gets pulled in once the channel heats up. Proposed next grid: `trapLevel` ∈ {0.35, 0.45} × `trapPeak` ∈ {8e18, 1.2e19, 1.6e19}, `hotTau` fixed at 1e-14 first (weakest tested so far that still shows any hot effect), `trapSigma`=0.04, `hotEb`=0.5. Check baseline (Vd≈0.15-0.3V) isn't already collapsed before trusting the rest.
+
 ---
 
 ## 11. Notebook and plotting

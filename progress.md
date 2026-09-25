@@ -65,6 +65,36 @@ committed `pulsedIV_lateOnset.slurm` + `params_lateOnset.txt`, pushed
 (ea69ef7), pulled on HPG, `mkdir -p results/20260924_lateOnset`, and
 submitted: **job 43252782, array 0-8 (9 tasks)**, `ee1` QOS was idle
 before submit. Writing per-task CSVs `pulsedIV_tp<trapPeak>_ht<hotTau>.csv`
-+ `params.json` into `results/20260924_lateOnset/task_<id>/`. Polling
-`squeue -u $USER` every ~3 min; will check every task's `.out`/`.err` for
-Newton failures/NaN/OOM once it finishes, then `rsync` back and plot.
++ `params.json` into `results/20260924_lateOnset/task_<id>/`.
+
+**Job 43252782 finished, all 9 tasks clean** (no Newton failures/NaN/OOM
+in any `.out`/`.err`, all 9 CSVs present with the full 28 rows). Pulled
+back with `rsync`, analyzed. **Result: none of the 9 combos hit the
+target** - see CLAUDE.md section 10b for the full table. Summary:
+
+- `trapPeak`=4e18 (F's charge) + any tested `hotTau` (1e-14, 7e-15, 5e-15):
+  no collapse at all through Vd=4.05V - current just rises and plateaus
+  (46.6 / 66.4 / 88.5 mA/mm at 4.05V respectively). Confirms the local
+  probes: below a certain `hotTau`, the hot-electron effect just doesn't
+  trigger a collapse at F's charge, it doesn't merely delay it.
+- `trapPeak`=6e18 or 8e18 (more charge, meant to restore depth): channel
+  is **already collapsed by Vd=0.15V**, the very first sweep point - e.g.
+  6e18/1e-14 drops from 2.5 to 0.49 mA/mm by Vd=0.6V, and 8e18 cases sit
+  at 0.03-0.6 mA/mm from the start. This isn't a late onset, it's an
+  always-on collapse: the *cold*, zero-field trap occupancy at
+  `trapLevel`=0.55 eV is already large enough at these densities to pinch
+  the channel at rest, independent of `hotTau`.
+
+So `trapPeak` and `hotTau` don't decompose into independent "depth" and
+"onset" knobs the way the section 10 trends (fit near F) suggested -
+that breaks down over this much wider a sweep.
+
+**Proposed next round** (see CLAUDE.md 10b for the reasoning): use
+`trapLevel` to decouple cold (at-rest) occupancy from hot (Vd-driven)
+capture - shallower `trapLevel` empties more at rest, buying headroom to
+push `trapPeak` higher without an always-on collapse, while `hotEb`/
+`hotTau` still gate how much extra density the hot-electron process pulls
+in once the channel heats up. Grid: `trapLevel` ∈ {0.35, 0.45} ×
+`trapPeak` ∈ {8e18, 1.2e19, 1.6e19}, `hotTau`=1e-14 fixed, `trapSigma`=0.04,
+`hotEb`=0.5 - 6 tasks. Will check with Ian before submitting (new lever
+combination, not yet validated at any point).
