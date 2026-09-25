@@ -417,3 +417,28 @@ submitted the trap-placement array: **job 43366825, array 0-14
 (15 tasks)**. CSVs `pulsedIV_mx<trapMeanX>_my<trapMeanY>.csv` +
 `params.json` into `results/20260925_trapPlacement/task_<id>/`. Polling
 `squeue -u ianstafford` every 5 min.
+
+**Job 43366825 finished: all 15 tasks clean** (no crashes, no core dumps,
+all CSVs full 17 rows). Pulled back. Full table in CLAUDE.md section 10c.
+
+- **Lateral position (`trapMeanY`) is the strongest placement lever.**
+  Moving the blob from the gate edge toward the drain delays onset
+  (0.2-0.3V → 0.4-0.5V) and raises pre-collapse current (7.8 → 24.3
+  mA/mm at the surface), with pre-collapse Id rising with Vd instead of
+  falling as in F.
+- At the gate edge (y=0.125) the channel is pinched at rest for every
+  depth - no normal region.
+- Deeper traps (toward the 2DEG) give an earlier onset, lower
+  pre-collapse current, and a deeper collapse.
+- y=0.20/x=0 reproduces Run F exactly (sanity check).
+
+**Closest match to `radPlot1` yet: `trapMeanX`=0.0, `trapMeanY`=2.0** -
+8.62/16.9/24.3/20.6 mA/mm at 0.1-0.4V (target 9.75/19.0/27.2/32.0),
+collapse to 0.020 at 0.5V (target 0.011), then creeps 0.010 → 0.023 by
+1.6V. Onset exactly at 0.5V. Remaining miss is the 0.4V point, which
+already sags. Saved as `figures/pulsedIV_placement_x0_y2.csv`.
+
+**Waiting on Ian:** is a surface trap blob ~2 µm into the access region
+physically plausible? If so, next step is a finer `trapMeanY` scan
+between ~1.0 and ~3.0 at x=0 (maybe also x=0.0075) to fix the 0.4V
+point.

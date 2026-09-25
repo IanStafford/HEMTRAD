@@ -363,6 +363,35 @@ This does **not** change `pulsedIV.tcl`'s or `GaN_modelfile_masterD`'s defaults 
 
 **Search summary (rounds late-onset A through I):** found that `trapPeak` (total trapped charge) and `hotTau`/`hotEb` (heating strength/capture barrier) all couple onset and depth together - more of any one gives an earlier *and* deeper collapse, never just one or the other. Escaping that required moving *diagonally*: lowering `trapPeak` (which delays onset but weakens depth) while raising `hotEb` and `hotTau` together (which restores depth at the new, later onset). `hotEb` turned out to be the biggest lever discovered late in the search (round G) - largely independent of `trapPeak`/`hotTau`'s onset-setting role, it can turn a barely-visible sag into a >1000x collapse at the same onset point. Also found a solver crash (`munmap_chunk(): invalid pointer`, not Newton/NaN) that affects a variable, parameter-idiosyncratic fraction of runs (6-56% per round) - a smaller `Vd_step`/more damping did not reduce it, so it's likely a genuine FLOOXS numerical edge case rather than a stability issue fixable from the driver.
 
+### 10c. Trap placement study (`trapMeanX` × `trapMeanY`, Run F baseline)
+
+Job 43366825, `results/20260925_trapPlacement/`. One Gaussian trap blob per device, Run F's other levers (`trapPeak`=4e18, `trapSigma`=0.04, `trapLevel`=0.55, `hotEb`=0.5, `hotTau`=1.3e-13), Vg=-2, Vd 0-1.6V/0.1V. All 15 tasks clean, no crashes. Geometry (`rfdevice.tcl`): gate y=[-0.125,0.125], field plate y=[0.285,0.725], drain contact y=3.41; x=0 AlGaN surface, x=0.015 2DEG interface.
+
+Pre-collapse Id (mA/mm) at Vd=0.1-0.5V, and onset (first Vd where Id < peak/10):
+
+| trapMeanX \ trapMeanY | 0.125 (gate edge) | 0.20 (F) | 0.285 (FP left) | 0.725 (FP right) | 2.0 (access) |
+|---|---|---|---|---|---|
+| 0.0 (surface) | ~1e-3 → pinched at rest | 7.8, 7.0, **0.006** @0.3 | 8.1, 13.2, **0.018** @0.3 | 8.3, 15.8, 1.27, **0.007** @0.3-0.4 | 8.6, 16.9, 24.3, 20.6, **0.020** @0.5 |
+| 0.0075 (mid-AlGaN) | ~5e-4 → pinched | 7.1, **0.010** @0.2 | 7.5, **0.052** @0.2 | 7.9, 12.9, **0.004** @0.3 | 8.4, 16.1, 19.0, **0.016** @0.4 |
+| 0.015 (2DEG) | ~4e-4 → pinched | 6.6, **0.003** @0.2 | 7.2, **0.009** @0.2 | 7.7, 7.3, **0.002** @0.3 | 8.2, 15.6, 6.3, **0.008** @0.4 |
+
+Depths are 2,400x-37,000x everywhere except the gate edge. Trends:
+- **Lateral (`trapMeanY`) is the strongest placement lever.** Moving the blob from the gate edge toward the drain delays onset (0.2-0.3V → 0.4-0.5V) and raises the pre-collapse current (peak 7.8 → 24.3 mA/mm at the surface), with the pre-collapse Id *rising* with Vd instead of falling as in F.
+- **At the gate edge (y=0.125) the channel is pinched at rest** for every depth (Id ~1e-3 to 1e-4 mA/mm from the first point) - no normal region at all.
+- **Depth (`trapMeanX`) moving toward the 2DEG** gives an earlier onset, lower pre-collapse current, and a deeper collapse - consistent with traps nearer the channel depleting it more directly.
+- The y=0.20 surface cell reproduces Run F exactly (7.8, 7.0, 0.006 at 0.3V), a good sanity check.
+
+**Closest match to `radPlot1` so far: `trapMeanX`=0.0, `trapMeanY`=2.0** (saved as `figures/pulsedIV_placement_x0_y2.csv`):
+
+| Vd | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 |
+|---|---|---|---|---|---|---|
+| this run | 8.62 | 16.9 | 24.3 | 20.6 | 0.020 | 0.012 |
+| radPlot1 | 9.75 | 19.0 | 27.2 | 32.0 | 0.011 | 0.004 |
+
+Onset lands exactly at 0.5V and the depth matches (0.020 vs 0.011 at 0.5V), with a physical creep-up afterward (0.010 at 0.8V → 0.023 at 1.6V). Pre-collapse tracks the target within ~11% through 0.3V; the remaining miss is at 0.4V, where the run has already started to sag (20.6 vs 32.0). This resolves most of the §10 "Next step" concern about F's pre-collapse *falling* with Vd - that came largely from the trap placement near the gate, not from `hotTau`.
+
+**Open question for Ian:** is a surface trap blob ~2 µm into the gate-drain access region physically plausible for this radiation damage? The grid only sampled y=0.725 and 2.0 in that range, so the next step would be a finer `trapMeanY` scan between ~1.0 and ~3.0 at x=0 (and maybe x=0.0075) to fix the 0.4V point.
+
 ---
 
 ## 11. Notebook and plotting
