@@ -59,5 +59,12 @@ trend covers, so flagging before committing HPG resources to a grid.
 - Once a combo lands onset near 3V with a ~1000x drop, follow up with a
   single full-resolution (0.1V step) confirmation run.
 
-**Waiting on Ian's go-ahead before `sbatch`** (hard rule, and this is a
-real physics-lever decision, not just re-running a validated config).
+**Ian approved the grid as proposed.** Made `pulsedIV.tcl`'s levers
+`info-exists`-guarded (defaults unchanged) so tasks can override them,
+committed `pulsedIV_lateOnset.slurm` + `params_lateOnset.txt`, pushed
+(ea69ef7), pulled on HPG, `mkdir -p results/20260924_lateOnset`, and
+submitted: **job 43252782, array 0-8 (9 tasks)**, `ee1` QOS was idle
+before submit. Writing per-task CSVs `pulsedIV_tp<trapPeak>_ht<hotTau>.csv`
++ `params.json` into `results/20260924_lateOnset/task_<id>/`. Polling
+`squeue -u $USER` every ~3 min; will check every task's `.out`/`.err` for
+Newton failures/NaN/OOM once it finishes, then `rsync` back and plot.
