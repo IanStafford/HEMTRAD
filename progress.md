@@ -251,5 +251,28 @@ tasks. `trapLevel`=0.35, `trapSigma`=0.04 fixed. Submitted **job
 43303128, array 0-17 (18 tasks)**, `ee1` QOS idle before submit. Longer
 `--time=02:30:00` given the finer `Vd_step` and heavier damping. CSVs
 `pulsedIV_tp<trapPeak>_ht<hotTau>_eb<hotEb>.csv` + `params.json` into
-`results/20260925_lateOnsetG/task_<id>/`. Polling `squeue -u ianstafford`
-every 5 min.
+`results/20260925_lateOnsetG/task_<id>/`.
+
+**Job 43303128 finished: 8/18 clean, 10 crashed (56%)** - worse than
+round F's 33%, despite the solver-side fix. Crash pattern doesn't
+correlate cleanly with `hotEb` (alternates success/crash at the same
+`trapPeak`/`hotTau` as `hotEb` increases), so this looks like a genuine
+FLOOXS numerical edge case, not something fixable from the driver side.
+Deleted ~11.6GB of core dumps.
+
+**But huge result from the 8 that succeeded: `hotEb` is a massive,
+mostly-independent depth lever.** At `trapPeak`=4e18/`hotTau`=5e-14
+(only ~2.3x deep at `hotEb`=0.5), `hotEb`=0.7 gives **~750x depth at
+onset ~1.9-2.0V** - the best combined late-onset + F-matching-depth
+result of the whole search. `trapPeak`=5e18/`hotTau`=3e-14/`hotEb`=0.7
+does even better on depth: ~8,300x at onset ~1.6-1.8V. Higher `hotEb`
+(0.8-0.9) overshoots to essentially fully-off (100,000x-2,000,000x),
+more dramatic than F but with an earlier onset. Full table in CLAUDE.md
+10b.
+
+Proposing round H: keep lowering `trapPeak`/`hotTau` while holding
+`hotEb` around 0.7-0.8 to push onset further toward 3V while keeping
+depth near F's ~1000x. `trapPeak` ∈ {3e18, 3.5e18} × `hotTau` ∈
+{4e-14, 5e-14, 6e-14} × `hotEb` ∈ {0.7, 0.8} - up to 18 tasks. Given the
+crash isn't fixable from our side, budgeting for losing 30-55% of tasks
+per round going forward. Checking with Ian before submitting.

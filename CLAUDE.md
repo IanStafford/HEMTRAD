@@ -303,6 +303,25 @@ Non-crashed / informative results:
 
 **Round G (job 43303128, `results/20260925_lateOnsetG/`):** solver fix (`Vd_step`=0.1 instead of 0.15, `dampValue`=0.05 instead of 0.10) applied together with a new `hotEb` sweep. Anchors (`trapPeak`, `hotTau`) picked from the "late onset, weak depth" cells in round F/E - A=4e18/5e-14, B=4.5e18/3e-14, C=4.5e18/5e-14, D=5e18/3e-14 - each crossed with `hotEb` ∈ {0.6, 0.7, 0.8, 0.9}, plus 2 extra at the best-depth control point 6e18/5e-14 (`hotEb` ∈ {0.6, 0.7}) to see how `hotEb` affects an already-deep case. 18 tasks, `trapLevel`=0.35, `trapSigma`=0.04 fixed.
 
+**Round G results.** Crash rate went *up*, not down: **10/18 (56%)** hit the same `munmap_chunk()` abort, vs round F's 33% - the solver-side fix (finer `Vd_step`, more damping) did not help, and the crash pattern doesn't correlate cleanly with `hotEb` (e.g. at `trapPeak`=4e18/`hotTau`=5e-14: `hotEb`=0.6 crashed, 0.7 succeeded, 0.8 crashed, 0.9 succeeded - alternating, not monotonic). This looks more like a genuine numerical edge case in the FLOOXS binary itself (triggered by some specific field/value state near the transition) than a step-size/damping stability issue we can tune away from the driver side. Deleted ~11.6GB of core dumps (HPG + local).
+
+**But the 8 successful tasks are the best results of the whole search:**
+
+| trapPeak | hotTau | hotEb | Onset | Depth |
+|---|---|---|---|---|
+| 4e18 | 5e-14 | 0.7 | **~1.9-2.0V** | ~750x (117.6→0.156) |
+| 4e18 | 5e-14 | 0.9 | ~1.6-1.7V | ~218,000x (111.5→0.00051) |
+| 4.5e18 | 3e-14 | 0.9 | ~1.7-1.8V | ~226,000x (113.5→0.0005) |
+| 4.5e18 | 5e-14 | 0.6 | ~1.7-1.8V | ~349x (112.9→0.324) |
+| 4.5e18 | 5e-14 | 0.8 | ~1.4-1.5V | ~181,000x (102.9→0.00057) |
+| 4.5e18 | 5e-14 | 0.9 | ~1.3-1.4V | ~2,360,000x (98.2→4.2e-5) |
+| **5e18** | **3e-14** | **0.7** | **~1.6-1.8V** | **~8,300x (111.2→0.0134)** |
+| 6e18 | 5e-14 | 0.6 | ~1.0-1.1V | ~14,600x (72.4→0.0049) |
+
+**`hotEb` is a huge independent depth lever** - at the same `trapPeak`=4e18/`hotTau`=5e-14 that gave only ~2.3x depth at `hotEb`=0.5 (round F), `hotEb`=0.7 gives ~750x and `hotEb`=0.9 gives ~218,000x. Raising `hotEb` follows the same earlier-and-deeper coupling as `trapPeak`/`hotTau` (0.7→0.9 at the same anchor moves onset from ~2.0V to ~1.7V while deepening ~300x further), so it's not an escape from the tension, but it shifts the whole achievable region: we can now get **F-matching depth (100s-1000s x) at onset ~1.6-2.0V**, later than any `hotEb`=0.5 result. Best single match to F's actual target (~1000x): `trapPeak`=5e18/`hotTau`=3e-14/`hotEb`=0.7 - onset ~1.6-1.8V, depth ~8,300x (deeper than F but same dramatic-collapse-then-slow-creep shape), or `trapPeak`=4e18/`hotTau`=5e-14/`hotEb`=0.7 - onset ~2.0V, depth ~750x (very close to F's actual ~1000x, latest onset of any good match yet).
+
+**Proposed round H:** keep lowering `trapPeak`/`hotTau` (continuing the established onset-delay direction) while tuning `hotEb` in the 0.6-0.8 range to hold depth near F's ~1000x, pushing onset further toward 3V. E.g. `trapPeak` ∈ {3e18, 3.5e18} × `hotTau` ∈ {4e-14, 5e-14, 6e-14} × `hotEb` ∈ {0.7, 0.8} - up to 18 tasks (some combos may be skipped if clearly redundant). Given the crash rate isn't fixable from the driver side, budget for ~30-55% of tasks being lost - the successful fraction has been enough to make real progress each round.
+
 ---
 
 ## 11. Notebook and plotting
