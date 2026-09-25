@@ -366,4 +366,22 @@ mid-AlGaN, 2DEG interface) × `trapMeanY` ∈ {0.125, 0.20, 0.285, 0.725,
 2.0} (gate edge, the value used throughout tuning, field-plate-left
 edge, field-plate-right edge, deep access near drain) - 15 devices.
 Committed `pulsedIV_trapPlacement.slurm` + `params_trapPlacement.txt`.
-Submitting.
+
+**HPG connection dropped mid-submit.** The `ssh hpg` command to pull,
+check QOS, `mkdir`, and `sbatch` the array hung past 120s and was killed
+by Ian; a follow-up `squeue` check also hung and was killed. `ssh -O
+check hpg` then failed outright: `Control socket connect(...): No such
+file or directory` - the multiplexed master connection is gone, not
+just slow. Per the hard rule: **stopping here, not retrying, not
+opening a new connection** (would stall on Duo, which I can't answer).
+**Unknown whether `sbatch` actually ran** before the first command was
+killed - need to check `squeue`/job history once the connection is back
+before resubmitting, to avoid a duplicate array.
+
+Also updated CLAUDE.md per Ian: HPG polling interval is now 5 minutes
+as the standing default (was "every 2-3 minutes"), for all future
+submissions unless he says otherwise for a specific run.
+
+**Waiting on Ian to re-authenticate the HPG connection** (his morning
+Duo tmux session) before the trap-placement job can be confirmed/
+submitted.
