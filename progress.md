@@ -96,5 +96,10 @@ push `trapPeak` higher without an always-on collapse, while `hotEb`/
 `hotTau` still gate how much extra density the hot-electron process pulls
 in once the channel heats up. Grid: `trapLevel` ∈ {0.35, 0.45} ×
 `trapPeak` ∈ {8e18, 1.2e19, 1.6e19}, `hotTau`=1e-14 fixed, `trapSigma`=0.04,
-`hotEb`=0.5 - 6 tasks. Will check with Ian before submitting (new lever
-combination, not yet validated at any point).
+`hotEb`=0.5 - 6 tasks.
+
+**Ian asked to stop here for now and review before another HPG run.**
+Nothing further submitted. No pending jobs on HPG (`ee1` QOS idle). Task
+is paused, not abandoned - the `trapLevel`×`trapPeak` grid above is ready
+to go (driver already supports it via the `info-exists` overrides) once
+he says go.
