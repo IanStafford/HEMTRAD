@@ -232,6 +232,23 @@ HPG grid (trapPeak × hotTau, trapSigma=0.04 fixed):
 
 **Proposed round C:** narrow `trapPeak` between the two round-B extremes - {8.5e18, 9.5e18, 1.05e19} - crossed with `hotTau` ∈ {1e-14, 2e-14} (more heating, to deepen the collapse) at `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. 6 tasks.
 
+**Round C (job 43297414, `results/20260925_lateOnsetC/`):** same fixed levers as round B (`trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5), Vd 0-4.05V/0.15V.
+
+| trapPeak | hotTau | Result |
+|---|---|---|
+| 8.5e18 | 1e-14 | peak 74.7 (Vd=1.2V) → 16.1 (Vd=1.65V), ~4.6x, recovers to 33.6 by 4.05V |
+| 8.5e18 | 2e-14 | peak 54.6 (Vd=0.75V) → **0.174 (Vd=1.2V), ~314x** - creeps to 0.627 by 4.05V, much closer to F's shape |
+| 9.5e18 | 1e-14 | peak 54.8 (Vd=0.9V) → 6.58 (Vd=1.35V), ~8.3x, recovers to 16.7 by 4.05V |
+| 9.5e18 | 2e-14 | peak 40.1 (Vd=0.6V) → **0.116 (Vd=0.9V), ~346x** - creeps to 0.596 by 4.05V |
+| 1.05e19 | 1e-14 | peak 37.4 (Vd=0.6V) → 3.59 (Vd=1.05V), ~10.4x, recovers to 11.9 by 4.05V |
+| 1.05e19 | 2e-14 | **crashed** (`munmap_chunk(): invalid pointer`, core dump, mid-sweep at Vd≈1.35V) - not a Newton/NaN failure, a solver abort. Partial data shows peak 27.8 (Vd=0.45V) → 0.074 (Vd=0.75V), ~378x, already the earliest-onset, deepest trend of the three `trapPeak` values before it died. Not retried; flagging per the "propose before changing physics" rule - this is right at the edge of the grid, not clearly a physics problem, likely just an extreme-value numerical crash. |
+
+**Best result so far by far:** `trapPeak`=8.5e18, `hotTau`=2e-14 - a genuine ~300x collapse (54.6→0.174 mA/mm) with a creep-up afterward (0.174→0.627), the same qualitative shape as F. Onset is ~0.9-1.2V, still short of the ~3V target, but this is the first combo with F-like *depth*.
+
+**Clear trend across B and C:** raising either `trapPeak` or `hotTau` makes the collapse both earlier *and* deeper - they don't trade off independently near this threshold. The jump from "shallow sag" (4-10x, `hotTau`=1e-14) to "dramatic collapse" (200-380x, `hotTau`=2e-14) at the *same* `trapPeak` looks like a threshold/runaway effect (heating fills more traps → more field → more heating), not a smooth function of the levers - consistent with the positive-feedback trap/Te loop described in section 7.
+
+**Proposed round D:** test whether *lowering* `trapPeak` while keeping the strong `hotTau`=2e-14 heating still crosses that runaway threshold, just later in Vd - `trapPeak` ∈ {6e18, 6.5e18, 7e18, 7.5e18, 8e18}, `hotTau`=2e-14 fixed, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. 5 tasks.
+
 ---
 
 ## 11. Notebook and plotting

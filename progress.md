@@ -138,5 +138,32 @@ queue instead of filtering, looks like an argument-passing quirk with
 `-c`; sticking to the `bash -l <<'REMOTE' ... REMOTE` heredoc form for
 all HPG commands per CLAUDE.md). CSVs
 `pulsedIV_tp<trapPeak>_ht<hotTau>.csv` + `params.json` into
-`results/20260925_lateOnsetC/task_<id>/`. Polling `squeue -u ianstafford`
-every 5 min.
+`results/20260925_lateOnsetC/task_<id>/`.
+
+**Job 43297414 finished: 5/6 tasks clean, 1 crashed.** Task 5
+(`trapPeak`=1.05e19, `hotTau`=2e-14) aborted mid-sweep (Vd≈1.35V) with
+`munmap_chunk(): invalid pointer` - a solver-level crash/core dump, not a
+Newton-failed or NaN. Deleted the 1.9GB core file (both copies, HPG and
+local) after confirming it wasn't needed for diagnosis. Not retrying that
+point for now - flagging rather than guessing at a physics fix, per the
+"propose before changing anything trap/Poisson-related" rule, though
+this looks like a numerical edge-case crash rather than a physics issue.
+
+**Big result: `trapPeak`=8.5e18, `hotTau`=2e-14 gives a real ~300x
+collapse** (54.6 → 0.174 mA/mm at Vd=0.75→1.2V), creeping to 0.627 by
+4.05V - the same qualitative shape as F, first time we've beaten ~10x
+depth. `trapPeak`=9.5e18 at the same `hotTau` gave ~346x (onset a bit
+earlier, ~0.6-0.9V). Full table in CLAUDE.md section 10b.
+
+Trend: raising `trapPeak` *or* `hotTau` makes the collapse both earlier
+**and** deeper together - looks like a threshold/runaway effect (more
+trapping → more field → more heating → more trapping) rather than two
+independently-tunable knobs. Onset is still only ~0.9-1.2V, well short
+of 3V, but depth is finally in the right ballpark.
+
+Proposing round D: test whether *lowering* `trapPeak` while keeping
+`hotTau`=2e-14 (the heating level that crosses the runaway threshold)
+pushes the same threshold-crossing later in Vd while keeping the depth.
+`trapPeak` ∈ {6e18, 6.5e18, 7e18, 7.5e18, 8e18}, `hotTau`=2e-14 fixed,
+`trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5 - 5 tasks. Checking with
+Ian before submitting.
