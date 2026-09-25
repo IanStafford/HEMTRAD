@@ -301,7 +301,7 @@ Non-crashed / informative results:
 
 **Ian's answers:** try `hotEb` next; also add the solver-side fix before the next grid. `pulsedIV.tcl`'s damping is now a lever (`dampValue`, `info-exists`-guarded, default 0.10 = unchanged behavior) instead of hardcoded 0.10.
 
-**Round G (job TBD, `results/20260925_lateOnsetG/`):** solver fix (`Vd_step`=0.1 instead of 0.15, `dampValue`=0.05 instead of 0.10) applied together with a new `hotEb` sweep. Anchors (`trapPeak`, `hotTau`) picked from the "late onset, weak depth" cells in round F/E - A=4e18/5e-14, B=4.5e18/3e-14, C=4.5e18/5e-14, D=5e18/3e-14 - each crossed with `hotEb` ∈ {0.6, 0.7, 0.8, 0.9}, plus 2 extra at the best-depth control point 6e18/5e-14 (`hotEb` ∈ {0.6, 0.7}) to see how `hotEb` affects an already-deep case. 18 tasks, `trapLevel`=0.35, `trapSigma`=0.04 fixed.
+**Round G (job 43303128, `results/20260925_lateOnsetG/`):** solver fix (`Vd_step`=0.1 instead of 0.15, `dampValue`=0.05 instead of 0.10) applied together with a new `hotEb` sweep. Anchors (`trapPeak`, `hotTau`) picked from the "late onset, weak depth" cells in round F/E - A=4e18/5e-14, B=4.5e18/3e-14, C=4.5e18/5e-14, D=5e18/3e-14 - each crossed with `hotEb` ∈ {0.6, 0.7, 0.8, 0.9}, plus 2 extra at the best-depth control point 6e18/5e-14 (`hotEb` ∈ {0.6, 0.7}) to see how `hotEb` affects an already-deep case. 18 tasks, `trapLevel`=0.35, `trapSigma`=0.04 fixed.
 
 ---
 

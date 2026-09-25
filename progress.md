@@ -247,4 +247,9 @@ new `hotEb` sweep at 4 "late onset, weak depth" anchor points from
 round E/F (`trapPeak`/`hotTau` = 4e18/5e-14, 4.5e18/3e-14, 4.5e18/5e-14,
 5e18/3e-14) × `hotEb` ∈ {0.6, 0.7, 0.8, 0.9}, plus 2 extra at the
 best-depth control point (6e18/5e-14) × `hotEb` ∈ {0.6, 0.7} - 18
-tasks. `trapLevel`=0.35, `trapSigma`=0.04 fixed. Submitting this.
+tasks. `trapLevel`=0.35, `trapSigma`=0.04 fixed. Submitted **job
+43303128, array 0-17 (18 tasks)**, `ee1` QOS idle before submit. Longer
+`--time=02:30:00` given the finer `Vd_step` and heavier damping. CSVs
+`pulsedIV_tp<trapPeak>_ht<hotTau>_eb<hotEb>.csv` + `params.json` into
+`results/20260925_lateOnsetG/task_<id>/`. Polling `squeue -u ianstafford`
+every 5 min.
