@@ -16,27 +16,29 @@
 window row=1 col=1
 
 #=================== levers ===================
+# Each has an `info exists` default so a driver copy or array task can
+# override it (`set <lever> <value>`) before sourcing this file.
 # trap distribution (radiation damage)
-set trapEn    1
-set trapPeak  4e18    ;# peak trap density (cm^-3)
-set trapMeanX 0.0     ;# Gaussian center, depth (um; 0 = AlGaN top, 0.015 = 2DEG)
-set trapMeanY 0.20    ;# Gaussian center, lateral (um; gate drain edge = 0.125)
-set trapSigma 0.025   ;# Gaussian spatial sigma (um)
-set trapLevel 0.68    ;# trap depth below Ec (eV)
-set trapWidth 0.1     ;# energy FWHM (eV)
+if {![info exists trapEn]}    { set trapEn    1 }
+if {![info exists trapPeak]}  { set trapPeak  4e18 }   ;# peak trap density (cm^-3)
+if {![info exists trapMeanX]} { set trapMeanX 0.0 }    ;# Gaussian center, depth (um; 0 = AlGaN top, 0.015 = 2DEG)
+if {![info exists trapMeanY]} { set trapMeanY 0.20 }   ;# Gaussian center, lateral (um; gate drain edge = 0.125)
+if {![info exists trapSigma]} { set trapSigma 0.025 }  ;# Gaussian spatial sigma (um)
+if {![info exists trapLevel]} { set trapLevel 0.68 }   ;# trap depth below Ec (eV)
+if {![info exists trapWidth]} { set trapWidth 0.1 }    ;# energy FWHM (eV)
 
 # hot-electron capture
-set hotEb   0.3       ;# capture barrier (eV); larger = hot electrons out-capture cold ones more (earlier, deeper collapse)
-set hotTau  1.0e-13   ;# energy relaxation time (s); larger = hotter at a given field
+if {![info exists hotEb]}  { set hotEb  0.3 }     ;# capture barrier (eV); larger = hot electrons out-capture cold ones more (earlier, deeper collapse)
+if {![info exists hotTau]} { set hotTau 1.0e-13 } ;# energy relaxation time (s); larger = hotter at a given field
 
 # sweep (curve tracer)
-set Vg_meas   -2.0
-set Vd_max    1.6
-set Vd_step   0.1
-set fillIters 4       ;# Te/solve/capture iterations per Vd point
-set fillRelax 0.5     ;# Te under-relaxation per iteration
+if {![info exists Vg_meas]}   { set Vg_meas   -2.0 }
+if {![info exists Vd_max]}    { set Vd_max    1.6 }
+if {![info exists Vd_step]}   { set Vd_step   0.1 }
+if {![info exists fillIters]} { set fillIters 4 }   ;# Te/solve/capture iterations per Vd point
+if {![info exists fillRelax]} { set fillRelax 0.5 } ;# Te under-relaxation per iteration
 
-set ivCSV "figures/pulsedIV.csv"   ;# columns: Vd, Id (mA/mm), peak Te (K)
+if {![info exists ivCSV]} { set ivCSV "figures/pulsedIV.csv" } ;# columns: Vd, Id (mA/mm), peak Te (K)
 #==============================================
 
 source GaN_modelfile_masterD
