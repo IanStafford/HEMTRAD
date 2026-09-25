@@ -130,3 +130,13 @@ Proposing round C: `trapPeak` ∈ {8.5e18, 9.5e18, 1.05e19} (bracketing the
 round-B gap) × `hotTau` ∈ {1e-14, 2e-14} (more heating, for depth) at
 `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5 - 6 tasks. Checking with
 Ian before submitting.
+
+Ian approved. Submitted **job 43297414, array 0-5 (6 tasks)**, `ee1`
+QOS idle before submit (confirmed via the heredoc form - a bare
+`ssh hpg bash -l -c 'squeue -A ee1'` earlier printed the whole cluster's
+queue instead of filtering, looks like an argument-passing quirk with
+`-c`; sticking to the `bash -l <<'REMOTE' ... REMOTE` heredoc form for
+all HPG commands per CLAUDE.md). CSVs
+`pulsedIV_tp<trapPeak>_ht<hotTau>.csv` + `params.json` into
+`results/20260925_lateOnsetC/task_<id>/`. Polling `squeue -u ianstafford`
+every 5 min.
