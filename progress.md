@@ -310,3 +310,20 @@ Ian approved. Submitted **job 43307897, array 0-17 (18 tasks)**, `ee1`
 QOS idle before submit. CSVs `pulsedIV_tp<trapPeak>_ht<hotTau>_eb<hotEb>.csv`
 + `params.json` into `results/20260925_lateOnsetI/task_<id>/`. Polling
 `squeue -u ianstafford` every 5 min.
+
+**Job 43307897 finished: 17/18 clean, only 1 crash (6%)** - crash rate
+keeps dropping (56%→33%→6%) with no driver-setting change behind it,
+strong evidence it's idiosyncratic per parameter point, not something we
+control from the driver.
+
+**Best result of the whole search:** `trapPeak`=3e18/`hotTau`=6e-14/
+`hotEb`=0.85 - peak 123.1 mA/mm at Vd=2.1V, sharp collapse to 0.132 at
+2.3V, min 0.061 at 2.4V (**onset ~2.2-2.3V, depth ~2004x**, same order
+of magnitude as F's ~1000x target), then creeps 0.061→0.542 by 4.05V -
+same qualitative shape as F. Onset is now 7x later than F's own 0.3V.
+Full table in CLAUDE.md 10b.
+
+Proposing round J: push further - `trapPeak` ∈ {2.5e18, 2.6e18, 2.75e18}
+× `hotEb` ∈ {0.9, 0.95} × `hotTau` ∈ {7e-14, 8e-14}, aiming for onset
+~2.5-2.8V while holding depth in the hundreds-to-thousands range.
+Checking with Ian before submitting.

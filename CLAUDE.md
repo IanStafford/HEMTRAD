@@ -338,6 +338,21 @@ Non-crashed / informative results:
 
 **Proposed round I:** push further along the same line - lower `trapPeak` toward {2.5e18, 2.75e18, 3e18, 3.25e18}, `hotTau` ∈ {6e-14, 7e-14}, `hotEb` ∈ {0.8, 0.85, 0.9} (skipping the 3 already-known cells), aiming to land onset closer to ~2.7-3V while keeping depth in the hundreds-x range. 18 tasks.
 
+**Round I results (job 43307897, `results/20260925_lateOnsetI/`): 17/18 clean, only 1 crash** (back down further, from 33%→6% - strong evidence the crash rate is idiosyncratic per parameter point, not our driver settings).
+
+**Best result of the entire search:** `trapPeak`=3e18/`hotTau`=6e-14/`hotEb`=0.85 - peak 123.1 mA/mm at Vd=2.1V, stays near-peak to 2.2V, then a sharp collapse to 0.132 at Vd=2.3V and 0.061 at Vd=2.4V (**onset ~2.2-2.3V, depth ~2004x** - same order of magnitude as F's ~1000x), then a slow creep 0.061→0.542 by Vd=4.05V (~8.9x creep, same qualitative shape as F). This is the closest match to the target (Vd~3V, ~1000x, F-like shape) found so far - onset is now 7x later than F's own 0.3V, in the same ballpark as depth.
+
+Other notable points:
+| trapPeak | hotTau | hotEb | Onset | Depth |
+|---|---|---|---|---|
+| 3e18 | 7e-14 | 0.85 | ~2.0-2.3V | ~1441x |
+| 3e18 | 7e-14 | 0.9 | ~2.0-2.3V | ~4817x (overshoots) |
+| 3.25e18 | 6e-14 | 0.8 | ~2.0-2.3V | ~513x |
+| 2.75e18 | 6e-14 | 0.9 | **~2.3-2.4V** (latest full-depth onset yet) | ~443x |
+| 2.75e18 | 7e-14 | 0.9 | ~2.1-2.4V | ~843x |
+
+**Proposed round J:** push further - lower `trapPeak` toward {2.5e18, 2.6e18, 2.75e18} with higher `hotEb` ∈ {0.9, 0.95} and `hotTau` ∈ {7e-14, 8e-14} to try to reach onset ~2.5-2.8V while holding depth in the hundreds-to-thousands range - continuing to close the gap to 3V.
+
 ---
 
 ## 11. Notebook and plotting
