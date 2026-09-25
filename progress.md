@@ -209,5 +209,10 @@ late-onset regime. Checking with Ian before submitting.
 Ian asked for bigger rounds - up to 18 tasks at once (near the 19-CPU
 QOS cap) instead of 6, to cover more ground per round-trip. Revised round
 F to an 18-task grid: `trapPeak` ∈ {3.5e18, 4e18, 4.5e18, 5e18, 5.5e18,
-6e18} × `hotTau` ∈ {3e-14, 4e-14, 5e-14}, same fixed levers. Submitting
-this.
+6e18} × `hotTau` ∈ {3e-14, 4e-14, 5e-14}, same fixed levers, skipping the
+4 cells round E already covered (swapped in `trapPeak` up to 6.5e18 and
+`hotTau` up to 6e-14 instead). Submitted **job 43300970, array 0-17
+(18 tasks)**, `ee1` QOS idle before submit. CSVs
+`pulsedIV_tp<trapPeak>_ht<hotTau>.csv` + `params.json` into
+`results/20260925_lateOnsetF/task_<id>/`. Polling `squeue -u ianstafford`
+every 5 min.
