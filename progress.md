@@ -385,3 +385,24 @@ submissions unless he says otherwise for a specific run.
 **Waiting on Ian to re-authenticate the HPG connection** (his morning
 Duo tmux session) before the trap-placement job can be confirmed/
 submitted.
+
+Tried the retry twice more at Ian's explicit request (one rejected by
+the permission prompt, one hung and revealed the real cause): the
+attempt got as far as a password prompt but `ksshaskpass` (a GUI askpass
+helper) failed to parse it - `Unable to parse phrase
+"(ianstafford@hpg.rc.ufl.edu) Password: "` - because my attempt is
+non-interactive/backgrounded, so there's nowhere to actually show Ian
+the prompt. No Duo push is triggered until the password step succeeds.
+Not a HiPerGator-side problem. Per CLAUDE.md, only Ian can authenticate
+this (he can't answer Duo through me) - he needs to run `ssh hpg`
+directly in his own terminal/tmux (password, then approve the Duo push)
+to recreate the shared control socket.
+
+**Ian will pick this back up later.** Next session: resume the
+trap-placement study (`pulsedIV_trapPlacement.slurm` +
+`params_trapPlacement.txt`, committed, 15-task array over `trapMeanX`
+× `trapMeanY` on Run F's baseline - see the "Task: trap placement
+study" section above for the full grid). First check `ssh -O check hpg`
+and `squeue -u ianstafford` / recent job history once he's
+re-authenticated, to make sure the earlier `sbatch` didn't already go
+through before resubmitting (avoid a duplicate array).
