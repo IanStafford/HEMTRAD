@@ -341,3 +341,29 @@ goal (radPlot1, ~0.4-0.5V onset) - it's a separate result for the
 "what if onset were ~3V" question.
 
 No jobs pending on HPG. Nothing else outstanding on this task.
+
+### Task: trap placement study (trapMeanX / trapMeanY)
+
+New task from Ian: use the existing single-Gaussian trap distribution's
+`trapMeanX` (depth) and `trapMeanY` (lateral, along the channel) to see
+how trap *placement* affects the collapse - one location per device/run,
+not multiple locations in one device (the model already only supports a
+single Gaussian, so no code changes needed, just a parameter sweep).
+
+Baseline (Ian's choice): Run F's tuned levers - `trapPeak`=4e18,
+`trapSigma`=0.04, `trapLevel`=0.55, `hotEb`=0.5, `hotTau`=1.3e-13,
+`Vg_meas`=-2, Vd 0-1.6V in 0.1V steps - matching the project's primary
+goal (radPlot1, ~0.4-0.5V onset), so this asks "where do traps matter
+most for the actual target collapse."
+
+Device geometry (from `rfdevice.tcl`): gate spans y=[-0.125,0.125]
+(`Gate_Length`=0.25), field plate spans y=[0.285,0.725] (`leftFP`/
+`rightFP`), drain contact at y=3.41. AlGaN top (surface) is x=0, the
+2DEG/AlGaN-GaN interface is x=`Al_Thick`=0.015.
+
+Grid (Ian approved): `trapMeanX` ∈ {0.0, 0.0075, 0.015} (surface,
+mid-AlGaN, 2DEG interface) × `trapMeanY` ∈ {0.125, 0.20, 0.285, 0.725,
+2.0} (gate edge, the value used throughout tuning, field-plate-left
+edge, field-plate-right edge, deep access near drain) - 15 devices.
+Committed `pulsedIV_trapPlacement.slurm` + `params_trapPlacement.txt`.
+Submitting.
