@@ -276,7 +276,7 @@ HPG grid (trapPeak × hotTau, trapSigma=0.04 fixed):
 
 **Real breakthrough:** moving diagonally (lower `trapPeak`, higher `hotTau` together) beats moving along either axis alone - e.g. `trapPeak`=6e18/`hotTau`=4e-14 gives onset ~1.35-1.5V *and* ~395x depth, better on **both** counts than round D's `trapPeak`=8e18/`hotTau`=2e-14 (onset ~1.05-1.2V, ~231x). So `trapPeak` and `hotTau` aren't just redundant knobs on the same runaway threshold - going to lower charge + stronger (but still well below F's 1.3e-13) heating buys a better trade than either alone. Onset ~2.1-2.25V (at `trapPeak`=5e18/`hotTau`=3e-14) is the closest to 3V so far, though shallow there.
 
-**Proposed round F:** continue the same diagonal further out - `trapPeak` ∈ {4e18, 4.5e18, 5e18} × `hotTau` ∈ {5e-14, 6e-14}, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. 6 tasks. (Note `trapPeak`=4e18 is F's own charge, but F used `hotTau`=1.3e-13 which we know collapses far too early at 0.3V - staying at `hotTau`≤6e-14 keeps well clear of that.)
+**Round F (revised, wider):** Ian asked for more combos per round (up to 18, near the 19-CPU QOS cap) instead of 6 at a time. `trapPeak` ∈ {3.5e18, 4e18, 4.5e18, 5e18, 5.5e18, 6e18} × `hotTau` ∈ {3e-14, 4e-14, 5e-14} - 18 tasks, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. Covers the whole diagonal region at once instead of one row/column per round. (`trapPeak`=4e18 is F's own charge, but staying at `hotTau`≤5e-14 keeps well clear of F's `hotTau`=1.3e-13, which we know collapses at 0.3V.)
 
 ---
 

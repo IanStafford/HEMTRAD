@@ -205,3 +205,9 @@ Proposing round F: keep pushing the same diagonal - `trapPeak` ∈
 =4e18 is F's own charge, but staying well below F's `hotTau`=1.3e-13
 (which we know collapses at 0.3V) should keep this safely in the
 late-onset regime. Checking with Ian before submitting.
+
+Ian asked for bigger rounds - up to 18 tasks at once (near the 19-CPU
+QOS cap) instead of 6, to cover more ground per round-trip. Revised round
+F to an 18-task grid: `trapPeak` ∈ {3.5e18, 4e18, 4.5e18, 5e18, 5.5e18,
+6e18} × `hotTau` ∈ {3e-14, 4e-14, 5e-14}, same fixed levers. Submitting
+this.
