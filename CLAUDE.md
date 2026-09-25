@@ -353,6 +353,16 @@ Other notable points:
 
 **Proposed round J:** push further - lower `trapPeak` toward {2.5e18, 2.6e18, 2.75e18} with higher `hotEb` ∈ {0.9, 0.95} and `hotTau` ∈ {7e-14, 8e-14} to try to reach onset ~2.5-2.8V while holding depth in the hundreds-to-thousands range - continuing to close the gap to 3V.
 
+**Ian stopped here and accepted this as the final result** (2026-09-25) rather than continuing to round J. Onset ~2.2-2.3V isn't exactly 3V but is 7x later than F's own onset with F-matching order-of-magnitude depth and the same qualitative shape - a reasonable match given the tension found across rounds F-I between onset and depth in this trap geometry.
+
+### Final answer: late-onset (~3V target) trap parameters
+
+**`trapPeak`=3e18, `trapSigma`=0.04, `trapLevel`=0.35, `hotEb`=0.85, `hotTau`=6e-14** (`trapMeanY`=0.20, `Vg_meas`=-2.0 as usual). Reproduces Run F's dramatic-collapse-then-creep shape with onset delayed to **~2.2-2.3V** (vs F's ~0.3V) and depth **~2004x** (vs F's ~1000x, same order of magnitude): peak 123.1 mA/mm at Vd=2.1V → 0.061 mA/mm at Vd=2.4V → creeps to 0.542 by Vd=4.05V. Saved as `figures/pulsedIV_lateOnset3V.csv` (Vd 0-4.05V in 0.1V steps). This is a **different parameter regime from Run F**, not a modification of it - `trapLevel` (0.35 vs F's 0.55) and `hotEb` (0.85 vs F's 0.5) both changed along with `trapPeak`/`hotTau`, discovered via the round A-I search in this section.
+
+This does **not** change `pulsedIV.tcl`'s or `GaN_modelfile_masterD`'s defaults - the project's primary goal (top of this file) is still the ~0.4-0.5V-onset match to `radPlot1`, which Run F (section 10) remains the best candidate for. This late-onset result is a separate, self-contained finding for the "what if the onset were ~3V instead" question.
+
+**Search summary (rounds late-onset A through I):** found that `trapPeak` (total trapped charge) and `hotTau`/`hotEb` (heating strength/capture barrier) all couple onset and depth together - more of any one gives an earlier *and* deeper collapse, never just one or the other. Escaping that required moving *diagonally*: lowering `trapPeak` (which delays onset but weakens depth) while raising `hotEb` and `hotTau` together (which restores depth at the new, later onset). `hotEb` turned out to be the biggest lever discovered late in the search (round G) - largely independent of `trapPeak`/`hotTau`'s onset-setting role, it can turn a barely-visible sag into a >1000x collapse at the same onset point. Also found a solver crash (`munmap_chunk(): invalid pointer`, not Newton/NaN) that affects a variable, parameter-idiosyncratic fraction of runs (6-56% per round) - a smaller `Vd_step`/more damping did not reduce it, so it's likely a genuine FLOOXS numerical edge case rather than a stability issue fixable from the driver.
+
 ---
 
 ## 11. Notebook and plotting

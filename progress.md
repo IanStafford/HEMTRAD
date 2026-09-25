@@ -327,3 +327,17 @@ Proposing round J: push further - `trapPeak` ∈ {2.5e18, 2.6e18, 2.75e18}
 × `hotEb` ∈ {0.9, 0.95} × `hotTau` ∈ {7e-14, 8e-14}, aiming for onset
 ~2.5-2.8V while holding depth in the hundreds-to-thousands range.
 Checking with Ian before submitting.
+
+**Ian said stop here - this is a good enough match.** Task complete.
+
+**Final answer:** `trapPeak`=3e18, `trapSigma`=0.04, `trapLevel`=0.35,
+`hotEb`=0.85, `hotTau`=6e-14 gives F's dramatic-collapse-then-creep
+shape with onset delayed to **~2.2-2.3V** (vs F's ~0.3V, a 7x delay) and
+depth **~2004x** (vs F's ~1000x, same order of magnitude). Saved as
+`figures/pulsedIV_lateOnset3V.csv`. Full writeup and search summary in
+CLAUDE.md section 10b. This does not change the repo's `pulsedIV.tcl`
+defaults or Run F's status as the best match to the project's primary
+goal (radPlot1, ~0.4-0.5V onset) - it's a separate result for the
+"what if onset were ~3V" question.
+
+No jobs pending on HPG. Nothing else outstanding on this task.
