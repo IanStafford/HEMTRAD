@@ -281,4 +281,8 @@ Ian approved. `trapPeak` ∈ {3e18, 3.5e18, 4e18} × `hotTau` ∈
 {4e-14, 5e-14, 6e-14} × `hotEb` ∈ {0.7, 0.8} (skipping cells already
 covered in round G) plus one extra (5e18/4e-14/0.7) - 18 tasks.
 `trapLevel`=0.35, `trapSigma`=0.04, same solver settings as round G
-(`Vd_step`=0.1, `dampValue`=0.05). Submitting.
+(`Vd_step`=0.1, `dampValue`=0.05). Submitted **job 43305778, array 0-17
+(18 tasks)**, `ee1` QOS idle before submit. CSVs
+`pulsedIV_tp<trapPeak>_ht<hotTau>_eb<hotEb>.csv` + `params.json` into
+`results/20260925_lateOnsetH/task_<id>/`. Polling `squeue -u ianstafford`
+every 5 min.
