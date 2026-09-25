@@ -306,4 +306,7 @@ Proposing round I: push further down this line - `trapPeak` ∈
 ~2.7-3V with depth still in the hundreds-x range. Checking with Ian
 before submitting.
 
-Ian approved. Submitting round I.
+Ian approved. Submitted **job 43307897, array 0-17 (18 tasks)**, `ee1`
+QOS idle before submit. CSVs `pulsedIV_tp<trapPeak>_ht<hotTau>_eb<hotEb>.csv`
++ `params.json` into `results/20260925_lateOnsetI/task_<id>/`. Polling
+`squeue -u ianstafford` every 5 min.
