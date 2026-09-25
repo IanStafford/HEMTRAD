@@ -406,3 +406,14 @@ study" section above for the full grid). First check `ssh -O check hpg`
 and `squeue -u ianstafford` / recent job history once he's
 re-authenticated, to make sure the earlier `sbatch` didn't already go
 through before resubmitting (avoid a duplicate array).
+
+## 2026-09-26
+
+`ssh -O check hpg` OK (master running, pid=75249) - Ian re-authenticated.
+Checked `sacct` history: no `pulsedIV_trapPlacement` job ever ran, so
+the earlier `sbatch` never went through before the connection dropped -
+no duplicate risk. Pulled latest repo on HPG, `ee1` QOS was idle, and
+submitted the trap-placement array: **job 43366825, array 0-14
+(15 tasks)**. CSVs `pulsedIV_mx<trapMeanX>_my<trapMeanY>.csv` +
+`params.json` into `results/20260925_trapPlacement/task_<id>/`. Polling
+`squeue -u ianstafford` every 5 min.
