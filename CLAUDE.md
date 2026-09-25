@@ -278,6 +278,27 @@ HPG grid (trapPeak × hotTau, trapSigma=0.04 fixed):
 
 **Round F (revised, wider):** Ian asked for more combos per round (up to 18, near the 19-CPU QOS cap) instead of 6 at a time. `trapPeak` ∈ {3.5e18, 4e18, 4.5e18, 5e18, 5.5e18, 6e18} × `hotTau` ∈ {3e-14, 4e-14, 5e-14} - 18 tasks, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. Covers the whole diagonal region at once instead of one row/column per round. (`trapPeak`=4e18 is F's own charge, but staying at `hotTau`≤5e-14 keeps well clear of F's `hotTau`=1.3e-13, which we know collapses at 0.3V.)
 
+**Round F results (job 43300970, `results/20260925_lateOnsetF/`).** Note: 2 of the 18 cells (`trapPeak`=5.5e18 at `hotTau`=3e-14 and 4e-14) turned out to be accidental duplicates of round E - an error in the exclusion list, harmless (deterministic, matched round E exactly) but wasted 2 of the 18 slots.
+
+**6 of 18 tasks (33%) crashed** with the identical signature to round C's crash - `munmap_chunk(): invalid pointer`, core dump, inside `FillStep`'s `device` solve, not a Newton-failed/NaN. Deleted ~7.5GB of core dumps (both HPG and local) after confirming the signature matched. Crashed cells: (4.5e18,4e-14), (5e18,5e-14), (5.5e18,5e-14), (5.5e18,6e-14), (6e18,6e-14), (6.5e18,3e-14) - mostly in the trapPeak 4.5-6.5e18 / hotTau 4-6e-14 band, i.e. right around the collapse transition itself. Several died before any collapse was visible in their partial CSV (inconclusive), others died just as the collapse was starting.
+
+Non-crashed / informative results:
+
+| trapPeak | hotTau | Onset | Depth |
+|---|---|---|---|
+| 3.5e18-4.5e18 | 3e-14 | none in range | <10% dip, not a real collapse |
+| 4e18 | 5e-14 | ~2.25-2.4V | ~2.3x (124.0→54.8) - weak but the latest onset with any visible collapse |
+| 4.5e18 | 3e-14 | ~2.4-2.55V | ~1.8x (124.2→68.8) - **latest onset of the whole search**, but barely a collapse |
+| 4.5e18 | 5e-14 | ~1.95-2.1V | ~9.9x (117.9→11.9) |
+| 6e18 | 5e-14 | ~1.05-1.35V | **~833x** (81.7→0.098) - close to F's depth, but early |
+| 6.5e18 | 4e-14 | ~1.05-1.2V | **~761x** (78.4→0.103) - same story |
+
+**Key tension surfacing clearly now:** the deepest collapses (700-830x, close to F's ~1000x) all sit at onset ~1.0-1.35V. Pushing onset out past ~2V (by further lowering `trapPeak`/`hotTau`) costs nearly all the depth - down to <10x, and past ~2.4V, down to <2x (barely visible). So far, in this `trapLevel`=0.35/`trapSigma`=0.04/`hotEb`=0.5 slice, later onset and F-like depth look like they're in real tension, not just requiring a finer grid - we may be up against something closer to a physical limit of this parameter combination rather than a search-resolution problem.
+
+**Two open questions for Ian, flagging rather than guessing:**
+1. **Physics direction:** we haven't touched `hotEb` (fixed at 0.5 throughout, F's value) or `trapSigma` (fixed at 0.04). Raising `hotEb` might restore depth at a given `trapPeak`/`hotTau` without needing more total charge (it directly lowers the effective trap level for a given Te), which could let onset stay late while depth recovers - untested. Alternatively this specific onset/depth target may just not be reachable with this trap geometry and needs accepting a softer match (e.g. onset ~2V with depth ~10-50x) as the practical target.
+2. **Crash rate:** 33% of this round's compute was lost to the same solver abort, concentrated exactly in the region we most want to explore. Per the "solver-side fixes first" rule, a smaller `Vd_step` or more damping through the transition (rather than any trap/Poisson physics change) is the sanctioned next move, but changes the driver's behavior generally and is worth a decision rather than a silent change.
+
 ---
 
 ## 11. Notebook and plotting

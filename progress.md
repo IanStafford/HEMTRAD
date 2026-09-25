@@ -214,5 +214,27 @@ F to an 18-task grid: `trapPeak` ∈ {3.5e18, 4e18, 4.5e18, 5e18, 5.5e18,
 `hotTau` up to 6e-14 instead). Submitted **job 43300970, array 0-17
 (18 tasks)**, `ee1` QOS idle before submit. CSVs
 `pulsedIV_tp<trapPeak>_ht<hotTau>.csv` + `params.json` into
-`results/20260925_lateOnsetF/task_<id>/`. Polling `squeue -u ianstafford`
-every 5 min.
+`results/20260925_lateOnsetF/task_<id>/`.
+
+**Job 43300970 finished: 12/18 tasks clean, 6 crashed** (33%), same
+`munmap_chunk(): invalid pointer` solver abort as round C's single crash
+- not Newton/NaN. Deleted ~7.5GB of core dumps (HPG + local). Also
+noticed 2 of the 18 cells were accidental duplicates of round E (my
+mistake building the exclusion list) - harmless, just wasted 2 slots.
+Full table and detail in CLAUDE.md section 10b.
+
+**The tension is now clear:** deepest collapses found (`trapPeak`=6e18/
+`hotTau`=5e-14: ~833x; `trapPeak`=6.5e18/`hotTau`=4e-14: ~761x) both sit
+at onset ~1.0-1.35V - close to F's depth but nowhere near 3V. Pushing
+onset later by backing off `trapPeak`/`hotTau` further costs nearly all
+the depth: onset ~2.4-2.55V (`trapPeak`=4.5e18/`hotTau`=3e-14) only gets
+~1.8x, barely a collapse. This might be a real limit of this `trapLevel`/
+`trapSigma`/`hotEb` combination, not just needing a finer grid.
+
+**Stopping to ask Ian** (written up fully in CLAUDE.md 10b) on two
+things: (1) whether to try `hotEb` (untested so far, fixed at F's 0.5)
+as a way to restore depth without more `trapPeak`/`hotTau`, or accept a
+softer target; (2) the 33% crash rate is now costing real compute right
+in the region we care about - worth addressing (smaller `Vd_step` or
+more damping near the transition, solver-side per the rules) before
+another big grid, or push forward on the current driver as-is.
