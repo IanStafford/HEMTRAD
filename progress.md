@@ -187,3 +187,8 @@ high hasn't been tried in this search but F itself ran at 1.3e-13 fine;
 the round-C crash was high `trapPeak` + high `hotTau` together, this is
 low `trapPeak` + higher `hotTau`, different corner. Checking with Ian
 before submitting.
+
+Ian approved. Submitted **job 43299061, array 0-5 (6 tasks)**, `ee1`
+QOS idle before submit. CSVs `pulsedIV_tp<trapPeak>_ht<hotTau>.csv` +
+`params.json` into `results/20260925_lateOnsetE/task_<id>/`. Polling
+`squeue -u ianstafford` every 5 min.
