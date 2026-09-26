@@ -460,3 +460,6 @@ request = pre-collapse peak / post-peak minimum; the reference device
 also allows a trap-free vs trapped comparison, which matters for
 locations that pinch the channel at rest (peak/min alone understates
 those). `pulsedIV_trapMap.slurm` + `params_trapMap.txt`.
+
+Submitted **job 43369760, array 0-50 (51 tasks) on `ee1-b`**. Results
+into `results/20260926_trapMap/task_<id>/`. Polling every 5 min.
