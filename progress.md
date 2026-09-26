@@ -481,3 +481,19 @@ failures at y=1.25/3.0). Retried those 5 with solver-side only changes
 - Least: 2.5 µm (~600x). 2.5 → 3.0 is non-monotonic; 3.0 is ~0.3 µm
   from the drain contact doping, possibly a contact-proximity effect.
 - Deeper (toward 2DEG) is consistently worse, ~5x suppression.
+
+### Task: trap concentration × level map (burst QOS)
+
+Ian: rerun on burst, traps kept well away from the source/drain contacts
+(contact doping likely made the 50-point map's near-contact points
+unreliable), single x, vary concentration and energy level. No longer
+fitting radPlot1 - studying how these parameters shape the collapse.
+
+Design (my choices, per Ian): x=0 (surface); y ∈ {-0.4, -0.125, 0,
+0.125, 0.285, 0.5, 0.725, 1.25, 1.75, 2.4} µm (≥0.7 µm from the source
+doping edge at -1.125, ≥0.88 µm from the drain edge at 3.285);
+`trapPeak` ∈ {2e18, 4e18, 8e18} × `trapLevel` ∈ {0.35, 0.55, 0.75} eV;
+10 positions per (conc, level) = 90 devices + trap-free reference.
+`trapSigma`=0.04, `hotEb`=0.5, `hotTau`=1.3e-13 (Run F), Vd 0-3.0V in
+0.1V (extended, since weaker traps may collapse later), `dampValue`=0.05.
+`pulsedIV_trapConcLevel.slurm` + `params_trapConcLevel.txt`.
