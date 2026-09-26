@@ -497,3 +497,6 @@ doping edge at -1.125, ≥0.88 µm from the drain edge at 3.285);
 `trapSigma`=0.04, `hotEb`=0.5, `hotTau`=1.3e-13 (Run F), Vd 0-3.0V in
 0.1V (extended, since weaker traps may collapse later), `dampValue`=0.05.
 `pulsedIV_trapConcLevel.slurm` + `params_trapConcLevel.txt`.
+
+Submitted **job 43373001, array 0-90 (91 tasks) on `ee1-b`**. Results into
+`results/20260926_trapConcLevel/task_<id>/`. Polling every 5 min.
