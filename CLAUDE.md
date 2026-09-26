@@ -417,6 +417,26 @@ Geometric mean over depth, by lateral position:
 - **Depth:** traps nearer the 2DEG are consistently worse. Suppression rises ~5x from surface (2.4e4) to 2DEG (1.25e5), collapse ratio ~2.3x.
 - Moving from the field plate out into the access region (0.285 → 2.0) raises pre-collapse current (8.6 → 19.5 mA/mm), consistent with 10c.
 
+
+### 10e. Trap concentration × energy level × position (burst QOS)
+
+Not a `radPlot1` fit - a study of how `trapPeak` and `trapLevel` shape the collapse in this model. Job 43373001 (91 tasks, `ee1-b`) + retry 43373919 (18 failed tasks, `Vd_step`=0.05), `results/20260926_trapConcLevel*/`. x=0 (surface), `trapSigma`=0.04, `hotEb`=0.5, `hotTau`=1.3e-13, Vg=-2, Vd 0-3.0V, `dampValue`=0.05. `trapPeak` ∈ {2e18, 4e18, 8e18} × `trapLevel` ∈ {0.35, 0.55, 0.75} eV × `trapMeanY` ∈ {-0.4, -0.125, 0, 0.125, 0.285, 0.5, 0.725, 1.25, 1.75, 2.4} µm, all ≥0.7 µm from the contact doping edges (-1.125, 3.285), plus a trap-free reference (Id(3V)=146.9 mA/mm). 79/90 ran to 3 V; 8 of the remaining 11 had already declared their regime before crashing (`munmap_chunk`), so **3/90 are undetermined**. `analyze_trapConcLevel.py` → `figures/trapConcLevel_metrics.csv`, `_IdVd.png`, `_summary.png`.
+
+Each device is classified by its current at rest (Id/Id_no-trap at Vd=0.1V) and whether it then drops >10x:
+
+| trapPeak \ trapLevel | 0.35 eV | 0.55 eV | 0.75 eV |
+|---|---|---|---|
+| 2e18 | no collapse ×10 | no collapse ×9, collapse ×1 (under gate) | no collapse ×7, off at rest ×3 (gate) |
+| 4e18 | collapse ×5, no collapse ×3, off ×1, ? ×1 | **collapse ×7**, off at rest ×3 (gate) | off at rest ×10 |
+| 8e18 | **collapse ×5**, off at rest ×3 (gate), ? ×2 | off at rest ×10 | off at rest ×10 |
+
+- **Three regimes, and energy level sets which one you're in.** Deep traps (0.75 eV) at ≥4e18, and 0.55 eV at 8e18, fill at rest and turn the device off before any Vd is applied: a threshold shift, not a current collapse. The hot-electron collapse lives in a narrow band: 4e18/0.35, 4e18/0.55, 8e18/0.35.
+- **Level acts more strongly than concentration.** In the access region at 4e18, going 0.35 → 0.55 eV barely changes at-rest current (~0.96 → ~0.8 of trap-free), but 0.55 → 0.75 eV cuts it to 1e-5-1e-3. Doubling 4e18 → 8e18 at 0.55 eV flips every position from collapse to off at rest.
+- **Inside the collapse band, onset and depth trade off:** 4e18/0.35 is late and shallow (onset 1.7-2.9V, 11-106x); 4e18/0.55 is early and deep (0.3-0.45V, 3e3-3e4x); 8e18/0.35 is early and deep (0.4-0.6V, ~4e4x) but with higher pre-collapse current (29-42 mA/mm), because the shallow level keeps the channel open at rest.
+- **Position:** traps under the gate (-0.125 to 0.125) are always the first to switch the device off at rest - at 2e18/0.75 they're the only affected positions. In the access region, onset moves later with distance from the gate in every collapse case (4e18/0.35: 1.7 → 2.5 → 2.9V; 4e18/0.55: 0.3 → 0.45V; 8e18/0.35: 0.4 → 0.6V).
+- **2e18 is too little charge** for a hot-electron collapse in the access region at any level through 3V; only gate-region traps matter.
+- **Caveats:** off-at-rest devices hit the numerical noise floor (~1e-8 mA/mm, visibly jagged at 8e18/0.75), so suppression values above ~1e9 aren't physically meaningful. Onset and collapse ratio are only reported for devices that conduct at rest.
+
 ---
 
 ## 11. Notebook and plotting

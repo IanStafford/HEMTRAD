@@ -500,3 +500,21 @@ doping edge at -1.125, ≥0.88 µm from the drain edge at 3.285);
 
 Submitted **job 43373001, array 0-90 (91 tasks) on `ee1-b`**. Results into
 `results/20260926_trapConcLevel/task_<id>/`. Polling every 5 min.
+
+**Job 43373001 finished** (73/91 COMPLETED; 15 `munmap_chunk` + 3 Newton
+stalls, 12 of 18 at 8e18). Retried the 18 with `Vd_step`=0.05: **job
+43373919**, 7 recovered. 79/90 ran to 3V; 8 more had already declared
+their regime before crashing - **3/90 undetermined**. Writeup in
+CLAUDE.md 10e; figures `figures/trapConcLevel_IdVd.png`,
+`figures/trapConcLevel_summary.png`, data
+`figures/trapConcLevel_metrics.csv`.
+
+- Three regimes: no effect, hot-electron collapse, off at rest
+  (threshold shift). Energy level decides which. The collapse only
+  shows up in a narrow band: 4e18/0.35, 4e18/0.55, 8e18/0.35.
+- 0.75 eV at ≥4e18, or 0.55 eV at 8e18: off at rest everywhere.
+- Within the band: 4e18/0.35 late + shallow (onset 1.7-2.9V, 11-106x);
+  4e18/0.55 and 8e18/0.35 early + deep (0.3-0.6V, 3e3-4e4x).
+- Gate-region traps always go off-at-rest first; in the access region,
+  onset moves later with distance from the gate.
+- 2e18: no access-region collapse at any level through 3V.
