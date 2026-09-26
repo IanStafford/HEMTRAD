@@ -392,6 +392,31 @@ Onset lands exactly at 0.5V and the depth matches (0.020 vs 0.011 at 0.5V), with
 
 **Open question for Ian:** is a surface trap blob ~2 µm into the gate-drain access region physically plausible for this radiation damage? The grid only sampled y=0.725 and 2.0 in that range, so the next step would be a finer `trapMeanY` scan between ~1.0 and ~3.0 at x=0 (and maybe x=0.0075) to fix the 0.4V point.
 
+
+### 10d. 50-location trap map (burst QOS)
+
+Job 43369760 (51 tasks on `ee1-b`) + retry 43370373, `results/20260926_trapMap*/`. Run F levers, Vg=-2, Vd 0-1.6V. Grid: `trapMeanX` ∈ {0, 3.75, 7.5, 11.25, 15} nm (surface → 2DEG) × `trapMeanY` ∈ {-0.5, 0, 0.125, 0.285, 0.5, 0.725, 1.25, 2.0, 2.5, 3.0} µm, plus a trap-free reference (`trapPeak`=1e10, Id(1.6V)=125.5 mA/mm). 5 tasks hit Newton's iteration limit near the collapse; a rerun with `Vd_step`=0.05/`dampValue`=0.05 recovered 4. The last (7.5 nm, 3.0 µm) is the known `munmap_chunk` crash, left as a hole: **49/50 complete**.
+
+Two metrics per device, in `figures/trapMap_ratios.csv`, plotted in `figures/trapMap_3d.png` and `figures/trapMap_3d_suppression.png` (`analyze_trapMap.py`):
+- **collapse ratio** = pre-collapse peak Id / minimum Id after the peak (as requested);
+- **suppression** = Id(trap-free) / Id(trapped) at Vd=1.6V.
+
+They disagree exactly where it matters. Traps **under the gate (y=0) and at the gate edge (0.125)** give a collapse ratio of only ~13x, because the channel is already off at rest (peak Id ~3e-4 to 1e-3 mA/mm). Yet they are the **most damaging locations** by suppression: ~1e6-3.6e6x below the trap-free device. Peak/min can't see a device that never turns on.
+
+Geometric mean over depth, by lateral position:
+
+| trapMeanY (µm) | -0.5 | 0 | 0.125 | 0.285 | 0.5 | 0.725 | 1.25 | 2.0 | 2.5 | 3.0 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| collapse ratio | 4.6e4 | 13 | 13 | 6.9e3 | 5.5e3 | 3.1e4 | 1.9e4 | 4.9e3 | 520 | 1.2e5 |
+| suppression | 3.6e5 | **2.3e6** | 7.2e5 | 1.7e4 | 1.4e4 | 6.7e4 | 4.1e4 | 1.7e4 | **600** | 3.8e5 |
+| mean peak Id (mA/mm) | 16.5 | ~0 | ~0 | 8.6 | 8.9 | 12.2 | 17.2 | 19.5 | 35.2 | 40.6 |
+
+- **Most profound impact: traps under the gate / at its drain edge** - the channel is pinched before any Vd is applied.
+- **Next: near the source (-0.5) and near the drain (3.0)**, both ~1e5 suppression with a clean normal-then-collapse shape. Source-side traps were not sampled before this map.
+- **Least: y=2.5 µm**, only ~600x suppression. The step from 2.5 (weak) to 3.0 (strong) is non-monotonic. y=3.0 sits ~0.3 µm from the drain contact's heavy doping (`Drain_Doping` edge at 3.285) and its minimum lands late (Vd≈1.4V), so it may be contact-proximity behavior rather than trap physics; worth checking before trusting it.
+- **Depth:** traps nearer the 2DEG are consistently worse. Suppression rises ~5x from surface (2.4e4) to 2DEG (1.25e5), collapse ratio ~2.3x.
+- Moving from the field plate out into the access region (0.285 → 2.0) raises pre-collapse current (8.6 → 19.5 mA/mm), consistent with 10c.
+
 ---
 
 ## 11. Notebook and plotting

@@ -463,3 +463,21 @@ those). `pulsedIV_trapMap.slurm` + `params_trapMap.txt`.
 
 Submitted **job 43369760, array 0-50 (51 tasks) on `ee1-b`**. Results
 into `results/20260926_trapMap/task_<id>/`. Polling every 5 min.
+
+**Job 43369760 finished** (46/51 complete; 5 Newton iteration-limit
+failures at y=1.25/3.0). Retried those 5 with solver-side only changes
+(`Vd_step`=0.05, `dampValue`=0.05): **job 43370373**, 4 recovered, 1
+(x=7.5nm, y=3.0) hit the known `munmap_chunk` crash - left as a hole.
+**49/50 locations complete.** Full writeup in CLAUDE.md 10d; plots
+`figures/trapMap_3d.png` (collapse ratio) and
+`figures/trapMap_3d_suppression.png` (vs trap-free reference); data in
+`figures/trapMap_ratios.csv`.
+
+- Most damaging: traps under the gate / at its drain edge - channel off
+  at rest, ~1e6-3.6e6x below trap-free. Their peak/min collapse ratio is
+  only ~13x, because there's no "normal" region to collapse from - so
+  the collapse ratio alone ranks them *least* harmful. Flagging.
+- Next: source side (-0.5 µm) and near drain (3.0 µm), ~1e5x.
+- Least: 2.5 µm (~600x). 2.5 → 3.0 is non-monotonic; 3.0 is ~0.3 µm
+  from the drain contact doping, possibly a contact-proximity effect.
+- Deeper (toward 2DEG) is consistently worse, ~5x suppression.
