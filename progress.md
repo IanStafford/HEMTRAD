@@ -442,3 +442,21 @@ already sags. Saved as `figures/pulsedIV_placement_x0_y2.csv`.
 physically plausible? If so, next step is a finer `trapMeanY` scan
 between ~1.0 and ~3.0 at x=0 (maybe also x=0.0075) to fix the 0.4V
 point.
+
+### Task: 50-location trap map (burst QOS)
+
+Ian asked for a 50-location trap placement map on HiPerGator's burst
+QOS, collapse ratio per location, and a 3D plot of ratio vs (x, y).
+Burst QOS `ee1-b`: 171 CPUs / 1.37 TB, 4-day wall, lower priority (900
+vs 36000 for `ee1`) - so all tasks run at once.
+
+Grid: `trapMeanX` ∈ {0, 0.00375, 0.0075, 0.01125, 0.015} (AlGaN surface
+→ 2DEG) × `trapMeanY` ∈ {-0.5, 0, 0.125, 0.285, 0.5, 0.725, 1.25, 2.0,
+2.5, 3.0} (source side, under gate, gate edge, field plate, access,
+near drain) = 50 devices, Run F's other levers, Vd 0-1.6V/0.1V. Plus a
+51st effectively trap-free reference (`trapPeak`=1e10; `trapEn`=0 would
+break `CaptureTraps`, which needs `IonAcceptor`). Collapse ratio per the
+request = pre-collapse peak / post-peak minimum; the reference device
+also allows a trap-free vs trapped comparison, which matters for
+locations that pinch the channel at rest (peak/min alone understates
+those). `pulsedIV_trapMap.slurm` + `params_trapMap.txt`.
