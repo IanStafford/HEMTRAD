@@ -645,3 +645,13 @@ gate region most damaging in every set; 2e18 access-region traps do
 nothing; onset moves later with distance from the gate (4e18/0.35: 1.5
 → 2.7 V); deeper traps consistently worse; collapse depth scale ~100x →
 2e4x → 7e4x for 4e18/0.35 → 4e18/0.55 → 8e18/0.35.
+
+**Collapse metric fixed (Ian's question).** Peak/min is biased by
+onset: pre-collapse Id rises with Vd, so late collapses start from a
+higher peak (corr(onset, peak) +0.86 to +0.91). It understated the early
+gate-edge collapses at 4e18/0.35 by ~8-10x (170-200 vs 1,500-1,900).
+(Also: drain-side traps collapse *later*, not earlier; gate-edge traps
+collapse earliest.) Figures regenerated with **collapse depth vs
+trap-free = Id_no-trap / Id at the post-collapse minimum**;
+`figures/trapMapSets_overview_ratio.png` replaced by `_overview_depth.png`;
+peak/min kept in the CSV. CLAUDE.md 10f updated.

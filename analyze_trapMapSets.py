@@ -1,16 +1,18 @@
 """3D trap maps at several trap concentrations/levels (job 43513462).
 
-Per device: collapse ratio (pre-collapse peak / post-peak min), suppression
+Per device: collapse depth vs trap-free (Id_no-trap / Id at the post-collapse
+minimum - the plotted collapse metric), collapse ratio (pre-collapse peak /
+post-peak min, kept for reference; it inflates late collapses), suppression
 (Id_no-trap / Id at Vd=3 V), at-rest fraction (Id / Id_no-trap at 0.1 V),
 regime, and the number of solver retries pulsedIV.tcl needed.
 
-Collapse ratio is only meaningful for devices that conduct at rest; devices
+Collapse metrics are only meaningful for devices that conduct at rest; devices
 that are off at rest (at-rest fraction < 0.1) are left as holes in the
-collapse-ratio surface and marked on the floor.
+collapse surface and marked on the floor.
 
 Writes figures/trapMapSets_metrics.csv, one figure per set
 (figures/trapMapSets_tp<peak>_tl<level>.png) and two overviews
-(figures/trapMapSets_overview_{ratio,suppression}.png).
+(figures/trapMapSets_overview_{depth,suppression}.png).
 """
 import glob
 import json
@@ -66,21 +68,27 @@ for (tp, tl, mx, my), (vd, idd, nre) in sorted(dev.items()):
     pk = idd[ipk]
     post = idd[ipk:]
     at_rest = idd[1] / iref(vd[1]) if len(vd) > 1 else np.nan
+    imin = ipk + int(np.argmin(post))
+    # Collapse depth vs a trap-free device at the same Vd, taken at the
+    # post-collapse minimum. Unlike peak/min it doesn't reward late onsets
+    # (whose pre-collapse peak is higher only because Id rises with Vd).
+    depth = iref(vd[imin]) / idd[imin]
     below = np.nonzero(post < pk / 10)[0]
     onset = vd[ipk + below[0]] if below.size else np.nan
     if at_rest < 0.1:
-        regime, ratio, onset = "off at rest", np.nan, np.nan
+        regime, ratio, onset, depth = "off at rest", np.nan, np.nan, np.nan
     else:
         ratio = pk / post.min()
         regime = "collapse" if np.isfinite(onset) else (
             "no collapse" if done else "incomplete")
         if regime == "incomplete":  # stopped before its collapse resolved
-            ratio = np.nan
+            ratio = depth = np.nan
     supp = iref(VD_END) / idd[-1] if done else np.nan
     rows.append(dict(trapPeak=tp, trapLevel=tl, trapMeanX=mx, trapMeanY=my,
                      regime=regime, complete=int(done), last_Vd=vd[-1],
                      retries=nre, peak_mA_mm=pk, onset_Vd=onset,
-                     collapse_ratio=ratio, at_rest_frac=at_rest,
+                     collapse_ratio=ratio, collapse_depth_vs_ref=depth,
+                     min_Vd=vd[imin], at_rest_frac=at_rest,
                      suppression_3V=supp))
 
 os.makedirs("figures", exist_ok=True)
@@ -123,14 +131,14 @@ def panel(ax, Z, off, inc, zlim, zlabel, title):
                         edgecolor="white", linewidth=0.5, alpha=0.92)
     ax.scatter(Y[ok], X[ok], Z[ok], color=INK, s=9, depthshade=False)
     floor = zlim[0]
-    if off.any() and "collapse" in zlabel:
+    if off.any() and "minimum" in zlabel:
         ax.scatter(Y[off], X[off], np.full(off.sum(), floor), marker="x",
                    color=OFF, s=30, depthshade=False, label="off at rest")
     if inc.any():
         ax.scatter(Y[inc], X[inc], np.full(inc.sum(), floor), marker="^",
                    color=MUTED, s=28, depthshade=False,
                    label="did not converge at collapse")
-    if (off.any() and "collapse" in zlabel) or inc.any():
+    if (off.any() and "minimum" in zlabel) or inc.any():
         ax.legend(loc="upper left", frameon=False, fontsize=8)
     for lo, hi in (GATE, FP):
         ax.plot([lo, hi, hi, lo, lo], [0, 0, 15, 15, 0], [floor] * 5,
@@ -150,14 +158,15 @@ def zrange(key):
     return (min(v) - 0.3, max(v) + 0.3) if v else (0, 1)
 
 
-ZR, ZS = zrange("collapse_ratio"), zrange("suppression_3V")
-RL = "log10 collapse ratio\n(conducting at rest)"
+ZR, ZS = zrange("collapse_depth_vs_ref"), zrange("suppression_3V")
+RL = "log10(Id_no-trap / Id) at the\npost-collapse minimum"
 SL = "log10(Id_no-trap / Id)\nat Vd = 3 V"
 
 for tp, tl in sets:
     fig = plt.figure(figsize=(14, 6.2))
     for k, (key, zl, lab, zr) in enumerate(
-            (("collapse_ratio", RL, "Collapse ratio", ZR),
+            (("collapse_depth_vs_ref", RL,
+              "Collapse depth vs trap-free (at the collapse)", ZR),
              ("suppression_3V", SL, "Suppression vs trap-free", ZS))):
         ax = fig.add_subplot(1, 2, k + 1, projection="3d")
         Z, off, inc = grid(tp, tl, key)
@@ -172,7 +181,7 @@ for tp, tl in sets:
     plt.close(fig)
     print("wrote", out)
 
-for key, zl, zr, name in (("collapse_ratio", RL, ZR, "ratio"),
+for key, zl, zr, name in (("collapse_depth_vs_ref", RL, ZR, "depth"),
                           ("suppression_3V", SL, ZS, "suppression")):
     ncol = 3
     nrow = (len(sets) + ncol - 1) // ncol
@@ -181,7 +190,7 @@ for key, zl, zr, name in (("collapse_ratio", RL, ZR, "ratio"),
         ax = fig.add_subplot(nrow, ncol, k + 1, projection="3d")
         Z, off, inc = grid(tp, tl, key)
         panel(ax, Z, off, inc, zr, zl, f"{tp:.0e} cm⁻³, {tl} eV")
-    fig.suptitle(f"{'Collapse ratio' if name == 'ratio' else 'Suppression vs trap-free'}"
+    fig.suptitle(f"{'Collapse depth vs trap-free, at the post-collapse minimum' if name == 'depth' else 'Suppression vs trap-free at Vd = 3 V'}"
                  " by trap location, for each trap concentration / level"
                  " (shared z-scale)", color=INK, fontsize=12)
     fig.tight_layout()
