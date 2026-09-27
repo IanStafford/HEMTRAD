@@ -702,3 +702,14 @@ Writeup CLAUDE.md 10g; figures `figures/trapCone_shapes.png`,
   total charge because its charge sits at the surface.
 - Next options: repeat the shape comparison at a collapsing set (e.g.
   4e18/0.55 or 8e18/0.35); refine the mesh before TRIM profiles.
+
+### Task: cone vs Gaussian at settings that collapse
+
+Ian: redo the shape comparison where the device actually collapses. Two
+collapsing sets run together on burst (same wall time as one): 4e18/0.55
+eV (Run F; early, deep collapse everywhere) and 4e18/0.35 eV (onset moves
+strongly with position, 0.2-2.7 V, so shape effects on onset should
+show). Same 5 cone geometries × 10 contact-safe apex positions at the
+surface, + trap-free reference = 101 tasks. Gaussian comparisons: the
+4e18/0.55 and 4e18/0.35 x=0 rows of job 43513462 (same settings).
+`pulsedIV_trapConeCollapse.slurm` + `params_trapConeCollapse.txt`.
