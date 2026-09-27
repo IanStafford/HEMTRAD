@@ -685,3 +685,6 @@ In-material cross-sections (µm², ∝ charge per gate width): 0.0024,
 0.1|15° is the equal-charge, pure-shape comparison. Compared against the
 Gaussian 2e18/0.75 x=0 row of job 43513462 (same Vd 0-3 V, damping,
 retry driver). `pulsedIV_trapCone.slurm` + `params_trapCone.txt`.
+
+Submitted **job 43536494, array 0-50 (51 tasks) on `ee1-b`**. Results into
+`results/20260927_trapCone/task_<id>/`. Polling every 5 min.
