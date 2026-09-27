@@ -475,6 +475,8 @@ Sets (`trapPeak`/`trapLevel`): 2e18/0.55, 2e18/0.75, 4e18/0.35, 4e18/0.55 (Run F
 
 ### 10g. Cone (cascade-like) vs Gaussian trap shape, 2e18 cm⁻³ / 0.75 eV
 
+> ⚠ See 10h: the access-region results here aren't mesh-verified (cones are only a few mesh cells wide there).
+
 Job 43536494 (51 tasks, `ee1-b`), `results/20260927_trapCone/`. All 51 completed, with no retries needed. `trapShape=cone`, apex at the AlGaN surface (`trapMeanX`=0) at the 10 contact-safe positions of 10f; 5 geometries (`coneLen` µm / `coneAngle`): 0.05/30°, 0.1/30°, 0.2/30°, 0.1/15°, 0.1/45° (`coneW0`=0.01, `coneEdge`=0.01). Compared against the Gaussian 2e18/0.75 x=0 row of job 43513462 (same Vd 0-3 V, damping, retry driver). `analyze_trapCone.py` → `figures/trapCone_metrics.csv`, `_shapes.png` (the profiles), `_vs_position.png`, `_IdVd.png`.
 
 In-material cross-section (µm², ∝ trapped charge per gate width): Gaussian 0.0051; cones 0.0025, 0.0078, 0.0271, 0.0047 (15°, ≈ equal charge to the Gaussian), 0.0121 (45°).
@@ -493,6 +495,22 @@ Suppression vs trap-free at Vd=3 V, under the gate (y=0) / at the gate edges (-0
 - **What matters is how much trap charge sits near the surface over the gate.** The narrow 15° cone (same total charge as the Gaussian) is ~270x weaker than the Gaussian under the gate, and the wide 45° cone is ~6x stronger. The Gaussian beats the 30° cones despite ~35% less total charge because its charge is concentrated at the surface (it's widest where the cones are narrowest, at the apex).
 - Implication for TRIM: only the near-surface part of a cascade profile (roughly the top 50 nm) should matter for this device, at least for deep (0.75 eV) traps at this density. Resolving the narrow top of a cascade will need a finer mesh than the current ~10-50 nm lateral spacing in the access region.
 - Caveat: this set never collapses, so it only tests the "off at rest" mechanism. Shape effects on the hot-electron collapse itself would need a collapsing set (e.g. 4e18/0.55 or 8e18/0.35).
+
+
+### 10h. ⚠ Mesh resolution in the access region (found 2026-09-27)
+
+The lateral mesh (`rfdevice.tcl` `line y`) is 5 nm at the gate and ~10-20 nm at the field plate, but coarsens to ~25-40 nm from y ≈ 0.725 µm out to the drain (spacing 0.02 → 0.05). Traps narrower than a few cells there are **not resolved**, even though the nodes still capture their total charge (±15%): the hot-electron runaway depends on the field around the trapped charge, which a coarse mesh smears out.
+
+Local check (scratch copy of `rfdevice.tcl` with `line y loc=1.25 spac=0.004`), 4e18/0.55 eV, trap at the surface at y=1.25 µm, Vd 0-1 V:
+
+| trap | standard mesh | refined mesh (4 nm) |
+|---|---|---|
+| cone 0.1 µm / 45° (25-50 nm wide near the 2DEG) | **no effect**: 9.5 → 85 mA/mm, tracks trap-free | **collapses** 8.2 → 0.025 at 0.2 V (~325x) |
+| Gaussian σ 40 nm | peak 22.8 at 0.3 V, collapse at 0.4 V, ~0.003 after | peak 12.0 at 0.2 V, collapse at **0.3 V**, 0.004-0.013 after |
+
+- **The cone vs Gaussian comparisons at collapsing settings (job 43538727, `figures/trapCone_4e18_*`) are mesh artifacts** wherever the cone sits in the coarse region. Their "cones suppress the collapse" result is wrong. The 2e18/0.75 cone study (10g) is probably fine at the gate (5-10 nm mesh) but its access-region "no effect" isn't verified.
+- **The Gaussian results are qualitatively robust but quantitatively mesh-sensitive** in the access region. Collapse still happens and is still deep, but onset shifts ~0.1 V earlier and the pre-collapse peak roughly halves on a fine mesh. That affects every access-region Gaussian number in 10b-10f, including the 10c `radPlot1` match at y=2.0 µm (onset "exactly 0.5 V").
+- Needs a decision before more trap-shape or TRIM work: local refinement that follows the trap (e.g. a `line y` at `trapMeanY` with ~4 nm spacing, driven by the trap levers) vs global refinement of the access region, plus a short convergence study (e.g. 8/4/2 nm) to pick the spacing.
 
 ---
 

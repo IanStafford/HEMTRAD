@@ -737,3 +737,18 @@ cone-vs-Gaussian comparisons are mesh-limited wherever the cone is
 narrower than a few mesh cells (the access region especially). Running
 the same check for the Gaussian (σ 40 nm) at y=1.25 to see whether the
 earlier Gaussian maps are also mesh-sensitive there.
+
+**Gaussian mesh check** (same position, refined 4 nm vs standard):
+still collapses deeply, but onset 0.3 V vs 0.4 V and pre-collapse peak
+12.0 vs 22.8 mA/mm. So Gaussian results are qualitatively robust but
+quantitatively mesh-sensitive in the access region (affects 10b-10f
+numbers there, incl. the 10c radPlot1 match at y=2.0 µm); cone results
+at collapsing settings are qualitatively wrong on the standard mesh.
+Full writeup CLAUDE.md 10h.
+
+**Waiting on Ian:** how to fix the mesh before more shape/TRIM work -
+(a) local refinement that follows the trap (a `line y` at `trapMeanY`
+with ~4 nm spacing, driven by the trap levers; cheap, but the mesh then
+differs per trap position), or (b) global refinement of the access
+region (uniform, slower everywhere) - plus a short convergence study
+(8/4/2 nm) to pick the spacing. Then rerun the cone comparison.
