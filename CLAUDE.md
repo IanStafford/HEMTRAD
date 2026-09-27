@@ -121,6 +121,13 @@ sed -i 's/^window.*//; s/^\(\s*\)chart /\1#chart /'
 - **Redefining a `const` solution after `device init` doesn't reach the assembled equations.** `sel` sees the new definition, but Poisson doesn't. To switch behavior at runtime, use data fields as above.
 - `sqrt(dot(DevPsi,DevPsi))` is |E| in V/cm (lengths are internally cm).
 - Current in the CSVs is `abs(contact flux)*1e6` = mA/mm.
+- **The `munmap_chunk(): invalid pointer` crash is a teardown artifact, not the real failure** (diagnosed 2026-09-27, reproduced locally under gdb on task 64 of job 43373001; same failure point on both builds). Chain:
+  1. Newton diverges at the collapse transition inside `FillStep`'s `device` (RHS norm → ~1e12). An expression evaluates to NaN/inf and `Values::TestProb` (`BasePDE/Values.cc:207`) throws.
+  2. The throw unwinds mid-assembly. The solver's member queues `eq0`/`eq1` (`BasePDE/Solver.h:219`) were loaded with every node/element via `ElementQueue::Build()`, which sets `InQueue`, and were only partly drained. Nothing clears them on the exception path.
+  3. `DevController` catches the string (`device/DevControl.cc:167`, prints `Caught Exception!`), `device` returns a Tcl error, the script aborts, and Tcl calls `GlobalExit` (`flooxs.cc:727`).
+  4. `GlobalExit` does `delete fslist` (never NULLed) → mesh teardown → a Node still flagged `InQueue` → `Element::~Element` calls `FLPS_panic("Fudge")` (`field/Element.cc:119`) → `FLPS_panic` runs Tcl `exit 1` → re-enters `GlobalExit` → deletes `fslist` again. It recurses ~3,300 times (`too many nested evaluations`) with a double free, which glibc reports as `munmap_chunk`. That's also why each crash leaves a 1-2 GB core.
+  - So "crash" and "Newton iteration-limit stall" are **the same numerical failure** (non-convergence at the runaway trap-filling transition) with two outcomes: oscillate → iteration limit → clean-ish exit; diverge → NaN → crash. That's why it's trajectory-dependent and only partly helped by damping or a smaller Vd step.
+  - **A Tcl `catch {device}` + retry is NOT safe on the current build:** `Solver::InitializeAssembly` (`Solver.cc:433`) refills `eq0`/`eq1` without clearing them, and `Build()` doesn't check `InQueue`, so stale elements from the failed solve would be assembled twice, silently.
 
 ---
 

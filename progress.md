@@ -518,3 +518,43 @@ CLAUDE.md 10e; figures `figures/trapConcLevel_IdVd.png`,
 - Gate-region traps always go off-at-rest first; in the access region,
   onset moves later with distance from the gate.
 - 2e18: no access-region collapse at any level through 3V.
+
+## 2026-09-27
+
+### Deep dive: why FLOOXS crashes (`munmap_chunk`)
+
+Reproduced locally (workstation build: gcc, FLOOXS `e7c2a30f`) under gdb
+using task 64 of job 43373001 (8e18 / 0.35 eV / y=0.285): fails at
+exactly the same point as on HPG (Intel icpx, `503b936`) - Vd=0.4 V
+completes, the Vd=0.5 V FillStep hits NaN. So it isn't the compiler or
+the older HPG commit. Backtrace at the first `FLPS_panic`:
+`GlobalExit → ~FieldServerList → ~Mesh → ~Tri → ~Edge → ~Node →
+Element::~Element → FLPS_panic("Fudge")`.
+
+Root cause (full chain in CLAUDE.md §6):
+- **Trigger:** Newton diverges to NaN at the collapse transition - the
+  same non-convergence as the "iteration-limit stalls", just diverging
+  instead of oscillating.
+- **Crash (two FLOOXS bugs):** (1) the NaN exception leaves the
+  solver's `eq0`/`eq1` queues half-drained with nodes still flagged
+  `InQueue`; (2) at exit, destroying such a node calls `FLPS_panic`,
+  which runs `exit` again inside `GlobalExit`, re-deleting `fslist`
+  (never NULLed) → ~3,300-deep recursion + double free → `munmap_chunk`
+  + 1-2 GB core.
+- A driver-side `catch {device}` + retry would silently double-assemble
+  stale elements (`InitializeAssembly` doesn't clear the queues), so the
+  fix has to be in FLOOXS.
+
+Proposed FLOOXS patch (tool fix, no model physics), ~10 lines:
+1. `Solver::InitializeAssembly`: `eq0.Clear(); eq1.Clear();` before refilling.
+2. `DevController` catch block(s): clear the solver queues (`ds->Store()`).
+3. `GlobalExit`: re-entry guard and `fslist = NULL` after delete;
+   `FLPS_panic`: if re-entered, `_exit(1)` instead of Tcl `exit`.
+With 1-3, a NaN becomes a clean Tcl error (no core dumps), and
+`pulsedIV.tcl` could `catch` it and retry that Vd point with a smaller
+step - which should recover most of the ~20-50% of runs we've been
+losing.
+
+**Waiting on Ian:** OK to (a) patch + build FLOOXS in a separate local
+build dir (installed `/usr/local/bin/flooxs` untouched) and test on task
+64, then (b) rebuild on HPG / send upstream?
