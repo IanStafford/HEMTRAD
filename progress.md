@@ -606,3 +606,11 @@ retry alone should end the crashes on HPG without rebuilding FLOOXS**.
 identical when nothing fails)? (2) FillStep vs plain `device` at
 bisection substeps? (3) Rebuild HPG FLOOXS with the patch / send
 upstream, or leave it local for now?
+
+**Ian: add the retry to pulsedIV.tcl** (and make more 3D plot sets at
+other trap levels/concentrations). Retry built into `pulsedIV.tcl`,
+levers `retryDepth`=5 and `retrySubFill`=1 (FillStep at bisection
+substeps, the tested behavior; Ian didn't pick, so I kept the default
+and made it switchable). Local check (task-64 params, Vd 0-0.3 V):
+identical to the previous values to every digit. Removed
+`tools/retry_snippet.tcl` (now in the driver).

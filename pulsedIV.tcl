@@ -40,6 +40,11 @@ if {![info exists fillRelax]} { set fillRelax 0.5 } ;# Te under-relaxation per i
 
 if {![info exists ivCSV]} { set ivCSV "figures/pulsedIV.csv" } ;# columns: Vd, Id (mA/mm), peak Te (K)
 if {![info exists dampValue]} { set dampValue 0.10 } ;# Newton damping on Qfn/Qfp/DevPsi; smaller = more damped/stable, slower
+
+# retry on solver failure (Newton limit or NaN): restore the last converged
+# solution + trap memory and bisect the Vd step. No effect if nothing fails.
+if {![info exists retryDepth]}   { set retryDepth 5 }   ;# max bisection levels per Vd point (0 = no retry)
+if {![info exists retrySubFill]} { set retrySubFill 1 } ;# 1: full FillStep at bisection substeps; 0: plain device solve there
 #==============================================
 
 source GaN_modelfile_masterD
@@ -63,15 +68,57 @@ CaptureTraps
 
 set f [open $ivCSV w]
 close $f
+# One attempt at Vd=d. fill=1 runs the hot-electron FillStep (a measured
+# point); fill=0 is a plain solve (a bisection substep with retrySubFill=0).
+proc TryPoint {d fill} {
+    global fillIters fillRelax
+    if {[catch {
+        contact name=D supply=$d
+        device
+        if {$fill} { set ::te [FillStep $fillIters $fillRelax] }
+    }]} { return 0 }
+    return 1
+}
+# `device store`/`device restore` save/restore the solution; restore also
+# clears the solver's element queues a thrown NaN leaves behind (a bare
+# catch + retry would re-assemble those elements - see CLAUDE.md section 6).
+proc SaveState {} {
+    sel z=TrapFrozen name=TFsave
+    sel z=TeTrap name=TEsave
+    device store
+}
+proc RestoreState {dPrev} {
+    device restore
+    sel z=TFsave name=TrapFrozen
+    sel z=TEsave name=TeTrap
+    contact name=D supply=$dPrev
+}
+# Reach d from the converged point dPrev, bisecting the step on failure.
+proc Reach {dPrev d depth fill} {
+    SaveState
+    if {[TryPoint $d $fill]} { return 1 }
+    incr ::nRetry
+    puts "RETRY Vd $dPrev -> $d failed (depth $depth), bisecting"
+    RestoreState $dPrev
+    if {$depth <= 0} { return 0 }
+    set mid [expr {0.5 * ($dPrev + $d)}]
+    if {![Reach $dPrev $mid [expr {$depth - 1}] $::retrySubFill]} { return 0 }
+    return [Reach $mid $d [expr {$depth - 1}] $fill]
+}
+
+set nRetry 0
+set dPrev 0.0
 set n [expr {int(round($Vd_max / $Vd_step))}]
 for {set i 0} {$i <= $n} {incr i} {
     set d [expr {$i * $Vd_step}]
-    contact name=D supply=$d
-    device
-    set te [FillStep $fillIters $fillRelax]
+    if {![Reach $dPrev $d $retryDepth 1]} {
+        puts "PULSED GAVE UP at Vd=$d after $retryDepth bisection levels"
+        break
+    }
+    set dPrev $d
     set cur [expr {abs([contact name=D sol=Qfn flux])*1.0e6}]
     #FLOOXS GIVES A/um
-    puts "PULSED Vd=$d Id=$cur peakTe=$te"
+    puts "PULSED Vd=$d Id=$cur peakTe=$te retries=$nRetry"
     set f [open $ivCSV a]
     puts $f "$d, $cur, $te"
     close $f
