@@ -625,3 +625,6 @@ rest everywhere (4e18/0.75, 8e18/0.55, 8e18/0.75). Each set: 5 depths
 = 50, total 250 + trap-free reference. Vd 0-3 V/0.1 V, `dampValue`=0.05,
 Run F hot-electron levers, new retry driver. `pulsedIV_trapMapSets.slurm`
 + `params_trapMapSets.txt`, `--array=0-250%160` on `ee1-b`.
+
+Submitted **job 43513462, array 0-250%160 (251 tasks) on `ee1-b`**.
+Results into `results/20260927_trapMapSets/task_<id>/`. Polling every 5 min.
