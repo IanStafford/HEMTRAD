@@ -1,27 +1,33 @@
-"""Cone vs Gaussian trap shape at 2e18 cm^-3 / 0.75 eV (job 43536494).
+"""Cone vs Gaussian trap shape at one (trapPeak, trapLevel) setting.
 
-Compares the cone sweep (5 geometries x 10 apex positions, apex at the AlGaN
-surface) against the Gaussian 2e18/0.75 x=0 row of the trap-map sets run
-(job 43513462: same Vd range, damping and retry driver).
+Compares a cone sweep (5 geometries x 10 apex positions, apex at the AlGaN
+surface) against the Gaussian x=0 row at the same setting from the trap-map
+sets run (job 43513462: same Vd range, damping and retry driver).
+
+Usage: python3 analyze_trapCone.py [RUN PEAK LEVEL TAG]
+  default: results/20260927_trapCone 2e18 0.75 trapCone      (job 43536494)
+  e.g.     results/20260927_trapConeCollapse 4e18 0.55 trapCone_4e18_0.55
 
 Per device: at-rest fraction (Id / Id_no-trap at Vd=0.1 V), regime, collapse
 onset, collapse depth vs trap-free at the post-collapse minimum, and
 suppression at Vd=3 V (same definitions as analyze_trapMapSets.py).
 
-Writes figures/trapCone_metrics.csv, figures/trapCone_shapes.png,
-figures/trapCone_vs_position.png and figures/trapCone_IdVd.png.
+Writes figures/<TAG>_metrics.csv, <TAG>_shapes.png, <TAG>_vs_position.png
+and <TAG>_IdVd.png.
 """
 import glob
 import json
 import math
 import os
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 from scipy.special import erf
 
-CONE = "results/20260927_trapCone"
+args = sys.argv[1:] or ["results/20260927_trapCone", "2e18", "0.75", "trapCone"]
+CONE, PEAK, LEVEL, TAG = args[0], float(args[1]), float(args[2]), args[3]
 GAUSS = "results/20260927_trapMapSets"
 VD_END = 3.0
 INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"
@@ -29,7 +35,7 @@ CAT = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]
 SEQ = LinearSegmentedColormap.from_list(
     "blue_seq", ["#ffffff", "#cde2fb", "#86b6ef", "#3987e5", "#0d366b"])
 GATE, FP = (-0.125, 0.125), (0.285, 0.725)
-PEAK, SIGMA, W0, EDGE = 2e18, 0.04, 0.01, 0.01
+SIGMA, W0, EDGE = 0.04, 0.01, 0.01
 
 
 def load(path):
@@ -50,13 +56,15 @@ for p, (vd, idd) in tasks(CONE):
     if p["trapPeak"] < 1e12:
         ref = (vd, idd)
         continue
+    if (p["trapPeak"], p["trapLevel"]) != (PEAK, LEVEL):
+        continue
     key = (f"cone {p['coneLen']:g} µm / {p['coneAngle']:g}°", p["trapMeanY"])
     if key not in curves or vd[-1] > curves[key][0][-1]:
         curves[key] = (vd, idd)
 for p, (vd, idd) in tasks(GAUSS):
     if p["trapPeak"] < 1e12 and ref is None:
         ref = (vd, idd)
-    if (p["trapPeak"], p["trapLevel"], p["trapMeanX"]) == (2e18, 0.75, 0.0):
+    if (p["trapPeak"], p["trapLevel"], p["trapMeanX"]) == (PEAK, LEVEL, 0.0):
         key = ("gaussian (σ 0.04 µm)", p["trapMeanY"])
         if key not in curves or vd[-1] > curves[key][0][-1]:
             curves[key] = (vd, idd)
@@ -101,7 +109,7 @@ for (shape, y), (vd, idd) in sorted(curves.items(), key=lambda kv: (geom_key(kv[
 
 os.makedirs("figures", exist_ok=True)
 cols = list(rows[0])
-with open("figures/trapCone_metrics.csv", "w") as f:
+with open(f"figures/{TAG}_metrics.csv", "w") as f:
     f.write(",".join(cols) + "\n")
     for r in rows:
         f.write(",".join(r[c] if isinstance(r[c], str) else f"{r[c]:.6g}"
@@ -157,9 +165,9 @@ for ax, s in zip(axs, shapes):
     ax.invert_yaxis()
 axs[0].set_ylabel("depth x (nm), surface at top")
 fig.colorbar(im, ax=axs, shrink=0.85, label="trap density (cm⁻³)")
-fig.suptitle("Trap distributions compared (2e18 cm⁻³ peak; area = in-material "
+fig.suptitle(f"Trap distributions compared ({PEAK:.0e} cm⁻³ peak; area = in-material "
              "cross-section ∝ charge per gate width)", color=INK, fontsize=10)
-fig.savefig("figures/trapCone_shapes.png", dpi=150)
+fig.savefig(f"figures/{TAG}_shapes.png", dpi=150)
 plt.close(fig)
 
 # 2) Metrics vs apex position.
@@ -191,15 +199,27 @@ axs[-1].set_xlabel("trap position trapMeanY (µm) - Gaussian centre / cone apex,
                    "source → drain")
 axs[1].legend(loc="upper right", ncol=2, frameon=False, fontsize=8)
 same = [s for s in shapes if s.endswith("/ 30°")]
-if len(same) > 1:
+
+
+def overlap(shs, key="suppression_3V", tol=0.05):
+    # True if these shapes agree within tol (relative) at every position
+    for yy in ys:
+        v = [r[key] for r in rows if r["shape"] in shs and r["trapMeanY"] == yy]
+        v = [x for x in v if np.isfinite(x) and x > 0]
+        if len(v) > 1 and (max(v) / min(v) - 1) > tol:
+            return False
+    return True
+
+
+if len(same) > 1 and overlap(same):
     axs[1].text(0.45, 0.30, "the three 30° cones (0.05, 0.1, 0.2 µm long)\n"
                 "overlap exactly: depth beyond ~50 nm has no effect",
                 transform=axs[1].transAxes, color=INK, fontsize=8)
 note = ("" if any(r["regime"] == "collapse" for r in rows)
         else " - no hot-electron collapse for any shape or position")
-fig.suptitle("Cone vs Gaussian trap shape, 2e18 cm⁻³ / 0.75 eV, at the AlGaN "
+fig.suptitle(f"Cone vs Gaussian trap shape, {PEAK:.0e} cm⁻³ / {LEVEL} eV, at the AlGaN "
              "surface" + note, color=INK, fontsize=11, x=0.01, ha="left")
-fig.savefig("figures/trapCone_vs_position.png", dpi=140)
+fig.savefig(f"figures/{TAG}_vs_position.png", dpi=140)
 plt.close(fig)
 
 # 3) Id-Vd per apex position.
@@ -227,8 +247,8 @@ h, l = axs.flat[0].get_legend_handles_labels()
 fig.legend(h, l, loc="outside lower center", ncol=len(l), frameon=False,
            fontsize=8)
 fig.suptitle("Id-Vd by trap position: cone geometries vs Gaussian "
-             "(2e18 cm⁻³ / 0.75 eV, surface)", color=INK, fontsize=11,
+             f"({PEAK:.0e} cm⁻³ / {LEVEL} eV, surface)", color=INK, fontsize=11,
              x=0.01, ha="left")
-fig.savefig("figures/trapCone_IdVd.png", dpi=130)
+fig.savefig(f"figures/{TAG}_IdVd.png", dpi=130)
 plt.close(fig)
-print("wrote figures/trapCone_{metrics.csv,shapes.png,vs_position.png,IdVd.png}")
+print(f"wrote figures/{TAG}_{{metrics.csv,shapes.png,vs_position.png,IdVd.png}}")

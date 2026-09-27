@@ -1,0 +1,61 @@
+shape,trapMeanY,regime,complete,last_Vd,at_rest_frac,onset_Vd,collapse_depth_vs_ref,suppression_3V
+gaussian (σ 0.04 µm),-0.4,collapse,1,3,0.829959,0.4,61714.3,104468
+gaussian (σ 0.04 µm),-0.125,off at rest,1,3,0.000135092,nan,nan,787380
+gaussian (σ 0.04 µm),0,off at rest,1,3,7.62286e-05,nan,nan,1.1027e+06
+gaussian (σ 0.04 µm),0.125,off at rest,1,3,0.000103773,nan,nan,155129
+gaussian (σ 0.04 µm),0.285,collapse,1,3,0.807299,0.3,12493.5,1590.28
+gaussian (σ 0.04 µm),0.5,collapse,1,3,0.815473,0.3,14248.2,1248.24
+gaussian (σ 0.04 µm),0.725,collapse,1,3,0.83114,0.3,116678,5046.72
+gaussian (σ 0.04 µm),1.25,collapse,1,3,0.84436,0.4,104071,5831.29
+gaussian (σ 0.04 µm),1.75,collapse,1,3,0.855446,0.4,164512,50586.2
+gaussian (σ 0.04 µm),2.4,collapse,1,3,0.866535,0.5,72333.5,17763.3
+cone 0.05 µm / 30°,-0.4,collapse,1,3,0.942744,0.8,37.3436,57.13
+cone 0.05 µm / 30°,-0.125,off at rest,1,3,9.78745e-05,nan,nan,2.37933e+06
+cone 0.05 µm / 30°,0,off at rest,1,3,3.60038e-05,nan,nan,830083
+cone 0.05 µm / 30°,0.125,off at rest,1,3,0.000161886,nan,nan,7705.54
+cone 0.05 µm / 30°,0.285,no collapse,1,3,0.917741,nan,6.17681,6.17681
+cone 0.05 µm / 30°,0.5,no collapse,1,3,0.923804,nan,2.29826,2.29826
+cone 0.05 µm / 30°,0.725,no collapse,1,3,0.959632,nan,9.40112,1.5866
+cone 0.05 µm / 30°,1.25,no collapse,1,3,0.975041,nan,1.00348,1.00348
+cone 0.05 µm / 30°,1.75,no collapse,1,3,0.977387,nan,1.00294,1.00294
+cone 0.05 µm / 30°,2.4,no collapse,1,3,0.977009,nan,1.00299,1.00299
+cone 0.1 µm / 15°,-0.4,no collapse,1,3,0.976014,nan,1.0705,1.0705
+cone 0.1 µm / 15°,-0.125,off at rest,1,3,0.000504039,nan,nan,182819
+cone 0.1 µm / 15°,0,off at rest,1,3,0.000231794,nan,nan,76794.6
+cone 0.1 µm / 15°,0.125,off at rest,1,3,0.00128229,nan,nan,274.364
+cone 0.1 µm / 15°,0.285,no collapse,1,3,0.956938,nan,1.44348,1.44348
+cone 0.1 µm / 15°,0.5,no collapse,1,3,0.960098,nan,1.20553,1.20553
+cone 0.1 µm / 15°,0.725,no collapse,1,3,0.978736,nan,1.0043,1.0043
+cone 0.1 µm / 15°,1.25,no collapse,1,3,0.983982,nan,1.00204,1.00204
+cone 0.1 µm / 15°,1.75,no collapse,1,3,0.983933,nan,1.00196,1.00196
+cone 0.1 µm / 15°,2.4,no collapse,1,3,0.985251,nan,1.00179,1.00179
+cone 0.1 µm / 30°,-0.4,collapse,1,3,0.942739,0.8,37.5772,57.5171
+cone 0.1 µm / 30°,-0.125,off at rest,1,3,9.77801e-05,nan,nan,2.42655e+06
+cone 0.1 µm / 30°,0,off at rest,1,3,3.59725e-05,nan,nan,846977
+cone 0.1 µm / 30°,0.125,off at rest,1,3,0.000161687,nan,nan,8220.21
+cone 0.1 µm / 30°,0.285,no collapse,1,3,0.917729,nan,6.3235,6.3235
+cone 0.1 µm / 30°,0.5,no collapse,1,3,0.923792,nan,2.30863,2.30863
+cone 0.1 µm / 30°,0.725,no collapse,1,3,0.959627,nan,9.47939,1.59333
+cone 0.1 µm / 30°,1.25,no collapse,1,3,0.975038,nan,1.00348,1.00348
+cone 0.1 µm / 30°,1.75,no collapse,1,3,0.977383,nan,1.00294,1.00294
+cone 0.1 µm / 30°,2.4,no collapse,1,3,0.977006,nan,1.00299,1.00299
+cone 0.1 µm / 45°,-0.4,collapse,1,3,0.863397,0.3,55201.4,95832.6
+cone 0.1 µm / 45°,-0.125,off at rest,1,3,3.9676e-05,nan,nan,4.09902e+06
+cone 0.1 µm / 45°,0,off at rest,1,3,1.91061e-05,nan,nan,2.62089e+06
+cone 0.1 µm / 45°,0.125,off at rest,1,3,4.47784e-05,nan,nan,84888.5
+cone 0.1 µm / 45°,0.285,collapse,1,3,0.838593,0.2,11395.5,487.984
+cone 0.1 µm / 45°,0.5,collapse,1,3,0.851255,0.2,3353.85,17.7967
+cone 0.1 µm / 45°,0.725,collapse,0,2,0.903007,0.4,9310.45,nan
+cone 0.1 µm / 45°,1.25,no collapse,1,3,0.946927,nan,1.01936,1.01936
+cone 0.1 µm / 45°,1.75,no collapse,1,3,0.95645,nan,1.01108,1.01108
+cone 0.1 µm / 45°,2.4,no collapse,1,3,0.957014,nan,1.00774,1.00774
+cone 0.2 µm / 30°,-0.4,collapse,1,3,0.942739,0.8,37.5772,57.5171
+cone 0.2 µm / 30°,-0.125,off at rest,1,3,9.77801e-05,nan,nan,2.4277e+06
+cone 0.2 µm / 30°,0,off at rest,1,3,3.59725e-05,nan,nan,847150
+cone 0.2 µm / 30°,0.125,off at rest,1,3,0.000161687,nan,nan,8220.21
+cone 0.2 µm / 30°,0.285,no collapse,1,3,0.917729,nan,6.3235,6.3235
+cone 0.2 µm / 30°,0.5,no collapse,1,3,0.923792,nan,2.30863,2.30863
+cone 0.2 µm / 30°,0.725,no collapse,1,3,0.959627,nan,9.47939,1.59333
+cone 0.2 µm / 30°,1.25,no collapse,1,3,0.975038,nan,1.00348,1.00348
+cone 0.2 µm / 30°,1.75,no collapse,1,3,0.977383,nan,1.00294,1.00294
+cone 0.2 µm / 30°,2.4,no collapse,1,3,0.977006,nan,1.00299,1.00299

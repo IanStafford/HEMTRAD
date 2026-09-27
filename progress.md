@@ -716,3 +716,24 @@ surface, + trap-free reference = 101 tasks. Gaussian comparisons: the
 
 Submitted **job 43538727, array 0-100 (101 tasks) on `ee1-b`**. Results into
 `results/20260927_trapConeCollapse/task_<id>/`. Polling every 5 min.
+
+**Job 43538727 finished: 101/101 COMPLETED, 0 crashes, 2 late give-ups.**
+Analysis (`analyze_trapCone.py` now takes RUN PEAK LEVEL TAG) →
+`figures/trapCone_4e18_0.55_*`, `figures/trapCone_4e18_0.35_*`.
+Apparent result: cones mostly remove the hot-electron collapse the
+Gaussian produces (4e18/0.55: Gaussian collapses at 7 positions, 30°
+cones at 1, 15° at 0; y ≥ 1.25 µm: every cone gives exactly 1.0 = no
+effect at all).
+
+**⚠ That is a mesh artifact.** Local check, 4e18/0.55, cone 0.1 µm/45° at
+y=1.25 µm with the lateral mesh refined to 4 nm there (scratch copy of
+rfdevice.tcl only): collapses 8.2 → 0.025 mA/mm at Vd=0.2 V (~325x),
+earlier than the Gaussian - vs *no effect* (9.5 → 85 mA/mm) on the
+standard mesh (~25-40 nm lateral spacing there, cone only 25-50 nm
+wide). A nodal-sampling check had said the mesh captures the cone's
+charge (±15%) - true, but the hot-electron runaway depends on the field
+around the narrow stripe, which the coarse mesh doesn't resolve. So the
+cone-vs-Gaussian comparisons are mesh-limited wherever the cone is
+narrower than a few mesh cells (the access region especially). Running
+the same check for the Gaussian (σ 40 nm) at y=1.25 to see whether the
+earlier Gaussian maps are also mesh-sensitive there.
