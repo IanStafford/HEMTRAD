@@ -614,3 +614,14 @@ substeps, the tested behavior; Ian didn't pick, so I kept the default
 and made it switchable). Local check (task-64 params, Vd 0-0.3 V):
 identical to the previous values to every digit. Removed
 `tools/retry_snippet.tcl` (now in the driver).
+
+### Task: 3D trap-map sets at several concentrations/levels (burst)
+
+5 sets (`trapPeak`/`trapLevel`), one per regime from the conc × level
+study: 2e18/0.55, 2e18/0.75, 4e18/0.35, 4e18/0.55 (Run F, re-mapped on
+the contact-safe grid), 8e18/0.35. Skipped the ones that were off at
+rest everywhere (4e18/0.75, 8e18/0.55, 8e18/0.75). Each set: 5 depths
+(0-15 nm) × 10 positions (-0.4 to 2.4 µm, ≥0.7 µm from contact doping)
+= 50, total 250 + trap-free reference. Vd 0-3 V/0.1 V, `dampValue`=0.05,
+Run F hot-electron levers, new retry driver. `pulsedIV_trapMapSets.slurm`
++ `params_trapMapSets.txt`, `--array=0-250%160` on `ee1-b`.
