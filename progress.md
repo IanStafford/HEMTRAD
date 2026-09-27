@@ -773,3 +773,18 @@ the 4e18/0.35 edges, depths 0/7.5/15 nm, same settings as job 43513462;
 
 Submitted **job 43542730, array 0-99 on `ee1-b`** → `results/20260928_critBand/`.
 Polling every 5 min.
+
+**Job 43542730 finished: 100/100 COMPLETED, 0 crashes** (12 retried, 3
+gave up). Refined bands: 2e18/0.55 = 0.30 µm (was 0.47 coarse),
+2e18/0.75 = 0.47 µm, 4e18/0.35 = 2.67 µm; 4e18/0.55 and 8e18/0.35 cover
+the whole trusted range (3.01 µm). **Ian: gate width 200 µm.**
+
+**Result (CLAUDE.md 10i, `critical_strike.py`, `figures/criticalStrike*`):**
+at 1e7 cm⁻² and W=200 µm, λ = Φ·Δy·W = 6.0 / 9.4 / 53 / 60 / 60 expected
+critical strikes → P(≥1) = 0.9975 / 0.99992 / ≈1 / ≈1 / ≈1. 50% fluence
+1.2e6 (2e18/0.55) down to 1.15e5 cm⁻² (4e18/0.55, 8e18/0.35). Caveat: the
+2D model makes each blob span the full width. Treating cascades as
+~0.16 µm patches along the width, only ~0.5-4.8% of the width is damaged
+→ a few-percent Id loss, not a collapse. Device-level collapse would
+need overlapping cascades, Φ ≳ 4e9 cm⁻². A 3D run would settle whether
+a single patch can trigger the runaway.

@@ -512,6 +512,26 @@ Local check (scratch copy of `rfdevice.tcl` with `line y loc=1.25 spac=0.004`), 
 - **The Gaussian results are qualitatively robust but quantitatively mesh-sensitive** in the access region. Collapse still happens and is still deep, but onset shifts ~0.1 V earlier and the pre-collapse peak roughly halves on a fine mesh. That affects every access-region Gaussian number in 10b-10f, including the 10c `radPlot1` match at y=2.0 µm (onset "exactly 0.5 V").
 - Needs a decision before more trap-shape or TRIM work: local refinement that follows the trap (e.g. a `line y` at `trapMeanY` with ~4 nm spacing, driven by the trap levers) vs global refinement of the access region, plus a short convergence study (e.g. 8/4/2 nm) to pick the spacing.
 
+
+### 10i. Critical-strike probability at 1e7 ions/cm² (Gaussian damage, W = 200 µm)
+
+`critical_strike.py` → `figures/criticalStrike_summary.csv`, `figures/criticalStrike.png`. Inputs: the 10f Gaussian maps (job 43513462 + retry) plus a band-edge refinement (job 43542730, 99 devices at depths 0/7.5/15 nm, 12 retried, 3 gave up; 0 crashes). **Gate width 200 µm** (from Ian).
+
+- **Critical strike** = the Gaussian blob (σ 40 nm) cuts Id to ≤ 1/10 of trap-free at any Vd ≤ 3 V (off at rest or collapse). The critical band Δy along the channel uses nearest-sample cells within the contact-safe range [-0.425, 2.585] µm, averaged over depths 0-15 nm. Stalled-at-collapse points are inferred from the same position at other depths (8 points).
+- **Poisson hits:** Φ = 1e7 cm⁻² = 0.1 µm⁻² (mean spacing ~3.2 µm); λ = Φ·Δy·W; P(≥1) = 1 − e^(−λ).
+
+| setting | critical band (µm) | Δy (depth range) | λ at W=200 | P(≥1) | Φ for 50% |
+|---|---|---|---|---|---|
+| 2e18 / 0.55 | ≈ -0.14 … 0.14 (gate) | 0.30 (0.28-0.32) | 6.0 | 0.9975 | 1.2e6 cm⁻² |
+| 2e18 / 0.75 | -0.2…-0.35 → 0.15 (gate, wider with depth) | 0.47 (0.39-0.54) | 9.4 | 0.99992 | 7.4e5 cm⁻² |
+| 4e18 / 0.35 | ≈ -0.3 … 1.75-2.6 | 2.67 (2.15-2.96) | 53 | ≈1 | 1.3e5 cm⁻² |
+| 4e18 / 0.55 | whole trusted range | 3.01 (≤4.41 incl. contact-adjacent) | 60 | ≈1 | 1.15e5 cm⁻² |
+| 8e18 / 0.35 | whole trusted range | 3.01 (≤4.41) | 60 | ≈1 | 1.15e5 cm⁻² |
+
+- **In the 2D model a critical strike is essentially certain at 1e7 cm⁻²** (≥99.75%, with 6-60 critical strikes expected per 200 µm device); 1e7 is 8-90x past the 50% fluence.
+- **Big caveat - 2D vs 3D:** the 2D sims make each blob uniform along the whole gate width. A real single cascade is ~4σ ≈ 0.16 µm wide along the width, and current flows around it. Parallel-channel estimate: expected fraction of width damaged = Φ·Δy·0.16 µm ≈ **0.5% (2e18) to 4.8% (4e18/8e18)**, i.e. a few-percent Id loss, not a device-level collapse. Whole-device collapse from cascades would need them to overlap along the width, Φ ≳ 1/(0.16 µm)² ≈ 4e9 cm⁻². Whether the hot-electron runaway even ignites around a 0.16 µm patch (current can bypass it) is untested; that needs a 3D FLOOXS run.
+- Access-region band edges carry the 10h mesh sensitivity. The 2e18 bands (gate region, fine mesh) are reliable.
+
 ---
 
 ## 11. Notebook and plotting
