@@ -713,3 +713,6 @@ show). Same 5 cone geometries × 10 contact-safe apex positions at the
 surface, + trap-free reference = 101 tasks. Gaussian comparisons: the
 4e18/0.55 and 4e18/0.35 x=0 rows of job 43513462 (same settings).
 `pulsedIV_trapConeCollapse.slurm` + `params_trapConeCollapse.txt`.
+
+Submitted **job 43538727, array 0-100 (101 tasks) on `ee1-b`**. Results into
+`results/20260927_trapConeCollapse/task_<id>/`. Polling every 5 min.
