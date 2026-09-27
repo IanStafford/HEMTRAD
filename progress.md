@@ -752,3 +752,21 @@ with ~4 nm spacing, driven by the trap levers; cheap, but the mesh then
 differs per trap position), or (b) global refinement of the access
 region (uniform, slower everywhere) - plus a short convergence study
 (8/4/2 nm) to pick the spacing. Then rerun the cone comparison.
+
+## 2026-09-28
+
+### Task: probability of a critical strike at 1e7 ions/cm²
+
+Ian: estimate the probability of a critical strike at a fluence of 1e7
+cm⁻², assuming each strike leaves the Gaussian-style trap blob; run more
+tests if needed. Critical = the strike cuts Id ≥10x below trap-free at
+any Vd ≤ 3 V (off at rest or collapse). From the 10f maps, the critical
+band along the channel is: gate region only for 2e18/0.55 and 2e18/0.75
+(edges uncertain by up to 0.28 µm), −0.125 to ~2 µm for 4e18/0.35, and
+the whole trusted range (−0.4…2.4 µm) for 4e18/0.55 and 8e18/0.35. No
+gate width in the repo → results per µm of width, scaled to examples.
+
+Refining the band edges: `pulsedIV_critBand.slurm` + `params_critBand.txt`
+- 12 extra positions around the gate edges for both 2e18 sets, 9 around
+the 4e18/0.35 edges, depths 0/7.5/15 nm, same settings as job 43513462;
+99 devices + trap-free reference.
