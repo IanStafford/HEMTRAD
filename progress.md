@@ -770,3 +770,6 @@ Refining the band edges: `pulsedIV_critBand.slurm` + `params_critBand.txt`
 - 12 extra positions around the gate edges for both 2e18 sets, 9 around
 the 4e18/0.35 edges, depths 0/7.5/15 nm, same settings as job 43513462;
 99 devices + trap-free reference.
+
+Submitted **job 43542730, array 0-99 on `ee1-b`** → `results/20260928_critBand/`.
+Polling every 5 min.
