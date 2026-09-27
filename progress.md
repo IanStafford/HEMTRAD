@@ -676,3 +676,12 @@ designed; (2) default `gauss` path is bit-identical to before (task-64
 params, 0-0.3 V). Mesh caveat: lateral spacing is ~10-20 nm near the
 field plate, ~50 nm farther out, so the 10 nm apex is barely resolved in
 the access region.
+
+Cone sweep: 2e18 / 0.75 eV, apex at the surface, 5 geometries
+(coneLen|coneAngle: 0.05|30, 0.1|30, 0.2|30, 0.1|15, 0.1|45) × the 10
+contact-safe apex positions of 10f + trap-free reference = 51 tasks.
+In-material cross-sections (µm², ∝ charge per gate width): 0.0024,
+0.0078, 0.0271, 0.0047, 0.0120 vs 0.0050 for the surface Gaussian - so
+0.1|15° is the equal-charge, pure-shape comparison. Compared against the
+Gaussian 2e18/0.75 x=0 row of job 43513462 (same Vd 0-3 V, damping,
+retry driver). `pulsedIV_trapCone.slurm` + `params_trapCone.txt`.
