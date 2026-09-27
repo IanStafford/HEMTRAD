@@ -655,3 +655,24 @@ collapse earliest.) Figures regenerated with **collapse depth vs
 trap-free = Id_no-trap / Id at the post-collapse minimum**;
 `figures/trapMapSets_overview_ratio.png` replaced by `_overview_depth.png`;
 peak/min kept in the CSV. CLAUDE.md 10f updated.
+
+### Task: cone-shaped trap distribution (displacement-cascade-like)
+
+Ian: replace the Gaussian with a "cone" (cascade-like) shape to see how
+shape matters, ahead of importing TRIM profiles; 2e18 cm⁻³ / 0.75 eV;
+keep it modular so switching back is trivial.
+
+Model change (committed first, CRLF preserved): `GaN_modelfile_masterD`
+now has a `trapShape` lever (default `gauss`) and one proc per shape,
+`TrapConc_gauss` / `TrapConc_cone`, returning the FLOOXS expression.
+Cone: apex at (`trapMeanX`, `trapMeanY`), axis into the device (+x),
+half-width `coneW0` (0.01 µm) at the apex widening at half-angle
+`coneAngle` (30°) over depth `coneLen` (0.1 µm), uniform `trapPeak`
+inside, `erf`-softened edges (`coneEdge` 0.01 µm; erf avoids exp overflow
+→ inf, which would trip the same NaN/inf check behind the crashes).
+Checks: (1) FLOOXS-evaluated cone matches an independent Python formula
+to 1e-4 (print precision), widens with depth and cuts off at 0.1 µm as
+designed; (2) default `gauss` path is bit-identical to before (task-64
+params, 0-0.3 V). Mesh caveat: lateral spacing is ~10-20 nm near the
+field plate, ~50 nm farther out, so the 10 nm apex is barely resolved in
+the access region.

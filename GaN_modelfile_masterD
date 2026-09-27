@@ -59,11 +59,45 @@ if {![info exists trapSigma]} { set trapSigma 0.025 } ;# Gaussian spatial sigma 
 if {![info exists trapLevel]} { set trapLevel 0.68 }  ;# trap depth below Ec (eV)
 if {![info exists trapWidth]} { set trapWidth 0.1 }   ;# energy FWHM (eV)
 
-# 2D Gaussian trap distribution
-set sigma $trapSigma
-set mean_x $trapMeanX
-set mean_y $trapMeanY
-set trapConc "$trapPeak*exp(-((x-$mean_x)*(x-$mean_x)+(y-$mean_y)*(y-$mean_y))/(2.0*$sigma*$sigma))"
+# Trap spatial distribution. trapShape picks the profile; each shape is a
+# proc TrapConc_<shape> returning a FLOOXS expression in x (depth, um) and
+# y (lateral, um). Add new shapes (e.g. an imported TRIM profile) the same way.
+#   gauss - 2D Gaussian centred at (trapMeanX, trapMeanY), sigma trapSigma
+#   cone  - displacement-cascade-like cone: apex at (trapMeanX, trapMeanY),
+#           axis along +x (into the device), half-width coneW0 at the apex
+#           widening at half-angle coneAngle over depth coneLen; uniform
+#           density trapPeak inside, erf-softened edges of width coneEdge
+if {![info exists trapShape]} { set trapShape gauss }
+if {![info exists coneLen]}   { set coneLen 0.1 }    ;# cone depth extent from apex (um)
+if {![info exists coneAngle]} { set coneAngle 30.0 } ;# cone half-angle (deg)
+if {![info exists coneW0]}    { set coneW0 0.01 }    ;# cone half-width at the apex (um)
+if {![info exists coneEdge]}  { set coneEdge 0.01 }  ;# edge softness (um); mesh is ~5-50 nm
+
+proc TrapConc_gauss {} {
+    global trapPeak trapMeanX trapMeanY trapSigma
+    set s $trapSigma
+    return "$trapPeak*exp(-((x-($trapMeanX))*(x-($trapMeanX))+(y-($trapMeanY))*(y-($trapMeanY)))/(2.0*$s*$s))"
+}
+
+proc TrapConc_cone {} {
+    global trapPeak trapMeanX trapMeanY coneLen coneAngle coneW0 coneEdge
+    set tanA [expr {tan($coneAngle * acos(-1.0) / 180.0)}]
+    set e $coneEdge
+    set x0 $trapMeanX
+    # local half-width grows linearly with depth below the apex
+    set w "($coneW0+$tanA*(x-($x0)))"
+    # smooth steps: inside the half-width laterally, between apex and apex+coneLen
+    # axially (the apex-side step is shifted by 2e so the apex itself is full)
+    set lat "0.5*(1.0+erf(($w-abs(y-($trapMeanY)))/$e))"
+    set top "0.5*(1.0+erf((x-($x0)+2.0*$e)/$e))"
+    set bot "0.5*(1.0+erf((($x0)+$coneLen-x)/$e))"
+    return "$trapPeak*$lat*$top*$bot"
+}
+
+if {[info procs TrapConc_$trapShape] eq ""} {
+    error "unknown trapShape '$trapShape' (no proc TrapConc_$trapShape)"
+}
+set trapConc [TrapConc_$trapShape]
 
 # Hot-electron trap capture (see IonizedAcceptor / HotStress in Poisson.tcl)
 if {![info exists hotEb]}   { set hotEb 0.3 }       ;# capture barrier (eV); 0 = Fermi-level occupancy
