@@ -578,3 +578,31 @@ NaN it now exits with a normal Tcl error (exit 1): 0 panics, no
 Test 2 running: scratch retry driver (each Vd point in `catch`; on
 failure `device restore` + restore `TrapFrozen`/`TeTrap`, then bisect
 the Vd step up to 5 levels).
+
+**Test 2 (retry driver, patched binary): PASS.** The 0.4 → 0.5 V step
+hit the NaN; one bisection level (via 0.45 V) got past it, and the sweep
+completed to 3 V with no further retries: collapse at 0.5 V (30.6 →
+0.0012 mA/mm, ~26,000x), creeping to 0.0037 by 3 V - consistent with
+its 8e18/0.35 eV neighbors.
+
+**Test 3 (same retry driver, stock unpatched binary): PASS, identical
+to every digit, no crash.** `device restore` already clears the stale
+queues (`DevController::Restore()` → `Solver::Restore()`). Verified the
+HPG source (`503b936`) has the same code path, so **the driver-side
+retry alone should end the crashes on HPG without rebuilding FLOOXS**.
+
+- FLOOXS patch committed on local branch `crash-fix`
+  (`~/flooxs-crashfix`), not installed, not on HPG, not upstream. Still
+  worth having as defense in depth: any *unrecovered* failure then
+  exits cleanly with no core dump.
+- Tested retry logic saved as `tools/retry_snippet.tcl`; not yet wired
+  into `pulsedIV.tcl`.
+- Caveat: a bisection substep runs a full `FillStep` at the
+  intermediate Vd, adding a little extra trap-fill history compared to
+  an un-retried run. The alternative is a plain `device` at substeps,
+  with `FillStep` only at grid points.
+
+**Waiting on Ian:** (1) wire the retry into `pulsedIV.tcl` (behavior is
+identical when nothing fails)? (2) FillStep vs plain `device` at
+bisection substeps? (3) Rebuild HPG FLOOXS with the patch / send
+upstream, or leave it local for now?
