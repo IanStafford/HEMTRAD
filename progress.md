@@ -558,3 +558,23 @@ losing.
 **Waiting on Ian:** OK to (a) patch + build FLOOXS in a separate local
 build dir (installed `/usr/local/bin/flooxs` untouched) and test on task
 64, then (b) rebuild on HPG / send upstream?
+
+**Ian approved testing in a separate local build.** Patched FLOOXS on a
+git worktree `~/flooxs-crashfix` (branch `crash-fix` off `e7c2a30f`),
+built in `~/flooxs-crashfix/build` with the same config as the release
+build; `~/flooxs` and `/usr/local/bin/flooxs` untouched. Patch (20
+lines, 4 files, no model physics):
+- `Solver::InitializeAssembly`: `eq0.Clear(); eq1.Clear();` before refilling.
+- `DevController::Solve` / `StressController::Solve` catch blocks:
+  `ds->Restore()` (clears the half-drained queues).
+- `FLPS_panic`: hard `std::_Exit(1)` if re-entered; `GlobalExit`:
+  re-entry guard + `fslist = NULL` after delete.
+
+**Test 1 (task 64 deck, unmodified, patched binary): PASS.** Identical
+Id at every Vd through 0.4 V (all digits) - no physics change. At the
+NaN it now exits with a normal Tcl error (exit 1): 0 panics, no
+`munmap_chunk`, no core dump.
+
+Test 2 running: scratch retry driver (each Vd point in `catch`; on
+failure `device restore` + restore `TrapFrozen`/`TeTrap`, then bisect
+the Vd step up to 5 levels).
