@@ -445,6 +445,28 @@ Each device is classified by its current at rest (Id/Id_no-trap at Vd=0.1V) and 
 - **2e18 is too little charge** for a hot-electron collapse in the access region at any level through 3V; only gate-region traps matter.
 - **Caveats:** off-at-rest devices hit the numerical noise floor (~1e-8 mA/mm, visibly jagged at 8e18/0.75), so suppression values above ~1e9 aren't physically meaningful. Onset and collapse ratio are only reported for devices that conduct at rest.
 
+
+### 10f. 3D trap maps at several concentrations / levels (burst QOS)
+
+Job 43513462 (251 tasks, `ee1-b`) + solver-side retry 43515232 (10 give-ups, `dampValue`=0.02, `retryDepth`=7), `results/20260927_trapMapSets*/`. **First sweep with the retry-enabled `pulsedIV.tcl`: 0 crashes** (previous sweeps lost 20-50% to `munmap_chunk`). 48 tasks needed at least one retry; 242/250 reached 3 V. The 8 that didn't (7 at 8e18/0.35 eV, drain-side access region, 1 at 4e18/0.35) stall exactly at their collapse point even with 7 bisection levels (~0.8 mV steps) and heavy damping. That looks like a discontinuous jump in the model at the runaway, which Vd continuation can't follow. They're marked "did not converge" on the plots, not plotted as values.
+
+Sets (`trapPeak`/`trapLevel`): 2e18/0.55, 2e18/0.75, 4e18/0.35, 4e18/0.55 (Run F), 8e18/0.35, one per regime from 10e. Each: 5 depths (0-15 nm) × 10 positions (-0.4 to 2.4 µm, contact-safe), Run F hot-electron levers, Vd 0-3 V, `dampValue`=0.05. `analyze_trapMapSets.py` → `figures/trapMapSets_metrics.csv`, `figures/trapMapSets_tp<peak>_tl<level>.png` (collapse-ratio and suppression 3D pair per set), `figures/trapMapSets_overview_{ratio,suppression}.png` (all sets, shared z-scale).
+
+| set | regimes (of 50) | collapse onset | collapse ratio (range, geo-mean) | suppression: gate region / access region |
+|---|---|---|---|---|
+| 2e18 / 0.55 | collapse 8 (gate only), none 40, off 2 | 0.2-0.3 V | 13-19 | ~500 / ~1 |
+| 2e18 / 0.75 | none 35, off 15 (gate) | - | - | ~6e5 / ~1 |
+| 4e18 / 0.35 | collapse 39, none 5, off 5, ? 1 | 0.2-2.9 V | 11-870 (1e2) | ~6e3 / 10-260 |
+| 4e18 / 0.55 | collapse 35, off 15 (gate) | 0.2-0.5 V | 3e3-7.5e4 (2e4) | ~2e6 / 5e3-1e5 |
+| 8e18 / 0.35 | collapse 28, off 15 (gate), ? 7 | 0.4-0.6 V | 3e4-3e5 (7e4) | ~2.6e6 / 5e4-3e5 |
+
+- **The gate region (y = -0.125 to 0.125) is the most damaging location in every set.** Once there's enough charge or a deep enough level, traps there turn the device off at rest at every depth.
+- **At 2e18, access-region traps do nothing** (suppression ≈1 at both levels). Only the gate region matters, and the level decides how much: 0.55 eV ~500x, 0.75 eV ~6e5x.
+- **Collapse onset moves later with distance from the gate in every collapsing set.** It's most dramatic at 4e18/0.35: 1.5 V at the field-plate edge → 2.7 V at 2.4 µm. The source side (-0.4 µm) also collapses late (2.7 V).
+- **Depth: traps nearer the 2DEG are consistently more damaging** in every set, by 1.5x (8e18/0.35) to 8x (4e18/0.35) in suppression from surface to 2DEG.
+- **Concentration/level set the collapse depth scale:** ~100x (4e18/0.35) → ~2e4x (4e18/0.55) → ~7e4x (8e18/0.35). Shallower level + more charge gives the deepest collapse while keeping the channel open at rest outside the gate.
+- 4e18/0.55 on the contact-safe grid agrees with the 10d map where they overlap.
+
 ---
 
 ## 11. Notebook and plotting

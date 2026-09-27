@@ -628,3 +628,20 @@ Run F hot-electron levers, new retry driver. `pulsedIV_trapMapSets.slurm`
 
 Submitted **job 43513462, array 0-250%160 (251 tasks) on `ee1-b`**.
 Results into `results/20260927_trapMapSets/task_<id>/`. Polling every 5 min.
+
+**Job 43513462 finished: all 251 COMPLETED, 0 crashes** (no `munmap`,
+no panics, no cores) - first sweep with the retry driver. 48 tasks
+needed retries, 10 gave up at their collapse point. Solver-side retry
+of those 10 (**job 43515232**, `dampValue` 0.02, `retryDepth` 7)
+recovered 2 → **242/250 complete**. The last 8 (7 at 8e18/0.35 drain
+side) stall exactly at the collapse even at ~0.8 mV steps - looks like
+a genuine jump in the model; left as marked holes.
+
+Figures: `figures/trapMapSets_tp<peak>_tl<level>.png` (5 sets, each a
+collapse-ratio + suppression 3D pair) and
+`figures/trapMapSets_overview_{ratio,suppression}.png`; data
+`figures/trapMapSets_metrics.csv`. Writeup CLAUDE.md 10f. Headlines:
+gate region most damaging in every set; 2e18 access-region traps do
+nothing; onset moves later with distance from the gate (4e18/0.35: 1.5
+→ 2.7 V); deeper traps consistently worse; collapse depth scale ~100x →
+2e4x → 7e4x for 4e18/0.35 → 4e18/0.55 → 8e18/0.35.
