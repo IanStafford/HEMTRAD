@@ -688,3 +688,17 @@ retry driver). `pulsedIV_trapCone.slurm` + `params_trapCone.txt`.
 
 Submitted **job 43536494, array 0-50 (51 tasks) on `ee1-b`**. Results into
 `results/20260927_trapCone/task_<id>/`. Polling every 5 min.
+
+**Job 43536494 finished: 51/51 COMPLETED, no retries, no crashes.**
+Writeup CLAUDE.md 10g; figures `figures/trapCone_shapes.png`,
+`_vs_position.png`, `_IdVd.png`; data `figures/trapCone_metrics.csv`.
+- No hot-electron collapse for any shape at 2e18/0.75 eV; only the gate
+  region switches off at rest; access region untouched for every shape.
+- Cone length (0.05/0.1/0.2 µm at 30°) makes no difference at all:
+  traps deeper than ~50 nm don't matter here.
+- Near-surface trap charge over the gate is what counts: 15° cone
+  (≈ Gaussian's total charge) ~270x weaker than the Gaussian under the
+  gate; 45° cone ~6x stronger; Gaussian beats 30° cones despite less
+  total charge because its charge sits at the surface.
+- Next options: repeat the shape comparison at a collapsing set (e.g.
+  4e18/0.55 or 8e18/0.35); refine the mesh before TRIM profiles.

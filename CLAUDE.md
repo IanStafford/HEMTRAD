@@ -472,6 +472,28 @@ Sets (`trapPeak`/`trapLevel`): 2e18/0.55, 2e18/0.75, 4e18/0.35, 4e18/0.55 (Run F
 - **Concentration/level set the collapse depth scale** (vs trap-free, geo-mean): ~200x (4e18/0.35) → ~1.3e5x (4e18/0.55) → ~2.5e5x (8e18/0.35). Shallower level + more charge gives the deepest collapse while keeping the channel open at rest outside the gate.
 - 4e18/0.55 on the contact-safe grid agrees with the 10d map where they overlap.
 
+
+### 10g. Cone (cascade-like) vs Gaussian trap shape, 2e18 cm⁻³ / 0.75 eV
+
+Job 43536494 (51 tasks, `ee1-b`), `results/20260927_trapCone/`. All 51 completed, with no retries needed. `trapShape=cone`, apex at the AlGaN surface (`trapMeanX`=0) at the 10 contact-safe positions of 10f; 5 geometries (`coneLen` µm / `coneAngle`): 0.05/30°, 0.1/30°, 0.2/30°, 0.1/15°, 0.1/45° (`coneW0`=0.01, `coneEdge`=0.01). Compared against the Gaussian 2e18/0.75 x=0 row of job 43513462 (same Vd 0-3 V, damping, retry driver). `analyze_trapCone.py` → `figures/trapCone_metrics.csv`, `_shapes.png` (the profiles), `_vs_position.png`, `_IdVd.png`.
+
+In-material cross-section (µm², ∝ trapped charge per gate width): Gaussian 0.0051; cones 0.0025, 0.0078, 0.0271, 0.0047 (15°, ≈ equal charge to the Gaussian), 0.0121 (45°).
+
+Suppression vs trap-free at Vd=3 V, under the gate (y=0) / at the gate edges (-0.125 | 0.125):
+
+| shape | y=0 | y=-0.125 / 0.125 | elsewhere |
+|---|---|---|---|
+| Gaussian σ 0.04 | 1.5e5 | 2.8e4 / 590 | 1-2.2 |
+| cone 0.05, 0.1, 0.2 µm @30° | 3.3e4-3.4e4 (identical) | 3.3e3-3.5e3 / 9 | ≈1 |
+| cone 0.1 µm @15° | 560 | 66 / 2.5 | ≈1 |
+| cone 0.1 µm @45° | 9.1e5 | 1.2e5 / 310 | ≈1 |
+
+- **No hot-electron collapse for any shape or position at 2e18/0.75 eV.** As with the Gaussian (10e, 10f), the only effect is static: the gate region is switched off at rest. The access region is untouched (≥92% of trap-free at rest, suppression ≈1) whatever the shape.
+- **Cone length doesn't matter.** 0.05, 0.1 and 0.2 µm at 30° agree to 2 significant figures everywhere, so traps deeper than ~50 nm into the GaN buffer have no effect at this level. The first few tens of nm (the 15 nm AlGaN barrier and just below the 2DEG) do all the work.
+- **What matters is how much trap charge sits near the surface over the gate.** The narrow 15° cone (same total charge as the Gaussian) is ~270x weaker than the Gaussian under the gate, and the wide 45° cone is ~6x stronger. The Gaussian beats the 30° cones despite ~35% less total charge because its charge is concentrated at the surface (it's widest where the cones are narrowest, at the apex).
+- Implication for TRIM: only the near-surface part of a cascade profile (roughly the top 50 nm) should matter for this device, at least for deep (0.75 eV) traps at this density. Resolving the narrow top of a cascade will need a finer mesh than the current ~10-50 nm lateral spacing in the access region.
+- Caveat: this set never collapses, so it only tests the "off at rest" mechanism. Shape effects on the hot-electron collapse itself would need a collapsing set (e.g. 4e18/0.55 or 8e18/0.35).
+
 ---
 
 ## 11. Notebook and plotting
