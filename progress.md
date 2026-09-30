@@ -788,3 +788,12 @@ critical strikes → P(≥1) = 0.9975 / 0.99992 / ≈1 / ≈1 / ≈1. 50% fluenc
 → a few-percent Id loss, not a collapse. Device-level collapse would
 need overlapping cascades, Φ ≳ 4e9 cm⁻². A 3D run would settle whether
 a single patch can trigger the runaway.
+
+## 2026-09-30
+
+Made a 12-slide progress-report deck (claude.ai Slides artifact:
+https://claude.ai/artifact/4RfyrQi58v7pD8NH6aFLqc, private until shared):
+problem, model, radPlot1 onset match via trap placement, late-onset
+(~2.3 V) result, trap maps, conc × level regimes, trap shape, critical-
+strike probability, tooling/crash fix, caveats, next steps. Added
+`figures/lateOnset_vs_F.png` (Run F vs late-onset Id-Vd) for it.
