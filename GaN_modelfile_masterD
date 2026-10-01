@@ -105,9 +105,18 @@ if {![info exists hotTau]}  { set hotTau 1.0e-13 }  ;# energy relaxation time (s
 if {![info exists hotMu]}   { set hotMu 600.0 }     ;# GaN electron mobility (cm2/Vs), matches GaN.tcl
 if {![info exists hotVsat]} { set hotVsat 1.9e7 }   ;# saturation velocity (cm/s)
 
+# Traps in the insulators (Nitride, HighK): static charge only, since no
+# carriers or Qfn are solved there. 0 = none (default, unchanged behavior);
+# -1 = the same trap density fully filled (-q*N); +1 = fixed positive (+q*N).
+if {![info exists insTrapSign]} { set insTrapSign 0 }
+
 if {$trapEn} {
     IonizedAcceptor GaN $trapConc $trapLevel $trapWidth
     IonizedAcceptor AlGaN $trapConc $trapLevel $trapWidth
+    if {$insTrapSign != 0} {
+        InsTrapCharge Nitride $trapConc $insTrapSign
+        InsTrapCharge HighK $trapConc $insTrapSign
+    }
 }
 
 #Electrical Initial Conditions

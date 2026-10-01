@@ -797,3 +797,29 @@ problem, model, radPlot1 onset match via trap placement, late-onset
 (~2.3 V) result, trap maps, conc × level regimes, trap shape, critical-
 strike probability, tooling/crash fix, caveats, next steps. Added
 `figures/lateOnset_vs_F.png` (Run F vs late-onset Id-Vd) for it.
+
+## 2026-10-01
+
+### Task: full x-y trap sensitivity map incl. insulators (burst)
+
+Ian: full sensitivity run + 3D plot, trap position from the top of the
+HighK to 0.5 µm into the GaN (x) and across the channel away from the
+contacts (y); put the trap charge into the insulator Poisson. Decisions
+(Ian): insulator traps = static charge, **both signs** (no carriers/Qfn
+in the insulators, so no Fermi or hot-electron filling there); **Run F
+levels** (4e18, 0.55 eV, σ 0.04); **current mesh**, flagged (10h).
+
+Model change: `Poisson.tcl` new `InsTrapCharge` (adds ±Ntrap to the
+insulator Poisson); `GaN_modelfile_masterD` new lever `insTrapSign`
+(0 default = unchanged; −1 = filled −q·N; +1 = +q·N) applied to Nitride
+and HighK. Local tests (Run F levels, y=0.5 µm, Vd 0-1 V), all clean:
+default bit-identical (task-64 check); HighK top −1/+1 → −0.13%/+0.12%
+(symmetric, so the term is wired right); Nitride just above the AlGaN
+(−1) → off at rest (~1e-10 mA/mm; fully-filled 4e18 there ≈ 1e13 cm⁻²,
+2DEG-scale); 250 nm into the GaN → identical to trap-free.
+
+Sweep: x ∈ {−275, −225, −150, −100, −30, −2.5, 0, 7.5, 15, 40, 80, 150,
+250, 375, 515} nm × y ∈ {−0.4 … 2.5} µm (13), positions inside metal
+excluded → grid A (−1) 182 + grid B (+1, insulator-centred) 65 + ref =
+248 tasks. `pulsedIV_trapXYMap.slurm` + `params_trapXYMap.txt`,
+`analyze_trapXYMap.py`.

@@ -19,6 +19,16 @@ proc InsPoisson {Mat} {
     pdbSetString $Mat DevPsi Equation $eqn
 }
 
+# Static trap charge in an insulator (no carriers or Qfn there, so no Fermi or
+# hot-electron occupancy): sign = -1 puts the traps in fully filled (-q*Ntrap),
+# +1 as fixed positive charge (+q*Ntrap, e.g. trapped holes). Rebuilds the
+# InsPoisson equation with the extra term.
+proc InsTrapCharge {Mat Ntrap sign} {
+    global q eps0
+    set eqn "- ($eps0 * [pdbDelayDouble $Mat DevPsi RelEps] * grad(DevPsi) / $q) + Doping + ($sign) * ($Ntrap)"
+    pdbSetString $Mat DevPsi Equation $eqn
+}
+
 # Acceptor trap: neutral when empty, -q when filled with an electron.
 # IonAcceptor = Ntrap * f, where f is the electron occupancy of a level Etrap
 # below Econd (Gaussian energy spread Efwhm via 3-point Gauss-Hermite).
