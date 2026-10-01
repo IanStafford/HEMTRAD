@@ -14,7 +14,8 @@ sign -1), figures/trapXYMap_map.png and _map_plus.png (2D maps over the
 device cross-section, sign -1 / +1)
 and figures/trapXYMap_sign.png (-1 vs +1 at insulator positions) and
 figures/trapXYMap_neutral.png (companion run results/20261001_trapXYMap0:
-insulator traps neutral, sign 0, x -30..80 nm, side by side with -1 / +1).
+insulator traps neutral, sign 0, x -30..80 nm, side by side with -1 / +1)
+and figures/trapXYMap_3d_neutral.png (its 3D surfaces).
 """
 import glob
 import json
@@ -139,32 +140,48 @@ def xlabels(xs):
     return [f"{x * 1e3:g} {layer(x)}" for x in xs]
 
 
-# 1) 3D surfaces, sign -1, depth on evenly spaced rows (the action is in a
-#    ~70 nm band that a linear axis would squash)
-fig = plt.figure(figsize=(16, 7.4))
-for k, (key, lab) in enumerate((("r_3V", "suppression at Vd = 3 V"),
-                                ("r_worst", "worst suppression, Vd 0.1-3 V"))):
-    xs, ys, Z = grid(-1, key, lambda v: min(-np.log10(v), FLOOR))
-    Y, X = np.meshgrid(ys, np.arange(len(xs)))
-    ax = fig.add_subplot(1, 2, k + 1, projection="3d")
-    ax.plot_surface(Y, X, np.where(np.isfinite(Z), Z, np.nan), cmap=SEQ,
-                    edgecolor="white", linewidth=0.4, alpha=0.93, vmin=0, vmax=FLOOR)
-    ok = np.isfinite(Z)
-    ax.scatter(Y[ok], X[ok], Z[ok], color=INK, s=6, depthshade=False)
-    ax.set_yticks(np.arange(len(xs)))
-    ax.set_yticklabels(xlabels(xs), fontsize=7)
-    ax.set_xlabel("y, lateral (µm)\nsource → drain", labelpad=8)
-    ax.set_ylabel("trap centre depth (nm)", labelpad=22)
-    ax.set_zlabel(f"log10 {lab}", labelpad=6)
-    ax.set_zlim(0, FLOOR)
-    ax.view_init(elev=32, azim=-128)
-    ax.set_title(lab, color=INK, fontsize=11)
-fig.suptitle("Trap-blob sensitivity across the device (Run F levels; insulator parts fully "
-             f"filled, -q·N; capped at 1e{FLOOR:g} = noise floor; holes = metal)",
-             color=INK, fontsize=12)
-fig.tight_layout()
-fig.savefig("figures/trapXYMap_3d.png", dpi=140)
-plt.close(fig)
+# 1) 3D surfaces, depth on evenly spaced rows (the action is in a ~70 nm band
+#    that a linear axis would squash)
+PANELS = {"r_rest": "suppression at rest, Vd = 0.1 V",
+          "r_3V": "suppression at Vd = 3 V",
+          "r_worst": "worst suppression, Vd 0.1-3 V"}
+
+
+def surf3d(sg, keys, title, out, azim=-128):
+    fig = plt.figure(figsize=(8 * len(keys), 7.4))
+    for k, key in enumerate(keys):
+        lab = PANELS[key]
+        xs, ys, Z = grid(sg, key, lambda v: min(-np.log10(v), FLOOR))
+        Y, X = np.meshgrid(ys, np.arange(len(xs)))
+        ax = fig.add_subplot(1, len(keys), k + 1, projection="3d")
+        ax.plot_surface(Y, X, np.where(np.isfinite(Z), Z, np.nan), cmap=SEQ,
+                        edgecolor="white", linewidth=0.4, alpha=0.93, vmin=0, vmax=FLOOR)
+        ok = np.isfinite(Z)
+        ax.scatter(Y[ok], X[ok], Z[ok], color=INK, s=6, depthshade=False)
+        ax.set_yticks(np.arange(len(xs)))
+        ax.set_yticklabels(xlabels(xs), fontsize=7)
+        ax.set_xlabel("y, lateral (µm)\nsource → drain", labelpad=8)
+        ax.set_ylabel("trap centre depth (nm)", labelpad=22)
+        ax.set_zlabel(f"log10 {lab}", labelpad=6)
+        ax.set_zlim(0, FLOOR)
+        ax.view_init(elev=32, azim=azim)
+        ax.set_title(lab, color=INK, fontsize=11)
+    fig.suptitle(title, color=INK, fontsize=12)
+    fig.tight_layout()
+    fig.savefig(out, dpi=140)
+    plt.close(fig)
+
+
+surf3d(-1, ("r_3V", "r_worst"),
+       "Trap-blob sensitivity across the device (Run F levels; insulator parts fully "
+       f"filled, -q·N; capped at 1e{FLOOR:g} = noise floor; holes = metal)",
+       "figures/trapXYMap_3d.png")
+if any(r["insTrapSign"] == 0 for r in rows):
+    surf3d(0, ("r_rest", "r_3V", "r_worst"),
+           "Neutral insulator traps (sign 0): Run F blob, x -30…80 nm. At rest only the gate "
+           "region is off; under bias the access region collapses "
+           f"(capped at 1e{FLOOR:g}; hole = metal)",
+           "figures/trapXYMap_3d_neutral.png")
 
 # 2) 2D maps over the cross-section, rows = sampled depths (top = HighK top)
 DIVR = DIV.reversed()   # blue = current cut, orange = current raised
@@ -288,4 +305,4 @@ if any(r["insTrapSign"] == 0 for r in rows):
                  "collapse, white = not run, hatched = metal)", color=INK, fontsize=12)
     fig.savefig("figures/trapXYMap_neutral.png", dpi=140)
     plt.close(fig)
-print("wrote figures/trapXYMap_{metrics.csv,3d.png,map.png,map_plus.png,sign.png,neutral.png}")
+print("wrote figures/trapXYMap_{metrics.csv,3d.png,3d_neutral.png,map.png,map_plus.png,sign.png,neutral.png}")
