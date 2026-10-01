@@ -870,3 +870,4 @@ Submitted **job 44294165** → `results/20261001_trapSiN/`. Polling every 5 min.
 ## 2026-10-01 - HighK vs SiN at Run F (Ian approved)
 
 Ian: repeat at Run F (4e18/0.55 eV); if HighK and SiN are still the same, dig into the dielectric model (he expects some field passivation from the HighK). `pulsedIV_trapSiN_F.slurm` / `params_trapSiN_F.txt`: the 10f Run F grid on `rfdevice_SiN.tcl` + a trap-free SiN reference, 51 tasks on `ee1-b`. HighK side = 10f job 43513462 + retry 43515232. `analyze_trapSiN.py` now takes `trapPeak trapLevel SiN_run tag` arguments.
+Submitted **job 44303974** → `results/20261001_trapSiN_F/`. Polling every 5 min. Meanwhile: reviewing the dielectric model locally.
