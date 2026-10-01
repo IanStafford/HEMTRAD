@@ -880,3 +880,7 @@ The HighK is applied correctly (solver reports εr HighK 35, Nitride 6.3, Metal 
 - So the identical HighK/SiN trap maps at 2e18/0.75 are physical for 0-3 V sweeps, not a dielectric-model bug. Trap-free Id: SiN +0.4% at 0.1 V to +2.7% at 20 V.
 - Also found: old `fieldpeak.tcl` set HighK εr 6.3 *before* sourcing the model file, which resets it to 35, so its "SiN" run was really HighK. Not fixed (unused script); noted.
 `figures/fieldPlate.png`, `_sweep.csv`, `_cuts.csv` (`plot_fieldPlate.py`). Run F SiN job 44303974 still running.
+
+## 2026-10-01 - HighK vs SiN at Run F done (job 44303974)
+
+51/51 clean (6 retried). Same as at 2e18/0.75: identical regimes, **identical collapse onset at every position**, depth within ±0.1-0.2 decades. Matches the field-plate check (no field outside the gate edge at ≤3 V). CLAUDE.md 10l updated. Nothing running on HPG.
