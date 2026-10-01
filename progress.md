@@ -860,3 +860,4 @@ Sweep `pulsedIV_trapDeep.slurm`: x ∈ {15,25,30,40,50,60,80} nm × y ∈ {−0.
 
 New `rfdevice_SiN.tcl` (every HighK region → Nitride) and a `deviceDeck` lever in `pulsedIV.tcl` (default unchanged; regression bit-identical). Local checks, Vd 0-0.5 V: trap-free SiN is 0.4-0.6% above HighK (10.06 vs 10.02 mA/mm at 0.1 V); 2e18/0.75 eV under the gate matches the HighK device to 4-5 significant figures (off at rest, ~0.0095 mA/mm). So any effect should show at higher Vd.
 Sweep `pulsedIV_trapSiN.slurm`: the 10f 2e18/0.75 grid (5 depths × 10 positions) on the SiN device + a trap-free SiN reference = 51 tasks on `ee1-b`. The HighK side reuses job 43513462. Analysis: `analyze_trapSiN.py`.
+Submitted **job 44294165** → `results/20261001_trapSiN/`. Polling every 5 min.
