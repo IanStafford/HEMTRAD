@@ -44,7 +44,7 @@ Ohmic AlGaN D
 Ohmic GaN B
 
 if {![info exists pGaN]} { set pGaN 0.0 }
-set phiB 1.65; # Placeholder for field plate when using pGaN contact
+if {![info exists phiB]} { set phiB 1.65 } ;# effective gate/FP barrier vs Nitride Ec (eV); sets Vth. Placeholder for field plate when using pGaN contact
 
 if {!$pGaN} {
     # Ambacher's formula can be applied when we have AlGaN/Metal or potentially with a thin layer of Nitride,

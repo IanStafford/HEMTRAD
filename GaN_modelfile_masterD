@@ -40,7 +40,8 @@ HoleContinuity AlGaN
 
 # Is the interface charge constant everwhere all the time?
 #Add interface charge
-pdbSetString AlGaN_GaN DevPsi Equation "7.0e12"
+if {![info exists polCharge]} { set polCharge 7.0e12 } ;# net AlGaN/GaN interface (polarization) charge, cm^-2
+pdbSetString AlGaN_GaN DevPsi Equation "$polCharge"
 
 source Poisson.tcl
 Poisson AlGaN
