@@ -871,3 +871,12 @@ Submitted **job 44294165** → `results/20261001_trapSiN/`. Polling every 5 min.
 
 Ian: repeat at Run F (4e18/0.55 eV); if HighK and SiN are still the same, dig into the dielectric model (he expects some field passivation from the HighK). `pulsedIV_trapSiN_F.slurm` / `params_trapSiN_F.txt`: the 10f Run F grid on `rfdevice_SiN.tcl` + a trap-free SiN reference, 51 tasks on `ee1-b`. HighK side = 10f job 43513462 + retry 43515232. `analyze_trapSiN.py` now takes `trapPeak trapLevel SiN_run tag` arguments.
 Submitted **job 44303974** → `results/20261001_trapSiN_F/`. Polling every 5 min. Meanwhile: reviewing the dielectric model locally.
+
+## 2026-10-01 - dielectric model check (local, `fieldPlateTest.tcl`)
+
+The HighK is applied correctly (solver reports εr HighK 35, Nitride 6.3, Metal 1e12; metal acts as a conductor, so the T-gate head is part of the gate). Trap-free, Vg=−2, Vd to 20 V, HighK then SiN (run consecutively):
+- **HighK does give field passivation, but only above ~5 V.** At 20 V the T-gate-head/field-plate peak drops from 416 to 202 kV/cm, and the field spreads out to ~1.2 µm (access-region field 116 vs 9 kV/cm). At 10 V: 98 vs 140.
+- **At Vd ≤ 3 V (all our trap sweeps) there is no field outside the gate edge** (3-4 kV/cm on both devices). The only hot spot is the gate drain edge (264 kV/cm at 3 V), under the gate stem with ~5 nm of nitride over the AlGaN, which the HighK can't reach; it differs by <2% even at 20 V.
+- So the identical HighK/SiN trap maps at 2e18/0.75 are physical for 0-3 V sweeps, not a dielectric-model bug. Trap-free Id: SiN +0.4% at 0.1 V to +2.7% at 20 V.
+- Also found: old `fieldpeak.tcl` set HighK εr 6.3 *before* sourcing the model file, which resets it to 35, so its "SiN" run was really HighK. Not fixed (unused script); noted.
+`figures/fieldPlate.png`, `_sweep.csv`, `_cuts.csv` (`plot_fieldPlate.py`). Run F SiN job 44303974 still running.
