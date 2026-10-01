@@ -12,7 +12,9 @@ r_worst = min over Vd of Id/Id_no-trap, collapse onset / depth vs trap-free
 Writes figures/trapXYMap_metrics.csv, figures/trapXYMap_3d.png (3D surfaces,
 sign -1), figures/trapXYMap_map.png and _map_plus.png (2D maps over the
 device cross-section, sign -1 / +1)
-and figures/trapXYMap_sign.png (-1 vs +1 at insulator positions).
+and figures/trapXYMap_sign.png (-1 vs +1 at insulator positions) and
+figures/trapXYMap_neutral.png (companion run results/20261001_trapXYMap0:
+insulator traps neutral, sign 0, x -30..80 nm, side by side with -1 / +1).
 """
 import glob
 import json
@@ -44,7 +46,8 @@ def load(p):
 
 
 ref, dev = None, {}
-for t in glob.glob(f"{RUN}/task_*") + glob.glob(f"{RUN}Retry/task_*"):
+for t in (glob.glob(f"{RUN}/task_*") + glob.glob(f"{RUN}Retry/task_*")
+          + glob.glob(f"{RUN}0/task_*")):
     p = json.load(open(os.path.join(t, "params.json")))
     c = glob.glob(os.path.join(t, "pulsedIV_*.csv"))
     if not c or os.path.getsize(c[0]) == 0:
@@ -97,7 +100,7 @@ with open("figures/trapXYMap_metrics.csv", "w") as f:
                          for c in cols) + "\n")
 print(f"{len(rows)} devices, {sum(r['complete'] for r in rows)} complete; "
       f"ref Id(3V) = {iref(VD_END):.4g} mA/mm")
-for sg in (-1, 1):
+for sg in (-1, 0, 1):
     rs = [r for r in rows if r["insTrapSign"] == sg]
     reg = {}
     for r in rs:
@@ -233,4 +236,56 @@ if ins:
                  "(shaded: gate, field plate)", color=INK, fontsize=12)
     fig.savefig("figures/trapXYMap_sign.png", dpi=140)
     plt.close(fig)
-print("wrote figures/trapXYMap_{metrics.csv,3d.png,map.png,map_plus.png,sign.png}")
+
+# 4) Neutral vs filled vs positive insulator charge at the shared near-surface rows
+if any(r["insTrapSign"] == 0 for r in rows):
+    xs0 = sorted({r["trapMeanX"] for r in rows if r["insTrapSign"] == 0})
+    ys0 = sorted({r["trapMeanY"] for r in rows if r["insTrapSign"] == 0})
+    look = {(r["insTrapSign"], r["trapMeanX"], r["trapMeanY"]): r for r in rows}
+    fig, axs = plt.subplots(2, 3, figsize=(18, 7.4), constrained_layout=True,
+                            sharex=True, sharey=True)
+    for c, (sg, name) in enumerate(((0, "neutral (sign 0)"), (-1, "filled, -q·N (sign -1)"),
+                                    (1, "positive, +q·N (sign +1)"))):
+        for rr, (key, lab) in enumerate((("r_rest", "at rest, Vd = 0.1 V"),
+                                         ("r_3V", "Vd = 3 V"))):
+            ax = axs[rr, c]
+            Z = np.full((len(xs0), len(ys0)), np.nan)
+            for i, x in enumerate(xs0):
+                for j, y in enumerate(ys0):
+                    r = look.get((sg, x, y))
+                    if r is not None and np.isfinite(r[key]) and r[key] > 0:
+                        Z[i, j] = max(np.log10(r[key]), -FLOOR)
+            pc = ax.pcolormesh(np.arange(len(ys0) + 1) - 0.5, np.arange(len(xs0) + 1) - 0.5,
+                               Z, cmap=DIVR, norm=TwoSlopeNorm(vmin=-FLOOR, vcenter=0, vmax=1))
+            for i, x in enumerate(xs0):
+                for j, y in enumerate(ys0):
+                    if in_metal(x, y):
+                        ax.add_patch(Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False,
+                                               hatch="//", ec=MUTED, lw=0))
+                    elif not np.isfinite(Z[i, j]) and (sg, x, y) in look:
+                        ax.text(j, i, "?", ha="center", va="center", color=INK, fontsize=8)
+                    elif (sg, x, y) not in look:
+                        ax.add_patch(Rectangle((j - 0.5, i - 0.5), 1, 1, fc="white", ec=GRID, lw=0.5))
+                    r = look.get((sg, x, y))
+                    if r is not None and r["regime"] == "collapse":
+                        ax.text(j, i, "C", ha="center", va="center", color="white",
+                                fontsize=8, fontweight="bold")
+            for i in range(1, len(xs0)):
+                if layer(xs0[i]) != layer(xs0[i - 1]):
+                    ax.axhline(i - 0.5, color=INK, lw=0.8)
+            ax.set_yticks(np.arange(len(xs0)))
+            ax.set_yticklabels(xlabels(xs0), fontsize=8)
+            ax.set_xticks(np.arange(len(ys0)))
+            ax.set_xticklabels([f"{y:g}" for y in ys0], fontsize=8)
+            ax.set_title(f"{name}: {lab}", color=INK, fontsize=10)
+            if rr == 1:
+                ax.set_xlabel("y (µm), source → drain")
+        axs[0, 0].invert_yaxis()
+    for rr in range(2):
+        axs[rr, 0].set_ylabel("trap centre depth (nm)")
+    fig.colorbar(pc, ax=axs, shrink=0.8, label=f"log10(Id / Id_no-trap), floor -{FLOOR:g}")
+    fig.suptitle("Insulator trap charge: neutral vs filled vs positive (Run F blob; C = hot-electron "
+                 "collapse, white = not run, hatched = metal)", color=INK, fontsize=12)
+    fig.savefig("figures/trapXYMap_neutral.png", dpi=140)
+    plt.close(fig)
+print("wrote figures/trapXYMap_{metrics.csv,3d.png,map.png,map_plus.png,sign.png,neutral.png}")

@@ -838,3 +838,7 @@ Writeup in CLAUDE.md 10j; figures `figures/trapXYMap_{3d,map,map_plus,sign}.png`
 ## 2026-10-01 - sign-0 companion submitted (Ian approved)
 
 Job **44274780**, 91 tasks on `ee1-b` (`pulsedIV_trapXYMap0.slurm`, `params_trapXYMap0.txt`) → `results/20261001_trapXYMap0/`. Same Run F blob, insulator traps neutral (`insTrapSign`=0), x ∈ {−30, −2.5, 0, 7.5, 15, 40, 80} nm × the 13 y positions (90 tasks; 1 centre inside metal skipped) + a trap-free reference. Polling every 5 min.
+
+## 2026-10-01 - sign-0 companion done (job 44274780)
+
+91/91 clean (6 retried, 0 crashes). With the insulator traps neutral, the hot-electron collapse comes back across the access region for blob centres from −2.5 to 40 nm (50 collapses, 0.62-0.90 of trap-free at rest). Earliest and deepest just below the 2DEG (7.5-15 nm: onset 0.2-0.4 V, 4e4-2e6x); at 40 nm it's later and shallower; at 80 nm, nothing. The gate region is off at rest, as in 10f. So filled insulator charge (−1) turns those collapses into "off at rest" and positive charge (+1) removes them. The passivation fill fraction is the key unknown. Figure `figures/trapXYMap_neutral.png`; CLAUDE.md 10j updated. 2 stragglers from job 44261474 (sign −1, y=−0.4, already off at rest) are still running.

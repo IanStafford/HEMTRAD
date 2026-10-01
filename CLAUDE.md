@@ -536,7 +536,7 @@ Local check (scratch copy of `rfdevice.tcl` with `line y loc=1.25 spac=0.004`), 
 
 ### 10j. Full x-y sensitivity map incl. insulator trap charge (burst QOS)
 
-> ⚠ Near the surface this map mostly measures the **insulator-charge assumption**, not semiconductor trapping (see below). Access-region numbers also carry the 10h mesh caveat.
+> ⚠ Near the surface the sign −1/+1 maps mostly measure the **insulator-charge assumption**, not semiconductor trapping; the sign-0 companion below isolates the semiconductor part. Access-region numbers also carry the 10h mesh caveat.
 
 Job 44261474 (248 tasks, `ee1-b`), `results/20261001_trapXYMap/`. Run F levels (4e18 / 0.55 eV, σ 40 nm, `hotEb` 0.5, `hotTau` 1.3e-13), Vd 0-3 V, `dampValue` 0.05. Blob centre x ∈ {-275 … 515} nm (HighK top → 0.5 µm into GaN, 15 depths) × y ∈ {-0.4 … 2.5} µm (13 positions, contact-safe); centres inside metal skipped. The parts of the blob in Nitride/HighK enter Poisson as static charge (`insTrapSign`, `InsTrapCharge` in `Poisson.tcl`): sign −1 at all 182 positions, +1 at the 65 insulator-centred ones. 243/248 finished cleanly: 0 crashes, 0 give-ups, 13 used retries. The other 5 (sign −1, y=−0.4, x −30…15 nm) were still bisecting at Vd≈1.35 V at write-up; they're already off at rest at the ~1e-9 mA/mm noise floor, so their regime is settled. `analyze_trapXYMap.py` → `figures/trapXYMap_metrics.csv`, `_3d.png`, `_map.png` (sign −1), `_map_plus.png` (+1), `_sign.png`. Depth is plotted on evenly spaced rows; values are capped at 1e-8 (noise floor).
 
@@ -544,7 +544,14 @@ Job 44261474 (248 tasks, `ee1-b`), `results/20261001_trapXYMap/`. Run F levels (
 - **Deep GaN traps do almost nothing.** At 80 nm, only the gate region is affected (0.06-0.25 of trap-free at 3 V); everywhere else ≥0.88. From 150 nm down, ≈1 everywhere.
 - **HighK, sign −1:** at −100 nm (50 nm above the nitride) it turns the device off for y ≥ 1.5 µm (1e-6 to 1.6e-7), partly at 1.0 µm (0.16), but has **no effect at y ≤ 0.725**, under the T-gate overhang and field plate (the metal there presumably screens it). At −150 nm, ≤40% loss; at −225/−275 nm (HighK top), no effect.
 - **Sign +1 (fixed positive insulator charge):** no effect anywhere except nitride-centred blobs under the gate (−2.5 nm: 1e-4 to 6e-6 of trap-free, off at rest), which come from the semiconductor half of the blob as in 10f. In the access region the positive nitride charge **cancels the hot-electron collapse** (0.89-1.003 of trap-free at 3 V, vs 1e-4-1e-5 in 10f at x=0).
-- So the sign of any charge trapped in the passivation dominates the near-surface result in both directions. **Open:** a companion sign-0 run (insulator traps neutral, the pre-10j model) at x −30…80 nm would separate the semiconductor-trap effect. Physically, insulator traps would only partly fill, so the true answer probably lies between sign −1 and 0.
+- So the sign of any charge trapped in the passivation dominates the near-surface result in both directions.
+
+**Sign-0 companion (job 44274780, 91 tasks, `results/20261001_trapXYMap0/`, `pulsedIV_trapXYMap0.slurm`):** the same blob with the insulator traps neutral, at x ∈ {−30, −2.5, 0, 7.5, 15, 40, 80} nm × the 13 y positions plus a reference. 91/91 clean, 6 retried, 0 crashes. Shown side by side with −1/+1 in `figures/trapXYMap_neutral.png`.
+- **With neutral insulators the normal hot-electron collapse comes back** wherever the blob centre is between −2.5 and 40 nm and outside the gate (50 collapses, all at 0.62-0.90 of trap-free at rest). Agrees with 10f where they overlap (x=0, y=0.5: onset 0.3 V, 1.4e4x).
+- **Gate region (y −0.125…0.125): off at rest** (1e-4 to 3e-5), from −2.5 to 40 nm. Same pattern as 10f.
+- **Depth:** onset is earliest and the collapse deepest just below the 2DEG (7.5-15 nm: onset 0.2-0.4 V, 4e4-2e6x). At 40 nm, onset is later (0.3-0.6 V, 2.1 V at y=2.5) and shallower (1e3-1e5x). At 80 nm nothing collapses (gate region 0.06-0.25 at 3 V, else ≈1). A blob centred 30 nm into the nitride does nothing, apart from 1e-2 to 6e-2 at the gate edges at 3 V.
+- **Lateral:** onset moves later with distance from the gate on both sides (x=0: 0.3 V at 0.2-0.5 µm → 0.7 V at 2.5 µm; 0.4 V at y=−0.4).
+- **Comparison:** filled insulator traps (−1) turn every one of those collapses into "off at rest", and positive charge (+1) removes them. Only the gate region behaves the same in all three. Real passivation traps would partly fill, so near-surface damage gives a collapse (sign 0) through a full threshold shift (sign −1), depending on how much charge the nitride holds. That fill fraction is the parameter to pin down (e.g. from measured Vth shift after irradiation).
 
 ---
 
