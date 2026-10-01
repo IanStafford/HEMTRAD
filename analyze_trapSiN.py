@@ -9,22 +9,29 @@ Per device: r_rest = Id/Id_no-trap at Vd=0.1 V, r_3V at 3 V, r_worst = min over
 Vd, collapse onset (first Vd where Id < running max / 10, for devices that
 conduct at rest), collapse depth vs trap-free at the post-onset minimum, regime.
 
-Writes figures/trapSiN_metrics.csv, figures/trapSiN_3d.png (suppression
-surfaces, HighK vs SiN, shared scale) and figures/trapSiN_compare.png (trap-free
+Writes figures/<tag>_metrics.csv, figures/<tag>_3d.png (suppression
+surfaces, HighK vs SiN, shared scale) and figures/<tag>_compare.png (trap-free
 Id-Vd of both devices, suppression vs position per depth, Id-Vd at the gate,
 and the HighK/SiN suppression ratio per position).
 """
 import glob
 import json
 import os
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
+# usage: python3 analyze_trapSiN.py [trapPeak trapLevel SiN_run tag]
+#   default: 2e18 0.75 results/20261001_trapSiN trapSiN
+#   Run F:   4e18 0.55 results/20261001_trapSiN_F trapSiN_F
+TP = float(sys.argv[1]) if len(sys.argv) > 1 else 2e18
+TL = float(sys.argv[2]) if len(sys.argv) > 2 else 0.75
+SIN_RUN = sys.argv[3] if len(sys.argv) > 3 else "results/20261001_trapSiN"
+TAG = sys.argv[4] if len(sys.argv) > 4 else "trapSiN"
 RUNS = {"HighK": ["results/20260927_trapMapSets", "results/20260927_trapMapSetsRetry"],
-        "SiN": ["results/20261001_trapSiN", "results/20261001_trapSiNRetry"]}
-TP, TL = 2e18, 0.75
+        "SiN": [SIN_RUN, SIN_RUN + "Retry"]}
 VD_END = 3.0
 SEQ = LinearSegmentedColormap.from_list(
     "blue_seq", ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"])
@@ -87,7 +94,7 @@ for (name, x, y), (vd, idd) in sorted(dev.items()):
 
 os.makedirs("figures", exist_ok=True)
 cols = list(rows[0])
-with open("figures/trapSiN_metrics.csv", "w") as f:
+with open(f"figures/{TAG}_metrics.csv", "w") as f:
     f.write(",".join(cols) + "\n")
     for r in rows:
         f.write(",".join(r[c] if isinstance(r[c], str) else f"{r[c]:.6g}"
@@ -148,7 +155,7 @@ fig.suptitle(f"Trap map {TP:.0e} cm⁻³ / {TL} eV: HighK (εr 35) vs SiN (εr 6
              "nitride; each vs its own trap-free device (outlines: gate, field plate)",
              color=INK, fontsize=12)
 fig.tight_layout()
-fig.savefig("figures/trapSiN_3d.png", dpi=140)
+fig.savefig(f"figures/{TAG}_3d.png", dpi=140)
 plt.close(fig)
 
 # 2) comparison: trap-free devices, suppression vs y per depth, Id-Vd at the gate
@@ -215,6 +222,6 @@ for ax in axs[:3]:
         ax.spines[s_].set_visible(False)
 fig.suptitle(f"Effect of the HighK dielectric ({TP:.0e} cm⁻³ / {TL} eV traps, Run F hot-electron levers)",
              color=INK, fontsize=12)
-fig.savefig("figures/trapSiN_compare.png", dpi=140)
+fig.savefig(f"figures/{TAG}_compare.png", dpi=140)
 plt.close(fig)
-print("wrote figures/trapSiN_{metrics.csv,3d.png,compare.png}")
+print(f"wrote figures/{TAG}_{{metrics.csv,3d.png,compare.png}}")

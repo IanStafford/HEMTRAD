@@ -866,3 +866,7 @@ Submitted **job 44294165** → `results/20261001_trapSiN/`. Polling every 5 min.
 
 51/51 clean (0 retries, 0 crashes). At 2e18/0.75 eV the HighK layer barely matters. Both devices: 15 off at rest (gate region), 35 no collapse, no hot-electron collapse anywhere. Suppression agrees within 0.01-0.02 decades under the gate and in the access region. The only difference: source side (y=−0.4 µm), where HighK is hurt 0.12-0.17 decades more at 3 V. Trap-free SiN carries +0.4% (0.1 V) to +1.5% (3 V) more current. CLAUDE.md 10l; `figures/trapSiN_{3d,compare}.png`.
 **Suggested next (needs Ian's OK):** repeat at a collapsing setting (Run F 4e18/0.55) to see whether HighK changes the hot-electron collapse itself.
+
+## 2026-10-01 - HighK vs SiN at Run F (Ian approved)
+
+Ian: repeat at Run F (4e18/0.55 eV); if HighK and SiN are still the same, dig into the dielectric model (he expects some field passivation from the HighK). `pulsedIV_trapSiN_F.slurm` / `params_trapSiN_F.txt`: the 10f Run F grid on `rfdevice_SiN.tcl` + a trap-free SiN reference, 51 tasks on `ee1-b`. HighK side = 10f job 43513462 + retry 43515232. `analyze_trapSiN.py` now takes `trapPeak trapLevel SiN_run tag` arguments.
