@@ -554,6 +554,22 @@ Job 44261474 (248 tasks, `ee1-b`), `results/20261001_trapXYMap/`. Run F levels (
 - **Lateral:** onset moves later with distance from the gate on both sides (x=0: 0.3 V at 0.2-0.5 µm → 0.7 V at 2.5 µm; 0.4 V at y=−0.4).
 - **Comparison:** filled insulator traps (−1) turn every one of those collapses into "off at rest", and positive charge (+1) removes them. Only the gate region behaves the same in all three. Real passivation traps would partly fill, so near-surface damage gives a collapse (sign 0) through a full threshold shift (sign −1), depending on how much charge the nitride holds. That fill fraction is the parameter to pin down (e.g. from measured Vth shift after irradiation).
 
+
+### 10k. Deep traps: thin blobs below the 2DEG (burst QOS)
+
+Ian's question from 10j: is the strong collapse with the blob centred 40 nm deep (25 nm below the 2DEG) caused by deep traps, or by the σ=40 nm tail reaching the 2DEG (0.82 of peak there)? Job 44286932 (71 tasks, `ee1-b`), `results/20261001_trapDeep/`, `pulsedIV_trapDeep.slurm`. Anisotropic blob via the new `trapSigmaY` lever: σx = 10 nm in depth, σy = 40 nm laterally (a 10 nm lateral width wouldn't be resolved on the access-region mesh, 10h; the depth mesh is 1-8 nm here). Run F traps (0.55 eV, `hotEb` 0.5, `hotTau` 1.3e-13), insulator traps neutral, Vd 0-3 V. Centres 0, 10, 15, 25, 35, 45, 65 nm below the 2DEG × y ∈ {−0.2, 0, 0.5, 1, 2} µm × peak 4e18 (same density as σ=40 nm) and 1.6e19 (same total charge). 71/71 clean, 5 retried, 0 crashes. `analyze_trapDeep.py` → `figures/trapDeep_metrics.csv`, `figures/trapDeep.png` (worst suppression vs depth, trap density left at the 2DEG on the top axis), `figures/trapDeep_IdVd.png`.
+
+| peak | 0 nm below | 10 nm | 15 nm | 25 nm | ≥35 nm |
+|---|---|---|---|---|---|
+| 4e18 | collapse everywhere (onset 0.3-0.5 V, 4e2-6e5x); gate off at rest | gate off at rest (2e5x); source side 28x; access/FP none | gate off at rest (2.4e3x); else none | none (gate 3x) | none |
+| 1.6e19 | off at rest everywhere (1e7-1e13x) | off at rest everywhere | off at rest everywhere | gate collapse (onset 0.2 V, 2.3e3x); else none | none (gate ≤2x) |
+
+- **The "deep" collapse in 10j was the tail at the 2DEG.** With the blob kept off the channel, traps 25+ nm below the 2DEG do nothing in the access region even at 4x the density (same total charge as the σ=40 nm blob). The access-region effect cuts off between 0 and 10 nm below at 4e18, and between 15 and 25 nm at 1.6e19.
+- **The gate region reaches deepest** (off at rest to 15 nm below at 4e18; a collapse at 25 nm below at 1.6e19), as in every other map.
+- **At 1.6e19, 0-15 nm below is off at rest, not a hot-electron collapse**: a static back-barrier from filled buffer acceptors (sheet charge up to ~4e13 cm⁻² if fully filled). The 4e18 blob on the 2DEG gives the usual collapse-then-recovery (y=1 µm: 25 → 0.02 mA/mm at 0.5 V, then back to ~30 by 3 V; the recovery is larger and noisier than the σ=40 nm blob's).
+- **Likely reason (inference, not checked against the band diagram):** an acceptor at Ec−0.55 eV fills only where the electron quasi-Fermi level is within reach, which in this structure is the first ~15-20 nm under the 2DEG; deeper, the buffer band rises and the traps stay empty. Hot electrons also live in the channel, so hot-electron capture can't reach deep traps either. A cut of Ec−Qfn vs depth would confirm it.
+- For TRIM profiles: only the damage within ~15-25 nm of the 2DEG (plus the AlGaN and the surface stack) should matter, consistent with 10g.
+
 ---
 
 ## 11. Notebook and plotting

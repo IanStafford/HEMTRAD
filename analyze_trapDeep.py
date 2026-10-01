@@ -57,12 +57,13 @@ for (tp, x, y), (vd, idd) in sorted(dev.items()):
     done = abs(vd[-1] - VD_END) < 1e-6
     m = vd > 0.05
     ratio = idd[m] / iref(vd[m])
-    ipk = int(np.argmax(idd))
-    post = idd[ipk:]
-    imin = ipk + int(np.argmin(post))
+    # collapse = Id falls below 1/10 of the highest Id reached so far (the
+    # current can recover past its pre-collapse peak later in the sweep)
+    runmax = np.maximum.accumulate(idd)
+    below = np.nonzero(idd < runmax / 10)[0]
+    onset = vd[below[0]] if below.size else np.nan
+    imin = (below[0] + int(np.argmin(idd[below[0]:]))) if below.size else int(np.argmin(idd[m]))
     r_rest = float(ratio[0])
-    below = np.nonzero(post < idd[ipk] / 10)[0]
-    onset = vd[ipk + below[0]] if below.size else np.nan
     depth = iref(vd[imin]) / idd[imin]
     if r_rest < 0.1:
         regime, onset, depth = "off at rest", np.nan, np.nan
@@ -117,7 +118,7 @@ for ax, tp in zip(axs, peaks):
         d, v, reg = zip(*pts)
         ax.plot(d, v, color=c, lw=2, label=f"y = {y:g} µm ({lab_y.get(y, '')})")
         for di, vi, ri in pts:
-            ax.plot(di, vi, "o" if ri == "collapse" else "s" if ri == "off at rest" else "D",
+            ax.plot(di, vi, "s" if ri == "off at rest" else "D" if ri == "incomplete" else "o",
                     ms=7, mfc=c if ri != "no collapse" else "white", mec=c, mew=1.5)
     ax.axhline(1, color=MUTED, lw=1, ls=":")
     ax.text(64, 1.08, "10× (critical)", color=MUTED,
@@ -130,16 +131,15 @@ for ax, tp in zip(axs, peaks):
                  f"({'same density' if tp < 1e19 else 'same total charge'} as σ = 40 nm)",
                  color=INK, fontsize=11)
     sec = ax.secondary_xaxis("top", functions=(lambda d: d, lambda d: d))
-    ticks = [0, 10, 15, 25, 35, 45, 65]
-    sec.set_ticks(ticks)
-    sec.set_ticklabels([f"{math.exp(-(t * 1e-3) ** 2 / (2 * SX * SX)):.0e}"
-                        if t > 20 else f"{math.exp(-(t * 1e-3) ** 2 / (2 * SX * SX)):.2f}"
-                        for t in ticks], fontsize=8)
+    sec.set_xticks([0, 10, 15, 25, 35, 45, 65])
+    sec.xaxis.set_major_formatter(plt.FuncFormatter(
+        lambda t, _: f"{math.exp(-(t * 1e-3) ** 2 / (2 * SX * SX)):.2g}"))
+    sec.tick_params(labelsize=8)
     sec.set_xlabel("trap density left at the 2DEG (fraction of peak)", fontsize=9)
 axs[0].set_ylabel(f"log10 worst suppression, Id_no-trap / Id, Vd 0.1-3 V\n(capped at {FLOOR:g})")
 axs[-1].legend(frameon=False, fontsize=9, loc="upper right")
 fig.suptitle("Do deep traps collapse the channel? Blob σ = 10 nm in depth, 40 nm laterally; "
-             "● collapse, ■ off at rest, ○ no collapse", color=INK, fontsize=12)
+             "● collapse, ■ off at rest, ○ no collapse, ◆ incomplete", color=INK, fontsize=12)
 fig.savefig("figures/trapDeep.png", dpi=140)
 plt.close(fig)
 
@@ -162,7 +162,7 @@ for ax, tp in zip(axs, peaks):
     ax.set_xlabel("Vd (V)")
     ax.set_title(f"peak {tp:.1e} cm⁻³, y = 1.0 µm (access region)", color=INK, fontsize=11)
 axs[0].set_ylabel("Id (mA/mm)")
-axs[-1].legend(frameon=False, fontsize=8, loc="lower right")
+axs[-1].legend(frameon=False, fontsize=8, loc="center left", bbox_to_anchor=(1.01, 0.5))
 fig.suptitle("Id-Vd vs blob depth (σx 10 nm, σy 40 nm, Run F traps, Vg = -2 V)",
              color=INK, fontsize=12)
 fig.savefig("figures/trapDeep_IdVd.png", dpi=140)
