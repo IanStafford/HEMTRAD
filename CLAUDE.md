@@ -159,6 +159,7 @@ In `GaN_modelfile_masterD`, each has an `info exists` default, so a driver or ar
 | `trapPeak` | 4e18 | peak density (cm⁻³) of the 2D Gaussian |
 | `trapMeanX`, `trapMeanY` | 0.0, 0.20 | center in µm (x = depth; 0 = AlGaN top, 0.015 = 2DEG; y: gate drain edge = 0.125) |
 | `trapSigma` | 0.025 | spatial sigma (µm) |
+| `trapSigmaY` | unset | optional lateral sigma (µm) for an anisotropic Gaussian; when set, `trapSigma` is the depth (x) sigma only. Unset = the isotropic expression, unchanged |
 | `trapShape` | gauss | spatial profile: `gauss` (2D Gaussian, uses `trapMeanX/Y`, `trapSigma`) or `cone` (below). Each shape is a proc `TrapConc_<name>` in `GaN_modelfile_masterD` returning a FLOOXS expression; add new ones (e.g. a TRIM profile) the same way |
 | `coneLen`, `coneAngle` | 0.1, 30 | cone: depth extent below the apex (µm), half-angle (deg). Apex at (`trapMeanX`, `trapMeanY`), axis along +x (into the device) |
 | `coneW0`, `coneEdge` | 0.01, 0.01 | cone: half-width at the apex (µm), erf edge softness (µm). Uniform density `trapPeak` inside. The mesh is ~10-20 nm laterally near the field plate and ~50 nm farther into the access region, so the narrow apex is barely resolved there |

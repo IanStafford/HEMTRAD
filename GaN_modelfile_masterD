@@ -56,6 +56,7 @@ if {![info exists trapPeak]}  { set trapPeak 4e18 }   ;# peak trap density (cm^-
 if {![info exists trapMeanX]} { set trapMeanX 0.0 }   ;# Gaussian center, depth (um)
 if {![info exists trapMeanY]} { set trapMeanY 0.20 }  ;# Gaussian center, lateral (um)
 if {![info exists trapSigma]} { set trapSigma 0.025 } ;# Gaussian spatial sigma (um)
+;# trapSigmaY (optional, no default): lateral sigma; if set, trapSigma is the depth sigma only
 if {![info exists trapLevel]} { set trapLevel 0.68 }  ;# trap depth below Ec (eV)
 if {![info exists trapWidth]} { set trapWidth 0.1 }   ;# energy FWHM (eV)
 
@@ -74,9 +75,14 @@ if {![info exists coneW0]}    { set coneW0 0.01 }    ;# cone half-width at the a
 if {![info exists coneEdge]}  { set coneEdge 0.01 }  ;# edge softness (um); mesh is ~5-50 nm
 
 proc TrapConc_gauss {} {
-    global trapPeak trapMeanX trapMeanY trapSigma
+    global trapPeak trapMeanX trapMeanY trapSigma trapSigmaY
     set s $trapSigma
-    return "$trapPeak*exp(-((x-($trapMeanX))*(x-($trapMeanX))+(y-($trapMeanY))*(y-($trapMeanY)))/(2.0*$s*$s))"
+    if {![info exists trapSigmaY]} {
+        return "$trapPeak*exp(-((x-($trapMeanX))*(x-($trapMeanX))+(y-($trapMeanY))*(y-($trapMeanY)))/(2.0*$s*$s))"
+    }
+    # anisotropic: trapSigma in depth (x), trapSigmaY laterally (y)
+    set sy $trapSigmaY
+    return "$trapPeak*exp(-(x-($trapMeanX))*(x-($trapMeanX))/(2.0*$s*$s)-(y-($trapMeanY))*(y-($trapMeanY))/(2.0*$sy*$sy))"
 }
 
 proc TrapConc_cone {} {

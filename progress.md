@@ -846,3 +846,8 @@ Job **44274780**, 91 tasks on `ee1-b` (`pulsedIV_trapXYMap0.slurm`, `params_trap
 ## 2026-10-01 - job 44261474 fully finished
 
 The last 5 tasks (sign −1, y=−0.4) gave up cleanly at Vd=1.4 V (`PULSED GAVE UP`, no crash, no cores). They were off at rest at the noise floor, so their regime is settled; not retried. Both maps are complete: 337 devices, 332 to 3 V. Nothing running on HPG.
+
+## 2026-10-01 - deep-trap test (Ian approved)
+
+Question: is the collapse from blobs centred 25+ nm into the GaN due to deep traps, or to the σ=40 nm tail at the 2DEG? New optional lever `trapSigmaY` (anisotropic Gaussian; unset = unchanged, verified bit-identical locally). Local test: σx 10 nm / σy 40 nm, 4e18/0.55 eV, centred 25 nm below the 2DEG at y=0.5: **no collapse through 1 V** (89.6 mA/mm, ≈ trap-free), whereas σ=40 nm at the same centre collapsed at 0.4 V.
+Sweep `pulsedIV_trapDeep.slurm`: x ∈ {15,25,30,40,50,60,80} nm × y ∈ {−0.2,0,0.5,1,2} µm × peak {4e18 (same density), 1.6e19 (same total charge)}, insulator traps neutral, + reference = 71 tasks on `ee1-b`.
