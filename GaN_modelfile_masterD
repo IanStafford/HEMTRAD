@@ -42,6 +42,9 @@ HoleContinuity AlGaN
 #Add interface charge
 if {![info exists polCharge]} { set polCharge 7.0e12 } ;# net AlGaN/GaN interface (polarization) charge, cm^-2
 pdbSetString AlGaN_GaN DevPsi Equation "$polCharge"
+# Optional net fixed charge at the AlGaN/SiN surface (cm^-2): surface donors in
+# excess of the AlGaN surface polarization charge (passivation-induced). Unset = none.
+if {[info exists surfCharge]} { pdbSetString AlGaN_Nitride DevPsi Equation "$surfCharge" }
 
 source Poisson.tcl
 Poisson AlGaN

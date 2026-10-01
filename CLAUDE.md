@@ -167,6 +167,7 @@ In `GaN_modelfile_masterD`, each has an `info exists` default, so a driver or ar
 | `insTrapSign` | 0 | trap charge in the insulators (Nitride, HighK): 0 none; −1 the same trap density fully filled (−q·N); +1 fixed positive (+q·N). Static, since no carriers/Qfn are solved there, so no Fermi or hot-electron filling (`InsTrapCharge` in `Poisson.tcl`) |
 | `polCharge` | 7.0e12 | net AlGaN/GaN interface (polarization) charge, cm⁻² (`GaN_modelfile_masterD`); sets the 2DEG density |
 | `phiB` | 1.65 | effective gate / field-plate barrier vs Nitride Ec, eV (`Metal.tcl`); an empirical Vth parameter (implied work function 2.6 eV). Enters only as `G − phiB`, so it shifts Id-Vg rigidly in Vg |
+| `surfCharge` | unset | net fixed charge at the AlGaN/SiN surface, cm⁻² (surface donors in excess of the AlGaN surface polarization). Raises the access-region 2DEG (~25% efficiency) far more than the gate region |
 | `hotEb` | 0.3 | capture barrier (eV); larger = earlier, deeper collapse; 0 = no hot-electron effect |
 | `hotTau` | 1e-13 | energy relaxation time (s); larger = hotter = earlier collapse |
 | `hotMu`, `hotVsat` | 600, 1.9e7 | used only for Te |

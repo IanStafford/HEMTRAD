@@ -10,6 +10,11 @@ if {![info exists Vd_cal]}     { set Vd_cal 10.0 } ;# measured at Vds = 10 V (ra
 if {![info exists Vg_max]}     { set Vg_max 1.0 }
 if {![info exists Vg_min]}     { set Vg_min -4.0 }
 if {![info exists Vg_step]}    { set Vg_step 0.1 }
+# Lumped ohmic contact resistances (ohm*mm), applied at the external terminals:
+# internal source = Id*Rs, internal drain = Vd - Id*Rd (gate referenced to the
+# external source, as measured). 0 = ideal contacts (the deck as before).
+if {![info exists Rs_contact]} { set Rs_contact 0.0 }
+if {![info exists Rd_contact]} { set Rd_contact 0.0 }
 set trapEn 0
 if {![info exists mobModel]}   { set mobModel field }
 
@@ -21,19 +26,43 @@ if {[info exists calHook]} { eval $calHook }
 Initialize
 device init
 
+# Drain current in A/mm (FLOOXS flux is A/um of depth).
+proc IdAmm {} { return [expr {abs([contact name=D sol=Qfn flux]) * 1.0e3}] }
+# Solve at external Vd = vd with the contact resistances, by fixed-point
+# iteration on the internal terminal voltages (converges fast: gm*R << 1).
+proc SolveRc {vd} {
+    global Rs_contact Rd_contact
+    if {$Rs_contact == 0.0 && $Rd_contact == 0.0} {
+        contact name=D supply=$vd
+        device
+        return
+    }
+    set id [IdAmm]
+    for {set it 0} {$it < 20} {incr it} {
+        set vs [expr {$id * $Rs_contact}]
+        set vdi [expr {$vd - $id * $Rd_contact}]
+        contact name=S supply=$vs
+        contact name=D supply=$vdi
+        device
+        set idn [IdAmm]
+        if {abs($idn - $id) * ($Rs_contact + $Rd_contact) < 1.0e-4} { return }
+        set id $idn
+    }
+    puts "RC WARNING: contact-resistance iteration did not converge at Vd=$vd"
+}
+
 for {set d 0.25} {$d < $Vd_cal + 0.001} {set d [expr {$d + 0.25}]} {
-    contact name=D supply=$d
-    device
+    SolveRc $d
 }
 for {set g $Vg_step} {$g < $Vg_max + 0.001} {set g [expr {$g + $Vg_step}]} {
     contact name=G supply=$g
-    device
+    SolveRc $Vd_cal
 }
 set f [open $calCSV w]
 for {set g $Vg_max} {$g > $Vg_min - 0.001} {set g [expr {$g - $Vg_step}]} {
     set g [expr {round($g * 1000.0) / 1000.0}]
     contact name=G supply=$g
-    device
+    SolveRc $Vd_cal
     set cur [expr {abs([contact name=D sol=Qfn flux]) * 1.0e6}]
     puts $f "$g, $cur"
     flush $f
