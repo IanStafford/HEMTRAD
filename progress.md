@@ -823,3 +823,5 @@ Sweep: x ∈ {−275, −225, −150, −100, −30, −2.5, 0, 7.5, 15, 40, 80,
 excluded → grid A (−1) 182 + grid B (+1, insulator-centred) 65 + ref =
 248 tasks. `pulsedIV_trapXYMap.slurm` + `params_trapXYMap.txt`,
 `analyze_trapXYMap.py`.
+
+Submitted **job 44261474, array 0-247%160 on `ee1-b`** → `results/20261001_trapXYMap/`. Polling every 5 min.

@@ -163,6 +163,7 @@ In `GaN_modelfile_masterD`, each has an `info exists` default, so a driver or ar
 | `coneLen`, `coneAngle` | 0.1, 30 | cone: depth extent below the apex (µm), half-angle (deg). Apex at (`trapMeanX`, `trapMeanY`), axis along +x (into the device) |
 | `coneW0`, `coneEdge` | 0.01, 0.01 | cone: half-width at the apex (µm), erf edge softness (µm). Uniform density `trapPeak` inside. The mesh is ~10-20 nm laterally near the field plate and ~50 nm farther into the access region, so the narrow apex is barely resolved there |
 | `trapLevel`, `trapWidth` | 0.68, 0.1 | depth below Ec and energy FWHM (eV) |
+| `insTrapSign` | 0 | trap charge in the insulators (Nitride, HighK): 0 none; −1 the same trap density fully filled (−q·N); +1 fixed positive (+q·N). Static, since no carriers/Qfn are solved there, so no Fermi or hot-electron filling (`InsTrapCharge` in `Poisson.tcl`) |
 | `hotEb` | 0.3 | capture barrier (eV); larger = earlier, deeper collapse; 0 = no hot-electron effect |
 | `hotTau` | 1e-13 | energy relaxation time (s); larger = hotter = earlier collapse |
 | `hotMu`, `hotVsat` | 600, 1.9e7 | used only for Te |
