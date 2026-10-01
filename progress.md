@@ -855,3 +855,8 @@ Sweep `pulsedIV_trapDeep.slurm`: x ∈ {15,25,30,40,50,60,80} nm × y ∈ {−0.
 ## 2026-10-01 - deep-trap test done (job 44286932)
 
 71/71 clean (5 retried, 0 crashes). Thin blob (σx 10 nm, σy 40 nm): **the 10j "deep" collapse was the σ=40 nm tail at the 2DEG.** At 4e18, the access-region collapse is gone once the blob centre is 10 nm below the 2DEG; at 1.6e19 (same total charge), gone by 25 nm. Nothing at ≥35 nm anywhere. The gate region reaches deepest (off at rest to 15 nm at 4e18; a collapse at 25 nm at 1.6e19). At 1.6e19, 0-15 nm below is off at rest (static back-barrier). Likely because deep 0.55 eV traps stay empty (Fermi level/hot electrons don't reach them), not yet checked against the band diagram. CLAUDE.md 10k; `figures/trapDeep.png`, `_IdVd.png`. Fixed the collapse detection in `analyze_trapDeep.py` (onset vs the running max, since Id can recover past its pre-collapse peak). Nothing running on HPG.
+
+## 2026-10-01 - HighK vs SiN passivation (Ian's request)
+
+New `rfdevice_SiN.tcl` (every HighK region → Nitride) and a `deviceDeck` lever in `pulsedIV.tcl` (default unchanged; regression bit-identical). Local checks, Vd 0-0.5 V: trap-free SiN is 0.4-0.6% above HighK (10.06 vs 10.02 mA/mm at 0.1 V); 2e18/0.75 eV under the gate matches the HighK device to 4-5 significant figures (off at rest, ~0.0095 mA/mm). So any effect should show at higher Vd.
+Sweep `pulsedIV_trapSiN.slurm`: the 10f 2e18/0.75 grid (5 depths × 10 positions) on the SiN device + a trap-free SiN reference = 51 tasks on `ee1-b`. The HighK side reuses job 43513462. Analysis: `analyze_trapSiN.py`.

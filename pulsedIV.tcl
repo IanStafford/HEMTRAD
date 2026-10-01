@@ -48,7 +48,8 @@ if {![info exists retrySubFill]} { set retrySubFill 1 } ;# 1: full FillStep at b
 #==============================================
 
 source GaN_modelfile_masterD
-source rfdevice.tcl
+if {![info exists deviceDeck]} { set deviceDeck rfdevice.tcl } ;# device structure deck (rfdevice_SiN.tcl: SiN instead of HighK)
+source $deviceDeck
 
 pdbSetDouble GaN Qfn DampValue $dampValue
 pdbSetDouble GaN Qfp DampValue $dampValue
