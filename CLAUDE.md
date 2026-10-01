@@ -571,6 +571,16 @@ Ian's question from 10j: is the strong collapse with the blob centred 40 nm deep
 - **Likely reason (inference, not checked against the band diagram):** an acceptor at Ec−0.55 eV fills only where the electron quasi-Fermi level is within reach, which in this structure is the first ~15-20 nm under the 2DEG; deeper, the buffer band rises and the traps stay empty. Hot electrons also live in the channel, so hot-electron capture can't reach deep traps either. A cut of Ec−Qfn vs depth would confirm it.
 - For TRIM profiles: only the damage within ~15-25 nm of the 2DEG (plus the AlGaN and the surface stack) should matter, consistent with 10g.
 
+
+### 10l. HighK vs SiN passivation, 2e18 cm⁻³ / 0.75 eV (burst QOS)
+
+Ian's question: what does the HighK dielectric do to the collapse? `rfdevice_SiN.tcl` is the same structure with every HighK region (εr 35; above the 50 nm nitride, around the T-gate, under the field plate) replaced by Nitride (εr 6.3), selected with the `deviceDeck` lever. Job 44294165 (51 tasks, `ee1-b`), `results/20261001_trapSiN/`: the 10f 2e18/0.75 grid (x 0-15 nm × y −0.4…2.4 µm, Run F hot-electron levers, Vd 0-3 V) plus a trap-free SiN reference. 51/51 clean, 0 retries. HighK side = job 43513462 (10f). Each device is normalised to its own trap-free reference. `analyze_trapSiN.py` → `figures/trapSiN_metrics.csv`, `_3d.png` (suppression surfaces side by side), `_compare.png` (trap-free Id-Vd, suppression vs y, Id-Vd, HighK/SiN ratio map).
+
+- **Trap-free:** SiN carries slightly more current, growing with Vd: +0.4% at 0.1 V, +0.8% at 1 V, +1.5% at 3 V (149.1 vs 146.9 mA/mm).
+- **Same regimes on both devices:** 15 off at rest (all in the gate region), 35 no collapse; no hot-electron collapse anywhere, as in 10f. Under the gate and in the access region the suppression agrees to within 0.01-0.02 decades (gate peak 10^5.2-10^6.2 on both).
+- **The only difference is on the source side (y = −0.4 µm, just outside the T-gate overhang at −0.325):** at 3 V, the HighK device is suppressed 0.12-0.17 decades more (10^−0.35…−0.61 vs SiN 10^−0.24…−0.43, i.e. ~1.3-1.5x), increasing with depth. At rest the two agree. Likely the high-εr layer couples the T-gate's −2 V further over the source access region, so a trap there depletes it more (inference).
+- **Conclusion at this setting: the HighK layer has almost no effect on trap sensitivity.** Above 50 nm of nitride it is too far from the channel to change the gate-region pinch-off. This setting never collapses, though, so it can't show whether HighK changes the *hot-electron* collapse, which depends on the drain-side field (where field-plate coupling through the HighK matters most). That would need the same comparison at a collapsing setting (e.g. Run F 4e18/0.55).
+
 ---
 
 ## 11. Notebook and plotting

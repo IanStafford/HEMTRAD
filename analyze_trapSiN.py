@@ -11,7 +11,8 @@ conduct at rest), collapse depth vs trap-free at the post-onset minimum, regime.
 
 Writes figures/trapSiN_metrics.csv, figures/trapSiN_3d.png (suppression
 surfaces, HighK vs SiN, shared scale) and figures/trapSiN_compare.png (trap-free
-Id-Vd of both devices, suppression vs position per depth, Id-Vd at the gate).
+Id-Vd of both devices, suppression vs position per depth, Id-Vd at the gate,
+and the HighK/SiN suppression ratio per position).
 """
 import glob
 import json
@@ -151,7 +152,8 @@ fig.savefig("figures/trapSiN_3d.png", dpi=140)
 plt.close(fig)
 
 # 2) comparison: trap-free devices, suppression vs y per depth, Id-Vd at the gate
-fig, axs = plt.subplots(1, 3, figsize=(18, 5.2), constrained_layout=True)
+fig, axs = plt.subplots(1, 4, figsize=(24, 5.2), constrained_layout=True,
+                        gridspec_kw={"width_ratios": [1, 1, 1, 1.1]})
 ax = axs[0]
 for name in RUNS:
     vr, ir = refs[name]
@@ -185,9 +187,29 @@ for c, y in zip(CAT, (-0.125, 0.0, 0.125, 0.5, 1.25)):
                         label=f"y = {y:g} µm, {name}")
 ax.set_xlabel("Vd (V)")
 ax.set_ylabel("Id (mA/mm)")
-ax.set_title("Id-Vd, traps at the surface (x = 0)", color=INK, fontsize=11)
+ax.set_title("Id-Vd, traps at the surface (x = 0); dashed SiN overlaps solid", color=INK, fontsize=11)
 ax.legend(frameon=False, fontsize=7, ncol=2)
-for ax in axs:
+ax = axs[3]
+D = grid("HighK", "r_3V") - grid("SiN", "r_3V")
+lim = max(0.05, np.nanmax(np.abs(D)))
+pc = ax.pcolormesh(np.arange(len(ys) + 1) - 0.5, np.arange(len(xs) + 1) - 0.5, D,
+                   cmap="RdBu_r", vmin=-lim, vmax=lim)
+for i in range(len(xs)):
+    for j in range(len(ys)):
+        if np.isfinite(D[i, j]):
+            ax.text(j, i, f"{D[i, j]:+.2f}", ha="center", va="center", fontsize=7,
+                    color="white" if abs(D[i, j]) > 0.6 * lim else INK)
+ax.set_xticks(np.arange(len(ys)))
+ax.set_xticklabels([f"{y:g}" for y in ys], fontsize=8)
+ax.set_yticks(np.arange(len(xs)))
+ax.set_yticklabels([f"{x * 1e3:g}" for x in xs], fontsize=8)
+ax.invert_yaxis()
+ax.set_xlabel("trapMeanY (µm)")
+ax.set_ylabel("depth (nm)")
+ax.set_title("log10(suppression HighK / SiN) at 3 V\n(red = HighK device hurt more)",
+             color=INK, fontsize=11)
+fig.colorbar(pc, ax=ax, shrink=0.85)
+for ax in axs[:3]:
     ax.grid(True, color=GRID, lw=0.8)
     for s_ in ("top", "right"):
         ax.spines[s_].set_visible(False)
