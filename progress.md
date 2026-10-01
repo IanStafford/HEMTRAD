@@ -842,3 +842,7 @@ Job **44274780**, 91 tasks on `ee1-b` (`pulsedIV_trapXYMap0.slurm`, `params_trap
 ## 2026-10-01 - sign-0 companion done (job 44274780)
 
 91/91 clean (6 retried, 0 crashes). With the insulator traps neutral, the hot-electron collapse comes back across the access region for blob centres from −2.5 to 40 nm (50 collapses, 0.62-0.90 of trap-free at rest). Earliest and deepest just below the 2DEG (7.5-15 nm: onset 0.2-0.4 V, 4e4-2e6x); at 40 nm it's later and shallower; at 80 nm, nothing. The gate region is off at rest, as in 10f. So filled insulator charge (−1) turns those collapses into "off at rest" and positive charge (+1) removes them. The passivation fill fraction is the key unknown. Figure `figures/trapXYMap_neutral.png`; CLAUDE.md 10j updated. 2 stragglers from job 44261474 (sign −1, y=−0.4, already off at rest) are still running.
+
+## 2026-10-01 - job 44261474 fully finished
+
+The last 5 tasks (sign −1, y=−0.4) gave up cleanly at Vd=1.4 V (`PULSED GAVE UP`, no crash, no cores). They were off at rest at the noise floor, so their regime is settled; not retried. Both maps are complete: 337 devices, 332 to 3 V. Nothing running on HPG.
