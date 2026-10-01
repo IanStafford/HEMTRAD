@@ -533,6 +533,19 @@ Local check (scratch copy of `rfdevice.tcl` with `line y loc=1.25 spac=0.004`), 
 - **Big caveat - 2D vs 3D:** the 2D sims make each blob uniform along the whole gate width. A real single cascade is ~4σ ≈ 0.16 µm wide along the width, and current flows around it. Parallel-channel estimate: expected fraction of width damaged = Φ·Δy·0.16 µm ≈ **0.5% (2e18) to 4.8% (4e18/8e18)**, i.e. a few-percent Id loss, not a device-level collapse. Whole-device collapse from cascades would need them to overlap along the width, Φ ≳ 1/(0.16 µm)² ≈ 4e9 cm⁻². Whether the hot-electron runaway even ignites around a 0.16 µm patch (current can bypass it) is untested; that needs a 3D FLOOXS run.
 - Access-region band edges carry the 10h mesh sensitivity. The 2e18 bands (gate region, fine mesh) are reliable.
 
+
+### 10j. Full x-y sensitivity map incl. insulator trap charge (burst QOS)
+
+> ⚠ Near the surface this map mostly measures the **insulator-charge assumption**, not semiconductor trapping (see below). Access-region numbers also carry the 10h mesh caveat.
+
+Job 44261474 (248 tasks, `ee1-b`), `results/20261001_trapXYMap/`. Run F levels (4e18 / 0.55 eV, σ 40 nm, `hotEb` 0.5, `hotTau` 1.3e-13), Vd 0-3 V, `dampValue` 0.05. Blob centre x ∈ {-275 … 515} nm (HighK top → 0.5 µm into GaN, 15 depths) × y ∈ {-0.4 … 2.5} µm (13 positions, contact-safe); centres inside metal skipped. The parts of the blob in Nitride/HighK enter Poisson as static charge (`insTrapSign`, `InsTrapCharge` in `Poisson.tcl`): sign −1 at all 182 positions, +1 at the 65 insulator-centred ones. 243/248 finished cleanly: 0 crashes, 0 give-ups, 13 used retries. The other 5 (sign −1, y=−0.4, x −30…15 nm) were still bisecting at Vd≈1.35 V at write-up; they're already off at rest at the ~1e-9 mA/mm noise floor, so their regime is settled. `analyze_trapXYMap.py` → `figures/trapXYMap_metrics.csv`, `_3d.png`, `_map.png` (sign −1), `_map_plus.png` (+1), `_sign.png`. Depth is plotted on evenly spaced rows; values are capped at 1e-8 (noise floor).
+
+- **Sign −1: everything from the nitride to 15 nm into the GaN is off at rest, at every y** (Id/Id_no-trap ~1e-10 at 3 V). That includes the access region, where the same traps without insulator charge gave the normal hot-electron collapse (10f). The cause is the Gaussian tail in the nitride: fully filled, it's 2.0e13 (x=0), 1.4e13 (15 nm), 6.4e12 (40 nm) and 9e11 cm⁻² (80 nm), i.e. ≥ the 2DEG density. The only collapse in the map is (40 nm, 2.5 µm); the rest of x=40 nm is at 1e-5 to 4e-3 of trap-free at rest.
+- **Deep GaN traps do almost nothing.** At 80 nm, only the gate region is affected (0.06-0.25 of trap-free at 3 V); everywhere else ≥0.88. From 150 nm down, ≈1 everywhere.
+- **HighK, sign −1:** at −100 nm (50 nm above the nitride) it turns the device off for y ≥ 1.5 µm (1e-6 to 1.6e-7), partly at 1.0 µm (0.16), but has **no effect at y ≤ 0.725**, under the T-gate overhang and field plate (the metal there presumably screens it). At −150 nm, ≤40% loss; at −225/−275 nm (HighK top), no effect.
+- **Sign +1 (fixed positive insulator charge):** no effect anywhere except nitride-centred blobs under the gate (−2.5 nm: 1e-4 to 6e-6 of trap-free, off at rest), which come from the semiconductor half of the blob as in 10f. In the access region the positive nitride charge **cancels the hot-electron collapse** (0.89-1.003 of trap-free at 3 V, vs 1e-4-1e-5 in 10f at x=0).
+- So the sign of any charge trapped in the passivation dominates the near-surface result in both directions. **Open:** a companion sign-0 run (insulator traps neutral, the pre-10j model) at x −30…80 nm would separate the semiconductor-trap effect. Physically, insulator traps would only partly fill, so the true answer probably lies between sign −1 and 0.
+
 ---
 
 ## 11. Notebook and plotting

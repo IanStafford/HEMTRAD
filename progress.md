@@ -825,3 +825,12 @@ excluded → grid A (−1) 182 + grid B (+1, insulator-centred) 65 + ref =
 `analyze_trapXYMap.py`.
 
 Submitted **job 44261474, array 0-247%160 on `ee1-b`** → `results/20261001_trapXYMap/`. Polling every 5 min.
+
+## 2026-10-01 - x-y sensitivity map finished (job 44261474)
+
+243/248 tasks done cleanly (0 crashes, 0 give-ups, 13 retried). The last 5 (sign −1, y=−0.4) are still bisecting at ~1.35 V and are already off at rest at the noise floor; left to finish or time out (3 h). Not cancelling without asking.
+Writeup in CLAUDE.md 10j; figures `figures/trapXYMap_{3d,map,map_plus,sign}.png`.
+- Sign −1 (filled insulator traps): blobs centred from the nitride to 40 nm into the GaN are off at rest everywhere, because the fully filled nitride tail (0.6-2e13 cm⁻²) outweighs the 2DEG. Below 80 nm, only the gate region is affected; from 150 nm down, nothing.
+- HighK at −100 nm turns the device off for y ≥ 1.5 µm; no effect under the T-gate or field plate.
+- Sign +1: the positive nitride charge cancels the access-region collapse; only under-gate blobs still turn the device off.
+**Decision for Ian:** run a sign-0 companion (insulator traps neutral) at x −30…80 nm × 13 y (~78 tasks, burst) to isolate the semiconductor-trap effect? Waiting.

@@ -10,7 +10,8 @@ r_worst = min over Vd of Id/Id_no-trap, collapse onset / depth vs trap-free
 (only for devices conducting at rest), regime.
 
 Writes figures/trapXYMap_metrics.csv, figures/trapXYMap_3d.png (3D surfaces,
-sign -1), figures/trapXYMap_map.png (2D maps over the device cross-section)
+sign -1), figures/trapXYMap_map.png and _map_plus.png (2D maps over the
+device cross-section, sign -1 / +1)
 and figures/trapXYMap_sign.png (-1 vs +1 at insulator positions).
 """
 import glob
@@ -119,64 +120,86 @@ def grid(sg, key, transform):
     return np.array(xs), np.array(ys), Z
 
 
-# 1) 3D surfaces, sign -1: suppression at 3 V and worst-case over the sweep
-fig = plt.figure(figsize=(16, 7.2))
-for k, (key, lab) in enumerate((("r_3V", "log10 suppression at Vd = 3 V"),
-                                ("r_worst", "log10 worst suppression, Vd 0.1-3 V"))):
-    xs, ys, Z = grid(-1, key, lambda v: -np.log10(v))
-    Y, X = np.meshgrid(ys, xs * 1e3)
+FLOOR = 8.0   # |log10| beyond ~8 is the numerical noise floor (Id ~1e-8 mA/mm)
+
+
+def layer(x):
+    return ("HighK" if x < -0.05 else "Nitride" if x < 0 else
+            "AlGaN" if x < 0.015 else "GaN")
+
+
+def in_metal(x, y):
+    return any(y0 < y < y1 and x0 < x < x1 for (y0, y1), (x0, x1), _ in METALS)
+
+
+def xlabels(xs):
+    return [f"{x * 1e3:g} {layer(x)}" for x in xs]
+
+
+# 1) 3D surfaces, sign -1, depth on evenly spaced rows (the action is in a
+#    ~70 nm band that a linear axis would squash)
+fig = plt.figure(figsize=(16, 7.4))
+for k, (key, lab) in enumerate((("r_3V", "suppression at Vd = 3 V"),
+                                ("r_worst", "worst suppression, Vd 0.1-3 V"))):
+    xs, ys, Z = grid(-1, key, lambda v: min(-np.log10(v), FLOOR))
+    Y, X = np.meshgrid(ys, np.arange(len(xs)))
     ax = fig.add_subplot(1, 2, k + 1, projection="3d")
-    ax.plot_surface(Y, X, Z, cmap=SEQ, edgecolor="white", linewidth=0.4,
-                    alpha=0.93, vmin=np.nanmin(Z), vmax=np.nanmax(Z))
+    ax.plot_surface(Y, X, np.where(np.isfinite(Z), Z, np.nan), cmap=SEQ,
+                    edgecolor="white", linewidth=0.4, alpha=0.93, vmin=0, vmax=FLOOR)
     ok = np.isfinite(Z)
     ax.scatter(Y[ok], X[ok], Z[ok], color=INK, s=6, depthshade=False)
+    ax.set_yticks(np.arange(len(xs)))
+    ax.set_yticklabels(xlabels(xs), fontsize=7)
     ax.set_xlabel("y, lateral (µm)\nsource → drain", labelpad=8)
-    ax.set_ylabel("x, depth (nm)\nHighK top → GaN", labelpad=8)
-    ax.set_zlabel(lab, labelpad=6)
-    ax.view_init(elev=28, azim=-55)
+    ax.set_ylabel("trap centre depth (nm)", labelpad=22)
+    ax.set_zlabel(f"log10 {lab}", labelpad=6)
+    ax.set_zlim(0, FLOOR)
+    ax.view_init(elev=32, azim=-128)
     ax.set_title(lab, color=INK, fontsize=11)
-fig.suptitle("Trap-blob sensitivity across the device (Run F levels; insulator "
-             "parts fully filled, -q·N; holes = inside metal)", color=INK,
-             fontsize=12)
+fig.suptitle("Trap-blob sensitivity across the device (Run F levels; insulator parts fully "
+             f"filled, -q·N; capped at 1e{FLOOR:g} = noise floor; holes = metal)",
+             color=INK, fontsize=12)
 fig.tight_layout()
 fig.savefig("figures/trapXYMap_3d.png", dpi=140)
 plt.close(fig)
 
-
-# 2) 2D maps over the cross-section (depth down, as in the device)
-def outline(ax):
-    for (y0, y1), (x0, x1), name in METALS:
-        ax.add_patch(Rectangle((y0, x0 * 1e3), y1 - y0, (x1 - x0) * 1e3,
-                               fill=False, edgecolor=INK, lw=1.2, hatch="//"))
-        if x0 > -0.35:
-            ax.text((y0 + y1) / 2, (x0 + x1) / 2 * 1e3, name, ha="center",
-                    va="center", fontsize=8, color=INK,
-                    bbox=dict(fc="white", ec="none", alpha=0.7, pad=1))
-    for xl, name in LAYERS:
-        ax.axhline(xl * 1e3, color=MUTED, lw=0.7, ls=":")
-        if name:
-            ax.text(2.62, xl * 1e3, name, fontsize=8, color=MUTED, va="bottom",
-                    ha="right")
-
-
-fig, axs = plt.subplots(1, 2, figsize=(16, 6.4), constrained_layout=True)
-for ax, (key, lab) in zip(axs, (("r_rest", "Id / Id_no-trap at rest (Vd = 0.1 V)"),
-                                ("r_3V", "Id / Id_no-trap at Vd = 3 V"))):
-    xs, ys, Z = grid(-1, key, np.log10)
-    lim = max(1.0, np.nanmax(np.abs(Z)))
-    pc = ax.pcolormesh(ys, xs * 1e3, Z, cmap=DIV, shading="nearest",
-                       norm=TwoSlopeNorm(vmin=-lim, vcenter=0.0, vmax=max(lim * 0.05, 0.05)))
-    outline(ax)
-    ax.set_ylim(530, -310)
-    ax.set_xlim(-0.45, 2.65)
-    ax.set_xlabel("y, lateral position of the trap blob (µm), source → drain")
-    ax.set_ylabel("x, depth (nm), surface stack at top")
-    ax.set_title(lab + " - log10, blue = current cut", color=INK, fontsize=11)
-    fig.colorbar(pc, ax=ax, shrink=0.9, label="log10(Id / Id_no-trap)")
-fig.suptitle("Where a trap blob hurts the device (Run F levels, insulator parts "
-             "-q·N); hatched = metal", color=INK, fontsize=12)
-fig.savefig("figures/trapXYMap_map.png", dpi=140)
-plt.close(fig)
+# 2) 2D maps over the cross-section, rows = sampled depths (top = HighK top)
+DIVR = DIV.reversed()   # blue = current cut, orange = current raised
+for sg in (-1, 1):
+    fig, axs = plt.subplots(1, 2, figsize=(16, 6.4 if sg < 0 else 3.6),
+                            constrained_layout=True)
+    for ax, (key, lab) in zip(axs, (("r_rest", "Id / Id_no-trap at rest (Vd = 0.1 V)"),
+                                    ("r_3V", "Id / Id_no-trap at Vd = 3 V"))):
+        xs, ys, Z = grid(sg, key, lambda v: max(np.log10(v), -FLOOR))
+        pc = ax.pcolormesh(np.arange(len(ys) + 1) - 0.5, np.arange(len(xs) + 1) - 0.5, Z,
+                           cmap=DIVR, norm=TwoSlopeNorm(vmin=-FLOOR, vcenter=0, vmax=1))
+        for i, x in enumerate(xs):
+            for j, y in enumerate(ys):
+                if in_metal(x, y):
+                    ax.add_patch(Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False,
+                                           hatch="//", ec=MUTED, lw=0))
+                elif not np.isfinite(Z[i, j]):
+                    ax.text(j, i, "?", ha="center", va="center", color=INK, fontsize=8)
+        for i in range(1, len(xs)):
+            if layer(xs[i]) != layer(xs[i - 1]):
+                ax.axhline(i - 0.5, color=INK, lw=0.8)
+        ax.set_yticks(np.arange(len(xs)))
+        ax.set_yticklabels(xlabels(xs), fontsize=8)
+        ax.set_xticks(np.arange(len(ys)))
+        ax.set_xticklabels([f"{y:g}" for y in ys], fontsize=8)
+        ax.invert_yaxis()
+        for j, y in enumerate(ys):
+            if -0.125 <= y <= 0.125:
+                ax.axvspan(j - 0.5, j + 0.5, ymin=0, ymax=0.012, color=INK)
+        ax.set_xlabel("y, lateral trap position (µm), source → drain (black tick = under gate)")
+        ax.set_ylabel("trap centre depth (nm), layer")
+        ax.set_title(lab, color=INK, fontsize=11)
+        fig.colorbar(pc, ax=ax, shrink=0.9, label=f"log10(Id / Id_no-trap), floor -{FLOOR:g}")
+    fig.suptitle(f"Where a trap blob hurts the device (Run F levels, insulator parts "
+                 f"{'-q·N, fully filled' if sg < 0 else '+q·N'}); blue = current cut, "
+                 "hatched = metal, ? = did not finish", color=INK, fontsize=12)
+    fig.savefig(f"figures/trapXYMap_map{'' if sg < 0 else '_plus'}.png", dpi=140)
+    plt.close(fig)
 
 # 3) Sign comparison at insulator-centred positions
 ins = sorted({(r["trapMeanX"], r["trapMeanY"]) for r in rows
@@ -188,7 +211,7 @@ if ins:
     colors = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"]
     for ax, sg in zip(axs, (-1, 1)):
         for c, x in zip(colors, xs_i):
-            pts = sorted((r["trapMeanY"], np.log10(r["r_3V"])) for r in rows
+            pts = sorted((r["trapMeanY"], max(np.log10(r["r_3V"]), -FLOOR)) for r in rows
                          if r["insTrapSign"] == sg and r["trapMeanX"] == x
                          and np.isfinite(r["r_3V"]))
             if pts:
@@ -204,10 +227,10 @@ if ins:
         ax.set_title(f"insulator charge {'-q·N (filled)' if sg < 0 else '+q·N (positive)'}",
                      color=INK)
         ax.set_xlabel("y (µm), source → drain")
-    axs[0].set_ylabel("log10(Id / Id_no-trap) at Vd = 3 V\n(below 0 = current cut)")
+    axs[0].set_ylabel(f"log10(Id / Id_no-trap) at Vd = 3 V\n(below 0 = current cut; floor -{FLOOR:g})")
     axs[1].legend(frameon=False, fontsize=9, loc="lower right")
     fig.suptitle("Traps centred in the insulators: sign of the trapped charge "
                  "(shaded: gate, field plate)", color=INK, fontsize=12)
     fig.savefig("figures/trapXYMap_sign.png", dpi=140)
     plt.close(fig)
-print("wrote figures/trapXYMap_{metrics.csv,3d.png,map.png,sign.png}")
+print("wrote figures/trapXYMap_{metrics.csv,3d.png,map.png,map_plus.png,sign.png}")
