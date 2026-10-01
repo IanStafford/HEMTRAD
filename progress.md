@@ -834,3 +834,7 @@ Writeup in CLAUDE.md 10j; figures `figures/trapXYMap_{3d,map,map_plus,sign}.png`
 - HighK at −100 nm turns the device off for y ≥ 1.5 µm; no effect under the T-gate or field plate.
 - Sign +1: the positive nitride charge cancels the access-region collapse; only under-gate blobs still turn the device off.
 **Decision for Ian:** run a sign-0 companion (insulator traps neutral) at x −30…80 nm × 13 y (~78 tasks, burst) to isolate the semiconductor-trap effect? Waiting.
+
+## 2026-10-01 - sign-0 companion submitted (Ian approved)
+
+Job **44274780**, 91 tasks on `ee1-b` (`pulsedIV_trapXYMap0.slurm`, `params_trapXYMap0.txt`) → `results/20261001_trapXYMap0/`. Same Run F blob, insulator traps neutral (`insTrapSign`=0), x ∈ {−30, −2.5, 0, 7.5, 15, 40, 80} nm × the 13 y positions (90 tasks; 1 centre inside metal skipped) + a trap-free reference. Polling every 5 min.
