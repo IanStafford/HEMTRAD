@@ -884,3 +884,10 @@ The HighK is applied correctly (solver reports εr HighK 35, Nitride 6.3, Metal 
 ## 2026-10-01 - HighK vs SiN at Run F done (job 44303974)
 
 51/51 clean (6 retried). Same as at 2e18/0.75: identical regimes, **identical collapse onset at every position**, depth within ±0.1-0.2 decades. Matches the field-plate check (no field outside the gate edge at ≤3 V). CLAUDE.md 10l updated. Nothing running on HPG.
+
+## 2026-10-01 - transfer-curve calibration (goal from Ian), checkpoint
+
+Target: `figures/rfDeviceHFO2_Experimental.csv` = raw `figures/RF_100nmHfOx_IdVgs_Example1.xlsx` (Ian): Id-Vgs at **Vds = 10 V**, 25 °C, 100 nm HfO2, std FP, Ids in **A for a 200 µm device → mA/mm = A·1e3/0.2**. Driver `calibIdVg.tcl` (trap-free, field mobility, Vg +1 → −4), plot `plot_calib.py`.
+- **Unmodified field mobility already fits:** within ±2.4% from Vg −2.6 to +1 V (rms 1.9% to 0 V, 1.8% to +1 V); 0 V: 649 vs 634, +1 V: 802 vs 810. Static mobility 600: rms 10% (wrong shape). `figures/calib_IdVg.png`.
+- Remaining: gm is ~4% high mid-range and **collapses above +0.5 V** (88 vs 160 mS/mm at +1 V), the same with static mobility, so it's electrostatic, not mobility. Diagnosing (charge under the gate, GaN vs AlGaN). Off-state drain leakage (~0.075 mA/mm) ignored per Ian.
+- Ian: after calibration, redo the trap studies with field mobility.
