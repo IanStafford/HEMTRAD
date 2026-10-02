@@ -912,3 +912,4 @@ Job 44342967 finished: the 2 remaining tasks also gave up cleanly after their co
 - **Archived** all static-mobility work: `archive/static_mobility/` (scripts, sweep files, figures; README) on main, full snapshot on branch **`static-mobility`** (d2eda77), raw results in `results/archive_static_mobility/` (workstation). `analyze_trapMapSets.py` now defaults to the field map. **Default `mobModel` is now `field`** (a479ca0).
 - **Collapse classes** (Ian): largest single-step loss >95% deep, 50-95% medium, <50% shallow (CLAUDE.md).
 - **Round 1** `pulsedIV_onsetField1.slurm` / `params_onsetField1.txt`: Run F position (x 0, y 0.2, σ 0.04), trapLevel {0.35,0.45,0.55} × trapPeak {2,3,4}e18 × hotTau {1e-14,3e-14,6e-14,1.3e-13} × hotEb {0.5,0.85}, Vd 0-4 V, + reference = 73 tasks on `ee1-b`.
+Submitted **job 44359813** → `results/20261002_onsetField1/`. Polling every 5 min.
