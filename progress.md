@@ -906,3 +906,9 @@ Submitted **job 44342967** → `results/20261001_trapMapF_field/`. Polling every
 
 48/51 done (1 gave up cleanly after its collapse; 2 source-side tasks still bisecting post-collapse, onset/depth already known). vs static (10f): collapse **earlier** (0.2 V almost everywhere vs 0.2-0.5 V), **~1 decade deeper** (10^4.9-10^7.1 vs 10^4.1-10^5.8 vs own trap-free), lateral onset trend nearly gone; 19 vs 15 off at rest (4 borderline at the FP edge). Trap-free baseline 75% higher at low Vd (part of the difference); the low-Vd region isn't covered by the calibration. CLAUDE.md 10n; `figures/trapMapF_field_tp4e+18_tl0.55.png`, `figures/mobCompare_F_{3d,compare}.png`.
 Job 44342967 finished: the 2 remaining tasks also gave up cleanly after their collapse (2.6 / 1.4 V). 0 crashes; regimes unchanged; figures regenerated. Nothing running on HPG.
+
+## 2026-10-01 - cleanup + late-onset search with field mobility (Ian)
+
+- **Archived** all static-mobility work: `archive/static_mobility/` (scripts, sweep files, figures; README) on main, full snapshot on branch **`static-mobility`** (d2eda77), raw results in `results/archive_static_mobility/` (workstation). `analyze_trapMapSets.py` now defaults to the field map. **Default `mobModel` is now `field`** (a479ca0).
+- **Collapse classes** (Ian): largest single-step loss >95% deep, 50-95% medium, <50% shallow (CLAUDE.md).
+- **Round 1** `pulsedIV_onsetField1.slurm` / `params_onsetField1.txt`: Run F position (x 0, y 0.2, σ 0.04), trapLevel {0.35,0.45,0.55} × trapPeak {2,3,4}e18 × hotTau {1e-14,3e-14,6e-14,1.3e-13} × hotEb {0.5,0.85}, Vd 0-4 V, + reference = 73 tasks on `ee1-b`.
