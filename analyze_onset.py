@@ -5,6 +5,8 @@ Collapse classes (Ian, 2026-10-01; CLAUDE.md): the largest single-step loss
 shallow. The collapse onset is the first step that reaches the class threshold
 (> 95% deep, >= 50% medium; shallow: the largest step). Devices below 10% of the
 trap-free current at Vd = 0.1 V are "off at rest" (no collapse to speak of).
+Runs that stop early (PULSED GAVE UP) with no recorded collapse are "stalled";
+their onset is the Vd they could not reach (the runaway, CLAUDE.md 10.5).
 
 usage: python3 analyze_onset.py run_dir tag [rows cols xpar ypar]
   defaults (round 1): rows=trapLevel cols=hotEb x=hotTau y=trapPeak
@@ -26,7 +28,8 @@ ROWS, COLS, XP, YP = (sys.argv[3:7] if len(sys.argv) >= 7
 INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"
 SEQ = LinearSegmentedColormap.from_list(
     "onset", ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"])
-CLS = {"deep": "D", "medium": "M", "shallow": "S", "off at rest": "off", "incomplete": "?"}
+CLS = {"deep": "D", "medium": "M", "shallow": "S", "off at rest": "off", "incomplete": "?",
+       "stalled": "stall"}
 
 
 def classify(loss):
@@ -69,6 +72,11 @@ for k, (vd, idd, p) in sorted(dev.items()):
     post_min = int(j + 1 + np.argmin(i[j + 1:]))
     if at_rest < 0.1:
         cls, onset = "off at rest", np.nan
+    elif cls == "shallow" and vd[-1] < p.get("Vd_max", vd[-1]) - 1e-6:
+        # stopped (PULSED GAVE UP) before reaching Vd_max without a recorded
+        # collapse: almost always the runaway that continuation can't follow
+        # (CLAUDE.md 10.5), so the collapse is probably at the stall voltage
+        cls, onset = "stalled", float(vd[-1] + 0.1)
     rows.append({**{q: p[q] for q in (ROWS, COLS, XP, YP)},
                  "class": cls, "max_step_loss": maxloss, "onset_Vd": onset,
                  "pre_Id": float(i[ipre]), "at_rest_frac": at_rest,
@@ -87,6 +95,8 @@ for r in rows:
     cnt[r["class"]] = cnt.get(r["class"], 0) + 1
 print(f"{len(rows)} devices: " + ", ".join(f"{k} {v}" for k, v in sorted(cnt.items()))
       + f"; ref Id(0.1/end) = {iref(0.1):.3g}/{ir[-1]:.4g} mA/mm")
+print("stalled (gave up before Vd_max, no recorded collapse):",
+      sorted(round(r["onset_Vd"], 1) for r in rows if r["class"] == "stalled"))
 print("latest-onset deep/medium collapses:")
 for r in sorted((r for r in rows if r["class"] in ("deep", "medium")),
                 key=lambda r: -r["onset_Vd"])[:15]:
@@ -113,7 +123,7 @@ for a, r_ in enumerate(rv):
                 if r["class"] in ("deep", "medium"):
                     Z[yi, xi] = r["onset_Vd"]
                 lab = CLS[r["class"]]
-                if r["class"] in ("deep", "medium", "shallow"):
+                if r["class"] in ("deep", "medium", "shallow", "stalled"):
                     lab += f"\n{r['onset_Vd']:.1f} V"
                 ax.text(xi, yi, lab, ha="center", va="center", fontsize=8,
                         color="white" if np.isfinite(Z[yi, xi]) and Z[yi, xi] > 0.6 * vmax else INK)

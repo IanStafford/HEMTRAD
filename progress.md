@@ -945,3 +945,9 @@ Submitted **job 44363616** → `results/20261002_onsetField2/`. Polling every 5 
 
 Ian: a series of ~10 static 3D surface plots at different Vd for one trap level/concentration, showing how trap position sets the collapse onset (maybe a GIF later). Chosen set: round-3 best (0.30 eV / 5e18 / hotTau 1e-14 / hotEb 1.0, σ 0.04), whose onset varies 1.5-2.3 V with position. `pulsedIV_posMapLate.slurm` / `params_posMapLate.txt`: trapMeanX {0, 3.75, 7.5, 11.25, 15} nm × trapMeanY {−0.4, −0.125, 0, 0.125, 0.285, 0.5, 0.725, 1.0, 1.25, 1.5, 1.75, 2.0, 2.4} µm + trap-free ref = 66 tasks, Vd 0-3 V. Runs alongside round 4 (job 44440027).
 Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 min.
+
+### Correction: round 3 stalls (2026-10-02, ~11:50)
+
+- Round 3's log check (skipped before its write-up — my mistake) shows **19/56 tasks ended with `PULSED GAVE UP`** (clean, no crashes/cores) at Vd 1.8-4.0 V, mostly from full current (e.g. 0.30/1.0/5e18 at y 1.5: 169 mA/mm at 2.7 V, gave up at 2.8 V). That is the runaway-stall of CLAUDE.md §10.5: the collapse is probably at the stall voltage, but the sweep can't step across it.
+- `analyze_onset.py` had counted these as **shallow**. Added a **"stalled"** class (gave up before Vd_max with no recorded collapse; onset = unreached Vd). Rounds 1-2 unchanged (no stalls). Round 3 now: deep 24, medium 5, shallow 8, stalled 19; stalls at 1.8, 1.8, 1.9, 2.0, 2.1, 2.1, 2.3, 2.7, 2.7, 2.8, 2.8, 2.9, 2.9, 2.9, 3.0, 3.5, 3.6, 3.7, 4.0 V.
+- So the **2.3 V best is a lower bound**: up to 9 devices may collapse at 2.7-4.0 V. **Proposed (needs Ian's OK):** rerun the stalled tasks with the solver-side settings that rescued the 10f stalls (`dampValue` 0.02, `retryDepth` 7). Physics unchanged. Same check will apply to round 4 and the position map.

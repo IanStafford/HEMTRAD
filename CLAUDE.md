@@ -201,7 +201,7 @@ For qualitative analysis, classify a collapse by its **largest single-step loss*
 - **medium:** 50-95%;
 - **shallow:** < 50%.
 
-The collapse onset is the Vd of the **first** step that reaches the class threshold (>95% deep, ≥50% medium; for shallow, the largest step). Changed 2026-10-02: "Vd of the largest step" misreported two-step collapses (e.g. 99.92% at 1.5 V, then 99.95% from the already-collapsed level at 2.3 V); re-scoring round 1 moved 2 of 72 onsets 0.1 V earlier. Devices below 10% of the trap-free current at Vd = 0.1 V are "off at rest" (a threshold shift, not a collapse). `analyze_onset.py` implements this.
+The collapse onset is the Vd of the **first** step that reaches the class threshold (>95% deep, ≥50% medium; for shallow, the largest step). Changed 2026-10-02: "Vd of the largest step" misreported two-step collapses (e.g. 99.92% at 1.5 V, then 99.95% from the already-collapsed level at 2.3 V); re-scoring round 1 moved 2 of 72 onsets 0.1 V earlier. Devices below 10% of the trap-free current at Vd = 0.1 V are "off at rest" (a threshold shift, not a collapse). Runs that stop early (`PULSED GAVE UP`) with no recorded collapse are **"stalled"**, onset = the Vd they couldn't reach (added 2026-10-02; before that they were wrongly counted as shallow). `analyze_onset.py` implements this.
 
 ### 10.1 Transfer-curve calibration vs the HfO2 device (field mobility)
 
@@ -258,7 +258,7 @@ Round 2 (cancelled job 44363616 at Ian's request, **resubmitted 2026-10-02 as jo
 
 Round 3: job 44435511, `pulsedIV_onsetField3.slurm` / `params_onsetField3.txt` (`trapPeak|trapLevel|hotTau|hotEb|trapMeanY`), `results/20261002_onsetField3/`: 8 sets (round-2 best at 0.30 eV, plus 0.25 eV with 5-7e18 / `hotTau` 1-1.5e-14) × `trapMeanY` {0.2, 0.5, 0.725, 1.0, 1.5, 2.0, 2.4} µm, + reference. Analyze: `python3 analyze_onset.py results/20261002_onsetField3 onsetField3 trapLevel hotEb trapMeanY trapPeak` (the 8 sets are unique in level × hotEb × trapPeak).
 
-**Round 3 result** (57 tasks, 0 crashes; `figures/onsetField3.png`): deep 24, medium 5, shallow 27. **Latest deep collapse 2.3 V**: 0.30 eV / 5e18 / `hotTau` 1e-14 / `hotEb` 1.0 at **y = 1.0 µm**, 99.4% in one step from 166 mA/mm (≈ trap-free, ~170 mA/mm), i.e. the device runs normally up to the collapse. Runner-up: 0.25 eV / 6e18 / 1.5e-14 / 1.0 at y = 1.5 µm, deep at 2.1 V from 164 mA/mm. Medium 2.3 V (0.25 / 5e18 / 1e-14 / 0.85 at y 0.2, 65%).
+**Round 3 result** (57/57 finished, 0 crashes, but **19 stalled**: `PULSED GAVE UP` at 1.8-4.0 V, mostly at full current, i.e. the runaway continuation can't follow (§10.5); 9 of them at ≥ 2.7 V, so the true latest onset may be later than 2.3 V; `figures/onsetField3.png`): deep 24, medium 5, shallow 8, stalled 19. **Latest deep collapse 2.3 V**: 0.30 eV / 5e18 / `hotTau` 1e-14 / `hotEb` 1.0 at **y = 1.0 µm**, 99.4% in one step from 166 mA/mm (≈ trap-free, ~170 mA/mm), i.e. the device runs normally up to the collapse. Runner-up: 0.25 eV / 6e18 / 1.5e-14 / 1.0 at y = 1.5 µm, deep at 2.1 V from 164 mA/mm. Medium 2.3 V (0.25 / 5e18 / 1e-14 / 0.85 at y 0.2, 65%).
 - **Position has an optimum:** for most sets the onset rises from y = 0.2 to ~1.0-1.5 µm (e.g. 0.30/1.0/5e18: 1.5 → 1.7 → 2.1 → 2.3 V at y 0.2/0.5/0.725/1.0), then the collapse turns shallow at y ≥ 1.5-2.0 (traps too far from the hot spot to run away).
 - Pre-collapse current: the best late collapses start from 150-166 mA/mm (near trap-free); some deep ones start from an already-sagged current (e.g. 0.30/0.85/5e18 at y 0.725: 8 mA/mm), so they are less clean.
 
