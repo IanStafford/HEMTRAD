@@ -954,3 +954,11 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Ian approved the round-3 stall retry (run alongside the position map if burst capacity allows).** `pulsedIV_onsetField3Retry.slurm` / `params_onsetField3Retry.txt`: the 19 stalled tasks, dampValue 0.02, retryDepth 7 → `results/20261002_onsetField3Retry/`.
 - Burst had 83/171 CPUs in use (all ours), so submitted alongside: **job 44443669**. Polling every 5 min (rounds 4, position map, retry together).
 - **Round 4 cancelled** (Ian: not expecting good results): job 44440027 scancelled with 17 tasks still running; 44 had completed (results left in `results/20261002_onsetField4/` on HPG, not analysed). Still running: position map 44441813, round-3 retry 44443669.
+
+### Position map done (job 44441813) → per-Vd 3D surfaces
+
+- 66/66 finished, 0 crashes, **11 stalled** (2.1-3.0 V, runaway). Set: 0.30 eV / 5e18 / hotTau 1e-14 / hotEb 1.0, σ 40 nm; 5 depths × 13 y + ref, Vd 0-3 V.
+- Figures: `figures/posMapLate_grid.png` (10 surfaces at Vd 0.5, 1.4, 1.6 … 3.0 V; nothing changes below ~1.2 V, so frames are concentrated where the collapse spreads), single frames in `figures/posMapLate_frames/` (ready for a GIF), and `figures/posMapLate_onset.png` (onset/class per position). Stalled positions are marked × on the floor and "stall" on the onset map.
+- Result: positions cut >10× grow 15 (gate region only, up to 1.2 V) → 17 / 23 / 30 / 36 / 41 / 43 at 1.4-2.4 V. Onset rises with distance from the gate (surface: 1.6 V at y 0.285 → 2.3 V at y 1.0) and deeper traps (7.5-15 nm) reach farther out (7.5 nm: 2.4 V at y 1.75). The latest points (2.5-3.0 V) are stalls.
+- `plot_posVd.py` got the "stalled" class (same rule as analyze_onset).
+- Next options: retry the 11 stalls (same solver settings as the round-3 retry) to resolve the right edge; make the GIF.

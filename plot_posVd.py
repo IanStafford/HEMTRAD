@@ -28,8 +28,9 @@ INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"
 SEQ = LinearSegmentedColormap.from_list(
     "blue_seq", ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"])
 GATE, FP = (-0.125, 0.125), (0.285, 0.725)
+STALL = "#eb6834"
 
-ref, dev, setdesc = None, {}, ""
+ref, dev, setdesc, VMAX = None, {}, "", 0.0
 for t in glob.glob(f"{RUN}/task_*") + glob.glob(f"{RUN}Retry/task_*"):
     p = json.load(open(os.path.join(t, "params.json")))
     c = glob.glob(os.path.join(t, "pulsedIV_*.csv"))
@@ -39,6 +40,7 @@ for t in glob.glob(f"{RUN}/task_*") + glob.glob(f"{RUN}Retry/task_*"):
     if p["trapPeak"] < 1e12:
         ref = (d[:, 0], d[:, 1])
         continue
+    VMAX = max(VMAX, p.get("Vd_max", d[-1, 0]))
     setdesc = (f"{p['trapPeak']:.0e} cm⁻³, {p['trapLevel']} eV, hotTau {p['hotTau']:g} s, "
                f"hotEb {p['hotEb']} eV")
     k = (p["trapMeanX"], p["trapMeanY"])
@@ -60,9 +62,10 @@ def supp_at(vd, idd, v):
     return float(np.clip(np.log10(np.interp(v, vr, ir) / max(i, 1e-30)), 0.0, FLOOR))
 
 
-def onset(vd, idd):
+def onset(vd, idd, vmax):
     """(class, onset Vd) by the §10.0 rule: largest single-step loss sets the
-    class; onset = first step reaching the class threshold."""
+    class; onset = first step reaching the class threshold. A run that gave up
+    before vmax without a recorded collapse is "stalled" at the unreached Vd."""
     m = vd > 0.05
     v, i = vd[m], idd[m]
     if i[0] / np.interp(v[0], vr, ir) < 0.1:
@@ -70,6 +73,8 @@ def onset(vd, idd):
     loss = 1.0 - i[1:] / i[:-1]
     mx = loss.max()
     cls = "deep" if mx > 0.95 else "medium" if mx >= 0.5 else "shallow"
+    if cls == "shallow" and vd[-1] < vmax - 1e-6:
+        return "stalled", float(vd[-1] + 0.1)
     thr = 0.95 if cls == "deep" else 0.5 if cls == "medium" else mx
     return cls, float(v[1 + np.nonzero(loss >= thr - 1e-12)[0][0]])
 
@@ -81,8 +86,8 @@ for (x, y), (vd, idd) in dev.items():
     i, j = xs.index(x), ys.index(y)
     for v in VDS:
         Z[v][i, j] = supp_at(vd, idd, v)
-    CLS[i, j], o = onset(vd, idd)
-    if CLS[i, j] in ("deep", "medium"):
+    CLS[i, j], o = onset(vd, idd, VMAX)
+    if CLS[i, j] in ("deep", "medium", "stalled"):
         ONS[i, j] = o
 
 plt.rcParams.update({"font.size": 9, "axes.edgecolor": MUTED,
@@ -95,6 +100,10 @@ def panel(ax, v):
                     linewidth=0.4, alpha=0.95)
     ok = np.isfinite(z)
     ax.scatter(Y[ok], X[ok], z[ok], color=INK, s=5, depthshade=False)
+    if (~ok).any():
+        ax.scatter(Y[~ok], X[~ok], np.zeros((~ok).sum()), marker="x", color=STALL, s=28,
+                   depthshade=False, label="run stalled before this Vd\n(collapse not resolved)")
+        ax.legend(loc="upper left", frameon=False, fontsize=7)
     for lo, hi in (GATE, FP):
         ax.plot([lo, hi, hi, lo, lo], [0, 0, 15, 15, 0], [0] * 5, color=INK, lw=1.0)
     ax.set_zlim(0, FLOOR)
@@ -133,7 +142,7 @@ for v in VDS:
 fig, ax = plt.subplots(figsize=(11, 4.2), constrained_layout=True)
 pc = ax.pcolormesh(np.arange(len(ys) + 1) - 0.5, np.arange(len(xs) + 1) - 0.5, ONS,
                    cmap=SEQ, vmin=0, vmax=max(VDS))
-lab = {"deep": "D", "medium": "M", "shallow": "S", "off at rest": "off"}
+lab = {"deep": "D", "medium": "M", "shallow": "S", "off at rest": "off", "stalled": "stall"}
 for i in range(len(xs)):
     for j in range(len(ys)):
         c = CLS[i, j]
@@ -149,7 +158,8 @@ ax.set_yticklabels([f"{x * 1e3:g}" for x in xs])
 ax.invert_yaxis()
 ax.set_xlabel("trap y (µm), source → drain")
 ax.set_ylabel("trap depth (nm)")
-ax.set_title(f"Collapse onset Vd by trap position (D deep >95%, M medium, S shallow, off = off at rest); {setdesc}",
+ax.set_title(f"Collapse onset Vd by trap position (D deep >95%, M medium, S shallow, off = off at rest,\n"
+             f"stall = run stopped at the runaway, collapse probably at that Vd); {setdesc}",
              color=INK, fontsize=10)
 fig.colorbar(pc, ax=ax, label="onset Vd (V)")
 fig.savefig(f"figures/{TAG}_onset.png", dpi=130)
