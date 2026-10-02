@@ -18,12 +18,16 @@ import glob
 import json
 import os
 import re
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
-RUN = "results/20260927_trapMapSets"
+# usage: python3 analyze_trapMapSets.py [run_dir [tag]]  (default: the 10f run,
+# tag trapMapSets; e.g. results/20261001_trapMapF_field trapMapF_field)
+RUN = sys.argv[1] if len(sys.argv) > 1 else "results/20260927_trapMapSets"
+TAG = sys.argv[2] if len(sys.argv) > 2 else "trapMapSets"
 VD_END = 3.0
 SEQ = LinearSegmentedColormap.from_list(
     "blue_seq", ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"])
@@ -93,7 +97,7 @@ for (tp, tl, mx, my), (vd, idd, nre) in sorted(dev.items()):
 
 os.makedirs("figures", exist_ok=True)
 cols = list(rows[0])
-with open("figures/trapMapSets_metrics.csv", "w") as f:
+with open(f"figures/{TAG}_metrics.csv", "w") as f:
     f.write(",".join(cols) + "\n")
     for r in rows:
         f.write(",".join(r[c] if isinstance(r[c], str) else f"{r[c]:.6g}"
@@ -176,13 +180,13 @@ for tp, tl in sets:
                  "  -  gate and field plate outlined on the floor",
                  color=INK, fontsize=11)
     fig.tight_layout()
-    out = f"figures/trapMapSets_tp{tp:.0e}_tl{tl}.png"
+    out = f"figures/{TAG}_tp{tp:.0e}_tl{tl}.png"
     fig.savefig(out, dpi=140)
     plt.close(fig)
     print("wrote", out)
 
-for key, zl, zr, name in (("collapse_depth_vs_ref", RL, ZR, "depth"),
-                          ("suppression_3V", SL, ZS, "suppression")):
+for key, zl, zr, name in ((("collapse_depth_vs_ref", RL, ZR, "depth"),
+                           ("suppression_3V", SL, ZS, "suppression")) if len(sets) > 1 else ()):
     ncol = 3
     nrow = (len(sets) + ncol - 1) // ncol
     fig = plt.figure(figsize=(6.2 * ncol, 5.4 * nrow))
@@ -194,7 +198,7 @@ for key, zl, zr, name in (("collapse_depth_vs_ref", RL, ZR, "depth"),
                  " by trap location, for each trap concentration / level"
                  " (shared z-scale)", color=INK, fontsize=12)
     fig.tight_layout()
-    out = f"figures/trapMapSets_overview_{name}.png"
+    out = f"figures/{TAG}_overview_{name}.png"
     fig.savefig(out, dpi=130)
     plt.close(fig)
     print("wrote", out)

@@ -896,3 +896,7 @@ Target: `figures/rfDeviceHFO2_Experimental.csv` = raw `figures/RF_100nmHfOx_IdVg
 
 **Calibrated model = existing deck with `mobModel field`, no parameter changes**: Id within ±2.4% of the measurement from Vg −2.6 to +1 V at Vds = 10 V (rms 1.9% to 0 V); mA/mm = A·1e3/0.2. Only miss: gm above +0.5 V (88 vs 160 mS/mm at +1 V; Id still matches). Tried interface charge, contact resistance, surface charge and 2DEG mobility (CLAUDE.md 10m table). All fix forward-bias gm only by softening the turn-on and dropping the −2 V region 4-6%, so none adopted. `figures/calib_IdVg.png`.
 **Next (Ian):** redo the trap studies with field mobility. Which ones (10f maps, 10j/10k, 10l?), and should field mobility become the default (`mobModel`)? Waiting before any sbatch.
+
+## 2026-10-01 - Run F trap map with field mobility (Ian: replicate the conc/level surface plots, Run F set only)
+
+`pulsedIV_trapMapF_field.slurm` / `params_trapMapF_field.txt`: the 10f 4e18/0.55 grid (5 depths × 10 positions) + trap-free reference, `mobModel field` set per run (deck default stays static), 51 tasks on `ee1-b`. `analyze_trapMapSets.py` now takes `[run_dir [tag]]` (default output byte-identical). Local check (x=0, y=0.5): runs cleanly, ~20 s/point; collapse at **0.2 V vs 0.3 V** with static mobility, ~10× deeper (0.0011 vs 0.010 mA/mm at 0.3 V).
