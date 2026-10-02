@@ -989,3 +989,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - 11/11 finished, 0 crashes/cores: **9 rescued**, 2 gave up again (y 2.0 µm at 11.25/15 nm depth, stalls at 2.9/2.8 V; the ramp step fell below its 0.002 floor at full current).
 - Position map now: deep 33, medium 10, shallow 15, off 5, stalled 2. **Surface traps collapse from 1.6 V (y 0.285 µm) to 3.0 V (y 1.75 µm), all deep**; 50/65 positions cut >10× by 3 V (was 41). Figures (`posMapLate_grid.png`, `posMapLate_onset.png`) and GIF regenerated.
 - Round-3 rescue (job 44452288): 15/19 done so far (15 rescued, 3 gave up), 4 still running.
+
+### Te-ramp rescue: round 3 done (job 44452288)
+- 19/19 finished, 0 crashes/cores/missing: **15 rescued**, 4 gave up again (all at y = 2.0 µm: 6e18/0.25/1.5e-14/1.0 at 3.0 V, 7e18/0.25/1e-14/1.0 at 2.8 V, 5e18/0.30/1.5e-14/0.85 at 2.9 V, 5e18/0.30/1e-14/1.0 at 3.7 V).
+- Round 3 re-scored: deep 36, medium 7, shallow 9, stalled 4 (was deep 24, medium 5, shallow 8, stalled 19).
+- **Latest deep collapse: 3.5 V** (was 2.3 V): 0.30 eV / 5e18 / hotTau 1e-14 / hotEb 1.0 at **y = 2.4 µm**. 177 mA/mm at 3.4 V (98.5% of trap-free 179.7) → 0.0018 mA/mm at 3.5 V (~1e5× in one step) → slow creep to 0.0023 by 4.0 V — the same collapse-then-creep shape as the measurement. Latest medium: 3.6 V (0.25 / 6e18 / 1e-14 / 0.85 at y 1.0, 91% step).
+- Best set's onset vs position: 1.5 / 1.7 / 2.1 / 2.3 / 2.8 / (stall 3.7) / 3.5 V at y 0.2 / 0.5 / 0.725 / 1.0 / 1.5 / 2.0 / 2.4 µm.
+- Remaining 6 stalls (4 here + 2 in the position map, all near y 2.0 µm): the ramp step hits its 0.002 floor at full current; a lower `teRampMin` is the next thing to try if they matter.
