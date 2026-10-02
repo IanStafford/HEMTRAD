@@ -590,6 +590,28 @@ Ian's question: what does the HighK dielectric do to the collapse? `rfdevice_SiN
 - Robustness: "dielectric doesn't matter at ≤3 V" is robust (insensitive to εr over 6.3-35; set by basic electrostatics). The high-Vd numbers are qualitative only (static mobility, no self-heating, corner mesh, Neumann top boundary), and the model has no dielectric fixed/interface charge or dynamic surface trapping, the usual way passivation affects real collapse.
 - Old `fieldpeak.tcl` set HighK εr 6.3 before sourcing the model file, which resets it to 35, so its "SiN" run was HighK.
 
+
+### 10m. Transfer-curve calibration vs the HfO2 device (field mobility)
+
+Target: `figures/rfDeviceHFO2_Experimental.csv` = raw `figures/RF_100nmHfOx_IdVgs_Example1.xlsx`: Id-Vgs at **Vds = 10 V**, 25 °C, 100 nm HfO2, standard FP. `Ids` is in **A for a 200 µm device** → mA/mm = A·1e3/0.2 (634 mA/mm at Vg=0, 810 at +1 V). FLOOXS flux is per µm of depth (×1e6 = mA/mm). Gate leakage ≤2e-3 mA/mm; the off-state floor (~0.075 mA/mm) is drain leakage and is not modelled (Ian: qualitative OFF vs ON only). Driver `calibIdVg.tcl` (trap-free, `mobModel field`, Vd ramp then Vg +1 → −4; levers `Vd_cal`, `Rs_contact`/`Rd_contact` lumped contact resistance, `deviceDeck`), scoring `calib_score.py` (aligns by a rigid Vg shift = ΔphiB), plot `plot_calib.py` → `figures/calib_IdVg.png`.
+
+**Result: the existing deck with `mobModel field` is the calibration; no parameters changed.** Id within ±2.4% from Vg −2.6 to +1 V (rms 1.9% to 0 V, 1.8% to +1 V); −2.0 V: −1.5%; 0 V: 649 vs 634; +1 V: 802 vs 810. Threshold region: +16% at −2.8 V, −15% at −3.0 V (model turns on slightly more steeply). Static mobility (600) is 10% rms with the wrong shape. Curves: `figures/calib_IdVg_{field,static,alt_pol8e12_Rc0.6}.csv`.
+
+Known miss: **gm above +0.5 V collapses** (88 vs 160 mS/mm at +1 V), while Id there still matches. Diagnosed at Vd=10 V: no spill-over into the AlGaN; the source access region (2DEG ~5e12 cm⁻², drops 1.5 V at +1 V) and the strip under the T-gate head overhang (1.5-3.7e12, the head couples through the HighK as a weak second gate) quasi-saturate (access-resistance gm roll-off, Palacios et al. TED 2006). Tried, all physically motivated, all trade the turn-on/−2 V region for forward-bias gm:
+
+| change (phiB refit for Vth) | rms to 0 V | at −2 V | gm −1/0/+1 (exp 220/196/159) |
+|---|---|---|---|
+| none (adopted) | 1.8% | −2% | 232/199/88 |
+| polCharge 9e12 / 1.1e13 | 13% / 22% | | 286/262/222, 326/312/281 |
+| polCharge 8e12 + Rc 0.6 Ω·mm, phiB 2.07 | 4.5% | −5% | 223/205/170 |
+| polCharge 7.5e12 + Rc 0.35, phiB 1.86 | 3.1% | −4% | 225/203/135 |
+| polCharge 9e12 + Rc 1.0, phiB 2.50 | 6.8% | −6% | 216/207/188 |
+| surfCharge 4e12 (Rc 0) | 22% | | 325/313/293 |
+| surfCharge 1.5e12 + Rc 0.6, phiB 1.86 | 3.2% | −4% | 231/219/189 |
+| 2DEG mobility excluding buffer doping (~1900) | 36% | | |
+
+More channel charge removes the access bottleneck but raises intrinsic gm, and the series resistance needed to trim it softens the turn-on. Kept the unmodified deck because it is best in the required range and at Vg = −2 V, where all trap studies run. A run at the fitted phiB confirmed the rigid-shift approximation (field plate effect < 0.1%). New levers (defaults = old behaviour): `polCharge`, `phiB`, `surfCharge`.
+
 ---
 
 ## 11. Notebook and plotting

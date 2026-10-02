@@ -891,3 +891,8 @@ Target: `figures/rfDeviceHFO2_Experimental.csv` = raw `figures/RF_100nmHfOx_IdVg
 - **Unmodified field mobility already fits:** within ±2.4% from Vg −2.6 to +1 V (rms 1.9% to 0 V, 1.8% to +1 V); 0 V: 649 vs 634, +1 V: 802 vs 810. Static mobility 600: rms 10% (wrong shape). `figures/calib_IdVg.png`.
 - Remaining: gm is ~4% high mid-range and **collapses above +0.5 V** (88 vs 160 mS/mm at +1 V), the same with static mobility, so it's electrostatic, not mobility. Diagnosing (charge under the gate, GaN vs AlGaN). Off-state drain leakage (~0.075 mA/mm) ignored per Ian.
 - Ian: after calibration, redo the trap studies with field mobility.
+
+## 2026-10-01 - calibration done
+
+**Calibrated model = existing deck with `mobModel field`, no parameter changes**: Id within ±2.4% of the measurement from Vg −2.6 to +1 V at Vds = 10 V (rms 1.9% to 0 V); mA/mm = A·1e3/0.2. Only miss: gm above +0.5 V (88 vs 160 mS/mm at +1 V; Id still matches). Tried interface charge, contact resistance, surface charge and 2DEG mobility (CLAUDE.md 10m table). All fix forward-bias gm only by softening the turn-on and dropping the −2 V region 4-6%, so none adopted. `figures/calib_IdVg.png`.
+**Next (Ian):** redo the trap studies with field mobility. Which ones (10f maps, 10j/10k, 10l?), and should field mobility become the default (`mobModel`)? Waiting before any sbatch.
