@@ -963,3 +963,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - `plot_posVd.py` got the "stalled" class (same rule as analyze_onset).
 - Next options: retry the 11 stalls (same solver settings as the round-3 retry) to resolve the right edge; make the GIF.
 - **GIF** (Ian): `figures/posMapLate.gif`, 30 frames at Vd 0.1-3.0 V in 0.1 V steps (one per simulated point), 350 ms/frame, last frame held 2 s, 0.6 MB; same fixed z-scale and camera as the static plots. Rebuild: `python3 plot_posVd.py results/20261002_posMapLate posMapLate_gif $(python3 -c "print(','.join(f'{0.1*k:.1f}' for k in range(1,31)))")` then `python3 make_gif.py figures/posMapLate_gif_frames figures/posMapLate.gif` (frames not committed).
+
+### Round-3 stall retry done (job 44443669): no stalls resolved
+
+- 19/19 finished, 0 crashes, all 19 gave up again. 18 stopped at exactly the same Vd as before, one 0.1 V earlier (the analysis keeps the further run). Even 7 bisection levels (0.8 mV steps) with damping 0.02 can't step past the stall, starting from full current (153-179 mA/mm).
+- So these are **discontinuous jumps at the runaway**, which Vd continuation can't follow — not a step-size/damping problem. For analysis: onset ≈ stall Vd (±0.1 V), depth unknown. Round-3 stalls at ≥ 2.7 V: 9 devices (e.g. 0.30/1.0/5e18 at y 1.5: 2.8 V; at y 2.0: 3.7 V), so **the latest onset is probably ~2.8-4 V**, not 2.3 V, but unconfirmed.
+- Retrying the position map's 11 stalls the same way would not help; not submitted.
+- If resolving them matters, it needs a different method (e.g. hold Vd at the stall and time-step the trap capture, or continue in hotTau/trapPeak instead of Vd). That's a driver change; proposing, not doing.
