@@ -939,3 +939,4 @@ Submitted **job 44363616** → `results/20261002_onsetField2/`. Polling every 5 
 - **Position optimum ~1.0-1.5 µm:** onset rises with distance from the gate (0.30/1.0/5e18: 1.5 → 1.7 → 2.1 → 2.3 V at y 0.2/0.5/0.725/1.0), then goes shallow at y ≥ 1.5-2.0.
 - Onset table by set × y in `figures/onsetField3_metrics.csv`; figure `figures/onsetField3.png`.
 - **Round 4** (`pulsedIV_onsetField4.slurm`, 61 tasks): refine around the 2.3 V device — 0.30 eV / hotEb 1.0, trapPeak {4.5,5,5.5}e18 × hotTau {0.8,1,1.2}e-14 × y {0.85,1.0,1.15,1.3,1.5,1.7}; plus 0.25 eV / 1.5e-14 / 1.0 at {5.5,6,6.5}e18 × y {1.3,1.7}.
+- Submitted **job 44440027** → `results/20261002_onsetField4/`. Polling every 5 min.

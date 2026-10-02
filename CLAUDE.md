@@ -262,7 +262,7 @@ Round 3: job 44435511, `pulsedIV_onsetField3.slurm` / `params_onsetField3.txt` (
 - **Position has an optimum:** for most sets the onset rises from y = 0.2 to ~1.0-1.5 µm (e.g. 0.30/1.0/5e18: 1.5 → 1.7 → 2.1 → 2.3 V at y 0.2/0.5/0.725/1.0), then the collapse turns shallow at y ≥ 1.5-2.0 (traps too far from the hot spot to run away).
 - Pre-collapse current: the best late collapses start from 150-166 mA/mm (near trap-free); some deep ones start from an already-sagged current (e.g. 0.30/0.85/5e18 at y 0.725: 8 mA/mm), so they are less clean.
 
-Round 4: job (see progress.md), `pulsedIV_onsetField4.slurm` / `params_onsetField4.txt`, `results/20261002_onsetField4/`: refine around the 2.3 V device: 0.30 eV / `hotEb` 1.0, `trapPeak` {4.5, 5, 5.5}e18 × `hotTau` {0.8, 1, 1.2}e-14 × `trapMeanY` {0.85, 1.0, 1.15, 1.3, 1.5, 1.7}, plus 0.25 eV / 1.5e-14 / 1.0 at {5.5, 6, 6.5}e18 × y {1.3, 1.7}; + reference (61 tasks). Analyze: `python3 analyze_onset.py results/20261002_onsetField4 onsetField4 trapLevel hotTau trapMeanY trapPeak`.
+Round 4: job 44440027, `pulsedIV_onsetField4.slurm` / `params_onsetField4.txt`, `results/20261002_onsetField4/`: refine around the 2.3 V device: 0.30 eV / `hotEb` 1.0, `trapPeak` {4.5, 5, 5.5}e18 × `hotTau` {0.8, 1, 1.2}e-14 × `trapMeanY` {0.85, 1.0, 1.15, 1.3, 1.5, 1.7}, plus 0.25 eV / 1.5e-14 / 1.0 at {5.5, 6, 6.5}e18 × y {1.3, 1.7}; + reference (61 tasks). Analyze: `python3 analyze_onset.py results/20261002_onsetField4 onsetField4 trapLevel hotTau trapMeanY trapPeak`.
 
 ### 10.4 Lessons from the static-mobility era (details in `archive/static_mobility/RESULTS.md`)
 
