@@ -256,7 +256,7 @@ Round 2 (cancelled job 44363616 at Ian's request, **resubmitted 2026-10-02 as jo
 
 **Local position check** (round-1 best set at y = 2.0 µm): deep collapse moved 1.0 → 1.5 V, so position is still an onset lever with field mobility (10.2's Run F collapses at 0.2 V everywhere, hiding it).
 
-Round 3: job (see progress.md), `pulsedIV_onsetField3.slurm` / `params_onsetField3.txt` (`trapPeak|trapLevel|hotTau|hotEb|trapMeanY`), `results/20261002_onsetField3/`: 8 sets (round-2 best at 0.30 eV, plus 0.25 eV with 5-7e18 / `hotTau` 1-1.5e-14) × `trapMeanY` {0.2, 0.5, 0.725, 1.0, 1.5, 2.0, 2.4} µm, + reference. Analyze: `python3 analyze_onset.py results/20261002_onsetField3 onsetField3 trapLevel hotEb trapMeanY trapPeak` (the 8 sets are unique in level × hotEb × trapPeak).
+Round 3: job 44435511, `pulsedIV_onsetField3.slurm` / `params_onsetField3.txt` (`trapPeak|trapLevel|hotTau|hotEb|trapMeanY`), `results/20261002_onsetField3/`: 8 sets (round-2 best at 0.30 eV, plus 0.25 eV with 5-7e18 / `hotTau` 1-1.5e-14) × `trapMeanY` {0.2, 0.5, 0.725, 1.0, 1.5, 2.0, 2.4} µm, + reference. Analyze: `python3 analyze_onset.py results/20261002_onsetField3 onsetField3 trapLevel hotEb trapMeanY trapPeak` (the 8 sets are unique in level × hotEb × trapPeak).
 
 ### 10.4 Lessons from the static-mobility era (details in `archive/static_mobility/RESULTS.md`)
 

@@ -931,3 +931,4 @@ Submitted **job 44363616** → `results/20261002_onsetField2/`. Polling every 5 
 
 - 73/73 clean (5 retried, 0 crashes/give-ups). deep 53, medium 14, shallow 5. **Latest deep onset 1.4 V** (0.30 eV / 5e18 / hotTau 1.5e-14 / hotEb 0.85; 98.8% loss from 76 mA/mm), up from 1.0 V in round 1. Latest medium 1.8 V (0.30 / 4e18 / 1.5e-14 / 1.0, 71%). 0.30 eV beats 0.35 and 0.40 everywhere; onset rises with lower hotTau + more trapPeak; hotEb 1.0 slightly earlier than 0.85. `figures/onsetField2.png`, `_metrics.csv`.
 - Round 3 (`pulsedIV_onsetField3.slurm`, 57 tasks): 8 trap sets × trapMeanY {0.2, 0.5, 0.725, 1.0, 1.5, 2.0, 2.4} µm + ref. Sets: 0.30 eV {5e18/1.5e-14/0.85, 6e18/1e-14/0.85, 5e18/1e-14/1.0, 6e18/1e-14/1.0}; 0.25 eV {5e18/1e-14/0.85, 6e18/1e-14/0.85, 6e18/1.5e-14/1.0, 7e18/1e-14/1.0}.
+- Submitted **job 44435511** → `results/20261002_onsetField3/`. Polling every 5 min.
