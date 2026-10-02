@@ -5,3 +5,4 @@ _probe_*.tcl
 _probe_*.csv
 _probe_*.log
 __pycache__/
+.obsidian/

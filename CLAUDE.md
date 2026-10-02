@@ -16,6 +16,7 @@ FLOOXS (Tcl) TCAD decks for an AlGaN/GaN HEMT (HighK/HfO2-passivated, T-gate + f
   - Workstation: `/home/staffian/HEMTRAD`, your working copy. Edit here.
   - HPG: `/home/ianstafford/blue/ee1/ianstafford/HEMTRAD`. Only `git pull` there. Never edit files on HPG directly.
   - GitHub: `IanStafford/HEMTRAD`. Branch `main` is current; branch `static-mobility` is the frozen pre-2026-10-01 tree.
+  - Obsidian vault: `~/notes/HEMTRAD-vault` (outside the repo, so Obsidian's `.obsidian/` config never lands here). It holds only symlinks to `CLAUDE.md`, `progress.md` and `archive/static_mobility/RESULTS.md`; edits in Obsidian change the repo files directly. Don't open the repo itself as a vault (`.obsidian/` is in `.gitignore` as a safety net). To add a note to the vault, `ln -s` the repo file there; never copy or move repo files into it.
 - **Where things run:**
   - Short checks (a few points, syntax tests, debugging a deck) → run locally on the workstation.
   - Sweeps, anything more than ~3 driver runs, anything long → SLURM on HPG.
