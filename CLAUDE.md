@@ -12,9 +12,10 @@ FLOOXS (Tcl) TCAD decks for an AlGaN/GaN HEMT (HighK/HfO2-passivated, T-gate + f
 
 - **You (the agent) run on Ian's workstation** (personal, off campus), inside `tmux`. Ian checks in from his laptop or phone via Remote Control. Assume he is **not watching** in real time.
 - **HiPerGator (HPG) is reached only through `ssh hpg`**, which reuses a multiplexed master connection that Ian authenticates (Duo) each morning. You cannot answer Duo.
-- **The repo exists in two places**, synced through git:
+- **The repo exists in three places**, synced through git (GitHub is the hub):
   - Workstation: `/home/staffian/HEMTRAD`, your working copy. Edit here.
   - HPG: `/home/ianstafford/blue/ee1/ianstafford/HEMTRAD`. Only `git pull` there. Never edit files on HPG directly.
+  - Ian's laptop: a read-only clone he uses to view files (figures, `progress.md`, the dashboard source) without SSH to the workstation or using Claude. He pulls there but **never pushes**, so it never introduces commits; you don't manage it. Anything Ian should see on the laptop must be committed and pushed from the workstation.
   - GitHub: `IanStafford/HEMTRAD`. Branch `main` is current; branch `static-mobility` is the frozen pre-2026-10-01 tree.
   - Obsidian vault: `~/notes/HEMTRAD-vault` (outside the repo, so Obsidian's `.obsidian/` config never lands here). It holds only symlinks to `CLAUDE.md`, `progress.md` and `archive/static_mobility/RESULTS.md`; edits in Obsidian change the repo files directly. Don't open the repo itself as a vault (`.obsidian/` is in `.gitignore` as a safety net). To add a note to the vault, `ln -s` the repo file there; never copy or move repo files into it.
 - **Where things run:**
