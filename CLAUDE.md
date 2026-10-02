@@ -248,6 +248,10 @@ Ian: redo the conc/level surfaces with field mobility; Run F (4e18/0.55 eV) only
 
 Ian (2026-10-01): push the collapse out further using the static-era methods (§10.4). Round 1: job 44359813, `pulsedIV_onsetField1.slurm` / `params_onsetField1.txt`, `results/20261002_onsetField1/`: Run F position (x 0, y 0.2 µm, σ 0.04), `trapLevel` {0.35, 0.45, 0.55} × `trapPeak` {2, 3, 4}e18 × `hotTau` {1e-14, 3e-14, 6e-14, 1.3e-13} × `hotEb` {0.5, 0.85}, Vd 0-4 V / 0.1 V, + trap-free reference (73 tasks). Analyze with `python3 analyze_onset.py results/20261002_onsetField1 onsetField1`.
 
+**Round 1 result** (73/73 clean, 0 retries; `figures/onsetField1.png`): deep 15, medium 12, shallow 44 (mostly no real collapse), off 1. Latest **deep** collapse **1.0 V** (0.35 eV / 4e18 / `hotTau` 3e-14 / `hotEb` 0.85, 97.6% step loss from 85.6 mA/mm); latest medium also 1.0 V (0.35 / 4e18 / 6e-14 / 0.5). Trends: ≥4e18 is needed for deep/medium (2e18 barely collapses); the shallower level collapses later; lower `hotTau` delays onset (0.5 → 0.7 → 1.0 V for 1.3e-13 → 6e-14 → 3e-14 at 0.35/4e18/0.85) until it turns shallow at 1e-14; `hotEb` 0.85 vs 0.5 deepens without much onset change. Much harder to delay than with static mobility (static reached ~2.2 V).
+
+Round 2: job (see progress.md), `pulsedIV_onsetField2.slurm`, `results/20261002_onsetField2/`: `trapLevel` {0.30, 0.35, 0.40} × `trapPeak` {4, 5, 6}e18 × `hotTau` {1, 1.5, 2, 3}e-14 × `hotEb` {0.85, 1.0} (more charge and a stronger barrier to keep depth at lower `hotTau`), + reference.
+
 ### 10.4 Lessons from the static-mobility era (details in `archive/static_mobility/RESULTS.md`)
 
 These were all found with constant mobility 600; field mobility collapses earlier and deeper (§10.2), so treat numbers as indicative.
