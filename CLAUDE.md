@@ -258,6 +258,12 @@ Round 2 (cancelled job 44363616 at Ian's request, **resubmitted 2026-10-02 as jo
 
 Round 3: job 44435511, `pulsedIV_onsetField3.slurm` / `params_onsetField3.txt` (`trapPeak|trapLevel|hotTau|hotEb|trapMeanY`), `results/20261002_onsetField3/`: 8 sets (round-2 best at 0.30 eV, plus 0.25 eV with 5-7e18 / `hotTau` 1-1.5e-14) × `trapMeanY` {0.2, 0.5, 0.725, 1.0, 1.5, 2.0, 2.4} µm, + reference. Analyze: `python3 analyze_onset.py results/20261002_onsetField3 onsetField3 trapLevel hotEb trapMeanY trapPeak` (the 8 sets are unique in level × hotEb × trapPeak).
 
+**Round 3 result** (57 tasks, 0 crashes; `figures/onsetField3.png`): deep 24, medium 5, shallow 27. **Latest deep collapse 2.3 V**: 0.30 eV / 5e18 / `hotTau` 1e-14 / `hotEb` 1.0 at **y = 1.0 µm**, 99.4% in one step from 166 mA/mm (≈ trap-free, ~170 mA/mm), i.e. the device runs normally up to the collapse. Runner-up: 0.25 eV / 6e18 / 1.5e-14 / 1.0 at y = 1.5 µm, deep at 2.1 V from 164 mA/mm. Medium 2.3 V (0.25 / 5e18 / 1e-14 / 0.85 at y 0.2, 65%).
+- **Position has an optimum:** for most sets the onset rises from y = 0.2 to ~1.0-1.5 µm (e.g. 0.30/1.0/5e18: 1.5 → 1.7 → 2.1 → 2.3 V at y 0.2/0.5/0.725/1.0), then the collapse turns shallow at y ≥ 1.5-2.0 (traps too far from the hot spot to run away).
+- Pre-collapse current: the best late collapses start from 150-166 mA/mm (near trap-free); some deep ones start from an already-sagged current (e.g. 0.30/0.85/5e18 at y 0.725: 8 mA/mm), so they are less clean.
+
+Round 4: job (see progress.md), `pulsedIV_onsetField4.slurm` / `params_onsetField4.txt`, `results/20261002_onsetField4/`: refine around the 2.3 V device: 0.30 eV / `hotEb` 1.0, `trapPeak` {4.5, 5, 5.5}e18 × `hotTau` {0.8, 1, 1.2}e-14 × `trapMeanY` {0.85, 1.0, 1.15, 1.3, 1.5, 1.7}, plus 0.25 eV / 1.5e-14 / 1.0 at {5.5, 6, 6.5}e18 × y {1.3, 1.7}; + reference (61 tasks). Analyze: `python3 analyze_onset.py results/20261002_onsetField4 onsetField4 trapLevel hotTau trapMeanY trapPeak`.
+
 ### 10.4 Lessons from the static-mobility era (details in `archive/static_mobility/RESULTS.md`)
 
 These were all found with constant mobility 600; field mobility collapses earlier and deeper (§10.2), so treat numbers as indicative.

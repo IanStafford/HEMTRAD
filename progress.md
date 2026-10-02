@@ -932,3 +932,10 @@ Submitted **job 44363616** → `results/20261002_onsetField2/`. Polling every 5 
 - 73/73 clean (5 retried, 0 crashes/give-ups). deep 53, medium 14, shallow 5. **Latest deep onset 1.4 V** (0.30 eV / 5e18 / hotTau 1.5e-14 / hotEb 0.85; 98.8% loss from 76 mA/mm), up from 1.0 V in round 1. Latest medium 1.8 V (0.30 / 4e18 / 1.5e-14 / 1.0, 71%). 0.30 eV beats 0.35 and 0.40 everywhere; onset rises with lower hotTau + more trapPeak; hotEb 1.0 slightly earlier than 0.85. `figures/onsetField2.png`, `_metrics.csv`.
 - Round 3 (`pulsedIV_onsetField3.slurm`, 57 tasks): 8 trap sets × trapMeanY {0.2, 0.5, 0.725, 1.0, 1.5, 2.0, 2.4} µm + ref. Sets: 0.30 eV {5e18/1.5e-14/0.85, 6e18/1e-14/0.85, 5e18/1e-14/1.0, 6e18/1e-14/1.0}; 0.25 eV {5e18/1e-14/0.85, 6e18/1e-14/0.85, 6e18/1.5e-14/1.0, 7e18/1e-14/1.0}.
 - Submitted **job 44435511** → `results/20261002_onsetField3/`. Polling every 5 min.
+
+### Round 3 done (job 44435511; 55/57 finished at write-up, last 2 already past their collapse) → round 4
+
+- 0 crashes. deep 24, medium 5, shallow 27. **Latest deep onset 2.3 V**: 0.30 eV / 5e18 / hotTau 1e-14 / hotEb 1.0 at **y = 1.0 µm**, 99.4% one-step loss from **166 mA/mm ≈ trap-free** (~170) — normal operation right up to the collapse. Runner-up 2.1 V (0.25 / 6e18 / 1.5e-14 / 1.0 at y = 1.5, from 164 mA/mm). Up from 1.4 V (round 2) and 1.5 V (local y = 2.0 check).
+- **Position optimum ~1.0-1.5 µm:** onset rises with distance from the gate (0.30/1.0/5e18: 1.5 → 1.7 → 2.1 → 2.3 V at y 0.2/0.5/0.725/1.0), then goes shallow at y ≥ 1.5-2.0.
+- Onset table by set × y in `figures/onsetField3_metrics.csv`; figure `figures/onsetField3.png`.
+- **Round 4** (`pulsedIV_onsetField4.slurm`, 61 tasks): refine around the 2.3 V device — 0.30 eV / hotEb 1.0, trapPeak {4.5,5,5.5}e18 × hotTau {0.8,1,1.2}e-14 × y {0.85,1.0,1.15,1.3,1.5,1.7}; plus 0.25 eV / 1.5e-14 / 1.0 at {5.5,6,6.5}e18 × y {1.3,1.7}.
