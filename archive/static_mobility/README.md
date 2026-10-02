@@ -2,12 +2,12 @@
 
 Everything here was simulated with the old default `mobModel static` (constant
 GaN electron mobility 600 cm²/V·s). On 2026-10-01 the deck was calibrated against
-the measured HfO2 transfer curve (CLAUDE.md §10m) and the field-dependent mobility
+the measured HfO2 transfer curve (CLAUDE.md §10.1) and the field-dependent mobility
 (`mobModel field`) replaced it. Results in this folder are kept for reference but
 are superseded.
 
-- **Write-ups:** CLAUDE.md §10-§10l (and the 10l dielectric check). File names
-  there refer to this folder.
+- **Write-ups:** `RESULTS.md` here (the old CLAUDE.md §10-§10l, verbatim). File
+  names there refer to this folder. CLAUDE.md §10.4 summarizes the lessons.
 - **Snapshot:** branch `static-mobility` (commit d2eda77) has every file in its
   original place, if anything here needs to be rerun exactly as it was.
 - **Contents:** sweep `pulsedIV_*.slurm` / `params_*.txt` (late-onset rounds A-I,

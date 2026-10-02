@@ -1,8 +1,10 @@
 # CLAUDE.md
 
-FLOOXS (Tcl) TCAD decks for an AlGaN/GaN HEMT, plus `figures.ipynb` for plots. See README.md for layout.
+FLOOXS (Tcl) TCAD decks for an AlGaN/GaN HEMT (HighK/HfO2-passivated, T-gate + field plate), driver scripts, HPG sweep templates, Python analysis scripts and `figures/`; `figures.ipynb` holds older paper plots. Superseded work is in `archive/` (static-mobility era: `archive/static_mobility/`, also branch `static-mobility`).
 
-**Current goal:** reproduce the **radiation-induced current collapse** seen on a pulsed curve tracer. At Vgs=-2V, Id-Vd runs normally, then drops ~1000x at a small Vd (~0.4-0.5 V), then creeps up slightly with Vd. The creep is physical. There are no experimental CSVs for this in the repo.
+**Context:** model the **radiation-induced current collapse** seen on a pulsed curve tracer: at Vgs=-2 V, Id-Vd runs normally, then drops ~1000x at a small Vd (~0.4-0.5 V), then creeps up slightly with Vd (the creep is physical; no experimental CSVs for this in the repo). The deck is now calibrated against a measured HfO2-device transfer curve with the field-dependent mobility (§10.1).
+
+**Current work:** with the calibrated field mobility, push the collapse onset to higher Vd (late-onset search, §10.3), classifying collapses as deep / medium / shallow (§10.0).
 
 ---
 
@@ -11,8 +13,9 @@ FLOOXS (Tcl) TCAD decks for an AlGaN/GaN HEMT, plus `figures.ipynb` for plots. S
 - **You (the agent) run on Ian's workstation** (personal, off campus), inside `tmux`. Ian checks in from his laptop or phone via Remote Control. Assume he is **not watching** in real time.
 - **HiPerGator (HPG) is reached only through `ssh hpg`**, which reuses a multiplexed master connection that Ian authenticates (Duo) each morning. You cannot answer Duo.
 - **The repo exists in two places**, synced through git:
-  - Workstation: `/home/ianstafford/blue/ee1/ianstafford`, which is your working copy. Edit here.
-  - HPG: `/home/ianstafford/blue/ee1/ianstafford`. Only `git pull` there. Never edit files on HPG directly.
+  - Workstation: `/home/staffian/HEMTRAD`, your working copy. Edit here.
+  - HPG: `/home/ianstafford/blue/ee1/ianstafford/HEMTRAD`. Only `git pull` there. Never edit files on HPG directly.
+  - GitHub: `IanStafford/HEMTRAD`. Branch `main` is current; branch `static-mobility` is the frozen pre-2026-10-01 tree.
 - **Where things run:**
   - Short checks (a few points, syntax tests, debugging a deck) → run locally on the workstation.
   - Sweeps, anything more than ~3 driver runs, anything long → SLURM on HPG.
@@ -42,7 +45,7 @@ If this fails, or any `ssh hpg` command hangs or fails to authenticate: **stop, 
 Non-interactive SSH doesn't load the login environment (`module`, `conda`, SLURM paths may be missing). Always use a login shell with a quoted heredoc, so nothing gets expanded on the workstation:
 ```bash
 ssh hpg bash -l <<'REMOTE'
-cd /blue/ee1/ianstafford/<repo>
+cd /home/ianstafford/blue/ee1/ianstafford/HEMTRAD
 git pull --ff-only
 squeue -u $USER
 REMOTE
@@ -66,10 +69,9 @@ $FLXSHOME/release/flooxs script.tcl
 - Never run `flooxs` on an HPG login node. It always goes through `sbatch` (or `srun` inside an allocation).
 
 ### Hard SLURM rules
-- `--account=ee1`, `--qos=<ee1-b: ee1>`.
-- **The group QOS caps at 19 CPUs total.** Check `squeue -A ee1` (other group members count too) before submitting. Throttle arrays with `%N` (e.g. `--array=0-7%4`) so jobs don't sit in `QOSGrpCpuLimit`.
+- `--account=ee1`. QOS `ee1` caps at **19 CPUs** for the whole group; burst QOS **`ee1-b`** allows ~171 and is what the large sweeps use. Check `squeue -A ee1` (other group members count too) before submitting, and throttle arrays with `%N` (e.g. `--array=0-72%80`) so jobs don't sit in `QOSGrpCpuLimit`.
 - **Ask Ian before any `sbatch`** unless he approved that specific run in the current task. **Ask before any `scancel`.** Only cancel your own job IDs, never `scancel -u`.
-- Poll with `squeue -u $USER` every 5 minutes (Ian's standard, overrides the general 2-3 minute guidance below unless he says otherwise for a specific run). Sleep between polls; don't busy-loop.
+- Poll with `squeue -u $USER` every 5 minutes (Ian's standard) unless he says otherwise for a specific run: a background loop with `sleep 300`, never a busy loop.
 
 ### Sweep workflow (the standard pattern)
 1. Commit the driver and the SLURM template on the workstation, then `git push`.
@@ -78,10 +80,10 @@ $FLXSHOME/release/flooxs script.tcl
 4. Each task copies the driver into its own directory `results/<YYYYMMDD>_<tag>/task_<id>/` and prepends `set <lever> <value>` lines (every lever has an `info exists` default). It then strips the GUI lines (§4) and runs there. **Never edit the repo copy in place.**
 5. Write per-task CSVs (`pulsedIV_<tag>.csv`), never the shared `figures/pulsedIV.csv`. Also write the full parameter set into a `params.json` next to each CSV.
 6. Format float parameters explicitly in names (`printf '%.2e'`), so you don't get `1.3000000000000001e-13` filenames.
-7. After the array finishes, check **every** task's `.out`/`.err` for `Newton failed`, NaN, OOM (`oom-kill`, signal 9), or a missing CSV. Use `grep`/`tail`, not `cat` on whole logs. Report failures before plotting.
-8. `rsync -av hpg:/blue/ee1/ianstafford/<repo>/results/<run>/ results/<run>/` to bring results back. Analyze and plot on the workstation.
+7. After the array finishes, check **every** task's `.out`/`.err` for `munmap`/`FLPS_panic`, OOM (`oom-kill`, signal 9), `DUE TO TIME`, `PULSED GAVE UP`, a missing CSV, and core files (delete them; 1-2 GB each). Use `grep`/`tail`, not `cat` on whole logs. Report failures before plotting.
+8. `rsync -a --exclude='core*' hpg:/home/ianstafford/blue/ee1/ianstafford/HEMTRAD/results/<run>/ results/<run>/` to bring results back. Analyze and plot on the workstation.
 
-Starting resources for a 17-point `pulsedIV` run: `--cpus-per-task=1 --mem=4gb --time=00:45:00`. OOM core dumps have happened before. If a task hits OOM, raise `--mem`; don't change the deck.
+Resources: `--cpus-per-task=1 --mem=4gb --time=03:00:00` for a 0-3 or 0-4 V `pulsedIV` sweep (most finish in 20-60 min; tasks bisecting through a collapse can take 2 h). If a task hits OOM, raise `--mem`; don't change the deck.
 
 ---
 
@@ -90,7 +92,8 @@ Starting resources for a 17-point `pulsedIV` run: `--cpus-per-task=1 --mem=4gb -
 - `flooxs <driver>.tcl` from the repo root (paths like `figures/...` are relative).
 - **Run one FLOOXS process at a time.** Simultaneous runs slow each other to a crawl. Check `pgrep -x flooxs` first, because Ian may be running one himself.
 - Kill runs by PID. `pkill -f "<pattern>"` also matches the shell that issued it.
-- A driver point takes roughly 30-60 s. A 17-point `pulsedIV.tcl` sweep takes about 12-15 min. Anything longer than one sweep goes to HPG.
+- A `pulsedIV.tcl` point takes roughly 20-60 s; a 0-3 V sweep 10-30 min. A trap-free `calibIdVg.tcl` transfer curve takes ~5 min (~25 min with contact resistance). Anything longer than one or two sweeps goes to HPG.
+- When running several local tests, chain them in one background loop that checks `pgrep -x flooxs` before each, so they run consecutively.
 - FLOOXS source for checking behavior: `~/flooxs/src`.
 
 ---
@@ -109,8 +112,9 @@ sed -i 's/^window.*//; s/^\(\s*\)chart /\1#chart /'
 - Start of session: `git pull`. After meaningful changes: commit with a message naming the runs or lever values, then push.
 - **Commit:** decks, drivers, `.slurm` templates, `params.txt`, analysis scripts, `progress.md`, small final CSVs used in figures.
 - **Don't commit:** `results/` sweep directories, `.out`/`.err` logs, meshes, build artifacts (these are in `.gitignore`).
-- `GaN_modelfile_masterD` has **CRLF** line endings and must keep them. `.gitattributes` contains `GaN_modelfile_masterD -text`. Python edits must use `open(..., newline='')`.
-- Commit **before** changing any model file (`GaN_modelfile_masterD`, `Poisson.tcl`).
+- `GaN_modelfile_masterD`, `Metal.tcl` and `Continuity.tcl` have **CRLF** line endings and must keep them (there is no `.gitattributes`; git stores them as-is). Edit them from Python with `open(..., newline='')` and check `file <name>` afterwards; a plain `open()` rewrite converts every line.
+- Commit **before** changing any model file (`GaN_modelfile_masterD`, `Poisson.tcl`, `GaN.tcl`, `AlGaN.tcl`, `Metal.tcl`, `Insulator.tcl`, `rfdevice*.tcl`).
+- Superseded work goes to `archive/<name>/` with a README (see `archive/static_mobility/`), not deleted.
 
 ---
 
@@ -127,8 +131,8 @@ sed -i 's/^window.*//; s/^\(\s*\)chart /\1#chart /'
   3. `DevController` catches the string (`device/DevControl.cc:167`, prints `Caught Exception!`), `device` returns a Tcl error, the script aborts, and Tcl calls `GlobalExit` (`flooxs.cc:727`).
   4. `GlobalExit` does `delete fslist` (never NULLed) → mesh teardown → a Node still flagged `InQueue` → `Element::~Element` calls `FLPS_panic("Fudge")` (`field/Element.cc:119`) → `FLPS_panic` runs Tcl `exit 1` → re-enters `GlobalExit` → deletes `fslist` again. It recurses ~3,300 times (`too many nested evaluations`) with a double free, which glibc reports as `munmap_chunk`. That's also why each crash leaves a 1-2 GB core.
   - So "crash" and "Newton iteration-limit stall" are **the same numerical failure** (non-convergence at the runaway trap-filling transition) with two outcomes: oscillate → iteration limit → clean-ish exit; diverge → NaN → crash. That's why it's trajectory-dependent and only partly helped by damping or a smaller Vd step.
-  - **A bare `catch {device}` + retry is NOT safe:** `Solver::InitializeAssembly` (`Solver.cc:433`) refills `eq0`/`eq1` without clearing them, and `Build()` doesn't check `InQueue`, so stale elements from the failed solve would be assembled twice, silently. **But `catch` + `device restore` IS safe on the existing builds (local and HPG):** `device restore` → `DevController::Restore()` copies PREV → CURR and calls `Solver::Restore()`, which clears `eq0`/`eq1`. So call `device store` before each attempt and `device restore` after any failure. Tested 2026-09-27: `tools/retry_snippet.tcl` (catch + store/restore of the solution and `TrapFrozen`/`TeTrap`, bisect the Vd step; now built into `pulsedIV.tcl`) takes task 64 past its NaN at 0.4 → 0.5 V with one bisection and completes to 3 V, with identical results on the stock and patched binaries.
-  - **FLOOXS fix** (local only): branch `crash-fix` in worktree `~/flooxs-crashfix`, built in `~/flooxs-crashfix/build/flooxs`. It clears the queues in `InitializeAssembly` and in the solve catch blocks, and makes `FLPS_panic`/`GlobalExit` non-reentrant. An unrecovered NaN then ends in a clean Tcl error with no core dump, and results are otherwise identical. Not installed, not on HPG, not sent upstream.
+  - **A bare `catch {device}` + retry is NOT safe:** `Solver::InitializeAssembly` (`Solver.cc:433`) refills `eq0`/`eq1` without clearing them, and `Build()` doesn't check `InQueue`, so stale elements from the failed solve would be assembled twice, silently. **But `catch` + `device restore` IS safe on the existing builds (local and HPG):** `device restore` → `DevController::Restore()` copies PREV → CURR and calls `Solver::Restore()`, which clears `eq0`/`eq1`. So call `device store` before each attempt and `device restore` after any failure. Tested 2026-09-27: catch + store/restore of the solution and `TrapFrozen`/`TeTrap` with Vd-step bisection (now built into `pulsedIV.tcl`) takes task 64 past its NaN at 0.4 → 0.5 V with one bisection and completes to 3 V, with identical results on the stock and patched binaries.
+  - **FLOOXS fix** (local only): branch `crash-fix` in worktree `~/flooxs-crashfix`, built in `~/flooxs-crashfix/build/flooxs`. It clears the queues in `InitializeAssembly` and in the solve catch blocks, and makes `FLPS_panic`/`GlobalExit` non-reentrant. An unrecovered NaN then ends in a clean Tcl error with no core dump, and results are otherwise identical. Not installed, not on HPG, not sent upstream. Exported as `flooxs-crashfix.patch` (untracked, repo root) for review.
 
 ---
 
@@ -155,7 +159,7 @@ In `GaN_modelfile_masterD`, each has an `info exists` default, so a driver or ar
 
 | Lever | Default | Meaning |
 |---|---|---|
-| `mobModel` | field | electron mobility: `field` (Farahmand low field + Heller high field; calibrated, §10m) or `static` (constant 600, used for everything archived in §10-§10l). Default changed to field on 2026-10-01 |
+| `mobModel` | field | electron mobility: `field` (Farahmand low field + Heller high field; calibrated, §10.1) or `static` (constant 600, used for everything in `archive/static_mobility/`). Default changed to field on 2026-10-01 |
 | `trapEn` | 0 | enable traps |
 | `trapPeak` | 4e18 | peak density (cm⁻³) of the 2D Gaussian |
 | `trapMeanX`, `trapMeanY` | 0.0, 0.20 | center in µm (x = depth; 0 = AlGaN top, 0.015 = 2DEG; y: gate drain edge = 0.125) |
@@ -177,432 +181,29 @@ In `GaN_modelfile_masterD`, each has an `info exists` default, so a driver or ar
 
 ## 9. Drivers
 
-- `pulsedIV.tcl`: curve-tracer model and the main tool for the collapse. **Since 2026-09-27 each Vd point is attempted in `catch`; on a solver failure (Newton limit or NaN) it restores the last converged solution + trap memory (`device store/restore`, `TrapFrozen`/`TeTrap`) and bisects the Vd step** (levers `retryDepth`=5, `retrySubFill`=1 = full `FillStep` at bisection substeps, 0 = plain solve there). Output is identical when nothing fails; `PULSED ... retries=N` and `RETRY ...` lines log any retries, `PULSED GAVE UP` if a point can't be reached (the run then stops cleanly, no crash). The device rests at `Vg_meas` (traps at steady state), then Vd is swept with `FillStep` at each point (fill-only, no emission). Levers are at the top. It writes `figures/pulsedIV.csv` with columns Vd, Id, peak Te. **The repo copy still has the original defaults (0.68 / 0.3 / 1e-13), not the tuned values below.**
+- `pulsedIV.tcl`: curve-tracer model and the main tool for the collapse (field mobility by default). **Since 2026-09-27 each Vd point is attempted in `catch`; on a solver failure (Newton limit or NaN) it restores the last converged solution + trap memory (`device store/restore`, `TrapFrozen`/`TeTrap`) and bisects the Vd step** (levers `retryDepth`=5, `retrySubFill`=1 = full `FillStep` at bisection substeps, 0 = plain solve there). Output is identical when nothing fails; `PULSED ... retries=N` and `RETRY ...` lines log any retries, `PULSED GAVE UP` if a point can't be reached (the run then stops cleanly, no crash). The device rests at `Vg_meas` (traps at steady state), then Vd is swept with `FillStep` at each point (fill-only, no emission). Levers are at the top. It writes `$ivCSV` (default `figures/pulsedIV.csv`) with columns Vd, Id, peak Te. Its trap defaults are the model file's (0.68 eV / `hotEb` 0.3 / `hotTau` 1e-13), not Run F: sweeps always set the levers explicitly. **Run F** = `trapPeak` 4e18, `trapSigma` 0.04, `trapLevel` 0.55, `hotEb` 0.5, `hotTau` 1.3e-13, at x=0, y=0.2 µm (the standard reference set).
 - **Device deck lever** (2026-10-01): `pulsedIV.tcl` sources `$deviceDeck` (default `rfdevice.tcl`). `rfdevice_SiN.tcl` is the same structure with every HighK region (εr 35) replaced by Nitride (εr 6.3): SiN-only passivation, same mesh.
-- `stressFreeze.tcl`: pulsed-IV quiescent-stress model. It stresses at (VgQ, VdQ) with `HotStress`, freezes the traps, then measures Id-Vd at Vg=-2. Stress (-2,10) gave a 46% drop plus knee walkout (`figures/hotStressIV_*.csv`). The (-4,20) stress NaNs at Vd≈17.5 V during the ramp.
-- `trapPlot.tcl` / `trapPlot.slurm`: older dynamic-trap driver (Id-Vd plus trap profile), and the array-job template to copy for new sweeps.
+- `calibIdVg.tcl`: trap-free transfer curve for calibration (§10.1): Vd ramp to `Vd_cal` (10 V), gate +1 → −4 V; optional lumped `Rs_contact`/`Rd_contact` (Ω·mm). Scored by `calib_score.py`, plotted by `plot_calib.py`.
+- `stressFreeze.tcl`: quiescent-stress model: stress at (VgQ, VdQ) with `HotStress`, freeze the traps, measure Id-Vd at Vg=-2. (Static era: stress (-2,10) gave a 46% drop plus knee walkout; (-4,20) NaNs at Vd≈17.5 V.) Not rerun with field mobility.
+- `trapPlot.tcl`: older dynamic-trap driver (Id-Vd plus trap profile).
+- Analysis: `analyze_onset.py` (collapse class/onset per device, §10.0), `analyze_trapMapSets.py [run tag]` (3D depth/suppression surfaces), `analyze_mobCompare.py` (static vs field maps).
 
 ---
 
-## 10. Tuning results
+## 10. Results (field mobility, 2026-10-01 onward)
 
-> **Archived (2026-10-01):** §10 through §10l were run with the old `mobModel static` (constant mobility 600). Their scripts, sweep files and figures are in `archive/static_mobility/` (see its README; file names in these sections refer to that folder), raw results in `results/archive_static_mobility/`, and the full pre-archive tree is branch `static-mobility`. Current work uses the calibrated field mobility (§10m onward).
+Static-mobility results (2026-09-23 to 10-01: Run F tuning, late-onset search, placement and trap maps, cone shapes, critical strike, insulator traps, deep traps, HighK vs SiN) are archived verbatim in `archive/static_mobility/RESULTS.md`; the lessons that still matter are in §10.4, the model caveats in §10.5.
 
-All `pulsedIV.tcl` runs, Vg=-2, Vd 0-1.6 in 0.1 V steps, `trapMeanY`=0.20. Target: `radPlot1` (9.75, 19.0, 27.2, 32.0 at 0.1-0.4 V, then 0.011 at 0.5 V).
-
-| Run | trapPeak | trapSigma | trapLevel | hotEb | hotTau | Result |
-|---|---|---|---|---|---|---|
-| defaults | 4e18 | 0.025 | 0.68 | 0.3 | 1e-13 | 5.7 → 1.2 at 0.2 V, shallow |
-| A | 4e18 | 0.025 | 0.68 | 0.3 | 3e-14 | only sags (too many traps filled at rest) |
-| B | 4e18 | 0.025 | 0.55 | 0.5 | 1e-13 | pre-collapse matches; 30 → 2 at 0.6 V, shallow |
-| C | 4e18 | 0.025 | 0.55 | 0.5 | 4e-14 | onset 0.85 V, shallow |
-| D | 8e18 | 0.025 | 0.55 | 0.5 | 1.3e-13 | collapsed from the first step |
-| E | 1.2e19 | 0.025 | 0.55 | 0.5 | 1.3e-13 | collapsed from the first step (stopped early) |
-| **F** | 4e18 | **0.04** | 0.55 | 0.5 | 1.3e-13 | **best shape**: 7.8, 7.0, then 0.006 at 0.3 V, creeps up to 0.018 at 1.6 V |
-| G | 5.5e18 | 0.025 | 0.55 | 0.5 | 1.3e-13 | 5.3, then 0.003 at 0.2 V, creeps up |
-
-Trends:
-- A shallower `trapLevel` means fewer traps filled at rest, so a higher pre-collapse current and a deeper collapse.
-- More total trapped charge (`trapPeak` × `trapSigma`²) gives a deeper collapse, but past about 5e18 × 0.025² it pinches the channel at rest.
-- Onset Vd scales roughly as 1/√`hotTau`.
-
-**Keep this table current.** Add every completed run and commit it.
-
-**Next step:** run F with `hotTau` ∈ {0.6e-13, 0.5e-13, 0.4e-13} as a 3-task HPG array, to move the onset to 0.4-0.5 V. Then set the best values as the defaults in `pulsedIV.tcl`. Note that F's pre-collapse current is also off: 7.8 / 7.0 mA/mm at 0.1 / 0.2 V vs target 9.75 / 19.0, and it *falls* with Vd where the target rises. Check pre-collapse shape against target before declaring a match.
-
-### 10b. Late-onset tuning (target: Run F's shape, but onset ~3 V instead of ~0.3 V)
-
-All runs below: Vg=-2, Vd 0-4.05 V in 0.15 V steps (coarse search resolution), `trapMeanY`=0.20, `hotEb`=0.5, `trapLevel`=0.55 (F's values). Job 43252782, `results/20260924_lateOnset/`.
-
-Local probes first (F's own trapPeak=4e18/trapSigma=0.04, hotTau only):
-| hotTau | Result |
-|---|---|
-| 1.3e-15 (naive 1/√hotTau extrapolation, 100x below F) | no collapse through Vd=4V; peak Te only 353K - heating too weak, full stop |
-| 1e-14 (10x below F) | only a shallow ~1.5x sag (42.4→28.9 mA/mm, Vd 0.75-1.25V), not dramatic |
-
-HPG grid (trapPeak × hotTau, trapSigma=0.04 fixed):
-| trapPeak | hotTau | Result |
-|---|---|---|
-| 4e18 | 1e-14 | no collapse; rises to 46.6 mA/mm by 4.05V |
-| 4e18 | 7e-15 | no collapse; rises to 66.4 mA/mm by 4.05V |
-| 4e18 | 5e-15 | no collapse; rises to 88.5 mA/mm by 4.05V |
-| 6e18 | 1e-14 | already collapsed at Vd=0.15 (2.5→0.49 mA/mm by 0.6V), not a late onset |
-| 6e18 | 7e-15 | already collapsed at Vd=0.15, same pattern |
-| 6e18 | 5e-15 | mostly flat ~3.5-4.8 mA/mm, barely any collapse |
-| 8e18 | 1e-14 | already collapsed at Vd=0.15 (channel pinched at rest) |
-| 8e18 | 7e-15 | already collapsed at Vd=0.15, same |
-| 8e18 | 5e-15 | already collapsed at Vd=0.15, same |
-
-**None of these hit the target.** trapPeak=4e18 (F's charge) never collapses once hotTau is cut enough to matter - lower hotTau trades depth for onset delay and there's no crossover before the effect just vanishes. trapPeak=6e18/8e18 (more charge, to try to restore depth) instead pinch the channel at rest (before the Vd sweep even starts, at Vd=0.15), because the *cold*, zero-field trap occupancy at `trapLevel`=0.55 eV is already large enough at that density - this has nothing to do with `hotTau`. So `trapPeak` alone can't add "hot-only" depth without also adding "always-on" depth.
-
-**Working hypothesis for next round:** decouple those two effects with `trapLevel`. A shallower level (smaller eV, e.g. 0.35-0.45) empties out more at cold/zero-field equilibrium (per the existing trend row above), which should buy headroom to raise `trapPeak` well past 6-8e18 *without* pinching at rest, while `hotEb`/`hotTau` still control how much of that extra density gets pulled in once the channel heats up. Proposed next grid: `trapLevel` ∈ {0.35, 0.45} × `trapPeak` ∈ {8e18, 1.2e19, 1.6e19}, `hotTau` fixed at 1e-14 first (weakest tested so far that still shows any hot effect), `trapSigma`=0.04, `hotEb`=0.5. Check baseline (Vd≈0.15-0.3V) isn't already collapsed before trusting the rest.
-
-**Round B (job 43283546, `results/20260925_lateOnsetB/`):** `trapLevel` × `trapPeak` grid, `hotTau`=1e-14, `trapSigma`=0.04, `hotEb`=0.5, same Vd 0-4.05V/0.15V sweep.
-
-| trapLevel | trapPeak | Result |
-|---|---|---|
-| 0.35 | 8e18 | rises cleanly to 85.5 mA/mm (peak Vd=1.35V), knee down to 30.2 at Vd=1.8V (~2.8x drop, **onset delayed to ~1.5-1.8V**), creeps back up to 52.3 by 4.05V |
-| 0.35 | 1.2e19 | peaks 21.1 mA/mm (Vd=0.45V), drops ~10x to ~2.0 by Vd=0.75-0.9V, creeps back to 9.07 by 4.05V |
-| 0.35 | 1.6e19 | already declining by Vd=0.15V (peak only 2.76), too much charge again |
-| 0.45 | 8e18 | peaks 12.0 at Vd=0.3V, drops to 1.6-1.7 by Vd=0.6-0.9V (~7x), creeps to 5.6 by 4.05V |
-| 0.45 | 1.2e19 | already declining from the first point (peak 0.82 at Vd=0.15V), too much charge |
-| 0.45 | 1.6e19 | already fully collapsed at Vd=0.15V (peak 0.07) |
-
-`trapLevel`=0.35 clearly has more dynamic range than 0.45 or the original 0.55 - it's the first time we've gotten a real "normal rise, then knee, then partial recovery" shape instead of either "no collapse" or "collapsed from the start." But nothing here is close to F's ~1000x depth (best is ~10x, at `trapPeak`=1.2e19), and the deepest case (8e18) has the latest onset (~1.5-1.8V) but only ~2.8x depth - the sweet spot for *both* late onset and F-like depth is somewhere between these two `trapPeak` values, not yet bracketed. Also notable: all these collapses **partially recover** with rising Vd (30→52, 2→9) rather than staying collapsed like F's slow creep (0.006→0.018) - a much bigger relative recovery, suggesting we're still short of the total trapped charge needed to keep the channel pinched as Vd keeps rising.
-
-**Proposed round C:** narrow `trapPeak` between the two round-B extremes - {8.5e18, 9.5e18, 1.05e19} - crossed with `hotTau` ∈ {1e-14, 2e-14} (more heating, to deepen the collapse) at `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. 6 tasks.
-
-**Round C (job 43297414, `results/20260925_lateOnsetC/`):** same fixed levers as round B (`trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5), Vd 0-4.05V/0.15V.
-
-| trapPeak | hotTau | Result |
-|---|---|---|
-| 8.5e18 | 1e-14 | peak 74.7 (Vd=1.2V) → 16.1 (Vd=1.65V), ~4.6x, recovers to 33.6 by 4.05V |
-| 8.5e18 | 2e-14 | peak 54.6 (Vd=0.75V) → **0.174 (Vd=1.2V), ~314x** - creeps to 0.627 by 4.05V, much closer to F's shape |
-| 9.5e18 | 1e-14 | peak 54.8 (Vd=0.9V) → 6.58 (Vd=1.35V), ~8.3x, recovers to 16.7 by 4.05V |
-| 9.5e18 | 2e-14 | peak 40.1 (Vd=0.6V) → **0.116 (Vd=0.9V), ~346x** - creeps to 0.596 by 4.05V |
-| 1.05e19 | 1e-14 | peak 37.4 (Vd=0.6V) → 3.59 (Vd=1.05V), ~10.4x, recovers to 11.9 by 4.05V |
-| 1.05e19 | 2e-14 | **crashed** (`munmap_chunk(): invalid pointer`, core dump, mid-sweep at Vd≈1.35V) - not a Newton/NaN failure, a solver abort. Partial data shows peak 27.8 (Vd=0.45V) → 0.074 (Vd=0.75V), ~378x, already the earliest-onset, deepest trend of the three `trapPeak` values before it died. Not retried; flagging per the "propose before changing physics" rule - this is right at the edge of the grid, not clearly a physics problem, likely just an extreme-value numerical crash. |
-
-**Best result so far by far:** `trapPeak`=8.5e18, `hotTau`=2e-14 - a genuine ~300x collapse (54.6→0.174 mA/mm) with a creep-up afterward (0.174→0.627), the same qualitative shape as F. Onset is ~0.9-1.2V, still short of the ~3V target, but this is the first combo with F-like *depth*.
-
-**Clear trend across B and C:** raising either `trapPeak` or `hotTau` makes the collapse both earlier *and* deeper - they don't trade off independently near this threshold. The jump from "shallow sag" (4-10x, `hotTau`=1e-14) to "dramatic collapse" (200-380x, `hotTau`=2e-14) at the *same* `trapPeak` looks like a threshold/runaway effect (heating fills more traps → more field → more heating), not a smooth function of the levers - consistent with the positive-feedback trap/Te loop described in section 7.
-
-**Proposed round D:** test whether *lowering* `trapPeak` while keeping the strong `hotTau`=2e-14 heating still crosses that runaway threshold, just later in Vd - `trapPeak` ∈ {6e18, 6.5e18, 7e18, 7.5e18, 8e18}, `hotTau`=2e-14 fixed, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. 5 tasks.
-
-**Round D (job 43298204, `results/20260925_lateOnsetD/`):** `hotTau`=2e-14, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5 fixed, Vd 0-4.05V/0.15V. All 5 tasks clean, no crashes.
-
-| trapPeak | Result |
-|---|---|
-| 6e18 | peak 109.9 (Vd=1.65V) → 9.03 (Vd=2.1V), ~12.2x, recovers to 19.2 by 4.05V |
-| 6.5e18 | peak 99.9 (Vd=1.5V) → 2.53 (Vd=1.8V), ~39.5x, creeps to 6.91 by 4.05V |
-| 7e18 | peak 86.5 (Vd=1.2V) → 1.08 (Vd=1.65V), ~80x, creeps to 3.05 by 4.05V |
-| 7.5e18 | peak 75.7 (Vd=1.05V) → 0.527 (Vd=1.5V), ~144x, creeps to 1.51 by 4.05V |
-| 8e18 | peak 65.0 (Vd=0.9V) → 0.281 (Vd=1.35V), ~231x, creeps to 0.975 by 4.05V |
-
-**Clean, monotonic trend confirming the round-C hypothesis:** lowering `trapPeak` from 8e18 to 6e18 (at fixed `hotTau`=2e-14) pushes the runaway-collapse onset later (1.05V → 1.8V) *and* weakens the eventual depth (231x → 12x) at the same time - the two don't decouple along this axis alone. Onset is now within range-of-sight of 3V but depth is trading away as we get there.
-
-**Proposed round E:** push further in both directions at once - lower `trapPeak` *and* raise `hotTau` together, so the weaker charge gets more heating leverage once it does cross threshold. `trapPeak` ∈ {5e18, 5.5e18, 6e18} × `hotTau` ∈ {3e-14, 4e-14}, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. 6 tasks. (`hotTau` this high is new territory for this search, though F itself ran at 1.3e-13 without issue - the round-C crash was at *high* `trapPeak` + `hotTau` together, not `hotTau` alone, so this direction - low `trapPeak`, higher `hotTau` - looks lower-risk.)
-
-**Round E (job 43299061, `results/20260925_lateOnsetE/`):** `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5 fixed, Vd 0-4.05V/0.15V. All 6 clean, no crashes.
-
-| trapPeak | hotTau | Onset | Depth |
-|---|---|---|---|
-| 5e18 | 3e-14 | **~2.1-2.25V** (latest yet) | ~6.8x (118.9→17.5) |
-| 5e18 | 4e-14 | ~1.8-1.95V | ~25x (113.5→4.53) |
-| 5.5e18 | 3e-14 | ~1.8-1.95V | ~34.7x (111.3→3.20) |
-| 5.5e18 | 4e-14 | ~1.5-1.65V | ~115x (102.6→0.890) |
-| 6e18 | 3e-14 | ~1.5-1.65V | ~115x (98.5→0.857) |
-| 6e18 | 4e-14 | ~1.35-1.5V | **~395x** (90.1→0.228) |
-
-**Real breakthrough:** moving diagonally (lower `trapPeak`, higher `hotTau` together) beats moving along either axis alone - e.g. `trapPeak`=6e18/`hotTau`=4e-14 gives onset ~1.35-1.5V *and* ~395x depth, better on **both** counts than round D's `trapPeak`=8e18/`hotTau`=2e-14 (onset ~1.05-1.2V, ~231x). So `trapPeak` and `hotTau` aren't just redundant knobs on the same runaway threshold - going to lower charge + stronger (but still well below F's 1.3e-13) heating buys a better trade than either alone. Onset ~2.1-2.25V (at `trapPeak`=5e18/`hotTau`=3e-14) is the closest to 3V so far, though shallow there.
-
-**Round F (revised, wider):** Ian asked for more combos per round (up to 18, near the 19-CPU QOS cap) instead of 6 at a time. `trapPeak` ∈ {3.5e18, 4e18, 4.5e18, 5e18, 5.5e18, 6e18} × `hotTau` ∈ {3e-14, 4e-14, 5e-14} - 18 tasks, `trapLevel`=0.35, `trapSigma`=0.04, `hotEb`=0.5. Covers the whole diagonal region at once instead of one row/column per round. (`trapPeak`=4e18 is F's own charge, but staying at `hotTau`≤5e-14 keeps well clear of F's `hotTau`=1.3e-13, which we know collapses at 0.3V.)
-
-**Round F results (job 43300970, `results/20260925_lateOnsetF/`).** Note: 2 of the 18 cells (`trapPeak`=5.5e18 at `hotTau`=3e-14 and 4e-14) turned out to be accidental duplicates of round E - an error in the exclusion list, harmless (deterministic, matched round E exactly) but wasted 2 of the 18 slots.
-
-**6 of 18 tasks (33%) crashed** with the identical signature to round C's crash - `munmap_chunk(): invalid pointer`, core dump, inside `FillStep`'s `device` solve, not a Newton-failed/NaN. Deleted ~7.5GB of core dumps (both HPG and local) after confirming the signature matched. Crashed cells: (4.5e18,4e-14), (5e18,5e-14), (5.5e18,5e-14), (5.5e18,6e-14), (6e18,6e-14), (6.5e18,3e-14) - mostly in the trapPeak 4.5-6.5e18 / hotTau 4-6e-14 band, i.e. right around the collapse transition itself. Several died before any collapse was visible in their partial CSV (inconclusive), others died just as the collapse was starting.
-
-Non-crashed / informative results:
-
-| trapPeak | hotTau | Onset | Depth |
-|---|---|---|---|
-| 3.5e18-4.5e18 | 3e-14 | none in range | <10% dip, not a real collapse |
-| 4e18 | 5e-14 | ~2.25-2.4V | ~2.3x (124.0→54.8) - weak but the latest onset with any visible collapse |
-| 4.5e18 | 3e-14 | ~2.4-2.55V | ~1.8x (124.2→68.8) - **latest onset of the whole search**, but barely a collapse |
-| 4.5e18 | 5e-14 | ~1.95-2.1V | ~9.9x (117.9→11.9) |
-| 6e18 | 5e-14 | ~1.05-1.35V | **~833x** (81.7→0.098) - close to F's depth, but early |
-| 6.5e18 | 4e-14 | ~1.05-1.2V | **~761x** (78.4→0.103) - same story |
-
-**Key tension surfacing clearly now:** the deepest collapses (700-830x, close to F's ~1000x) all sit at onset ~1.0-1.35V. Pushing onset out past ~2V (by further lowering `trapPeak`/`hotTau`) costs nearly all the depth - down to <10x, and past ~2.4V, down to <2x (barely visible). So far, in this `trapLevel`=0.35/`trapSigma`=0.04/`hotEb`=0.5 slice, later onset and F-like depth look like they're in real tension, not just requiring a finer grid - we may be up against something closer to a physical limit of this parameter combination rather than a search-resolution problem.
-
-**Two open questions for Ian, flagging rather than guessing:**
-1. **Physics direction:** we haven't touched `hotEb` (fixed at 0.5 throughout, F's value) or `trapSigma` (fixed at 0.04). Raising `hotEb` might restore depth at a given `trapPeak`/`hotTau` without needing more total charge (it directly lowers the effective trap level for a given Te), which could let onset stay late while depth recovers - untested. Alternatively this specific onset/depth target may just not be reachable with this trap geometry and needs accepting a softer match (e.g. onset ~2V with depth ~10-50x) as the practical target.
-2. **Crash rate:** 33% of this round's compute was lost to the same solver abort, concentrated exactly in the region we most want to explore. Per the "solver-side fixes first" rule, a smaller `Vd_step` or more damping through the transition (rather than any trap/Poisson physics change) is the sanctioned next move, but changes the driver's behavior generally and is worth a decision rather than a silent change.
-
-**Ian's answers:** try `hotEb` next; also add the solver-side fix before the next grid. `pulsedIV.tcl`'s damping is now a lever (`dampValue`, `info-exists`-guarded, default 0.10 = unchanged behavior) instead of hardcoded 0.10.
-
-**Round G (job 43303128, `results/20260925_lateOnsetG/`):** solver fix (`Vd_step`=0.1 instead of 0.15, `dampValue`=0.05 instead of 0.10) applied together with a new `hotEb` sweep. Anchors (`trapPeak`, `hotTau`) picked from the "late onset, weak depth" cells in round F/E - A=4e18/5e-14, B=4.5e18/3e-14, C=4.5e18/5e-14, D=5e18/3e-14 - each crossed with `hotEb` ∈ {0.6, 0.7, 0.8, 0.9}, plus 2 extra at the best-depth control point 6e18/5e-14 (`hotEb` ∈ {0.6, 0.7}) to see how `hotEb` affects an already-deep case. 18 tasks, `trapLevel`=0.35, `trapSigma`=0.04 fixed.
-
-**Round G results.** Crash rate went *up*, not down: **10/18 (56%)** hit the same `munmap_chunk()` abort, vs round F's 33% - the solver-side fix (finer `Vd_step`, more damping) did not help, and the crash pattern doesn't correlate cleanly with `hotEb` (e.g. at `trapPeak`=4e18/`hotTau`=5e-14: `hotEb`=0.6 crashed, 0.7 succeeded, 0.8 crashed, 0.9 succeeded - alternating, not monotonic). This looks more like a genuine numerical edge case in the FLOOXS binary itself (triggered by some specific field/value state near the transition) than a step-size/damping stability issue we can tune away from the driver side. Deleted ~11.6GB of core dumps (HPG + local).
-
-**But the 8 successful tasks are the best results of the whole search:**
-
-| trapPeak | hotTau | hotEb | Onset | Depth |
-|---|---|---|---|---|
-| 4e18 | 5e-14 | 0.7 | **~1.9-2.0V** | ~750x (117.6→0.156) |
-| 4e18 | 5e-14 | 0.9 | ~1.6-1.7V | ~218,000x (111.5→0.00051) |
-| 4.5e18 | 3e-14 | 0.9 | ~1.7-1.8V | ~226,000x (113.5→0.0005) |
-| 4.5e18 | 5e-14 | 0.6 | ~1.7-1.8V | ~349x (112.9→0.324) |
-| 4.5e18 | 5e-14 | 0.8 | ~1.4-1.5V | ~181,000x (102.9→0.00057) |
-| 4.5e18 | 5e-14 | 0.9 | ~1.3-1.4V | ~2,360,000x (98.2→4.2e-5) |
-| **5e18** | **3e-14** | **0.7** | **~1.6-1.8V** | **~8,300x (111.2→0.0134)** |
-| 6e18 | 5e-14 | 0.6 | ~1.0-1.1V | ~14,600x (72.4→0.0049) |
-
-**`hotEb` is a huge independent depth lever** - at the same `trapPeak`=4e18/`hotTau`=5e-14 that gave only ~2.3x depth at `hotEb`=0.5 (round F), `hotEb`=0.7 gives ~750x and `hotEb`=0.9 gives ~218,000x. Raising `hotEb` follows the same earlier-and-deeper coupling as `trapPeak`/`hotTau` (0.7→0.9 at the same anchor moves onset from ~2.0V to ~1.7V while deepening ~300x further), so it's not an escape from the tension, but it shifts the whole achievable region: we can now get **F-matching depth (100s-1000s x) at onset ~1.6-2.0V**, later than any `hotEb`=0.5 result. Best single match to F's actual target (~1000x): `trapPeak`=5e18/`hotTau`=3e-14/`hotEb`=0.7 - onset ~1.6-1.8V, depth ~8,300x (deeper than F but same dramatic-collapse-then-slow-creep shape), or `trapPeak`=4e18/`hotTau`=5e-14/`hotEb`=0.7 - onset ~2.0V, depth ~750x (very close to F's actual ~1000x, latest onset of any good match yet).
-
-**Proposed round H:** keep lowering `trapPeak`/`hotTau` (continuing the established onset-delay direction) while tuning `hotEb` in the 0.6-0.8 range to hold depth near F's ~1000x, pushing onset further toward 3V. E.g. `trapPeak` ∈ {3e18, 3.5e18} × `hotTau` ∈ {4e-14, 5e-14, 6e-14} × `hotEb` ∈ {0.7, 0.8} - up to 18 tasks (some combos may be skipped if clearly redundant). Given the crash rate isn't fixable from the driver side, budget for ~30-55% of tasks being lost - the successful fraction has been enough to make real progress each round.
-
-**Round H results (job 43305778, `results/20260925_lateOnsetH/`):** 12/18 clean, 6 crashed (33%, back down from round G's 56% - reinforces that the crash rate is idiosyncratic per parameter point, not something our driver settings control). Best results yet:
-
-| trapPeak | hotTau | hotEb | Onset | Depth |
-|---|---|---|---|---|
-| **3e18** | **6e-14** | **0.8** | **~2.3-2.4V** | **~336x** (124.2→0.369), creeps to 2.17 by 4.05V - **latest onset with real (>100x) depth so far, and the shape (smooth rise, sharp ~336x drop, slow creep) is the closest match to F's qualitative curve yet** |
-| 3.5e18 | 6e-14 | 0.8 | ~2.0-2.1V | ~1277x (118.8→0.093), creeps to 1.10 by 4.05V - depth almost exactly matches F's ~1000x target |
-| 4e18 | 6e-14 | 0.7 | ~1.7-1.9V | ~1443x (114.3→0.079) |
-| 4e18 | 6e-14 | 0.8 | ~1.5-1.7V | ~37,500x (110.3→0.0029) - overshoots depth a lot |
-| 4e18 | 4e-14 | 0.8 | ~1.9-2.1V | ~5,676x (117.7→0.021) |
-| 3e18 | 4e-14 | 0.8 | ~2.3-2.6V | ~41x (127.2→3.08) - late but shallow |
-| 3.5e18 | 4e-14 | 0.7 | ~2.2-2.5V | ~25.6x (125.0→4.89) |
-
-**Two strong candidates now:** `trapPeak`=3e18/`hotTau`=6e-14/`hotEb`=0.8 (onset ~2.3-2.4V, ~336x - best onset match) and `trapPeak`=3.5e18/`hotTau`=6e-14/`hotEb`=0.8 (onset ~2.0-2.1V, ~1277x - best depth match). Both sit on the same `hotTau`=6e-14/`hotEb`=0.8 line; lower `trapPeak` clearly keeps buying later onset along it without the depth collapsing to near-nothing the way it did at `hotEb`=0.5.
-
-**Proposed round I:** push further along the same line - lower `trapPeak` toward {2.5e18, 2.75e18, 3e18, 3.25e18}, `hotTau` ∈ {6e-14, 7e-14}, `hotEb` ∈ {0.8, 0.85, 0.9} (skipping the 3 already-known cells), aiming to land onset closer to ~2.7-3V while keeping depth in the hundreds-x range. 18 tasks.
-
-**Round I results (job 43307897, `results/20260925_lateOnsetI/`): 17/18 clean, only 1 crash** (back down further, from 33%→6% - strong evidence the crash rate is idiosyncratic per parameter point, not our driver settings).
-
-**Best result of the entire search:** `trapPeak`=3e18/`hotTau`=6e-14/`hotEb`=0.85 - peak 123.1 mA/mm at Vd=2.1V, stays near-peak to 2.2V, then a sharp collapse to 0.132 at Vd=2.3V and 0.061 at Vd=2.4V (**onset ~2.2-2.3V, depth ~2004x** - same order of magnitude as F's ~1000x), then a slow creep 0.061→0.542 by Vd=4.05V (~8.9x creep, same qualitative shape as F). This is the closest match to the target (Vd~3V, ~1000x, F-like shape) found so far - onset is now 7x later than F's own 0.3V, in the same ballpark as depth.
-
-Other notable points:
-| trapPeak | hotTau | hotEb | Onset | Depth |
-|---|---|---|---|---|
-| 3e18 | 7e-14 | 0.85 | ~2.0-2.3V | ~1441x |
-| 3e18 | 7e-14 | 0.9 | ~2.0-2.3V | ~4817x (overshoots) |
-| 3.25e18 | 6e-14 | 0.8 | ~2.0-2.3V | ~513x |
-| 2.75e18 | 6e-14 | 0.9 | **~2.3-2.4V** (latest full-depth onset yet) | ~443x |
-| 2.75e18 | 7e-14 | 0.9 | ~2.1-2.4V | ~843x |
-
-**Proposed round J:** push further - lower `trapPeak` toward {2.5e18, 2.6e18, 2.75e18} with higher `hotEb` ∈ {0.9, 0.95} and `hotTau` ∈ {7e-14, 8e-14} to try to reach onset ~2.5-2.8V while holding depth in the hundreds-to-thousands range - continuing to close the gap to 3V.
-
-**Ian stopped here and accepted this as the final result** (2026-09-25) rather than continuing to round J. Onset ~2.2-2.3V isn't exactly 3V but is 7x later than F's own onset with F-matching order-of-magnitude depth and the same qualitative shape - a reasonable match given the tension found across rounds F-I between onset and depth in this trap geometry.
-
-### Final answer: late-onset (~3V target) trap parameters
-
-**`trapPeak`=3e18, `trapSigma`=0.04, `trapLevel`=0.35, `hotEb`=0.85, `hotTau`=6e-14** (`trapMeanY`=0.20, `Vg_meas`=-2.0 as usual). Reproduces Run F's dramatic-collapse-then-creep shape with onset delayed to **~2.2-2.3V** (vs F's ~0.3V) and depth **~2004x** (vs F's ~1000x, same order of magnitude): peak 123.1 mA/mm at Vd=2.1V → 0.061 mA/mm at Vd=2.4V → creeps to 0.542 by Vd=4.05V. Saved as `figures/pulsedIV_lateOnset3V.csv` (Vd 0-4.05V in 0.1V steps). This is a **different parameter regime from Run F**, not a modification of it - `trapLevel` (0.35 vs F's 0.55) and `hotEb` (0.85 vs F's 0.5) both changed along with `trapPeak`/`hotTau`, discovered via the round A-I search in this section.
-
-This does **not** change `pulsedIV.tcl`'s or `GaN_modelfile_masterD`'s defaults - the project's primary goal (top of this file) is still the ~0.4-0.5V-onset match to `radPlot1`, which Run F (section 10) remains the best candidate for. This late-onset result is a separate, self-contained finding for the "what if the onset were ~3V instead" question.
-
-**Search summary (rounds late-onset A through I):** found that `trapPeak` (total trapped charge) and `hotTau`/`hotEb` (heating strength/capture barrier) all couple onset and depth together - more of any one gives an earlier *and* deeper collapse, never just one or the other. Escaping that required moving *diagonally*: lowering `trapPeak` (which delays onset but weakens depth) while raising `hotEb` and `hotTau` together (which restores depth at the new, later onset). `hotEb` turned out to be the biggest lever discovered late in the search (round G) - largely independent of `trapPeak`/`hotTau`'s onset-setting role, it can turn a barely-visible sag into a >1000x collapse at the same onset point. Also found a solver crash (`munmap_chunk(): invalid pointer`, not Newton/NaN) that affects a variable, parameter-idiosyncratic fraction of runs (6-56% per round) - a smaller `Vd_step`/more damping did not reduce it, so it's likely a genuine FLOOXS numerical edge case rather than a stability issue fixable from the driver.
-
-### 10c. Trap placement study (`trapMeanX` × `trapMeanY`, Run F baseline)
-
-Job 43366825, `results/20260925_trapPlacement/`. One Gaussian trap blob per device, Run F's other levers (`trapPeak`=4e18, `trapSigma`=0.04, `trapLevel`=0.55, `hotEb`=0.5, `hotTau`=1.3e-13), Vg=-2, Vd 0-1.6V/0.1V. All 15 tasks clean, no crashes. Geometry (`rfdevice.tcl`): gate y=[-0.125,0.125], field plate y=[0.285,0.725], drain contact y=3.41; x=0 AlGaN surface, x=0.015 2DEG interface.
-
-Pre-collapse Id (mA/mm) at Vd=0.1-0.5V, and onset (first Vd where Id < peak/10):
-
-| trapMeanX \ trapMeanY | 0.125 (gate edge) | 0.20 (F) | 0.285 (FP left) | 0.725 (FP right) | 2.0 (access) |
-|---|---|---|---|---|---|
-| 0.0 (surface) | ~1e-3 → pinched at rest | 7.8, 7.0, **0.006** @0.3 | 8.1, 13.2, **0.018** @0.3 | 8.3, 15.8, 1.27, **0.007** @0.3-0.4 | 8.6, 16.9, 24.3, 20.6, **0.020** @0.5 |
-| 0.0075 (mid-AlGaN) | ~5e-4 → pinched | 7.1, **0.010** @0.2 | 7.5, **0.052** @0.2 | 7.9, 12.9, **0.004** @0.3 | 8.4, 16.1, 19.0, **0.016** @0.4 |
-| 0.015 (2DEG) | ~4e-4 → pinched | 6.6, **0.003** @0.2 | 7.2, **0.009** @0.2 | 7.7, 7.3, **0.002** @0.3 | 8.2, 15.6, 6.3, **0.008** @0.4 |
-
-Depths are 2,400x-37,000x everywhere except the gate edge. Trends:
-- **Lateral (`trapMeanY`) is the strongest placement lever.** Moving the blob from the gate edge toward the drain delays onset (0.2-0.3V → 0.4-0.5V) and raises the pre-collapse current (peak 7.8 → 24.3 mA/mm at the surface), with the pre-collapse Id *rising* with Vd instead of falling as in F.
-- **At the gate edge (y=0.125) the channel is pinched at rest** for every depth (Id ~1e-3 to 1e-4 mA/mm from the first point) - no normal region at all.
-- **Depth (`trapMeanX`) moving toward the 2DEG** gives an earlier onset, lower pre-collapse current, and a deeper collapse - consistent with traps nearer the channel depleting it more directly.
-- The y=0.20 surface cell reproduces Run F exactly (7.8, 7.0, 0.006 at 0.3V), a good sanity check.
-
-**Closest match to `radPlot1` so far: `trapMeanX`=0.0, `trapMeanY`=2.0** (saved as `figures/pulsedIV_placement_x0_y2.csv`):
-
-| Vd | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 |
-|---|---|---|---|---|---|---|
-| this run | 8.62 | 16.9 | 24.3 | 20.6 | 0.020 | 0.012 |
-| radPlot1 | 9.75 | 19.0 | 27.2 | 32.0 | 0.011 | 0.004 |
-
-Onset lands exactly at 0.5V and the depth matches (0.020 vs 0.011 at 0.5V), with a physical creep-up afterward (0.010 at 0.8V → 0.023 at 1.6V). Pre-collapse tracks the target within ~11% through 0.3V; the remaining miss is at 0.4V, where the run has already started to sag (20.6 vs 32.0). This resolves most of the §10 "Next step" concern about F's pre-collapse *falling* with Vd - that came largely from the trap placement near the gate, not from `hotTau`.
-
-**Open question for Ian:** is a surface trap blob ~2 µm into the gate-drain access region physically plausible for this radiation damage? The grid only sampled y=0.725 and 2.0 in that range, so the next step would be a finer `trapMeanY` scan between ~1.0 and ~3.0 at x=0 (and maybe x=0.0075) to fix the 0.4V point.
-
-
-### 10d. 50-location trap map (burst QOS)
-
-Job 43369760 (51 tasks on `ee1-b`) + retry 43370373, `results/20260926_trapMap*/`. Run F levers, Vg=-2, Vd 0-1.6V. Grid: `trapMeanX` ∈ {0, 3.75, 7.5, 11.25, 15} nm (surface → 2DEG) × `trapMeanY` ∈ {-0.5, 0, 0.125, 0.285, 0.5, 0.725, 1.25, 2.0, 2.5, 3.0} µm, plus a trap-free reference (`trapPeak`=1e10, Id(1.6V)=125.5 mA/mm). 5 tasks hit Newton's iteration limit near the collapse; a rerun with `Vd_step`=0.05/`dampValue`=0.05 recovered 4. The last (7.5 nm, 3.0 µm) is the known `munmap_chunk` crash, left as a hole: **49/50 complete**.
-
-Two metrics per device, in `figures/trapMap_ratios.csv`, plotted in `figures/trapMap_3d.png` and `figures/trapMap_3d_suppression.png` (`analyze_trapMap.py`):
-- **collapse ratio** = pre-collapse peak Id / minimum Id after the peak (as requested);
-- **suppression** = Id(trap-free) / Id(trapped) at Vd=1.6V.
-
-They disagree exactly where it matters. Traps **under the gate (y=0) and at the gate edge (0.125)** give a collapse ratio of only ~13x, because the channel is already off at rest (peak Id ~3e-4 to 1e-3 mA/mm). Yet they are the **most damaging locations** by suppression: ~1e6-3.6e6x below the trap-free device. Peak/min can't see a device that never turns on.
-
-Geometric mean over depth, by lateral position:
-
-| trapMeanY (µm) | -0.5 | 0 | 0.125 | 0.285 | 0.5 | 0.725 | 1.25 | 2.0 | 2.5 | 3.0 |
-|---|---|---|---|---|---|---|---|---|---|---|
-| collapse ratio | 4.6e4 | 13 | 13 | 6.9e3 | 5.5e3 | 3.1e4 | 1.9e4 | 4.9e3 | 520 | 1.2e5 |
-| suppression | 3.6e5 | **2.3e6** | 7.2e5 | 1.7e4 | 1.4e4 | 6.7e4 | 4.1e4 | 1.7e4 | **600** | 3.8e5 |
-| mean peak Id (mA/mm) | 16.5 | ~0 | ~0 | 8.6 | 8.9 | 12.2 | 17.2 | 19.5 | 35.2 | 40.6 |
-
-- **Most profound impact: traps under the gate / at its drain edge** - the channel is pinched before any Vd is applied.
-- **Next: near the source (-0.5) and near the drain (3.0)**, both ~1e5 suppression with a clean normal-then-collapse shape. Source-side traps were not sampled before this map.
-- **Least: y=2.5 µm**, only ~600x suppression. The step from 2.5 (weak) to 3.0 (strong) is non-monotonic. y=3.0 sits ~0.3 µm from the drain contact's heavy doping (`Drain_Doping` edge at 3.285) and its minimum lands late (Vd≈1.4V), so it may be contact-proximity behavior rather than trap physics; worth checking before trusting it.
-- **Depth:** traps nearer the 2DEG are consistently worse. Suppression rises ~5x from surface (2.4e4) to 2DEG (1.25e5), collapse ratio ~2.3x.
-- Moving from the field plate out into the access region (0.285 → 2.0) raises pre-collapse current (8.6 → 19.5 mA/mm), consistent with 10c.
-
-
-### 10e. Trap concentration × energy level × position (burst QOS)
-
-Not a `radPlot1` fit - a study of how `trapPeak` and `trapLevel` shape the collapse in this model. Job 43373001 (91 tasks, `ee1-b`) + retry 43373919 (18 failed tasks, `Vd_step`=0.05), `results/20260926_trapConcLevel*/`. x=0 (surface), `trapSigma`=0.04, `hotEb`=0.5, `hotTau`=1.3e-13, Vg=-2, Vd 0-3.0V, `dampValue`=0.05. `trapPeak` ∈ {2e18, 4e18, 8e18} × `trapLevel` ∈ {0.35, 0.55, 0.75} eV × `trapMeanY` ∈ {-0.4, -0.125, 0, 0.125, 0.285, 0.5, 0.725, 1.25, 1.75, 2.4} µm, all ≥0.7 µm from the contact doping edges (-1.125, 3.285), plus a trap-free reference (Id(3V)=146.9 mA/mm). 79/90 ran to 3 V; 8 of the remaining 11 had already declared their regime before crashing (`munmap_chunk`), so **3/90 are undetermined**. `analyze_trapConcLevel.py` → `figures/trapConcLevel_metrics.csv`, `_IdVd.png`, `_summary.png`.
-
-Each device is classified by its current at rest (Id/Id_no-trap at Vd=0.1V) and whether it then drops >10x:
-
-| trapPeak \ trapLevel | 0.35 eV | 0.55 eV | 0.75 eV |
-|---|---|---|---|
-| 2e18 | no collapse ×10 | no collapse ×9, collapse ×1 (under gate) | no collapse ×7, off at rest ×3 (gate) |
-| 4e18 | collapse ×5, no collapse ×3, off ×1, ? ×1 | **collapse ×7**, off at rest ×3 (gate) | off at rest ×10 |
-| 8e18 | **collapse ×5**, off at rest ×3 (gate), ? ×2 | off at rest ×10 | off at rest ×10 |
-
-- **Three regimes, and energy level sets which one you're in.** Deep traps (0.75 eV) at ≥4e18, and 0.55 eV at 8e18, fill at rest and turn the device off before any Vd is applied: a threshold shift, not a current collapse. The hot-electron collapse lives in a narrow band: 4e18/0.35, 4e18/0.55, 8e18/0.35.
-- **Level acts more strongly than concentration.** In the access region at 4e18, going 0.35 → 0.55 eV barely changes at-rest current (~0.96 → ~0.8 of trap-free), but 0.55 → 0.75 eV cuts it to 1e-5-1e-3. Doubling 4e18 → 8e18 at 0.55 eV flips every position from collapse to off at rest.
-- **Inside the collapse band, onset and depth trade off:** 4e18/0.35 is late and shallow (onset 1.7-2.9V, 11-106x); 4e18/0.55 is early and deep (0.3-0.45V, 3e3-3e4x); 8e18/0.35 is early and deep (0.4-0.6V, ~4e4x) but with higher pre-collapse current (29-42 mA/mm), because the shallow level keeps the channel open at rest.
-- **Position:** traps under the gate (-0.125 to 0.125) are always the first to switch the device off at rest - at 2e18/0.75 they're the only affected positions. In the access region, onset moves later with distance from the gate in every collapse case (4e18/0.35: 1.7 → 2.5 → 2.9V; 4e18/0.55: 0.3 → 0.45V; 8e18/0.35: 0.4 → 0.6V).
-- **2e18 is too little charge** for a hot-electron collapse in the access region at any level through 3V; only gate-region traps matter.
-- **Caveats:** off-at-rest devices hit the numerical noise floor (~1e-8 mA/mm, visibly jagged at 8e18/0.75), so suppression values above ~1e9 aren't physically meaningful. Onset and collapse ratio are only reported for devices that conduct at rest.
-
-
-### 10f. 3D trap maps at several concentrations / levels (burst QOS)
-
-Job 43513462 (251 tasks, `ee1-b`) + solver-side retry 43515232 (10 give-ups, `dampValue`=0.02, `retryDepth`=7), `results/20260927_trapMapSets*/`. **First sweep with the retry-enabled `pulsedIV.tcl`: 0 crashes** (previous sweeps lost 20-50% to `munmap_chunk`). 48 tasks needed at least one retry; 242/250 reached 3 V. The 8 that didn't (7 at 8e18/0.35 eV, drain-side access region, 1 at 4e18/0.35) stall exactly at their collapse point even with 7 bisection levels (~0.8 mV steps) and heavy damping. That looks like a discontinuous jump in the model at the runaway, which Vd continuation can't follow. They're marked "did not converge" on the plots, not plotted as values.
-
-Sets (`trapPeak`/`trapLevel`): 2e18/0.55, 2e18/0.75, 4e18/0.35, 4e18/0.55 (Run F), 8e18/0.35, one per regime from 10e. Each: 5 depths (0-15 nm) × 10 positions (-0.4 to 2.4 µm, contact-safe), Run F hot-electron levers, Vd 0-3 V, `dampValue`=0.05. `analyze_trapMapSets.py` → `figures/trapMapSets_metrics.csv`, `figures/trapMapSets_tp<peak>_tl<level>.png` (collapse-depth and suppression 3D pair per set), `figures/trapMapSets_overview_{depth,suppression}.png` (all sets, shared z-scale).
-
-**Collapse metric (changed 2026-09-27, Ian's question):** peak/min ("collapse ratio") is biased by onset. Id rises with Vd before the collapse, so a late collapse starts from a much higher peak: corr(onset, peak) = +0.86 to +0.91. At 4e18/0.35 the gate-edge collapses (onset 0.2 V, peak ~4.5 mA/mm, already ~25% of trap-free at rest) read 170-200x by peak/min but ~1,500-1,900x against a trap-free device, 8-10x understated. The plotted metric is now **collapse depth vs trap-free: Id_no-trap / Id at the Vd of the post-collapse minimum** (`collapse_depth_vs_ref`). Peak/min stays in the CSV as `collapse_ratio`. Note that drain-side traps collapse *later*, not earlier (onset rises with distance from the gate); gate-edge traps collapse earliest when they conduct at rest.
-
-| set | regimes (of 50) | collapse onset | collapse depth vs trap-free (range, geo-mean) | suppression: gate region / access region |
-|---|---|---|---|---|
-| 2e18 / 0.55 | collapse 8 (gate only), none 40, off 2 | 0.2-0.3 V | 58-290 (110) | ~500 / ~1 |
-| 2e18 / 0.75 | none 35, off 15 (gate) | - | - | ~6e5 / ~1 |
-| 4e18 / 0.35 | collapse 39, none 5, off 5, ? 1 | 0.2-2.9 V | 13-2.7e3 (200) | ~6e3 / 10-260 |
-| 4e18 / 0.55 | collapse 35, off 15 (gate) | 0.2-0.5 V | 1.2e4-6.8e5 (1.3e5) | ~2e6 / 5e3-1e5 |
-| 8e18 / 0.35 | collapse 28, off 15 (gate), ? 7 | 0.4-0.6 V | 7.4e4-1.3e6 (2.5e5) | ~2.6e6 / 5e4-3e5 |
-
-- **The gate region (y = -0.125 to 0.125) is the most damaging location in every set.** Once there's enough charge or a deep enough level, traps there turn the device off at rest at every depth.
-- **At 2e18, access-region traps do nothing** (suppression ≈1 at both levels). Only the gate region matters, and the level decides how much: 0.55 eV ~500x, 0.75 eV ~6e5x.
-- **Collapse onset moves later with distance from the gate in every collapsing set.** It's most dramatic at 4e18/0.35: 1.5 V at the field-plate edge → 2.7 V at 2.4 µm. The source side (-0.4 µm) also collapses late (2.7 V).
-- **Depth: traps nearer the 2DEG are consistently more damaging** in every set, by 1.5x (8e18/0.35) to 8x (4e18/0.35) in suppression from surface to 2DEG.
-- **Concentration/level set the collapse depth scale** (vs trap-free, geo-mean): ~200x (4e18/0.35) → ~1.3e5x (4e18/0.55) → ~2.5e5x (8e18/0.35). Shallower level + more charge gives the deepest collapse while keeping the channel open at rest outside the gate.
-- 4e18/0.55 on the contact-safe grid agrees with the 10d map where they overlap.
-
-
-### 10g. Cone (cascade-like) vs Gaussian trap shape, 2e18 cm⁻³ / 0.75 eV
-
-> ⚠ See 10h: the access-region results here aren't mesh-verified (cones are only a few mesh cells wide there).
-
-Job 43536494 (51 tasks, `ee1-b`), `results/20260927_trapCone/`. All 51 completed, with no retries needed. `trapShape=cone`, apex at the AlGaN surface (`trapMeanX`=0) at the 10 contact-safe positions of 10f; 5 geometries (`coneLen` µm / `coneAngle`): 0.05/30°, 0.1/30°, 0.2/30°, 0.1/15°, 0.1/45° (`coneW0`=0.01, `coneEdge`=0.01). Compared against the Gaussian 2e18/0.75 x=0 row of job 43513462 (same Vd 0-3 V, damping, retry driver). `analyze_trapCone.py` → `figures/trapCone_metrics.csv`, `_shapes.png` (the profiles), `_vs_position.png`, `_IdVd.png`.
-
-In-material cross-section (µm², ∝ trapped charge per gate width): Gaussian 0.0051; cones 0.0025, 0.0078, 0.0271, 0.0047 (15°, ≈ equal charge to the Gaussian), 0.0121 (45°).
-
-Suppression vs trap-free at Vd=3 V, under the gate (y=0) / at the gate edges (-0.125 | 0.125):
-
-| shape | y=0 | y=-0.125 / 0.125 | elsewhere |
-|---|---|---|---|
-| Gaussian σ 0.04 | 1.5e5 | 2.8e4 / 590 | 1-2.2 |
-| cone 0.05, 0.1, 0.2 µm @30° | 3.3e4-3.4e4 (identical) | 3.3e3-3.5e3 / 9 | ≈1 |
-| cone 0.1 µm @15° | 560 | 66 / 2.5 | ≈1 |
-| cone 0.1 µm @45° | 9.1e5 | 1.2e5 / 310 | ≈1 |
-
-- **No hot-electron collapse for any shape or position at 2e18/0.75 eV.** As with the Gaussian (10e, 10f), the only effect is static: the gate region is switched off at rest. The access region is untouched (≥92% of trap-free at rest, suppression ≈1) whatever the shape.
-- **Cone length doesn't matter.** 0.05, 0.1 and 0.2 µm at 30° agree to 2 significant figures everywhere, so traps deeper than ~50 nm into the GaN buffer have no effect at this level. The first few tens of nm (the 15 nm AlGaN barrier and just below the 2DEG) do all the work.
-- **What matters is how much trap charge sits near the surface over the gate.** The narrow 15° cone (same total charge as the Gaussian) is ~270x weaker than the Gaussian under the gate, and the wide 45° cone is ~6x stronger. The Gaussian beats the 30° cones despite ~35% less total charge because its charge is concentrated at the surface (it's widest where the cones are narrowest, at the apex).
-- Implication for TRIM: only the near-surface part of a cascade profile (roughly the top 50 nm) should matter for this device, at least for deep (0.75 eV) traps at this density. Resolving the narrow top of a cascade will need a finer mesh than the current ~10-50 nm lateral spacing in the access region.
-- Caveat: this set never collapses, so it only tests the "off at rest" mechanism. Shape effects on the hot-electron collapse itself would need a collapsing set (e.g. 4e18/0.55 or 8e18/0.35).
-
-
-### 10h. ⚠ Mesh resolution in the access region (found 2026-09-27)
-
-The lateral mesh (`rfdevice.tcl` `line y`) is 5 nm at the gate and ~10-20 nm at the field plate, but coarsens to ~25-40 nm from y ≈ 0.725 µm out to the drain (spacing 0.02 → 0.05). Traps narrower than a few cells there are **not resolved**, even though the nodes still capture their total charge (±15%): the hot-electron runaway depends on the field around the trapped charge, which a coarse mesh smears out.
-
-Local check (scratch copy of `rfdevice.tcl` with `line y loc=1.25 spac=0.004`), 4e18/0.55 eV, trap at the surface at y=1.25 µm, Vd 0-1 V:
-
-| trap | standard mesh | refined mesh (4 nm) |
-|---|---|---|
-| cone 0.1 µm / 45° (25-50 nm wide near the 2DEG) | **no effect**: 9.5 → 85 mA/mm, tracks trap-free | **collapses** 8.2 → 0.025 at 0.2 V (~325x) |
-| Gaussian σ 40 nm | peak 22.8 at 0.3 V, collapse at 0.4 V, ~0.003 after | peak 12.0 at 0.2 V, collapse at **0.3 V**, 0.004-0.013 after |
-
-- **The cone vs Gaussian comparisons at collapsing settings (job 43538727, `figures/trapCone_4e18_*`) are mesh artifacts** wherever the cone sits in the coarse region. Their "cones suppress the collapse" result is wrong. The 2e18/0.75 cone study (10g) is probably fine at the gate (5-10 nm mesh) but its access-region "no effect" isn't verified.
-- **The Gaussian results are qualitatively robust but quantitatively mesh-sensitive** in the access region. Collapse still happens and is still deep, but onset shifts ~0.1 V earlier and the pre-collapse peak roughly halves on a fine mesh. That affects every access-region Gaussian number in 10b-10f, including the 10c `radPlot1` match at y=2.0 µm (onset "exactly 0.5 V").
-- Needs a decision before more trap-shape or TRIM work: local refinement that follows the trap (e.g. a `line y` at `trapMeanY` with ~4 nm spacing, driven by the trap levers) vs global refinement of the access region, plus a short convergence study (e.g. 8/4/2 nm) to pick the spacing.
-
-
-### 10i. Critical-strike probability at 1e7 ions/cm² (Gaussian damage, W = 200 µm)
-
-`critical_strike.py` → `figures/criticalStrike_summary.csv`, `figures/criticalStrike.png`. Inputs: the 10f Gaussian maps (job 43513462 + retry) plus a band-edge refinement (job 43542730, 99 devices at depths 0/7.5/15 nm, 12 retried, 3 gave up; 0 crashes). **Gate width 200 µm** (from Ian).
-
-- **Critical strike** = the Gaussian blob (σ 40 nm) cuts Id to ≤ 1/10 of trap-free at any Vd ≤ 3 V (off at rest or collapse). The critical band Δy along the channel uses nearest-sample cells within the contact-safe range [-0.425, 2.585] µm, averaged over depths 0-15 nm. Stalled-at-collapse points are inferred from the same position at other depths (8 points).
-- **Poisson hits:** Φ = 1e7 cm⁻² = 0.1 µm⁻² (mean spacing ~3.2 µm); λ = Φ·Δy·W; P(≥1) = 1 − e^(−λ).
-
-| setting | critical band (µm) | Δy (depth range) | λ at W=200 | P(≥1) | Φ for 50% |
-|---|---|---|---|---|---|
-| 2e18 / 0.55 | ≈ -0.14 … 0.14 (gate) | 0.30 (0.28-0.32) | 6.0 | 0.9975 | 1.2e6 cm⁻² |
-| 2e18 / 0.75 | -0.2…-0.35 → 0.15 (gate, wider with depth) | 0.47 (0.39-0.54) | 9.4 | 0.99992 | 7.4e5 cm⁻² |
-| 4e18 / 0.35 | ≈ -0.3 … 1.75-2.6 | 2.67 (2.15-2.96) | 53 | ≈1 | 1.3e5 cm⁻² |
-| 4e18 / 0.55 | whole trusted range | 3.01 (≤4.41 incl. contact-adjacent) | 60 | ≈1 | 1.15e5 cm⁻² |
-| 8e18 / 0.35 | whole trusted range | 3.01 (≤4.41) | 60 | ≈1 | 1.15e5 cm⁻² |
-
-- **In the 2D model a critical strike is essentially certain at 1e7 cm⁻²** (≥99.75%, with 6-60 critical strikes expected per 200 µm device); 1e7 is 8-90x past the 50% fluence.
-- **Big caveat - 2D vs 3D:** the 2D sims make each blob uniform along the whole gate width. A real single cascade is ~4σ ≈ 0.16 µm wide along the width, and current flows around it. Parallel-channel estimate: expected fraction of width damaged = Φ·Δy·0.16 µm ≈ **0.5% (2e18) to 4.8% (4e18/8e18)**, i.e. a few-percent Id loss, not a device-level collapse. Whole-device collapse from cascades would need them to overlap along the width, Φ ≳ 1/(0.16 µm)² ≈ 4e9 cm⁻². Whether the hot-electron runaway even ignites around a 0.16 µm patch (current can bypass it) is untested; that needs a 3D FLOOXS run.
-- Access-region band edges carry the 10h mesh sensitivity. The 2e18 bands (gate region, fine mesh) are reliable.
-
-
-### 10j. Full x-y sensitivity map incl. insulator trap charge (burst QOS)
-
-> ⚠ Near the surface the sign −1/+1 maps mostly measure the **insulator-charge assumption**, not semiconductor trapping; the sign-0 companion below isolates the semiconductor part. Access-region numbers also carry the 10h mesh caveat.
-
-Job 44261474 (248 tasks, `ee1-b`), `results/20261001_trapXYMap/`. Run F levels (4e18 / 0.55 eV, σ 40 nm, `hotEb` 0.5, `hotTau` 1.3e-13), Vd 0-3 V, `dampValue` 0.05. Blob centre x ∈ {-275 … 515} nm (HighK top → 0.5 µm into GaN, 15 depths) × y ∈ {-0.4 … 2.5} µm (13 positions, contact-safe); centres inside metal skipped. The parts of the blob in Nitride/HighK enter Poisson as static charge (`insTrapSign`, `InsTrapCharge` in `Poisson.tcl`): sign −1 at all 182 positions, +1 at the 65 insulator-centred ones. 243/248 finished cleanly: 0 crashes, 0 give-ups, 13 used retries. The other 5 (sign −1, y=−0.4, x −30…15 nm) gave up cleanly at Vd=1.4 V after ~2 h of bisecting (no crash). They're already off at rest at the noise floor (1e-11 of trap-free), so their regime is settled and they weren't retried. `analyze_trapXYMap.py` → `figures/trapXYMap_metrics.csv`, `_3d.png`, `_map.png` (sign −1), `_map_plus.png` (+1), `_sign.png`. Depth is plotted on evenly spaced rows; values are capped at 1e-8 (noise floor).
-
-- **Sign −1: everything from the nitride to 15 nm into the GaN is off at rest, at every y** (Id/Id_no-trap ~1e-10 at 3 V). That includes the access region, where the same traps without insulator charge gave the normal hot-electron collapse (10f). The cause is the Gaussian tail in the nitride: fully filled, it's 2.0e13 (x=0), 1.4e13 (15 nm), 6.4e12 (40 nm) and 9e11 cm⁻² (80 nm), i.e. ≥ the 2DEG density. The only collapse in the map is (40 nm, 2.5 µm); the rest of x=40 nm is at 1e-5 to 4e-3 of trap-free at rest.
-- **Deep GaN traps do almost nothing.** At 80 nm, only the gate region is affected (0.06-0.25 of trap-free at 3 V); everywhere else ≥0.88. From 150 nm down, ≈1 everywhere.
-- **HighK, sign −1:** at −100 nm (50 nm above the nitride) it turns the device off for y ≥ 1.5 µm (1e-6 to 1.6e-7), partly at 1.0 µm (0.16), but has **no effect at y ≤ 0.725**, under the T-gate overhang and field plate (the metal there presumably screens it). At −150 nm, ≤40% loss; at −225/−275 nm (HighK top), no effect.
-- **Sign +1 (fixed positive insulator charge):** no effect anywhere except nitride-centred blobs under the gate (−2.5 nm: 1e-4 to 6e-6 of trap-free, off at rest), which come from the semiconductor half of the blob as in 10f. In the access region the positive nitride charge **cancels the hot-electron collapse** (0.89-1.003 of trap-free at 3 V, vs 1e-4-1e-5 in 10f at x=0).
-- So the sign of any charge trapped in the passivation dominates the near-surface result in both directions.
-
-**Sign-0 companion (job 44274780, 91 tasks, `results/20261001_trapXYMap0/`, `pulsedIV_trapXYMap0.slurm`):** the same blob with the insulator traps neutral, at x ∈ {−30, −2.5, 0, 7.5, 15, 40, 80} nm × the 13 y positions plus a reference. 91/91 clean, 6 retried, 0 crashes. Shown side by side with −1/+1 in `figures/trapXYMap_neutral.png`; 3D surfaces (at rest, 3 V, worst) in `figures/trapXYMap_3d_neutral.png`.
-- **With neutral insulators the normal hot-electron collapse comes back** wherever the blob centre is between −2.5 and 40 nm and outside the gate (50 collapses, all at 0.62-0.90 of trap-free at rest). Agrees with 10f where they overlap (x=0, y=0.5: onset 0.3 V, 1.4e4x).
-- **Gate region (y −0.125…0.125): off at rest** (1e-4 to 3e-5), from −2.5 to 40 nm. Same pattern as 10f.
-- **Depth:** onset is earliest and the collapse deepest just below the 2DEG (7.5-15 nm: onset 0.2-0.4 V, 4e4-2e6x). At 40 nm, onset is later (0.3-0.6 V, 2.1 V at y=2.5) and shallower (1e3-1e5x). At 80 nm nothing collapses (gate region 0.06-0.25 at 3 V, else ≈1). A blob centred 30 nm into the nitride does nothing, apart from 1e-2 to 6e-2 at the gate edges at 3 V.
-- **Lateral:** onset moves later with distance from the gate on both sides (x=0: 0.3 V at 0.2-0.5 µm → 0.7 V at 2.5 µm; 0.4 V at y=−0.4).
-- **Comparison:** filled insulator traps (−1) turn every one of those collapses into "off at rest", and positive charge (+1) removes them. Only the gate region behaves the same in all three. Real passivation traps would partly fill, so near-surface damage gives a collapse (sign 0) through a full threshold shift (sign −1), depending on how much charge the nitride holds. That fill fraction is the parameter to pin down (e.g. from measured Vth shift after irradiation).
-
-
-### 10k. Deep traps: thin blobs below the 2DEG (burst QOS)
-
-Ian's question from 10j: is the strong collapse with the blob centred 40 nm deep (25 nm below the 2DEG) caused by deep traps, or by the σ=40 nm tail reaching the 2DEG (0.82 of peak there)? Job 44286932 (71 tasks, `ee1-b`), `results/20261001_trapDeep/`, `pulsedIV_trapDeep.slurm`. Anisotropic blob via the new `trapSigmaY` lever: σx = 10 nm in depth, σy = 40 nm laterally (a 10 nm lateral width wouldn't be resolved on the access-region mesh, 10h; the depth mesh is 1-8 nm here). Run F traps (0.55 eV, `hotEb` 0.5, `hotTau` 1.3e-13), insulator traps neutral, Vd 0-3 V. Centres 0, 10, 15, 25, 35, 45, 65 nm below the 2DEG × y ∈ {−0.2, 0, 0.5, 1, 2} µm × peak 4e18 (same density as σ=40 nm) and 1.6e19 (same total charge). 71/71 clean, 5 retried, 0 crashes. `analyze_trapDeep.py` → `figures/trapDeep_metrics.csv`, `figures/trapDeep.png` (worst suppression vs depth, trap density left at the 2DEG on the top axis), `figures/trapDeep_IdVd.png`.
-
-| peak | 0 nm below | 10 nm | 15 nm | 25 nm | ≥35 nm |
-|---|---|---|---|---|---|
-| 4e18 | collapse everywhere (onset 0.3-0.5 V, 4e2-6e5x); gate off at rest | gate off at rest (2e5x); source side 28x; access/FP none | gate off at rest (2.4e3x); else none | none (gate 3x) | none |
-| 1.6e19 | off at rest everywhere (1e7-1e13x) | off at rest everywhere | off at rest everywhere | gate collapse (onset 0.2 V, 2.3e3x); else none | none (gate ≤2x) |
-
-- **The "deep" collapse in 10j was the tail at the 2DEG.** With the blob kept off the channel, traps 25+ nm below the 2DEG do nothing in the access region even at 4x the density (same total charge as the σ=40 nm blob). The access-region effect cuts off between 0 and 10 nm below at 4e18, and between 15 and 25 nm at 1.6e19.
-- **The gate region reaches deepest** (off at rest to 15 nm below at 4e18; a collapse at 25 nm below at 1.6e19), as in every other map.
-- **At 1.6e19, 0-15 nm below is off at rest, not a hot-electron collapse**: a static back-barrier from filled buffer acceptors (sheet charge up to ~4e13 cm⁻² if fully filled). The 4e18 blob on the 2DEG gives the usual collapse-then-recovery (y=1 µm: 25 → 0.02 mA/mm at 0.5 V, then back to ~30 by 3 V; the recovery is larger and noisier than the σ=40 nm blob's).
-- **Likely reason (inference, not checked against the band diagram):** an acceptor at Ec−0.55 eV fills only where the electron quasi-Fermi level is within reach, which in this structure is the first ~15-20 nm under the 2DEG; deeper, the buffer band rises and the traps stay empty. Hot electrons also live in the channel, so hot-electron capture can't reach deep traps either. A cut of Ec−Qfn vs depth would confirm it.
-- For TRIM profiles: only the damage within ~15-25 nm of the 2DEG (plus the AlGaN and the surface stack) should matter, consistent with 10g.
-
-
-### 10l. HighK vs SiN passivation, 2e18 cm⁻³ / 0.75 eV (burst QOS)
-
-Ian's question: what does the HighK dielectric do to the collapse? `rfdevice_SiN.tcl` is the same structure with every HighK region (εr 35; above the 50 nm nitride, around the T-gate, under the field plate) replaced by Nitride (εr 6.3), selected with the `deviceDeck` lever. Job 44294165 (51 tasks, `ee1-b`), `results/20261001_trapSiN/`: the 10f 2e18/0.75 grid (x 0-15 nm × y −0.4…2.4 µm, Run F hot-electron levers, Vd 0-3 V) plus a trap-free SiN reference. 51/51 clean, 0 retries. HighK side = job 43513462 (10f). Each device is normalised to its own trap-free reference. `analyze_trapSiN.py` → `figures/trapSiN_metrics.csv`, `_3d.png` (suppression surfaces side by side), `_compare.png` (trap-free Id-Vd, suppression vs y, Id-Vd, HighK/SiN ratio map).
-
-- **Trap-free:** SiN carries slightly more current, growing with Vd: +0.4% at 0.1 V, +0.8% at 1 V, +1.5% at 3 V (149.1 vs 146.9 mA/mm).
-- **Same regimes on both devices:** 15 off at rest (all in the gate region), 35 no collapse; no hot-electron collapse anywhere, as in 10f. Under the gate and in the access region the suppression agrees to within 0.01-0.02 decades (gate peak 10^5.2-10^6.2 on both).
-- **The only difference is on the source side (y = −0.4 µm, just outside the T-gate overhang at −0.325):** at 3 V, the HighK device is suppressed 0.12-0.17 decades more (10^−0.35…−0.61 vs SiN 10^−0.24…−0.43, i.e. ~1.3-1.5x), increasing with depth. At rest the two agree. Likely the high-εr layer couples the T-gate's −2 V further over the source access region, so a trap there depletes it more (inference).
-- **Conclusion at this setting: the HighK layer has almost no effect on trap sensitivity.** Above 50 nm of nitride it is too far from the channel to change the gate-region pinch-off. This setting never collapses, though, so it can't show whether HighK changes the *hot-electron* collapse, which depends on the drain-side field (where field-plate coupling through the HighK matters most). That would need the same comparison at a collapsing setting (e.g. Run F 4e18/0.55).
-
-**Run F repeat (job 44303974, `results/20261001_trapSiN_F/`, 51/51 clean, 6 retried; `figures/trapSiN_F_{3d,compare}.png`):** still the same. Both devices: 35 collapse, 15 off at rest (gate region), no regime differs. **Collapse onset is identical at every position** (0.2-0.5 V); collapse depth and 3 V suppression agree within ±0.1-0.2 decades.
-
-**Why (dielectric check, `fieldPlateTest.tcl` / `plot_fieldPlate.py` → `figures/fieldPlate.png`):** trap-free, Vg=−2, Vd to 20 V. The HighK εr=35 is applied (checked), and the HighK does passivate the field: at 20 V the T-gate-head/field-plate peak drops 416 → 202 kV/cm and the field spreads toward the drain (access region at 1 µm: 116 vs 9 kV/cm); at 10 V, 98 vs 140. But at Vd ≤ 3 V there is no field outside the gate drain edge (3-4 kV/cm on both). The only hot spot is the gate edge (264 kV/cm at 3 V), under the gate stem with ~5 nm of nitride over the AlGaN, which the HighK can't reach (<2% different even at 20 V). The hot-electron heating in every 0-3 V sweep comes from there, so the passivation dielectric can't matter. Seeing HighK in the collapse would need sweeps to ~10-20 V.
-- Robustness: "dielectric doesn't matter at ≤3 V" is robust (insensitive to εr over 6.3-35; set by basic electrostatics). The high-Vd numbers are qualitative only (static mobility, no self-heating, corner mesh, Neumann top boundary), and the model has no dielectric fixed/interface charge or dynamic surface trapping, the usual way passivation affects real collapse.
-- Old `fieldpeak.tcl` set HighK εr 6.3 before sourcing the model file, which resets it to 35, so its "SiN" run was HighK.
-
-
-### Collapse classification (Ian, 2026-10-01)
+### 10.0 Collapse classification (Ian, 2026-10-01)
 
 For qualitative analysis, classify a collapse by its **largest single-step loss**, 1 − Id(Vd_n)/Id(Vd_n−1), over the sweep:
 - **deep:** > 95% of the previous-step current lost in one step;
 - **medium:** 50-95%;
 - **shallow:** < 50%.
-The collapse onset is the Vd of that step.
 
-### 10m. Transfer-curve calibration vs the HfO2 device (field mobility)
+The collapse onset is the Vd of that step. Devices below 10% of the trap-free current at Vd = 0.1 V are "off at rest" (a threshold shift, not a collapse). `analyze_onset.py` implements this. Two-step collapses exist (e.g. a big drop, then the largest relative step from an already-low current); the metric reports the largest step.
+
+### 10.1 Transfer-curve calibration vs the HfO2 device (field mobility)
 
 Target: `figures/rfDeviceHFO2_Experimental.csv` = raw `figures/RF_100nmHfOx_IdVgs_Example1.xlsx`: Id-Vgs at **Vds = 10 V**, 25 °C, 100 nm HfO2, standard FP. `Ids` is in **A for a 200 µm device** → mA/mm = A·1e3/0.2 (634 mA/mm at Vg=0, 810 at +1 V). FLOOXS flux is per µm of depth (×1e6 = mA/mm). Gate leakage ≤2e-3 mA/mm; the off-state floor (~0.075 mA/mm) is drain leakage and is not modelled (Ian: qualitative OFF vs ON only). Driver `calibIdVg.tcl` (trap-free, `mobModel field`, Vd ramp then Vg +1 → −4; levers `Vd_cal`, `Rs_contact`/`Rd_contact` lumped contact resistance, `deviceDeck`), scoring `calib_score.py` (aligns by a rigid Vg shift = ΔphiB), plot `plot_calib.py` → `figures/calib_IdVg.png`.
 
@@ -624,11 +225,11 @@ Known miss: **gm above +0.5 V collapses** (88 vs 160 mS/mm at +1 V), while Id th
 More channel charge removes the access bottleneck but raises intrinsic gm, and the series resistance needed to trim it softens the turn-on. Kept the unmodified deck because it is best in the required range and at Vg = −2 V, where all trap studies run. A run at the fitted phiB confirmed the rigid-shift approximation (field plate effect < 0.1%). New levers (defaults = old behaviour): `polCharge`, `phiB`, `surfCharge`.
 
 
-### 10n. Run F trap map with the calibrated field mobility
+### 10.2 Run F trap map with the calibrated field mobility
 
-Ian: redo the conc/level surfaces with field mobility; Run F (4e18/0.55 eV) only. Job 44342967 (51 tasks, `ee1-b`, `pulsedIV_trapMapF_field.slurm`), `results/20261001_trapMapF_field/`: the 10f grid (5 depths × 10 positions, Vd 0-3 V, Run F hot-electron levers) with `mobModel field` set per run (deck default still static). No crashes; 3 source-side tasks (y −0.4, x 3.75/7.5/11.25 nm) gave up cleanly after their collapse (at Vd 2.6/1.4/1.1 V), so their onset and depth are known but no 3 V value. Figures: `figures/trapMapF_field_tp4e+18_tl0.55.png` (same 3D pair as 10f, via `analyze_trapMapSets.py <run> <tag>`), `figures/mobCompare_F_{3d,compare}.png` (`analyze_mobCompare.py`, each model vs its own trap-free device).
+Ian: redo the conc/level surfaces with field mobility; Run F (4e18/0.55 eV) only. Job 44342967 (51 tasks, `ee1-b`, `pulsedIV_trapMapF_field.slurm`), `results/20261001_trapMapF_field/`: the static-era 10f grid (5 depths × 10 positions, Vd 0-3 V, Run F hot-electron levers; `archive/static_mobility/RESULTS.md` §10f) with `mobModel field`. No crashes; 3 source-side tasks (y −0.4, x 3.75/7.5/11.25 nm) gave up cleanly after their collapse (at Vd 2.6/1.4/1.1 V), so their onset and depth are known but no 3 V value. Figures: `figures/trapMapF_field_tp4e+18_tl0.55.png` (same 3D pair as the static map, via `analyze_trapMapSets.py <run> <tag>`), `figures/mobCompare_F_{3d,compare}.png` (`analyze_mobCompare.py`, each model vs its own trap-free device).
 
-| | static (10f) | field (calibrated) |
+| | static (archived 10f) | field (calibrated) |
 |---|---|---|
 | trap-free Id at 0.1 / 1 / 3 V | 10.0 / 90.1 / 146.9 | 17.6 / 136.9 / 177.2 mA/mm |
 | regimes (of 50) | collapse 35, off at rest 15 | collapse 31, off at rest 19 |
@@ -636,10 +237,34 @@ Ian: redo the conc/level surfaces with field mobility; Run F (4e18/0.55 eV) only
 | collapse depth vs trap-free | 10^4.1-10^5.8 | 10^4.9-10^7.1 (~1 decade deeper) |
 | at-rest Id / trap-free | 0.71-0.87 | 0.04-0.63 |
 
-- **Field mobility gives an earlier, deeper and more uniform collapse.** The lateral onset trend of 10f (later with distance from the gate) nearly disappears.
+- **Field mobility gives an earlier, deeper and more uniform collapse.** The static-era lateral onset trend (later with distance from the gate) nearly disappears.
 - The 4 extra "off at rest" devices are 11-15 nm deep at the field-plate edge (y 0.285-0.5 µm), at 0.04-0.05 of trap-free, just under the 0.1 cut, so borderline rather than a new regime. The gate region (−0.125…0.125) is off at rest in both.
 - Suppression at 3 V is ~1 decade larger with field mobility in the access region and near the source; similar under the gate; slightly smaller at y=0.5 µm.
-- **Caveat:** part of the larger ratios is the higher trap-free baseline (low-field mobility ~1160 vs 600 cm²/V·s gives 75% more current at low Vd). The calibration (10m) only checked saturation at Vds = 10 V; the low-Vd linear region where these collapses happen is not validated (needs measured Id-Vd).
+- **Caveat:** part of the larger ratios is the higher trap-free baseline (low-field mobility ~1160 vs 600 cm²/V·s gives 75% more current at low Vd). The calibration (§10.1) only checked saturation at Vds = 10 V; the low-Vd linear region where these collapses happen is not validated (needs measured Id-Vd).
+
+---
+
+### 10.3 Late-onset search with field mobility (in progress)
+
+Ian (2026-10-01): push the collapse out further using the static-era methods (§10.4). Round 1: job 44359813, `pulsedIV_onsetField1.slurm` / `params_onsetField1.txt`, `results/20261002_onsetField1/`: Run F position (x 0, y 0.2 µm, σ 0.04), `trapLevel` {0.35, 0.45, 0.55} × `trapPeak` {2, 3, 4}e18 × `hotTau` {1e-14, 3e-14, 6e-14, 1.3e-13} × `hotEb` {0.5, 0.85}, Vd 0-4 V / 0.1 V, + trap-free reference (73 tasks). Analyze with `python3 analyze_onset.py results/20261002_onsetField1 onsetField1`.
+
+### 10.4 Lessons from the static-mobility era (details in `archive/static_mobility/RESULTS.md`)
+
+These were all found with constant mobility 600; field mobility collapses earlier and deeper (§10.2), so treat numbers as indicative.
+- **Run F** (4e18 / σ 0.04 / 0.55 eV / `hotEb` 0.5 / `hotTau` 1.3e-13 at y 0.2) gave the best `radPlot1`-like shape (collapse at 0.3 V, creep after). A surface blob at y = 2.0 µm matched `radPlot1`'s 0.5 V onset (§10c).
+- **Onset and depth are coupled** (§10b): more `trapPeak`, `hotTau` or `hotEb` all give an earlier *and* deeper collapse. Delaying onset while keeping depth needed diagonal moves: lower `trapPeak` with higher `hotEb`/`hotTau`, and a shallower `trapLevel` (0.35 eV). `hotEb` is the strongest depth lever. Best static late onset: 3e18 / σ 0.04 / 0.35 eV / `hotEb` 0.85 / `hotTau` 6e-14 → onset ~2.2 V, ~2000x.
+- **Regimes** (§10e): deep levels (0.75 eV) at ≥4e18, or 0.55 eV at 8e18, fill at rest and switch the device off (threshold shift). The hot-electron collapse lives in a band: 4e18/0.35, 4e18/0.55, 8e18/0.35. 2e18 only matters under the gate.
+- **Position** (§10c-f, §10j-k): the gate region (y −0.125…0.125) is always the most damaging (off at rest). Traps nearer the 2DEG are worse. Only trap density within ~15-25 nm of the 2DEG matters: deeper blobs (or the deep part of a cone) do nothing (§10g, §10k).
+- **Insulator traps** (§10j): fully filled (−q·N) Nitride traps turn every near-surface blob off at rest; positive (+q·N) ones cancel the collapse; neutral ones restore it. The passivation fill fraction is the key unknown.
+- **HighK vs SiN** (§10l): identical collapse at Vd ≤ 3 V (the only hot spot is the gate drain edge, under ~5 nm of nitride). HighK does flatten the T-gate-head/field-plate field, but only above ~5 V. `fieldpeak.tcl` (archived) set HighK εr before sourcing the model file, so its "SiN" run was HighK.
+- **Critical strike** (§10i): at 1e7 ions/cm², a 2D critical strike is near-certain, but in 3D a single cascade damages only a few % of the 200 µm gate width.
+
+### 10.5 Known model caveats
+
+- **Mesh** (static §10h, still applies): lateral spacing is 5 nm at the gate, 10-20 nm at the field plate, 25-40 nm from y ≈ 0.725 µm to the drain. Narrow traps there are unresolved (cones in the access region were mesh artifacts); access-region Gaussian results are qualitatively robust but onset can shift ~0.1 V and pre-collapse current halve on a 4 nm mesh. Refine (`line y` at `trapMeanY`) before shape or TRIM work.
+- **Calibration covers saturation only** (Vds = 10 V); the low-Vd linear region where collapses occur is unvalidated, and gm above +0.5 V is not reproduced (§10.1). Off-state drain leakage isn't modelled.
+- **Not modelled:** self-heating (Temp is constant 300 K), dielectric fixed/interface charge by default (`surfCharge` lever exists, unset), dynamic surface or dielectric trapping (insulator traps are static, `insTrapSign`), non-local electron heating (Te is local-field).
+- **Numerics:** a few devices still stall at the runaway even with 7 bisection levels and heavy damping (a discontinuous jump that Vd continuation can't follow); they stop cleanly (`PULSED GAVE UP`) and are reported as incomplete.
 
 ---
 
@@ -648,5 +273,5 @@ Ian: redo the conc/level surfaces with field mobility; Run F (4e18/0.55 eV) only
 `figures.ipynb` runs on the workstation's system `python3` kernel (numpy/pandas/matplotlib/scipy; `jupyter_client` + `ipykernel` installed, `nbformat`/`nbconvert` not). Several older cells point at `/home/staffian/banjo-wombat/...` paths that no longer exist.
 
 - To add results, append a cell and execute only it plus the setup cells (1: imports, 2: `flooxsRead`) through `jupyter_client`, so other cells' outputs are untouched. Keep the JSON as `indent=1` with a trailing newline.
-- `figures/pulsedIV_F.csv` is plotted against `radPlot1` in the last cell.
+- Cells that load static-era outputs (`pulsedIV_F.csv`, `hotStressIV_*`, `mobility_*`, `rfDeviceHFO2_Simulated.csv`) now need the `archive/static_mobility/figures/` prefix; `figures/pulsedIV_F.csv` was plotted against `radPlot1` in the last cell.
 - All plotting happens on the workstation, after `rsync`. Nothing on HPG touches the notebook.
