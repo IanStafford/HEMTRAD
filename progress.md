@@ -996,3 +996,7 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Latest deep collapse: 3.5 V** (was 2.3 V): 0.30 eV / 5e18 / hotTau 1e-14 / hotEb 1.0 at **y = 2.4 µm**. 177 mA/mm at 3.4 V (98.5% of trap-free 179.7) → 0.0018 mA/mm at 3.5 V (~1e5× in one step) → slow creep to 0.0023 by 4.0 V — the same collapse-then-creep shape as the measurement. Latest medium: 3.6 V (0.25 / 6e18 / 1e-14 / 0.85 at y 1.0, 91% step).
 - Best set's onset vs position: 1.5 / 1.7 / 2.1 / 2.3 / 2.8 / (stall 3.7) / 3.5 V at y 0.2 / 0.5 / 0.725 / 1.0 / 1.5 / 2.0 / 2.4 µm.
 - Remaining 6 stalls (4 here + 2 in the position map, all near y 2.0 µm): the ramp step hits its 0.002 floor at full current; a lower `teRampMin` is the next thing to try if they matter.
+
+### Dashboard updated for Oct 2 (wrap-up, 14:51)
+- Oct 2 page and overview refreshed with the Te-ramp rescue results (24/30 stalls resolved, latest deep collapse 3.5 V at y = 2.4 µm); new figure `figures/lateOnset_IdVd.png` (`plot_lateIdVd.py`: trap-free vs the 2.3 V and 3.5 V collapses). Version 3: https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd
+- No jobs running on HPG. Open next: lower `teRampMin` for the 6 remaining stalls (y ≈ 2.0 µm); nitride trap charge with field mobility.
