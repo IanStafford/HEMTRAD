@@ -201,7 +201,7 @@ For qualitative analysis, classify a collapse by its **largest single-step loss*
 - **medium:** 50-95%;
 - **shallow:** < 50%.
 
-The collapse onset is the Vd of that step. Devices below 10% of the trap-free current at Vd = 0.1 V are "off at rest" (a threshold shift, not a collapse). `analyze_onset.py` implements this. Two-step collapses exist (e.g. a big drop, then the largest relative step from an already-low current); the metric reports the largest step.
+The collapse onset is the Vd of the **first** step that reaches the class threshold (>95% deep, ≥50% medium; for shallow, the largest step). Changed 2026-10-02: "Vd of the largest step" misreported two-step collapses (e.g. 99.92% at 1.5 V, then 99.95% from the already-collapsed level at 2.3 V); re-scoring round 1 moved 2 of 72 onsets 0.1 V earlier. Devices below 10% of the trap-free current at Vd = 0.1 V are "off at rest" (a threshold shift, not a collapse). `analyze_onset.py` implements this.
 
 ### 10.1 Transfer-curve calibration vs the HfO2 device (field mobility)
 

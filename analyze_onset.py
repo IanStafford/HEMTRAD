@@ -2,7 +2,8 @@
 
 Collapse classes (Ian, 2026-10-01; CLAUDE.md): the largest single-step loss
 1 - Id(Vd_n)/Id(Vd_n-1) over the sweep is > 95% deep, 50-95% medium, < 50%
-shallow; the collapse onset is the Vd of that step. Devices below 10% of the
+shallow. The collapse onset is the first step that reaches the class threshold
+(> 95% deep, >= 50% medium; shallow: the largest step). Devices below 10% of the
 trap-free current at Vd = 0.1 V are "off at rest" (no collapse to speak of).
 
 usage: python3 analyze_onset.py run_dir tag [rows cols xpar ypar]
@@ -57,10 +58,13 @@ for k, (vd, idd, p) in sorted(dev.items()):
     v, i = vd[m], idd[m]
     at_rest = float(i[0] / iref(v[0]))
     loss = 1.0 - i[1:] / i[:-1]
-    j = int(np.argmax(loss))
-    maxloss = float(loss[j])
-    onset = float(v[j + 1])
+    maxloss = float(loss.max())
     cls = classify(maxloss)
+    # onset = the FIRST step reaching this device's class threshold (a device can
+    # drop twice, e.g. 99.9% at 1.5 V and again from the collapsed level at 2.3 V)
+    thr = 0.95 if cls == "deep" else 0.5 if cls == "medium" else maxloss
+    j = int(np.nonzero(loss >= thr - 1e-12)[0][0])
+    onset = float(v[j + 1])
     ipre = j                               # last point before the drop
     post_min = int(j + 1 + np.argmin(i[j + 1:]))
     if at_rest < 0.1:
