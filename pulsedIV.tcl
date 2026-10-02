@@ -45,6 +45,17 @@ if {![info exists dampValue]} { set dampValue 0.10 } ;# Newton damping on Qfn/Qf
 # solution + trap memory and bisect the Vd step. No effect if nothing fails.
 if {![info exists retryDepth]}   { set retryDepth 5 }   ;# max bisection levels per Vd point (0 = no retry)
 if {![info exists retrySubFill]} { set retrySubFill 1 } ;# 1: full FillStep at bisection substeps; 0: plain device solve there
+# Te ramp fallback (2026-10-02): if a point still fails after bisection, hold Vd
+# at the target and move Te toward its local-field target in adaptive steps
+# (halve on failure, grow on success), capturing after each converged solve,
+# until max|TeTarget-Te|/Te < teRampTol. Same operations as FillStep, smaller
+# Te steps: a continuation in Te through the runaway, where one w = 0.5 jump is
+# too big for Newton. Only runs where the sweep would otherwise give up.
+if {![info exists teRamp]}    { set teRamp    1 }      ;# 0 = off (old behaviour: give up)
+if {![info exists teRampW0]}  { set teRampW0  0.1 }    ;# first Te relaxation fraction
+if {![info exists teRampMin]} { set teRampMin 0.002 }  ;# give up below this fraction
+if {![info exists teRampTol]} { set teRampTol 0.01 }   ;# stop when Te is within 1% of target
+if {![info exists teRampMax]} { set teRampMax 300 }    ;# max ramp sub-steps per point
 #==============================================
 
 source GaN_modelfile_masterD
@@ -107,19 +118,59 @@ proc Reach {dPrev d depth fill} {
     return [Reach $mid $d [expr {$depth - 1}] $fill]
 }
 
+# Te continuation at fixed Vd = d, starting from the converged point dPrev.
+proc TeRampPoint {dPrev d} {
+    global teRampW0 teRampMin teRampTol teRampMax
+    RestoreState $dPrev
+    SaveState
+    if {[catch { contact name=D supply=$d; device }]} {
+        RestoreState $dPrev
+        return 0
+    }
+    set w $teRampW0
+    for {set k 1} {$k <= $teRampMax} {incr k} {
+        SaveState
+        if {[catch {
+            set ::te [UpdateTe $w]
+            device
+            CaptureTraps
+        }]} {
+            device restore
+            sel z=TFsave name=TrapFrozen
+            sel z=TEsave name=TeTrap
+            set w [expr {$w / 2.0}]
+            puts "TERAMP Vd=$d step $k failed, w -> $w"
+            if {$w < $teRampMin} { return 0 }
+            continue
+        }
+        sel z=[HotTeExpr] name=TeTarget
+        sel z=abs(TeTarget-TeTrap)/TeTrap
+        set r [lindex [peak GaN] 1]
+        puts "TERAMP Vd=$d step $k w=$w Id=[expr {abs([contact name=D sol=Qfn flux])*1.0e6}] peakTe=$::te mismatch=$r"
+        if {$r < $teRampTol} { return 1 }
+        set w [expr {min(0.5, $w * 1.5)}]
+    }
+    return 1
+}
+
 set nRetry 0
+set nRamp 0
 set dPrev 0.0
 set n [expr {int(round($Vd_max / $Vd_step))}]
 for {set i 0} {$i <= $n} {incr i} {
     set d [expr {$i * $Vd_step}]
     if {![Reach $dPrev $d $retryDepth 1]} {
-        puts "PULSED GAVE UP at Vd=$d after $retryDepth bisection levels"
-        break
+        if {!$teRamp || ![TeRampPoint $dPrev $d]} {
+            puts "PULSED GAVE UP at Vd=$d after $retryDepth bisection levels"
+            break
+        }
+        incr nRamp
+        puts "PULSED TERAMP rescued Vd=$d"
     }
     set dPrev $d
     set cur [expr {abs([contact name=D sol=Qfn flux])*1.0e6}]
     #FLOOXS GIVES A/um
-    puts "PULSED Vd=$d Id=$cur peakTe=$te retries=$nRetry"
+    puts "PULSED Vd=$d Id=$cur peakTe=$te retries=$nRetry ramps=$nRamp"
     set f [open $ivCSV a]
     puts $f "$d, $cur, $te"
     close $f
