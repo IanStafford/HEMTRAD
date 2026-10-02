@@ -984,3 +984,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 ### Work-log dashboard (Ian's request), 2026-10-02
 - Published a private page with the work so far, one page per day (Sep 22-23 … Oct 2), each with what was done, what needed work (status pills: fixed / open / in progress / noted), and example figures; overview page with status tiles, open items and a timeline: https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd (snapshot as of ~13:45, stall rescue 15/30 at that time).
 - Dashboard source moved into the repo (`dashboard/`, republished to the same URL as version 2); CLAUDE.md §12 now has the "wrap up for the day" update procedure.
+
+### Te-ramp rescue: position map done (job 44452289)
+- 11/11 finished, 0 crashes/cores: **9 rescued**, 2 gave up again (y 2.0 µm at 11.25/15 nm depth, stalls at 2.9/2.8 V; the ramp step fell below its 0.002 floor at full current).
+- Position map now: deep 33, medium 10, shallow 15, off 5, stalled 2. **Surface traps collapse from 1.6 V (y 0.285 µm) to 3.0 V (y 1.75 µm), all deep**; 50/65 positions cut >10× by 3 V (was 41). Figures (`posMapLate_grid.png`, `posMapLate_onset.png`) and GIF regenerated.
+- Round-3 rescue (job 44452288): 15/19 done so far (15 rescued, 3 gave up), 4 still running.
