@@ -940,3 +940,7 @@ Submitted **job 44363616** → `results/20261002_onsetField2/`. Polling every 5 
 - Onset table by set × y in `figures/onsetField3_metrics.csv`; figure `figures/onsetField3.png`.
 - **Round 4** (`pulsedIV_onsetField4.slurm`, 61 tasks): refine around the 2.3 V device — 0.30 eV / hotEb 1.0, trapPeak {4.5,5,5.5}e18 × hotTau {0.8,1,1.2}e-14 × y {0.85,1.0,1.15,1.3,1.5,1.7}; plus 0.25 eV / 1.5e-14 / 1.0 at {5.5,6,6.5}e18 × y {1.3,1.7}.
 - Submitted **job 44440027** → `results/20261002_onsetField4/`. Polling every 5 min.
+
+## 2026-10-02 - position map for per-Vd 3D surfaces (Ian's request)
+
+Ian: a series of ~10 static 3D surface plots at different Vd for one trap level/concentration, showing how trap position sets the collapse onset (maybe a GIF later). Chosen set: round-3 best (0.30 eV / 5e18 / hotTau 1e-14 / hotEb 1.0, σ 0.04), whose onset varies 1.5-2.3 V with position. `pulsedIV_posMapLate.slurm` / `params_posMapLate.txt`: trapMeanX {0, 3.75, 7.5, 11.25, 15} nm × trapMeanY {−0.4, −0.125, 0, 0.125, 0.285, 0.5, 0.725, 1.0, 1.25, 1.5, 1.75, 2.0, 2.4} µm + trap-free ref = 66 tasks, Vd 0-3 V. Runs alongside round 4 (job 44440027).
