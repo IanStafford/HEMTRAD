@@ -37,7 +37,7 @@ def classify(loss):
 
 
 ref, dev = None, {}
-for run in (RUN, RUN + "Retry"):
+for run in [RUN] + sorted(glob.glob(RUN + "Retry*")):
     for t in glob.glob(f"{run}/task_*"):
         p = json.load(open(os.path.join(t, "params.json")))
         c = glob.glob(os.path.join(t, "pulsedIV_*.csv"))

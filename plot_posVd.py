@@ -31,7 +31,7 @@ GATE, FP = (-0.125, 0.125), (0.285, 0.725)
 STALL = "#eb6834"
 
 ref, dev, setdesc, VMAX = None, {}, "", 0.0
-for t in glob.glob(f"{RUN}/task_*") + glob.glob(f"{RUN}Retry/task_*"):
+for t in glob.glob(f"{RUN}/task_*") + glob.glob(f"{RUN}Retry*/task_*"):
     p = json.load(open(os.path.join(t, "params.json")))
     c = glob.glob(os.path.join(t, "pulsedIV_*.csv"))
     if not c or os.path.getsize(c[0]) == 0:
