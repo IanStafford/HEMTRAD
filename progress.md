@@ -900,3 +900,4 @@ Target: `figures/rfDeviceHFO2_Experimental.csv` = raw `figures/RF_100nmHfOx_IdVg
 ## 2026-10-01 - Run F trap map with field mobility (Ian: replicate the conc/level surface plots, Run F set only)
 
 `pulsedIV_trapMapF_field.slurm` / `params_trapMapF_field.txt`: the 10f 4e18/0.55 grid (5 depths × 10 positions) + trap-free reference, `mobModel field` set per run (deck default stays static), 51 tasks on `ee1-b`. `analyze_trapMapSets.py` now takes `[run_dir [tag]]` (default output byte-identical). Local check (x=0, y=0.5): runs cleanly, ~20 s/point; collapse at **0.2 V vs 0.3 V** with static mobility, ~10× deeper (0.0011 vs 0.010 mA/mm at 0.3 V).
+Submitted **job 44342967** → `results/20261001_trapMapF_field/`. Polling every 5 min.
