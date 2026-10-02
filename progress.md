@@ -905,3 +905,4 @@ Submitted **job 44342967** → `results/20261001_trapMapF_field/`. Polling every
 ## 2026-10-01 - Run F map with field mobility (job 44342967)
 
 48/51 done (1 gave up cleanly after its collapse; 2 source-side tasks still bisecting post-collapse, onset/depth already known). vs static (10f): collapse **earlier** (0.2 V almost everywhere vs 0.2-0.5 V), **~1 decade deeper** (10^4.9-10^7.1 vs 10^4.1-10^5.8 vs own trap-free), lateral onset trend nearly gone; 19 vs 15 off at rest (4 borderline at the FP edge). Trap-free baseline 75% higher at low Vd (part of the difference); the low-Vd region isn't covered by the calibration. CLAUDE.md 10n; `figures/trapMapF_field_tp4e+18_tl0.55.png`, `figures/mobCompare_F_{3d,compare}.png`.
+Job 44342967 finished: the 2 remaining tasks also gave up cleanly after their collapse (2.6 / 1.4 V). 0 crashes; regimes unchanged; figures regenerated. Nothing running on HPG.

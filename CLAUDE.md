@@ -615,7 +615,7 @@ More channel charge removes the access bottleneck but raises intrinsic gm, and t
 
 ### 10n. Run F trap map with the calibrated field mobility
 
-Ian: redo the conc/level surfaces with field mobility; Run F (4e18/0.55 eV) only. Job 44342967 (51 tasks, `ee1-b`, `pulsedIV_trapMapF_field.slurm`), `results/20261001_trapMapF_field/`: the 10f grid (5 depths × 10 positions, Vd 0-3 V, Run F hot-electron levers) with `mobModel field` set per run (deck default still static). No crashes; 1 gave up cleanly (x 11.25 nm, y −0.4, after its collapse); 2 (y −0.4, x 3.75/7.5 nm) still bisecting post-collapse at write-up. Figures: `figures/trapMapF_field_tp4e+18_tl0.55.png` (same 3D pair as 10f, via `analyze_trapMapSets.py <run> <tag>`), `figures/mobCompare_F_{3d,compare}.png` (`analyze_mobCompare.py`, each model vs its own trap-free device).
+Ian: redo the conc/level surfaces with field mobility; Run F (4e18/0.55 eV) only. Job 44342967 (51 tasks, `ee1-b`, `pulsedIV_trapMapF_field.slurm`), `results/20261001_trapMapF_field/`: the 10f grid (5 depths × 10 positions, Vd 0-3 V, Run F hot-electron levers) with `mobModel field` set per run (deck default still static). No crashes; 3 source-side tasks (y −0.4, x 3.75/7.5/11.25 nm) gave up cleanly after their collapse (at Vd 2.6/1.4/1.1 V), so their onset and depth are known but no 3 V value. Figures: `figures/trapMapF_field_tp4e+18_tl0.55.png` (same 3D pair as 10f, via `analyze_trapMapSets.py <run> <tag>`), `figures/mobCompare_F_{3d,compare}.png` (`analyze_mobCompare.py`, each model vs its own trap-free device).
 
 | | static (10f) | field (calibrated) |
 |---|---|---|
