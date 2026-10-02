@@ -901,3 +901,7 @@ Target: `figures/rfDeviceHFO2_Experimental.csv` = raw `figures/RF_100nmHfOx_IdVg
 
 `pulsedIV_trapMapF_field.slurm` / `params_trapMapF_field.txt`: the 10f 4e18/0.55 grid (5 depths × 10 positions) + trap-free reference, `mobModel field` set per run (deck default stays static), 51 tasks on `ee1-b`. `analyze_trapMapSets.py` now takes `[run_dir [tag]]` (default output byte-identical). Local check (x=0, y=0.5): runs cleanly, ~20 s/point; collapse at **0.2 V vs 0.3 V** with static mobility, ~10× deeper (0.0011 vs 0.010 mA/mm at 0.3 V).
 Submitted **job 44342967** → `results/20261001_trapMapF_field/`. Polling every 5 min.
+
+## 2026-10-01 - Run F map with field mobility (job 44342967)
+
+48/51 done (1 gave up cleanly after its collapse; 2 source-side tasks still bisecting post-collapse, onset/depth already known). vs static (10f): collapse **earlier** (0.2 V almost everywhere vs 0.2-0.5 V), **~1 decade deeper** (10^4.9-10^7.1 vs 10^4.1-10^5.8 vs own trap-free), lateral onset trend nearly gone; 19 vs 15 off at rest (4 borderline at the FP edge). Trap-free baseline 75% higher at low Vd (part of the difference); the low-Vd region isn't covered by the calibration. CLAUDE.md 10n; `figures/trapMapF_field_tp4e+18_tl0.55.png`, `figures/mobCompare_F_{3d,compare}.png`.

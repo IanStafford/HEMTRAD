@@ -612,6 +612,24 @@ Known miss: **gm above +0.5 V collapses** (88 vs 160 mS/mm at +1 V), while Id th
 
 More channel charge removes the access bottleneck but raises intrinsic gm, and the series resistance needed to trim it softens the turn-on. Kept the unmodified deck because it is best in the required range and at Vg = −2 V, where all trap studies run. A run at the fitted phiB confirmed the rigid-shift approximation (field plate effect < 0.1%). New levers (defaults = old behaviour): `polCharge`, `phiB`, `surfCharge`.
 
+
+### 10n. Run F trap map with the calibrated field mobility
+
+Ian: redo the conc/level surfaces with field mobility; Run F (4e18/0.55 eV) only. Job 44342967 (51 tasks, `ee1-b`, `pulsedIV_trapMapF_field.slurm`), `results/20261001_trapMapF_field/`: the 10f grid (5 depths × 10 positions, Vd 0-3 V, Run F hot-electron levers) with `mobModel field` set per run (deck default still static). No crashes; 1 gave up cleanly (x 11.25 nm, y −0.4, after its collapse); 2 (y −0.4, x 3.75/7.5 nm) still bisecting post-collapse at write-up. Figures: `figures/trapMapF_field_tp4e+18_tl0.55.png` (same 3D pair as 10f, via `analyze_trapMapSets.py <run> <tag>`), `figures/mobCompare_F_{3d,compare}.png` (`analyze_mobCompare.py`, each model vs its own trap-free device).
+
+| | static (10f) | field (calibrated) |
+|---|---|---|
+| trap-free Id at 0.1 / 1 / 3 V | 10.0 / 90.1 / 146.9 | 17.6 / 136.9 / 177.2 mA/mm |
+| regimes (of 50) | collapse 35, off at rest 15 | collapse 31, off at rest 19 |
+| collapse onset | 0.2-0.5 V, later away from the gate | 0.2 V almost everywhere (0.2-0.3 at 2.4 µm) |
+| collapse depth vs trap-free | 10^4.1-10^5.8 | 10^4.9-10^7.1 (~1 decade deeper) |
+| at-rest Id / trap-free | 0.71-0.87 | 0.04-0.63 |
+
+- **Field mobility gives an earlier, deeper and more uniform collapse.** The lateral onset trend of 10f (later with distance from the gate) nearly disappears.
+- The 4 extra "off at rest" devices are 11-15 nm deep at the field-plate edge (y 0.285-0.5 µm), at 0.04-0.05 of trap-free, just under the 0.1 cut, so borderline rather than a new regime. The gate region (−0.125…0.125) is off at rest in both.
+- Suppression at 3 V is ~1 decade larger with field mobility in the access region and near the source; similar under the gate; slightly smaller at y=0.5 µm.
+- **Caveat:** part of the larger ratios is the higher trap-free baseline (low-field mobility ~1160 vs 600 cm²/V·s gives 75% more current at low Vd). The calibration (10m) only checked saturation at Vds = 10 V; the low-Vd linear region where these collapses happen is not validated (needs measured Id-Vd).
+
 ---
 
 ## 11. Notebook and plotting
