@@ -920,3 +920,7 @@ Round 1: 73/73 clean. Latest deep collapse **1.0 V** (0.35 eV / 4e18 / hotTau 3e
 Round 2 `pulsedIV_onsetField2.slurm`: trapLevel {0.30,0.35,0.40} × trapPeak {4,5,6}e18 × hotTau {1,1.5,2,3}e-14 × hotEb {0.85,1.0} + ref = 73 tasks on `ee1-b`.
 Submitted **job 44363616** → `results/20261002_onsetField2/`. Polling every 5 min.
 **Round 2 cancelled** (Ian, 2026-10-02): job 44363616 scancelled shortly after starting; to be resumed later with the same `pulsedIV_onsetField2.slurm` / `params_onsetField2.txt` (resubmit as-is; partial results in `results/20261002_onsetField2/` on HPG can be ignored).
+
+## 2026-10-02 - session resumed (Ian driving ~1.5 h, continuing without prompts)
+
+- Round 2 of the late-onset search **resubmitted unchanged** as **job 44433016** (`pulsedIV_onsetField2.slurm`, 73 tasks, `ee1-b`). The cancelled run's partial output on HPG was moved to `results/20261002_onsetField2_cancelled/`. Polling every 5 min.
