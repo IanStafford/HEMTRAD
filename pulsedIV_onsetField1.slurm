@@ -7,7 +7,7 @@
 # retry driver, mobModel field (deck default).
 #
 # One line per task in params_onsetField1.txt:
-#   trapPeak|trapLevel|trapMeanX|trapMeanY
+#   trapPeak|trapLevel|hotTau|hotEb
 #
 #SBATCH --job-name=pulsedIV_onsetField1
 #SBATCH --account=ee1
