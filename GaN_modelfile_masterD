@@ -12,7 +12,7 @@ set hbar 1.054571628e-34
 set egan 7.88e-13
 
 # electron mobility model: static (constant) or field (doping/temperature/field dependent)
-if {![info exists mobModel]} { set mobModel static }
+if {![info exists mobModel]} { set mobModel field }  ;# calibrated vs the HfO2 device (CLAUDE.md 10m); static = old constant 600
 
 source GaN.tcl
 source AlGaN.tcl

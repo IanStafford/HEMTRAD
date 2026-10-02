@@ -155,6 +155,7 @@ In `GaN_modelfile_masterD`, each has an `info exists` default, so a driver or ar
 
 | Lever | Default | Meaning |
 |---|---|---|
+| `mobModel` | field | electron mobility: `field` (Farahmand low field + Heller high field; calibrated, §10m) or `static` (constant 600, used for everything archived in §10-§10l). Default changed to field on 2026-10-01 |
 | `trapEn` | 0 | enable traps |
 | `trapPeak` | 4e18 | peak density (cm⁻³) of the 2D Gaussian |
 | `trapMeanX`, `trapMeanY` | 0.0, 0.20 | center in µm (x = depth; 0 = AlGaN top, 0.015 = 2DEG; y: gate drain edge = 0.125) |
