@@ -250,7 +250,7 @@ Ian (2026-10-01): push the collapse out further using the static-era methods (§
 
 **Round 1 result** (73/73 clean, 0 retries; `figures/onsetField1.png`): deep 15, medium 12, shallow 44 (mostly no real collapse), off 1. Latest **deep** collapse **1.0 V** (0.35 eV / 4e18 / `hotTau` 3e-14 / `hotEb` 0.85, 97.6% step loss from 85.6 mA/mm); latest medium also 1.0 V (0.35 / 4e18 / 6e-14 / 0.5). Trends: ≥4e18 is needed for deep/medium (2e18 barely collapses); the shallower level collapses later; lower `hotTau` delays onset (0.5 → 0.7 → 1.0 V for 1.3e-13 → 6e-14 → 3e-14 at 0.35/4e18/0.85) until it turns shallow at 1e-14; `hotEb` 0.85 vs 0.5 deepens without much onset change. Much harder to delay than with static mobility (static reached ~2.2 V).
 
-Round 2: job 44363616, `pulsedIV_onsetField2.slurm`, `results/20261002_onsetField2/`: `trapLevel` {0.30, 0.35, 0.40} × `trapPeak` {4, 5, 6}e18 × `hotTau` {1, 1.5, 2, 3}e-14 × `hotEb` {0.85, 1.0} (more charge and a stronger barrier to keep depth at lower `hotTau`), + reference.
+Round 2 (**cancelled 2026-10-02 at Ian's request, to resume later**; was job 44363616), `pulsedIV_onsetField2.slurm`, `results/20261002_onsetField2/`: `trapLevel` {0.30, 0.35, 0.40} × `trapPeak` {4, 5, 6}e18 × `hotTau` {1, 1.5, 2, 3}e-14 × `hotEb` {0.85, 1.0} (more charge and a stronger barrier to keep depth at lower `hotTau`), + reference.
 
 ### 10.4 Lessons from the static-mobility era (details in `archive/static_mobility/RESULTS.md`)
 
