@@ -19,8 +19,8 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-RUNS = ["results/20260927_trapMapSets", "results/20260927_trapMapSetsRetry",
-        "results/20260928_critBand"]
+RUNS = ["results/archive_static_mobility/20260927_trapMapSets", "results/archive_static_mobility/20260927_trapMapSetsRetry",
+        "results/archive_static_mobility/20260928_critBand"]
 FLUENCE = 1e7 * 1e-8          # ions/cm^2 -> ions/um^2
 CRIT = 0.1                    # Id / Id_no-trap at or below this is critical
 Y_LO, Y_HI = -0.425, 2.585    # contact-safe: >=0.7 um from contact doping edges

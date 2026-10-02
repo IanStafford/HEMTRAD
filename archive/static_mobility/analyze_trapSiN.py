@@ -28,9 +28,9 @@ from matplotlib.colors import LinearSegmentedColormap
 #   Run F:   4e18 0.55 results/20261001_trapSiN_F trapSiN_F
 TP = float(sys.argv[1]) if len(sys.argv) > 1 else 2e18
 TL = float(sys.argv[2]) if len(sys.argv) > 2 else 0.75
-SIN_RUN = sys.argv[3] if len(sys.argv) > 3 else "results/20261001_trapSiN"
+SIN_RUN = sys.argv[3] if len(sys.argv) > 3 else "results/archive_static_mobility/20261001_trapSiN"
 TAG = sys.argv[4] if len(sys.argv) > 4 else "trapSiN"
-RUNS = {"HighK": ["results/20260927_trapMapSets", "results/20260927_trapMapSetsRetry"],
+RUNS = {"HighK": ["results/archive_static_mobility/20260927_trapMapSets", "results/archive_static_mobility/20260927_trapMapSetsRetry"],
         "SiN": [SIN_RUN, SIN_RUN + "Retry"]}
 VD_END = 3.0
 SEQ = LinearSegmentedColormap.from_list(

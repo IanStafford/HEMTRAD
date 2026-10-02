@@ -21,7 +21,7 @@ TP = float(sys.argv[1]) if len(sys.argv) > 1 else 4e18
 TL = float(sys.argv[2]) if len(sys.argv) > 2 else 0.55
 FIELD_RUN = sys.argv[3] if len(sys.argv) > 3 else "results/20261001_trapMapF_field"
 TAG = sys.argv[4] if len(sys.argv) > 4 else "mobCompare_F"
-RUNS = {"static": ["results/20260927_trapMapSets", "results/20260927_trapMapSetsRetry"],
+RUNS = {"static": ["results/archive_static_mobility/20260927_trapMapSets", "results/archive_static_mobility/20260927_trapMapSetsRetry"],
         "field": [FIELD_RUN, FIELD_RUN + "Retry"]}
 VD_END = 3.0
 SEQ = LinearSegmentedColormap.from_list(

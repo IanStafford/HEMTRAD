@@ -26,7 +26,7 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm
 from matplotlib.patches import Rectangle
 
-RUN = "results/20261001_trapXYMap"
+RUN = "results/archive_static_mobility/20261001_trapXYMap"
 VD_END = 3.0
 INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"
 SEQ = LinearSegmentedColormap.from_list(

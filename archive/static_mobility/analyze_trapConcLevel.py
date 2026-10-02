@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
-RUN = "results/20260926_trapConcLevel"
+RUN = "results/archive_static_mobility/20260926_trapConcLevel"
 VD_END = 3.0
 INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"
 LEVEL_COLORS = {0.35: "#2a78d6", 0.55: "#eb6834", 0.75: "#1baf7a"}

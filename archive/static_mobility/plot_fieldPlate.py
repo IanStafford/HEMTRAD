@@ -11,7 +11,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-RUN = sys.argv[1] if len(sys.argv) > 1 else "results/20261001_fieldPlate"
+RUN = sys.argv[1] if len(sys.argv) > 1 else "results/archive_static_mobility/20261001_fieldPlate"
 TAGS = {"highk": "HighK (εr 35)", "sin": "SiN (εr 6.3)"}
 VDS = ("3", "10", "20")
 INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"

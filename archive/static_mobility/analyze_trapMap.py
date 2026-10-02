@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
-RUN = "results/20260926_trapMap"
+RUN = "results/archive_static_mobility/20260926_trapMap"
 CSV_OUT = "figures/trapMap_ratios.csv"
 PNG_OUT = "figures/trapMap_3d.png"
 

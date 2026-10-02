@@ -11,7 +11,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-RUN = "results/20260925_trapPlacement"
+RUN = "results/archive_static_mobility/20260925_trapPlacement"
 OUT = sys.argv[1] if len(sys.argv) > 1 else "figures/trapPlacement.png"
 
 # Reference categorical palette, slots 1-5 in fixed order (dataviz skill).

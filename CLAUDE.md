@@ -74,7 +74,7 @@ $FLXSHOME/release/flooxs script.tcl
 ### Sweep workflow (the standard pattern)
 1. Commit the driver and the SLURM template on the workstation, then `git push`.
 2. On HPG: `git pull --ff-only`.
-3. Write `params.txt`: one line per array task, parameter bundle **pipe-delimited**. Task `$SLURM_ARRAY_TASK_ID` reads line N+1 (the `trapPlot.slurm` pattern).
+3. Write `params.txt`: one line per array task, parameter bundle **pipe-delimited**. Task `$SLURM_ARRAY_TASK_ID` reads line N+1. Template: `pulsedIV_trapMapF_field.slurm` (older ones are in `archive/static_mobility/`).
 4. Each task copies the driver into its own directory `results/<YYYYMMDD>_<tag>/task_<id>/` and prepends `set <lever> <value>` lines (every lever has an `info exists` default). It then strips the GUI lines (§4) and runs there. **Never edit the repo copy in place.**
 5. Write per-task CSVs (`pulsedIV_<tag>.csv`), never the shared `figures/pulsedIV.csv`. Also write the full parameter set into a `params.json` next to each CSV.
 6. Format float parameters explicitly in names (`printf '%.2e'`), so you don't get `1.3000000000000001e-13` filenames.
@@ -184,6 +184,8 @@ In `GaN_modelfile_masterD`, each has an `info exists` default, so a driver or ar
 ---
 
 ## 10. Tuning results
+
+> **Archived (2026-10-01):** §10 through §10l were run with the old `mobModel static` (constant mobility 600). Their scripts, sweep files and figures are in `archive/static_mobility/` (see its README; file names in these sections refer to that folder), raw results in `results/archive_static_mobility/`, and the full pre-archive tree is branch `static-mobility`. Current work uses the calibrated field mobility (§10m onward).
 
 All `pulsedIV.tcl` runs, Vg=-2, Vd 0-1.6 in 0.1 V steps, `trapMeanY`=0.20. Target: `radPlot1` (9.75, 19.0, 27.2, 32.0 at 0.1-0.4 V, then 0.011 at 0.5 V).
 
@@ -590,6 +592,14 @@ Ian's question: what does the HighK dielectric do to the collapse? `rfdevice_SiN
 - Robustness: "dielectric doesn't matter at ≤3 V" is robust (insensitive to εr over 6.3-35; set by basic electrostatics). The high-Vd numbers are qualitative only (static mobility, no self-heating, corner mesh, Neumann top boundary), and the model has no dielectric fixed/interface charge or dynamic surface trapping, the usual way passivation affects real collapse.
 - Old `fieldpeak.tcl` set HighK εr 6.3 before sourcing the model file, which resets it to 35, so its "SiN" run was HighK.
 
+
+### Collapse classification (Ian, 2026-10-01)
+
+For qualitative analysis, classify a collapse by its **largest single-step loss**, 1 − Id(Vd_n)/Id(Vd_n−1), over the sweep:
+- **deep:** > 95% of the previous-step current lost in one step;
+- **medium:** 50-95%;
+- **shallow:** < 50%.
+The collapse onset is the Vd of that step.
 
 ### 10m. Transfer-curve calibration vs the HfO2 device (field mobility)
 

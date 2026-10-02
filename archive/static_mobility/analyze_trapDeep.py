@@ -21,7 +21,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-RUN = "results/20261001_trapDeep"
+RUN = "results/archive_static_mobility/20261001_trapDeep"
 VD_END = 3.0
 X2DEG, SX = 0.015, 0.01
 FLOOR = 8.0

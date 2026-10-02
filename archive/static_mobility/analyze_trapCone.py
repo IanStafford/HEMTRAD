@@ -26,9 +26,9 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 from scipy.special import erf
 
-args = sys.argv[1:] or ["results/20260927_trapCone", "2e18", "0.75", "trapCone"]
+args = sys.argv[1:] or ["results/archive_static_mobility/20260927_trapCone", "2e18", "0.75", "trapCone"]
 CONE, PEAK, LEVEL, TAG = args[0], float(args[1]), float(args[2]), args[3]
-GAUSS = "results/20260927_trapMapSets"
+GAUSS = "results/archive_static_mobility/20260927_trapMapSets"
 VD_END = 3.0
 INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"
 CAT = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]
