@@ -1,0 +1,491 @@
+<title>HEMT Collapse Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+/* Layout: lab notebook. Sticky date rail on the left (chip strip on phones), one day per page,
+   "done" and "needs work" side by side, then that day's figures. Figures stay on light paper in both themes. */
+:root {
+  --bg: #f3f5f7;
+  --surface: #ffffff;
+  --ink: #18212b;
+  --muted: #5b6876;
+  --line: #d9dfe5;
+  --accent: #1f5fae;
+  --accent-soft: #e3edf9;
+  --paper: #ffffff;
+  --ok: #1d7a4f;       --ok-soft: #e1f2e9;
+  --warn: #9a5b00;     --warn-soft: #fbefd9;
+  --open: #b23a2b;     --open-soft: #fbe5e1;
+  --gray-soft: #eceff2;
+  --f-display: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161c; --surface: #19212a; --ink: #e6ebf0; --muted: #9aa7b4; --line: #2a3541;
+    --accent: #7fb0ec; --accent-soft: #1d2c3e; --paper: #f4f6f8;
+    --ok: #6fcf9f; --ok-soft: #173326; --warn: #e6b45c; --warn-soft: #3a2c12;
+    --open: #f08c7c; --open-soft: #3d1f1a; --gray-soft: #232d38;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161c; --surface: #19212a; --ink: #e6ebf0; --muted: #9aa7b4; --line: #2a3541;
+  --accent: #7fb0ec; --accent-soft: #1d2c3e; --paper: #f4f6f8;
+  --ok: #6fcf9f; --ok-soft: #173326; --warn: #e6b45c; --warn-soft: #3a2c12;
+  --open: #f08c7c; --open-soft: #3d1f1a; --gray-soft: #232d38;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.55; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 56px; }
+header.top { display: grid; gap: 6px; padding-bottom: 20px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--f-display); font-weight: 600; font-size: clamp(26px, 4vw, 34px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 70ch; margin: 0; }
+.layout { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 32px; align-items: start; }
+nav.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 2px; }
+nav.rail a { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: baseline; padding: 7px 10px; border-radius: 6px; text-decoration: none; color: var(--ink); }
+nav.rail a .d { font-family: var(--f-mono); font-size: 13px; }
+nav.rail a .t { font-size: 12px; color: var(--muted); text-align: right; }
+nav.rail a:hover { background: var(--gray-soft); }
+nav.rail a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+nav.rail a[aria-current="page"] .t { color: var(--accent); }
+nav.rail .sep { height: 1px; background: var(--line); margin: 6px 4px; }
+.era { font-family: var(--f-mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); padding: 10px 10px 2px; }
+main { min-width: 0; }
+section.page { display: grid; gap: 22px; }
+.js section.page { display: none; }
+.js section.page.on { display: grid; }
+.no-js-sep { border-top: 1px dashed var(--line); margin-block: 30px; }
+.js .no-js-sep { display: none; }
+.pagehead { display: grid; gap: 6px; }
+.pagehead h2 { font-family: var(--f-display); font-weight: 600; font-size: 24px; line-height: 1.2; margin: 0; text-wrap: balance; }
+.pagehead p { margin: 0; color: var(--muted); max-width: 72ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--gray-soft); color: var(--muted); }
+.chip.era-static { background: var(--warn-soft); color: var(--warn); }
+.chip.era-field { background: var(--accent-soft); color: var(--accent); }
+.cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; min-width: 0; }
+.panel h3 { margin: 0 0 10px; font-size: 13px; font-family: var(--f-mono); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+ul.done, ul.todo { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+ul.done li { padding-left: 16px; position: relative; }
+ul.done li::before { content: ""; position: absolute; left: 0; top: .62em; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
+ul.todo li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; }
+.pill { font-family: var(--f-mono); font-size: 11px; letter-spacing: .03em; padding: 2px 7px; border-radius: 4px; white-space: nowrap; margin-top: 2px; }
+.pill.resolved { background: var(--ok-soft); color: var(--ok); }
+.pill.open { background: var(--open-soft); color: var(--open); }
+.pill.progress { background: var(--warn-soft); color: var(--warn); }
+.pill.noted { background: var(--gray-soft); color: var(--muted); }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: .93em; }
+.figs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
+figure a.img { display: block; background: var(--paper); padding: 8px; }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; font-size: 13.5px; color: var(--muted); }
+figcaption b { color: var(--ink); font-weight: 600; display: block; margin-bottom: 2px; }
+.figs.wide { grid-template-columns: minmax(0, 1fr); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 14px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.tile .k { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.tile .v { font-family: var(--f-display); font-size: 26px; font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.tile .s { font-size: 13px; color: var(--muted); }
+.tile.warn { border-left: 3px solid var(--warn); }
+.tile.ok { border-left: 3px solid var(--ok); }
+table.tl { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.tl td { padding: 9px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+table.tl td:first-child { font-family: var(--f-mono); white-space: nowrap; width: 1%; }
+table.tl td:last-child { text-align: right; white-space: nowrap; }
+.scroll-x { overflow-x: auto; }
+.daylink { font-family: var(--f-mono); font-size: 12px; white-space: nowrap; }
+.pager { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 6px; }
+.pager a { font-family: var(--f-mono); font-size: 13px; text-decoration: none; }
+code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft); padding: 1px 4px; border-radius: 3px; }
+@media (max-width: 860px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  nav.rail { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--bg); display: flex; overflow-x: auto; gap: 6px; padding-block: 8px; margin-inline: -20px; padding-inline: 20px; border-bottom: 1px solid var(--line); }
+  nav.rail a { grid-template-columns: auto; padding: 5px 10px; border: 1px solid var(--line); white-space: nowrap; }
+  nav.rail a .t, nav.rail .sep, nav.rail .era { display: none; }
+  .cols { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: no-preference) { section.page.on { animation: fade .18s ease-out; } }
+@keyframes fade { from { opacity: .4; } to { opacity: 1; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">FLOOXS TCAD · AlGaN/GaN HEMT · HiPerGator sweeps · snapshot 2026-10-02, 13:45</div>
+    <h1>Radiation-induced current collapse: work log</h1>
+    <p class="lede">What was run each day, with example figures, and what still needed work. Currents are in mA/mm, measured at Vg = −2 V unless noted. Work before Oct 1 used the old constant mobility and is archived; current work uses the calibrated field-dependent mobility.</p>
+  </header>
+
+  <div class="layout">
+    <nav class="rail" aria-label="Days">
+      <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
+      <div class="sep"></div>
+      <div class="era">Field mobility</div>
+      <a href="#oct02" data-page="oct02"><span class="d">Oct 2</span><span class="t">late onset · stalls</span></a>
+      <a href="#oct01" data-page="oct01"><span class="d">Oct 1</span><span class="t">calibration</span></a>
+      <div class="era">Static mobility (archived)</div>
+      <a href="#sep30" data-page="sep30"><span class="d">Sep 30</span><span class="t">deck</span></a>
+      <a href="#sep28" data-page="sep28"><span class="d">Sep 28</span><span class="t">critical strike</span></a>
+      <a href="#sep27" data-page="sep27"><span class="d">Sep 27</span><span class="t">crash fix · maps</span></a>
+      <a href="#sep26" data-page="sep26"><span class="d">Sep 26</span><span class="t">trap maps</span></a>
+      <a href="#sep25" data-page="sep25"><span class="d">Sep 25</span><span class="t">2.2 V onset</span></a>
+      <a href="#sep24" data-page="sep24"><span class="d">Sep 24</span><span class="t">first search</span></a>
+      <a href="#sep22" data-page="sep22"><span class="d">Sep 22–23</span><span class="t">setup</span></a>
+    </nav>
+
+    <main>
+      <!-- OVERVIEW -->
+      <section class="page" id="overview" data-title="Overview">
+        <div class="pagehead">
+          <h2>Where things stand</h2>
+          <p>Ten working days. The model is now calibrated against a measured HfO₂ device, and the late-onset search with that model has pushed the deep collapse from 0.2 V (Run F) to at least 2.3 V. Many of the latest collapses were stuck at a solver stall; a fix is running now.</p>
+        </div>
+        <div class="tiles">
+          <div class="tile ok"><span class="k">Calibration</span><span class="v">±2.4%</span><span class="s">Field-mobility model vs measured HfO₂ transfer curve, Vg −2.6 to +1 V at Vds = 10 V. No parameters changed.</span></div>
+          <div class="tile"><span class="k">Latest deep collapse</span><span class="v">≥ 2.3 V</span><span class="s">0.30 eV / 5e18 cm⁻³ / hotTau 1e-14 / hotEb 1.0 at y = 1.0 µm, from full current (166 mA/mm). Up from 0.2 V for Run F.</span></div>
+          <div class="tile warn"><span class="k">Stall rescue</span><span class="v">15 / 30</span><span class="s">Stalled runs rescued so far by the new Te-ramp fallback; 1 gave up. Jobs 44452288 and 44452289 still running.</span></div>
+          <div class="tile"><span class="k">HPG burst runs</span><span class="v">~1,700</span><span class="s">Device simulations on <code>ee1-b</code> since Sep 24; zero <code>munmap</code> crashes since the Sep 27 retry driver.</span></div>
+        </div>
+
+        <div class="panel">
+          <h3>Open items</h3>
+          <ul class="todo">
+            <li><span class="pill progress">in progress</span><span>Resolve the runs that stall at the runaway (19 in round 3, 11 in the position map). The damping retry rescued none; the Te-ramp fallback is rescuing them now. <a class="daylink" href="#oct02">Oct 2</a></span></li>
+            <li><span class="pill progress">in progress</span><span>Confirm the latest collapse onset. 2.3 V is a lower bound until the stalled devices (stalls at 2.7–4.0 V) are resolved. <a class="daylink" href="#oct02">Oct 2</a></span></li>
+            <li><span class="pill open">open</span><span>Calibration only covers saturation (Vds = 10 V). The low-Vd linear region where collapses happen is unvalidated, and gm above +0.5 V is too low (88 vs 160 mS/mm). <a class="daylink" href="#oct01">Oct 1</a></span></li>
+            <li><span class="pill open">open</span><span>How much of the passivation's trap density is filled. Filled, neutral and positive insulator charge give three different answers. <a class="daylink" href="#oct01">Oct 1</a></span></li>
+            <li><span class="pill open">open</span><span>Mesh in the access region (25–40 nm) is too coarse for narrow traps; needs refinement before TRIM or cascade-shape work. <a class="daylink" href="#sep27">Sep 27</a></span></li>
+            <li><span class="pill open">open</span><span>2D vs 3D: a real cascade damages only a ~0.16 µm patch of the 200 µm gate width. Whether that can trigger a device-level collapse needs a 3D run. <a class="daylink" href="#sep28">Sep 28</a></span></li>
+            <li><span class="pill open">open</span><span>Is a trap blob ~2 µm into the access region physically plausible for this radiation damage? It gave the best <code>radPlot1</code> match. <a class="daylink" href="#sep25">Sep 25</a></span></li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h3>Timeline</h3>
+          <div class="scroll-x">
+            <table class="tl">
+              <tr><td>Oct 2</td><td>Late-onset rounds 1–3 with field mobility (1.0 → 1.4 → 2.3 V); position-map surfaces and GIF; diagnosed and fixed the runaway stall.</td><td><a class="daylink" href="#oct02">open</a></td></tr>
+              <tr><td>Oct 1</td><td>Insulator trap charge, deep traps, HighK vs SiN, calibration to the HfO₂ device, Run F map with field mobility, static work archived.</td><td><a class="daylink" href="#oct01">open</a></td></tr>
+              <tr><td>Sep 30</td><td>Progress-report slide deck.</td><td><a class="daylink" href="#sep30">open</a></td></tr>
+              <tr><td>Sep 28</td><td>Critical-strike probability at 1e7 ions/cm², W = 200 µm.</td><td><a class="daylink" href="#sep28">open</a></td></tr>
+              <tr><td>Sep 27</td><td>Root cause of the FLOOXS crash and a retry driver; five trap-map sets; cone-shaped traps; mesh problem found.</td><td><a class="daylink" href="#sep27">open</a></td></tr>
+              <tr><td>Sep 26</td><td>50-location trap map; concentration × level × position regimes.</td><td><a class="daylink" href="#sep26">open</a></td></tr>
+              <tr><td>Sep 25</td><td>Late-onset rounds B–I reach ~2.2 V; trap placement matches <code>radPlot1</code>'s 0.5 V onset.</td><td><a class="daylink" href="#sep25">open</a></td></tr>
+              <tr><td>Sep 24</td><td>HPG workflow set up; first late-onset grid finds no match.</td><td><a class="daylink" href="#sep24">open</a></td></tr>
+              <tr><td>Sep 22–23</td><td>Repository and device decks set up.</td><td><a class="daylink" href="#sep22">open</a></td></tr>
+            </table>
+          </div>
+        </div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- OCT 2 -->
+      <section class="page" id="oct02" data-title="Oct 2">
+        <div class="pagehead">
+          <h2>Oct 2 · Late onset with field mobility, position surfaces, stall fix</h2>
+          <p>Pushed the collapse onset out with the calibrated mobility, mapped how trap position sets the onset, and found and fixed the solver stall that hid the latest collapses.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 44359813 · 44433016 · 44435511 · 44441813 · 44443669 · 44452288 · 44452289</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Late-onset rounds 1–3 (202 devices). Latest deep collapse <span class="num">1.0 → 1.4 → 2.3 V</span>. The 2.3 V device (0.30 eV / 5e18 / hotTau 1e-14 / hotEb 1.0 at y = 1.0 µm) runs at full current (<span class="num">166 mA/mm</span>) until it collapses.</li>
+              <li>Trap position is a strong onset lever: moving traps from y = 0.2 to 1.0 µm delays the collapse by ~0.8 V; beyond ~1.5–2 µm they no longer collapse.</li>
+              <li>Position map (65 positions): 10 surfaces at fixed Vd and a GIF in 0.1 V steps. Onset rises with distance from the gate, and traps nearer the 2DEG reach farther out.</li>
+              <li>Collapse classes adopted: deep (&gt;95% lost in one step), medium (50–95%), shallow (&lt;50%), plus "stalled" for runs that stop at the runaway.</li>
+              <li>Stall diagnosed: the solve diverges right after the electron temperature jumps halfway to its new target. Added a Te-ramp fallback that steps Te gradually at fixed Vd; locally it rescued a 1.8 V stall (<span class="num">137 → 0.00085 mA/mm</span>) with 0–1.7 V unchanged.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill progress">in progress</span><span>19 of 56 round-3 runs and 11 of 65 position-map runs stalled. The damping retry (job 44443669) resolved none; the Te-ramp rescue (jobs 44452288/9) has rescued 15 so far, with 1 giving up.</span></li>
+              <li><span class="pill progress">in progress</span><span>2.3 V is a lower bound: 9 stalled devices stop between 2.7 and 4.0 V and may collapse there.</span></li>
+              <li><span class="pill resolved">fixed</span><span>The analysis had counted stalled runs as shallow, and reported two-step collapses at the second drop. Both corrected.</span></li>
+              <li><span class="pill noted">stopped</span><span>Round 4 (refinement around 2.3 V) cancelled with 44 of 61 done; not analysed.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/onsetField3.jpg" target="_blank" rel="noopener"><img src="fig/onsetField3.jpg" alt="Grid of collapse onset and class for eight trap sets at seven lateral positions" loading="lazy"></a><figcaption><b>Round 3: onset by trap set and position</b>Cells show class (D/M/S) and onset Vd. Later onsets cluster around y = 1.0–1.5 µm.</figcaption></figure>
+          <figure><a class="img" href="fig/posMapLate_onset.jpg" target="_blank" rel="noopener"><img src="fig/posMapLate_onset.jpg" alt="Map of collapse onset voltage over trap depth and lateral position" loading="lazy"></a><figcaption><b>Onset over trap position</b>Onset rises from 1.4 V near the gate to 2.4 V at y = 1.75 µm (7.5 nm deep). "stall" cells are the runs being rescued.</figcaption></figure>
+        </div>
+        <div class="figs wide">
+          <figure><a class="img" href="fig/posMapLate_grid.jpg" target="_blank" rel="noopener"><img src="fig/posMapLate_grid.jpg" alt="Ten 3D surfaces of current suppression over trap position at increasing drain voltage" loading="lazy"></a><figcaption><b>Collapse spreading across trap positions as Vd rises</b>log10(Id_no-trap / Id) over depth and lateral position at Vd = 0.5 and 1.4–3.0 V, shared z-scale. Positions cut more than 10×: 15 up to 1.2 V, 43 by 2.4 V.</figcaption></figure>
+          <figure><a class="img" href="fig/posMapLate.gif" target="_blank" rel="noopener"><img src="fig/posMapLate.gif" alt="Animation of the suppression surface as drain voltage sweeps from 0.1 to 3.0 V" loading="lazy"></a><figcaption><b>Same surface, animated (Vd 0.1 → 3.0 V)</b>One frame per simulated 0.1 V step. Orange × marks a run that had stalled before that voltage.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#oct01">Oct 1 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- OCT 1 -->
+      <section class="page" id="oct01" data-title="Oct 1">
+        <div class="pagehead">
+          <h2>Oct 1 · Insulators, deep traps, the dielectric, and calibration</h2>
+          <p>The busiest day: four model questions answered with static mobility, then the deck calibrated against measured data, the field mobility adopted, and the static work archived.</p>
+          <div class="chips"><span class="chip era-static">static, then field mobility</span><span class="chip">jobs 44261474 · 44274780 · 44286932 · 44294165 · 44303974 · 44342967 · 44359813</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Full x–y trap map including charge in the passivation (339 devices). Filled nitride traps switch near-surface blobs off at rest; positive charge cancels the collapse; neutral traps restore it.</li>
+              <li>Deep traps: thin blobs 25 nm or more below the 2DEG do nothing. The earlier "deep" collapse came from the wide blob's tail reaching the channel.</li>
+              <li>HighK vs SiN passivation: identical collapse at Vd ≤ 3 V. HighK does flatten the field-plate field, but only above ~5 V.</li>
+              <li>Calibration against the measured HfO₂ transfer curve (Vds = 10 V, 200 µm device): the existing field-mobility model fits within <span class="num">±2.4%</span> from Vg −2.6 to +1 V with no parameter changes.</li>
+              <li>Run F map redone with field mobility: collapse earlier (0.2 V almost everywhere) and about 1 decade deeper.</li>
+              <li>Archived all static-mobility work (folder plus branch <code>static-mobility</code>); field mobility made the default; <code>CLAUDE.md</code> cut from 651 to 276 lines.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill open">open</span><span>Fraction of passivation traps that are filled. It decides between collapse, off-at-rest and no collapse for near-surface damage.</span></li>
+              <li><span class="pill open">open</span><span>Forward-bias gm too low (88 vs 160 mS/mm at +1 V). Interface charge, contact resistance and surface charge all fixed it only by worsening the −2 V region.</span></li>
+              <li><span class="pill open">open</span><span>Low-Vd linear region not checked against data; a measured Id–Vd curve would cover it.</span></li>
+              <li><span class="pill noted">noted</span><span>Old <code>fieldpeak.tcl</code> set the HighK permittivity before loading the model file, so its "SiN" run was really HighK.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/calib_IdVg.jpg" target="_blank" rel="noopener"><img src="fig/calib_IdVg.jpg" alt="Measured vs simulated transfer curve with error and transconductance panels" loading="lazy"></a><figcaption><b>Calibration vs the HfO₂ device</b>Field mobility (blue) within ±2.4% from −2.6 to +1 V; static mobility (green) about 10% off with the wrong shape.</figcaption></figure>
+          <figure><a class="img" href="fig/trapXYMap_neutral.jpg" target="_blank" rel="noopener"><img src="fig/trapXYMap_neutral.jpg" alt="Maps comparing neutral, filled and positive insulator trap charge" loading="lazy"></a><figcaption><b>Insulator trap charge: neutral vs filled vs positive</b>The same semiconductor traps give collapse, off-at-rest or nothing depending on the passivation charge.</figcaption></figure>
+          <figure><a class="img" href="fig/trapDeep.jpg" target="_blank" rel="noopener"><img src="fig/trapDeep.jpg" alt="Suppression vs depth of a thin trap blob below the 2DEG" loading="lazy"></a><figcaption><b>Deep traps do nothing past ~25 nm</b>10 nm-thick blob, two densities; the access-region effect is gone 10–25 nm below the 2DEG.</figcaption></figure>
+          <figure><a class="img" href="fig/fieldPlate.jpg" target="_blank" rel="noopener"><img src="fig/fieldPlate.jpg" alt="Lateral field profiles for HighK and SiN at 3, 10 and 20 V" loading="lazy"></a><figcaption><b>HighK passivates the field only above ~5 V</b>At 20 V the field-plate peak drops from 416 to 202 kV/cm; at 3 V both devices are identical.</figcaption></figure>
+          <figure><a class="img" href="fig/mobCompare_F_compare.jpg" target="_blank" rel="noopener"><img src="fig/mobCompare_F_compare.jpg" alt="Static vs field mobility comparison for the Run F trap map" loading="lazy"></a><figcaption><b>Run F map: static vs field mobility</b>Field mobility collapses earlier and deeper; part of that is its 75% higher trap-free current.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#oct02">← Oct 2</a><a href="#sep30">Sep 30 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- SEP 30 -->
+      <section class="page" id="sep30" data-title="Sep 30">
+        <div class="pagehead">
+          <h2>Sep 30 · Progress-report deck</h2>
+          <p>Summarised the first week for a progress report.</p>
+          <div class="chips"><span class="chip era-static">static mobility</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>12-slide deck: problem, model, <code>radPlot1</code> onset match, late-onset result, trap maps, regimes, trap shape, critical strike, crash fix, caveats, next steps. <a href="https://claude.ai/artifact/4RfyrQi58v7pD8NH6aFLqc" target="_blank" rel="noopener">Open the deck</a></li>
+              <li>Added a Run F vs late-onset Id–Vd figure for it.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo"><li><span class="pill noted">noted</span><span>Deck numbers are static-mobility results; field mobility now collapses earlier and deeper.</span></li></ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/lateOnset_vs_F.jpg" target="_blank" rel="noopener"><img src="fig/lateOnset_vs_F.jpg" alt="Id-Vd of Run F and the late-onset trap set" loading="lazy"></a><figcaption><b>Run F vs the late-onset set</b>Same collapse-then-creep shape, onset moved from 0.3 V to ~2.2 V.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#oct01">← Oct 1</a><a href="#sep28">Sep 28 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- SEP 28 -->
+      <section class="page" id="sep28" data-title="Sep 28">
+        <div class="pagehead">
+          <h2>Sep 28 · Probability of a critical strike</h2>
+          <p>How likely is at least one ion strike to land where its trap blob cuts the current 10× or more, at 1e7 ions/cm² on a 200 µm device?</p>
+          <div class="chips"><span class="chip era-static">static mobility</span><span class="chip">job 43542730</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Refined the critical-band edges (100 devices, 0 crashes): 0.30 µm (2e18/0.55) up to the whole 3.0 µm trusted range (4e18/0.55, 8e18/0.35).</li>
+              <li>Expected critical strikes λ = 6 to 60; P(≥1) = <span class="num">0.9975</span> to ≈1. 50% fluence 1.2e6 down to 1.15e5 ions/cm².</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo"><li><span class="pill open">open</span><span>The 2D model spreads each blob over the full gate width. A real cascade damages ~0.16 µm of width, about 0.5–4.8% of the device in total, so device-level collapse needs a 3D run to judge.</span></li></ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/criticalStrike.jpg" target="_blank" rel="noopener"><img src="fig/criticalStrike.jpg" alt="Probability of at least one critical strike vs gate width and fluence" loading="lazy"></a><figcaption><b>P(≥1 critical strike)</b>vs gate width at 1e7 ions/cm², and vs fluence at W = 200 µm, for each trap setting.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#sep30">← Sep 30</a><a href="#sep27">Sep 27 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- SEP 27 -->
+      <section class="page" id="sep27" data-title="Sep 27">
+        <div class="pagehead">
+          <h2>Sep 27 · Crash root cause, map sets, cone traps</h2>
+          <p>Found why FLOOXS was crashing, made sweeps survive it, then ran the first crash-free maps.</p>
+          <div class="chips"><span class="chip era-static">static mobility</span><span class="chip">jobs 43513462 · 43515232 · 43536494 · 43538727</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Root cause of <code>munmap_chunk</code>: Newton diverges to NaN at the collapse, leaves stale solver queues, and the exit then recurses ~3,300 times with a double free (1–2 GB cores).</li>
+              <li><code>pulsedIV.tcl</code> now catches a failed point, restores the last solution and bisects the Vd step. A patched FLOOXS build exists locally.</li>
+              <li>Five trap-map sets (251 devices): first sweep with zero crashes. The gate region is the most damaging location in every set.</li>
+              <li>Collapse metric changed to depth vs the trap-free device; peak/min understated gate-edge collapses 8–10×.</li>
+              <li>Cone-shaped (cascade-like) traps added as a switchable shape.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill open">open</span><span>Access-region mesh (25–40 nm) can't resolve narrow traps. The cone results there were mesh artifacts; Gaussian onsets shift ~0.1 V on a 4 nm mesh.</span></li>
+              <li><span class="pill progress">in progress</span><span>8 devices stalled at the runaway even with 7 bisection levels; the same stall returned on Oct 2 and is being fixed now.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/trapMapSets_overview_depth.jpg" target="_blank" rel="noopener"><img src="fig/trapMapSets_overview_depth.jpg" alt="3D surfaces of collapse depth for five trap concentration and level sets" loading="lazy"></a><figcaption><b>Collapse depth for five trap sets</b>Shared scale; ~200× (4e18/0.35) to ~2.5e5× (8e18/0.35) vs trap-free.</figcaption></figure>
+          <figure><a class="img" href="fig/trapCone_vs_position.jpg" target="_blank" rel="noopener"><img src="fig/trapCone_vs_position.jpg" alt="Suppression vs position for cone and Gaussian trap shapes" loading="lazy"></a><figcaption><b>Cone vs Gaussian traps</b>Cone length doesn't matter; charge near the surface over the gate does. Access-region results unverified (mesh).</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#sep28">← Sep 28</a><a href="#sep26">Sep 26 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- SEP 26 -->
+      <section class="page" id="sep26" data-title="Sep 26">
+        <div class="pagehead">
+          <h2>Sep 26 · Trap maps on the burst queue</h2>
+          <p>First large maps on <code>ee1-b</code>: where a trap blob does the most damage, and how concentration and energy level set the regime.</p>
+          <div class="chips"><span class="chip era-static">static mobility</span><span class="chip">jobs 43369760 · 43370373 · 43373001 · 43373919</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>50-location map (49/50 complete): traps under the gate and at its drain edge are most damaging (~1e6× below trap-free); y = 2.5 µm least (~600×).</li>
+              <li>Concentration × level × position (90 devices): three regimes — off at rest (deep levels or high density), hot-electron collapse (a narrow band), and no collapse (2e18 in the access region).</li>
+              <li>Trap energy level matters more than concentration for which regime a device lands in.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill resolved">fixed</span><span>Peak/min "collapse ratio" can't see a device that's off at rest; added suppression vs trap-free (and an onset-unbiased depth metric on Sep 27).</span></li>
+              <li><span class="pill resolved">fixed</span><span>Traps near the drain contact (y = 3.0 µm) looked contact-affected; later maps stay ≥ 0.7 µm from contact doping.</span></li>
+              <li><span class="pill noted">noted</span><span>3 of 90 devices undetermined after crashes.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/trapMap_3d_suppression.jpg" target="_blank" rel="noopener"><img src="fig/trapMap_3d_suppression.jpg" alt="3D surface of suppression over trap position" loading="lazy"></a><figcaption><b>Suppression over 50 trap locations</b>The gate region dominates; the device never turns on there.</figcaption></figure>
+          <figure><a class="img" href="fig/trapConcLevel_summary.jpg" target="_blank" rel="noopener"><img src="fig/trapConcLevel_summary.jpg" alt="Summary of regimes by trap concentration and energy level" loading="lazy"></a><figcaption><b>Concentration × level regimes</b>Off at rest, collapse, or nothing; the collapse lives in a narrow band.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#sep27">← Sep 27</a><a href="#sep25">Sep 25 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- SEP 25 -->
+      <section class="page" id="sep25" data-title="Sep 25">
+        <div class="pagehead">
+          <h2>Sep 25 · Late onset to ~2.2 V, trap placement</h2>
+          <p>Eight more search rounds found a trap set that collapses ~7× later than Run F, and moving the trap blob matched the measured 0.5 V onset.</p>
+          <div class="chips"><span class="chip era-static">static mobility</span><span class="chip">rounds B–I · jobs 43283546 → 43307897 · 43366825</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>A shallower trap level (0.35 eV) gave room to add charge without pinching the channel at rest; <code>hotEb</code> turned out to be the strongest depth lever.</li>
+              <li>Accepted result: 3e18 / 0.35 eV / hotEb 0.85 / hotTau 6e-14 → onset <span class="num">~2.2–2.3 V</span>, ~2000× deep, then a slow creep.</li>
+              <li>Trap placement (15 devices): a surface blob at y = 2.0 µm matched <code>radPlot1</code>'s 0.5 V onset and depth (0.020 vs 0.011 mA/mm).</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill resolved">fixed Sep 27</span><span><code>munmap_chunk</code> crashes lost 6–56% of each round; smaller steps and more damping didn't help.</span></li>
+              <li><span class="pill noted">accepted</span><span>Onset and depth move together: later onset costs depth. Stopped at ~2.2 V instead of the 3 V target.</span></li>
+              <li><span class="pill open">open</span><span>The <code>radPlot1</code> match sags early at 0.4 V (20.6 vs 32.0 mA/mm), and a blob 2 µm into the access region needs a physical justification.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/lateOnset_vs_F.jpg" target="_blank" rel="noopener"><img src="fig/lateOnset_vs_F.jpg" alt="Id-Vd of Run F and the late-onset trap set" loading="lazy"></a><figcaption><b>Run F vs the late-onset set</b>Onset ~0.3 V vs ~2.2 V, both ~1000× deep.</figcaption></figure>
+          <figure><a class="img" href="fig/trapPlacement.jpg" target="_blank" rel="noopener"><img src="fig/trapPlacement.jpg" alt="Id-Vd curves for trap blobs at different positions" loading="lazy"></a><figcaption><b>Trap placement</b>Moving the blob toward the drain delays onset and raises the pre-collapse current.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#sep26">← Sep 26</a><a href="#sep24">Sep 24 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- SEP 24 -->
+      <section class="page" id="sep24" data-title="Sep 24">
+        <div class="pagehead">
+          <h2>Sep 24 · HPG workflow and the first late-onset grid</h2>
+          <p>Set up the sweep workflow on HiPerGator and tried to move Run F's collapse from 0.3 V to 3 V.</p>
+          <div class="chips"><span class="chip era-static">static mobility</span><span class="chip">job 43252782</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Sweep workflow on HPG: connection check, SLURM array template, per-task parameters and <code>params.json</code>; driver levers made overridable.</li>
+              <li>Local probes: lowering hotTau alone doesn't delay the collapse. At 1.3e-15 s nothing happens (peak Te 353 K); at 1e-14 s only a 1.5× sag.</li>
+              <li>Round A (9 devices): trap density {4, 6, 8}e18 × hotTau {1, 0.7, 0.5}e-14.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill resolved">fixed Sep 25</span><span>No match: 4e18 never collapsed, and 6–8e18 pinched the channel at rest. A shallower trap level solved this the next day.</span></li>
+              <li><span class="pill noted">noted</span><span>The "onset ∝ 1/√hotTau" trend fitted near Run F doesn't hold far from it.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="pager"><a href="#sep25">← Sep 25</a><a href="#sep22">Sep 22–23 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- SEP 22-23 -->
+      <section class="page" id="sep22" data-title="Sep 22–23">
+        <div class="pagehead">
+          <h2>Sep 22–23 · Repository setup</h2>
+          <p>Before the progress log started.</p>
+          <div class="chips"><span class="chip era-static">static mobility</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Repository created with the FLOOXS device decks, model files and plotting notebook.</li>
+              <li>Trap parameters, RF device drivers and figure data updated; Run F (4e18 / σ 40 nm / 0.55 eV) became the reference trap set.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo"><li><span class="pill resolved">fixed</span><span>A sign bug had put empty traps into Poisson as negative charge, so trapping fed on itself. Fixed before the sweeps began; only the onset and depth of the old <code>radPlot</code> curves are targets.</span></li></ul>
+          </div>
+        </div>
+        <div class="pager"><a href="#sep24">← Sep 24</a><span></span></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  document.documentElement.classList.add("js");
+  var pages = Array.prototype.slice.call(document.querySelectorAll("section.page"));
+  var links = Array.prototype.slice.call(document.querySelectorAll("nav.rail a"));
+  var ids = pages.map(function (p) { return p.id; });
+  function show(id, scroll) {
+    if (ids.indexOf(id) < 0) id = "overview";
+    pages.forEach(function (p) { p.classList.toggle("on", p.id === id); });
+    links.forEach(function (a) {
+      if (a.getAttribute("data-page") === id) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+    var cur = document.querySelector('nav.rail a[data-page="' + id + '"]');
+    if (cur && cur.scrollIntoView && window.matchMedia("(max-width: 860px)").matches) {
+      cur.scrollIntoView({ block: "nearest", inline: "center" });
+    }
+    if (scroll) window.scrollTo(0, 0);
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = a.getAttribute("href").slice(1);
+    if (ids.indexOf(id) < 0) return;
+    e.preventDefault();
+    try { history.replaceState(null, "", "#" + id); } catch (err) {}
+    show(id, true);
+  });
+  window.addEventListener("hashchange", function () { show(location.hash.slice(1), true); });
+  show(location.hash.slice(1) || "overview", false);
+})();
+</script>

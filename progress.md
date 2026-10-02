@@ -983,3 +983,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 ### Work-log dashboard (Ian's request), 2026-10-02
 - Published a private page with the work so far, one page per day (Sep 22-23 … Oct 2), each with what was done, what needed work (status pills: fixed / open / in progress / noted), and example figures; overview page with status tiles, open items and a timeline: https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd (snapshot as of ~13:45, stall rescue 15/30 at that time).
+- Dashboard source moved into the repo (`dashboard/`, republished to the same URL as version 2); CLAUDE.md §12 now has the "wrap up for the day" update procedure.

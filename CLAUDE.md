@@ -295,3 +295,24 @@ These were all found with constant mobility 600; field mobility collapses earlie
 - To add results, append a cell and execute only it plus the setup cells (1: imports, 2: `flooxsRead`) through `jupyter_client`, so other cells' outputs are untouched. Keep the JSON as `indent=1` with a trailing newline.
 - Cells that load static-era outputs (`pulsedIV_F.csv`, `hotStressIV_*`, `mobility_*`, `rfDeviceHFO2_Simulated.csv`) now need the `archive/static_mobility/figures/` prefix; `figures/pulsedIV_F.csv` was plotted against `radPlot1` in the last cell.
 - All plotting happens on the workstation, after `rsync`. Nothing on HPG touches the notebook.
+
+---
+
+## 12. Work-log dashboard ("wrap up for the day")
+
+A private claude.ai artifact, **https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd** ("HEMT Collapse Log"), shows the work day by day: an Overview page plus one page per working day, each with what was done, what needed work, and example figures. Ian opens it from claude.ai Artifacts. Source: `dashboard/hemt-collapse-log.html`, figures in `dashboard/fig/` (web-sized copies), helper `dashboard/webfig.py`. Always edit the repo copy; never start a new artifact.
+
+**When Ian says "wrap up for the day"**, update and republish it:
+
+1. `git pull`. Gather the day's work from `progress.md` (that date's entries), `git log --since=<date>`, CLAUDE.md §10, and any jobs still running (`squeue`).
+2. **Add a day page** at the top of `<main>`, right after the Overview section and its `<div class="no-js-sep"></div>`, copying the structure of the existing day sections exactly:
+   - `<section class="page" id="mmmdd" data-title="Mon D">` (e.g. `id="oct03"`), a `.pagehead` with `<h2>Mon D · short headline</h2>`, a one-sentence `<p>`, and `.chips`: one era chip (`chip era-field` "field mobility", or `era-static` for anything run with static mobility) and one chip listing the day's SLURM job IDs.
+   - `.cols` with two `.panel`s: **Done** (`ul.done`, 3-6 items, each one sentence with the key number in `<span class="num">`) and **Needed work** (`ul.todo`, each `<li>` = a pill + text). Pills: `pill resolved` ("fixed", or "fixed Mon D" when fixed on a later day), `pill open` ("open"), `pill progress` ("in progress"), `pill noted` ("noted" / "accepted" / "stopped").
+   - `.figs` grid with 1-5 `<figure>`s of the day's key figures (`.figs wide` for very wide ones like surface grids or GIFs). Make the web copies with `python3 dashboard/webfig.py figures/<a>.png ...` and use the printed `fig/<name>.jpg` paths. Each figure: `<a class="img" href="fig/x.jpg" target="_blank" rel="noopener"><img src="fig/x.jpg" alt="…" loading="lazy"></a>` and a `<figcaption><b>title</b>one-line takeaway with the number</figcaption>`.
+   - A `.pager` with `← Overview` and the previous day's link; also point the previous newest day's `← …` link at the new day.
+3. **Nav rail:** add `<a href="#mmmdd" data-page="mmmdd"><span class="d">Mon D</span><span class="t">2-3 word topic</span></a>` at the top of the "Field mobility" era group (newest first).
+4. **Overview:** update the header's "snapshot" date/time, the four status tiles (keep the same four unless one stops mattering; values must match the latest results), the **Open items** list (add new ones, drop resolved ones, link each to its day with `<a class="daylink" href="#mmmdd">`), and add a **Timeline** row at the top.
+5. **Older days:** if something from an earlier day got fixed today, change that item's pill to `pill resolved` "fixed Mon D" on its original day. Don't rewrite older days otherwise.
+6. Style: plain, specific sentences with real numbers (mA/mm, V, job IDs), no marketing tone, same voice as the existing pages. Keep figure paths relative (`fig/...`).
+7. **Publish to the same URL:** call Artifact `action: "read"` on the URL first if this conversation hasn't read or published it, then publish `file_path` = `dashboard/hemt-collapse-log.html`, `url` = the URL above, `root` = `dashboard`, and `files` = every `fig/...` the page references (`{"fig/x.jpg": "fig/x.jpg", ...}`; files left out are kept, so listing new ones is enough). Don't pass `icon`.
+8. Commit `dashboard/` (HTML, new figures), add a dated `progress.md` line ("dashboard updated for Mon D"), push, and send Ian a push notification with the link.
