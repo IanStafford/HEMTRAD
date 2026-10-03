@@ -1007,3 +1007,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Job 44573468 (325 tasks, `ee1-b`, `%170`, `pulsedIV_posMapLM.slurm` / `params_posMapLM.txt`): same 65-position grid and Vd 0-3 V as `posMapLate`, hot-electron levers fixed at the late-onset set (hotTau 1e-14, hotEb 1.0, sigma 40 nm), Te-ramp on. Sets: 0.30 eV / 4e18 and 6e18 (concentration series with the existing 0.30/5e18 map), 0.25 / 6e18, 0.40 / 5e18, 0.55 / 4e18 (Run F level and density). Output `results/20261003_posMap_<set>/`; trap-free reference reused from `20261002_posMapLate/task_65`.
 - Next: GIF + grid + onset map per set with `plot_posVd.py` / `make_gif.py`; then curve-tracer runs at Vg = -1 and 0 V.
 - Ian chose key-device Id-Vd for the Vg sweep. Job 44573629 (8 tasks, `pulsedIV_curveTracer.slurm` / `params_curveTracer.txt`): Vg = -1 and 0 V, Vd 0-4 V, for trap-free, late-onset set at y 1.0 and 2.4 µm, Run F. Output `results/20261003_curveTracer/`; figures will go to `figures/Vg_-1V/` and `figures/Vg_0V/` (-2 V stays in `figures/`). Both jobs pending (priority) at 10:40.
+
+### Curve tracer at Vg = -1 / 0 V done (job 44573629)
+- 8/8 completed to 4 V, 0 crashes/retries/Te-ramps (12-30 min each). Plots + CSVs in `figures/Vg_-1V/`, `figures/Vg_0V/` (`plot_curveTracer.py`; dashed = same device at -2 V).
+- **Higher gate bias collapses much earlier and deeper.** Late-onset set, deep onset at y 1.0 / 2.4 µm: 2.3 / 3.5 V at Vg -2 → 1.6 / 1.8 V at -1 → 1.5 / 1.8 V at 0 (at 0 V, y 2.4 drops in two steps: 201 → 36 → 0.03 mA/mm at 1.6-1.8 V). Pre-collapse Id 180-205 mA/mm (trap-free at -1 / 0 V reaches 407 / 513 mA/mm at 4 V vs 184 at -2). Post-collapse floor 1e-5 to 1e-4 mA/mm (vs 2e-3 at -2), and y 2.4 decays with Vd instead of creeping.
+- Run F: same as at -2 V (rest ~6-7 mA/mm, collapse at 0.2 V, creep to 0.3-0.4 mA/mm by 4 V).
+- -1 and 0 V are nearly identical below ~1.5 V (access-region limited).
