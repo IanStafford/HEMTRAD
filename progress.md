@@ -1013,3 +1013,14 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Higher gate bias collapses much earlier and deeper.** Late-onset set, deep onset at y 1.0 / 2.4 µm: 2.3 / 3.5 V at Vg -2 → 1.6 / 1.8 V at -1 → 1.5 / 1.8 V at 0 (at 0 V, y 2.4 drops in two steps: 201 → 36 → 0.03 mA/mm at 1.6-1.8 V). Pre-collapse Id 180-205 mA/mm (trap-free at -1 / 0 V reaches 407 / 513 mA/mm at 4 V vs 184 at -2). Post-collapse floor 1e-5 to 1e-4 mA/mm (vs 2e-3 at -2), and y 2.4 decays with Vd instead of creeping.
 - Run F: same as at -2 V (rest ~6-7 mA/mm, collapse at 0.2 V, creep to 0.3-0.4 mA/mm by 4 V).
 - -1 and 0 V are nearly identical below ~1.5 V (access-region limited).
+
+### Position maps at 5 level / concentration sets done (job 44573468)
+- 325/325 completed, 0 crashes/OOM/timeouts/cores; 29 tasks used the Te-ramp, 3 still gave up (2 in 0.30/6e18, 1 in 0.55/4e18). Trap-free reference copied from `20261002_posMapLate/task_65` into each set as `task_ref`.
+- Per set (`figures/posMap_<set>_{grid,onset}.png`, `_frames/`, `.gif`; Vd 0-3 V, classes over 65 positions; surface-row onset from y 0.285 µm outward):
+  - 0.30 eV / 4e18: medium 7, shallow 58, no deep collapse. Too little charge.
+  - 0.30 / 5e18 (existing `posMapLate`): deep 33; surface 1.6 → 3.0 V at y 0.285 → 1.75 µm.
+  - 0.30 / 6e18: deep 43, off 13; surface 1.2 → 1.9 V, deep even at y 2.0-2.4 (1.8-1.9 V). 58/65 cut >10× by 2 V.
+  - 0.25 / 6e18: deep 29, shallow 25; surface 1.8 → 3.0 V (y 0.285 → 1.0); deeper rows reach farther (15 nm: 1.6 → 2.9 V at y 1.75). The front runs into the 3 V limit, so y ≥ 1.25 µm (surface) likely collapses past 3 V.
+  - 0.40 / 5e18: deep 50, off 15; every non-gate position collapses at 0.8-1.2 V, little position dependence.
+  - 0.55 / 4e18: deep 42, medium 8, off 15; collapses at 0.4-0.5 V almost everywhere (at-rest Id 52-66% of trap-free).
+- Trend: deeper level or more charge → earlier, more uniform collapse; the position-dependent onset (the "spreading front") only shows for shallow levels near the charge threshold (0.25-0.30 eV, 5-6e18).
