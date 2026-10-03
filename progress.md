@@ -1000,3 +1000,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 ### Dashboard updated for Oct 2 (wrap-up, 14:51)
 - Oct 2 page and overview refreshed with the Te-ramp rescue results (24/30 stalls resolved, latest deep collapse 3.5 V at y = 2.4 µm); new figure `figures/lateOnset_IdVd.png` (`plot_lateIdVd.py`: trap-free vs the 2.3 V and 3.5 V collapses). Version 3: https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd
 - No jobs running on HPG. Open next: lower `teRampMin` for the 6 remaining stalls (y ≈ 2.0 µm); nitride trap charge with field mobility.
+
+## 2026-10-03
+
+### Position maps at 5 trap level / concentration sets (Ian: GIF surfaces at different levels and concentrations)
+- Job 44573468 (325 tasks, `ee1-b`, `%170`, `pulsedIV_posMapLM.slurm` / `params_posMapLM.txt`): same 65-position grid and Vd 0-3 V as `posMapLate`, hot-electron levers fixed at the late-onset set (hotTau 1e-14, hotEb 1.0, sigma 40 nm), Te-ramp on. Sets: 0.30 eV / 4e18 and 6e18 (concentration series with the existing 0.30/5e18 map), 0.25 / 6e18, 0.40 / 5e18, 0.55 / 4e18 (Run F level and density). Output `results/20261003_posMap_<set>/`; trap-free reference reused from `20261002_posMapLate/task_65`.
+- Next: GIF + grid + onset map per set with `plot_posVd.py` / `make_gif.py`; then curve-tracer runs at Vg = -1 and 0 V.
