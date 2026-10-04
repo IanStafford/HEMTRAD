@@ -119,7 +119,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
 
 <div class="wrap">
   <header class="top">
-    <div class="eyebrow">FLOOXS TCAD · AlGaN/GaN HEMT · HiPerGator sweeps · snapshot 2026-10-02, 14:51</div>
+    <div class="eyebrow">FLOOXS TCAD · AlGaN/GaN HEMT · HiPerGator sweeps · snapshot 2026-10-04, 09:00</div>
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">What was run each day, with example figures, and what still needed work. Currents are in mA/mm, measured at Vg = −2 V unless noted. Work before Oct 1 used the old constant mobility and is archived; current work uses the calibrated field-dependent mobility.</p>
   </header>
@@ -129,6 +129,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
       <div class="sep"></div>
       <div class="era">Field mobility</div>
+      <a href="#oct03" data-page="oct03"><span class="d">Oct 3</span><span class="t">level maps · Vg</span></a>
       <a href="#oct02" data-page="oct02"><span class="d">Oct 2</span><span class="t">late onset · stalls</span></a>
       <a href="#oct01" data-page="oct01"><span class="d">Oct 1</span><span class="t">calibration</span></a>
       <div class="era">Static mobility (archived)</div>
@@ -146,18 +147,19 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <section class="page" id="overview" data-title="Overview">
         <div class="pagehead">
           <h2>Where things stand</h2>
-          <p>Ten working days. The model is now calibrated against a measured HfO₂ device, and the late-onset search with that model has pushed the deep collapse from 0.2 V (Run F) to 3.5 V. A solver stall that hid the latest collapses was fixed the same day; 6 of 30 stalled runs remain.</p>
+          <p>Eleven working days. The model is now calibrated against a measured HfO₂ device, and the late-onset search with that model has pushed the deep collapse from 0.2 V (Run F) to 3.5 V. A solver stall that hid the latest collapses was fixed the same day. Oct 3 showed the collapse is current-driven in this model: a less negative gate moves it earlier, not later.</p>
         </div>
         <div class="tiles">
           <div class="tile ok"><span class="k">Calibration</span><span class="v">±2.4%</span><span class="s">Field-mobility model vs measured HfO₂ transfer curve, Vg −2.6 to +1 V at Vds = 10 V. No parameters changed.</span></div>
           <div class="tile"><span class="k">Latest deep collapse</span><span class="v">3.5 V</span><span class="s">0.30 eV / 5e18 cm⁻³ / hotTau 1e-14 / hotEb 1.0 at y = 2.4 µm: 177 → 0.0018 mA/mm in one 0.1 V step, then a slow creep. Up from 0.2 V for Run F.</span></div>
-          <div class="tile ok"><span class="k">Stall rescue</span><span class="v">24 / 30</span><span class="s">Stalled runs rescued by the Te-ramp fallback (jobs 44452288/9). The 6 left are all near y = 2.0 µm.</span></div>
-          <div class="tile"><span class="k">HPG burst runs</span><span class="v">~1,700</span><span class="s">Device simulations on <code>ee1-b</code> since Sep 24; zero <code>munmap</code> crashes since the Sep 27 retry driver.</span></div>
+          <div class="tile warn"><span class="k">Gate bias, Vg −2 → 0 V</span><span class="v">3.5 → 1.8 V</span><span class="s">Same trap set at y = 2.4 µm collapses earlier at higher Vg: the collapse starts at ~165–205 mA/mm whatever the Vg. Opposite to a field-driven mechanism.</span></div>
+          <div class="tile"><span class="k">HPG burst runs</span><span class="v">~2,050</span><span class="s">Device simulations on <code>ee1-b</code> since Sep 24; zero <code>munmap</code> crashes since the Sep 27 retry driver.</span></div>
         </div>
 
         <div class="panel">
           <h3>Open items</h3>
           <ul class="todo">
+            <li><span class="pill open">open</span><span>Is the measured collapse hot-electron (current-driven) or field-driven? In the model, raising Vg from −2 to 0 V moves the late collapses from 2.3/3.5 V to 1.5/1.8 V. Measuring the onset vs Vg on the curve tracer would settle it; three model tests proposed (off-state pre-stress, Poole–Frenkel capture, field-filled surface traps), awaiting a decision. <a class="daylink" href="#oct03">Oct 3</a></span></li>
             <li><span class="pill open">open</span><span>6 runs still stall at the runaway (all near y = 2.0 µm, 2.8–3.7 V; the Te-ramp step falls below its 0.002 floor at full current). A lower <code>teRampMin</code> is the next thing to try. <a class="daylink" href="#oct02">Oct 2</a></span></li>
             <li><span class="pill open">open</span><span>Insulator (nitride) trap charge has only been tested with static mobility; not yet repeated with the calibrated field mobility. <a class="daylink" href="#oct01">Oct 1</a></span></li>
             <li><span class="pill open">open</span><span>Calibration only covers saturation (Vds = 10 V). The low-Vd linear region where collapses happen is unvalidated, and gm above +0.5 V is too low (88 vs 160 mS/mm). <a class="daylink" href="#oct01">Oct 1</a></span></li>
@@ -172,6 +174,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           <h3>Timeline</h3>
           <div class="scroll-x">
             <table class="tl">
+              <tr><td>Oct 3</td><td>Position maps at five trap level / concentration sets with GIFs; curve tracer at Vg = −1 and 0 V (collapse moves earlier).</td><td><a class="daylink" href="#oct03">open</a></td></tr>
               <tr><td>Oct 2</td><td>Late-onset rounds 1–3 with field mobility (1.0 → 1.4 → 2.3 V); position-map surfaces and GIF; fixed the runaway stall (24/30 rescued), latest deep collapse 3.5 V.</td><td><a class="daylink" href="#oct02">open</a></td></tr>
               <tr><td>Oct 1</td><td>Insulator trap charge, deep traps, HighK vs SiN, calibration to the HfO₂ device, Run F map with field mobility, static work archived.</td><td><a class="daylink" href="#oct01">open</a></td></tr>
               <tr><td>Sep 30</td><td>Progress-report slide deck.</td><td><a class="daylink" href="#sep30">open</a></td></tr>
@@ -184,6 +187,46 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
             </table>
           </div>
         </div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- OCT 3 -->
+      <section class="page" id="oct03" data-title="Oct 3">
+        <div class="pagehead">
+          <h2>Oct 3 · Trap level / concentration maps, curve tracer at Vg = −1 and 0 V</h2>
+          <p>Repeated the position-map surfaces and GIF for five more trap level / concentration sets, and ran the key devices at less negative gate bias.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 44573468 · 44573629</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Position maps for 0.30 eV / 4e18 and 6e18, 0.25 / 6e18, 0.40 / 5e18 and 0.55 / 4e18 (hotTau 1e-14, hotEb 1.0; <span class="num">325/325</span> runs clean, 29 rescued by the Te-ramp). Each has a 10-panel surface grid, an onset map and a GIF.</li>
+              <li>Deeper level or more charge collapses earlier and more uniformly: <span class="num">0.4–0.5 V</span> almost everywhere at 0.55 eV, <span class="num">0.8–1.2 V</span> at 0.40 eV. 0.30 eV / 4e18 has no deep collapse at all.</li>
+              <li>The onset only spreads outward with trap position near the charge threshold: 0.30 / 5e18 surface traps 1.6 → 3.0 V, 0.25 / 6e18 1.8 → 3.0 V (y 0.285 → 1.0 µm), 0.30 / 6e18 1.2 → 1.9 V.</li>
+              <li>Curve tracer (8 runs, Vd 0–4 V): at Vg = −1 / 0 V the late collapses move from <span class="num">2.3 / 3.5 V</span> (y 1.0 / 2.4 µm, Vg −2) to <span class="num">1.5–1.8 V</span>, and go deeper (floor 1e-5 to 1e-4 mA/mm). Run F is unchanged (collapse at 0.2 V).</li>
+              <li>Why: the collapse starts at about the same current (<span class="num">165–205 mA/mm</span>) at every Vg. At −2 V the gate limits the current near that level, so it takes until 2.2–3.4 V; at −1 / 0 V the current passes it by ~1.6 V. The peak field at the gate edge is lower at higher Vg (peak Te 335 vs 703 K at 3 V), but these traps sit in the access region, away from it.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill open">open</span><span>Field-driven trapping (gate injection into surface states, tunnelling into HfO₂ traps, Poole–Frenkel capture, buffer trapping) would move the onset later with higher Vg. Proposed tests: off-state pre-stress with <code>stressFreeze.tcl</code> (no physics change), then a Poole–Frenkel capture option. Awaiting Ian.</span></li>
+              <li><span class="pill open">open</span><span>Measure the collapse onset vs Vg (−2, −1, 0 V) on the curve tracer: earlier with higher Vg means hot-electron trapping, later means field-driven.</span></li>
+              <li><span class="pill open">open</span><span>0.25 eV / 6e18: surface traps beyond y = 1.0 µm reach the 3 V end of the sweep, so they may collapse past 3 V; a 0–4 V rerun would show it.</span></li>
+              <li><span class="pill noted">noted</span><span>3 runs still gave up (2 in 0.30 / 6e18, 1 in 0.55 / 4e18). The local electron-heating estimate for a uniform access region is &lt;1 K, so the runaway must come from local depletion under the trap patch; not yet checked with a field/Te dump.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/curveTracer_Vg0V.jpg" target="_blank" rel="noopener"><img src="fig/curveTracer_Vg0V.jpg" alt="Id-Vd at Vg = 0 V for trap-free, two late-onset trap positions and Run F, with the Vg = -2 V curves dashed" loading="lazy"></a><figcaption><b>Curve tracer at Vg = 0 V</b>Late collapses at 1.5 and 1.8 V (dashed −2 V curves: 2.3 and 3.5 V). Trap-free current reaches 513 mA/mm at 4 V.</figcaption></figure>
+          <figure><a class="img" href="fig/curveTracer_Vg-1V.jpg" target="_blank" rel="noopener"><img src="fig/curveTracer_Vg-1V.jpg" alt="Id-Vd at Vg = -1 V for the same four devices" loading="lazy"></a><figcaption><b>Curve tracer at Vg = −1 V</b>Nearly the same as 0 V below 1.5 V; collapses at 1.6 and 1.8 V.</figcaption></figure>
+          <figure><a class="img" href="fig/posMap_tl0.25_tp6e18_onset.jpg" target="_blank" rel="noopener"><img src="fig/posMap_tl0.25_tp6e18_onset.jpg" alt="Onset map over trap position for 0.25 eV, 6e18" loading="lazy"></a><figcaption><b>Onset by position, 0.25 eV / 6e18</b>Deep onsets 1.6–3.0 V; traps closer to the 2DEG keep collapsing farther from the gate.</figcaption></figure>
+          <figure><a class="img" href="fig/posMap_tl0.30_tp6e18_onset.jpg" target="_blank" rel="noopener"><img src="fig/posMap_tl0.30_tp6e18_onset.jpg" alt="Onset map over trap position for 0.30 eV, 6e18" loading="lazy"></a><figcaption><b>Onset by position, 0.30 eV / 6e18</b>20% more charge than the Oct 2 map: deep collapse at 1.2–1.9 V everywhere past the field plate.</figcaption></figure>
+          <figure><a class="img" href="fig/posMap_tl0.40_tp5e18_onset.jpg" target="_blank" rel="noopener"><img src="fig/posMap_tl0.40_tp5e18_onset.jpg" alt="Onset map over trap position for 0.40 eV, 5e18" loading="lazy"></a><figcaption><b>Onset by position, 0.40 eV / 5e18</b>A 0.1 eV deeper level: all 50 non-gate positions collapse deep at 0.8–1.2 V.</figcaption></figure>
+        </div>
+        <div class="figs wide">
+          <figure><a class="img" href="fig/posMap_tl0.25_tp6e18.gif" target="_blank" rel="noopener"><img src="fig/posMap_tl0.25_tp6e18.gif" alt="Animation of the suppression surface for 0.25 eV, 6e18 as Vd sweeps 0.1 to 3.0 V" loading="lazy"></a><figcaption><b>0.25 eV / 6e18, animated (Vd 0.1 → 3.0 V)</b>The collapse front moves out from the field plate edge with Vd; 44 of 65 positions cut more than 10× by 3 V. GIFs for all sets are in <code>figures/posMap_*.gif</code>.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#oct02">Oct 2 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
@@ -223,7 +266,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           <figure><a class="img" href="fig/posMapLate_grid.jpg" target="_blank" rel="noopener"><img src="fig/posMapLate_grid.jpg" alt="Ten 3D surfaces of current suppression over trap position at increasing drain voltage" loading="lazy"></a><figcaption><b>Collapse spreading across trap positions as Vd rises</b>log10(Id_no-trap / Id) over depth and lateral position at Vd = 0.5 and 1.4–3.0 V, shared z-scale. Positions cut more than 10×: 15 up to 1.2 V, 50 of 65 by 3.0 V.</figcaption></figure>
           <figure><a class="img" href="fig/posMapLate.gif" target="_blank" rel="noopener"><img src="fig/posMapLate.gif" alt="Animation of the suppression surface as drain voltage sweeps from 0.1 to 3.0 V" loading="lazy"></a><figcaption><b>Same surface, animated (Vd 0.1 → 3.0 V)</b>One frame per simulated 0.1 V step. Orange × marks a run that had stalled before that voltage.</figcaption></figure>
         </div>
-        <div class="pager"><a href="#overview">← Overview</a><a href="#oct01">Oct 1 →</a></div>
+        <div class="pager"><a href="#oct03">← Oct 3</a><a href="#oct01">Oct 1 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 

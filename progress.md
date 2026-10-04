@@ -1024,3 +1024,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - 0.40 / 5e18: deep 50, off 15; every non-gate position collapses at 0.8-1.2 V, little position dependence.
   - 0.55 / 4e18: deep 42, medium 8, off 15; collapses at 0.4-0.5 V almost everywhere (at-rest Id 52-66% of trap-free).
 - Trend: deeper level or more charge → earlier, more uniform collapse; the position-dependent onset (the "spreading front") only shows for shallow levels near the charge threshold (0.25-0.30 eV, 5-6e18).
+
+### Discussion: why higher Vg collapses earlier (2026-10-03)
+- Collapse starts at ~165-205 mA/mm at every Vg (y 1.0: 166/178/165; y 2.4: 177/194/200 at Vg -2/-1/0). Trap-free peak Te is lower at higher Vg (Vd 3 V: 703 / 335 / 339 K), so the trigger is current through the access-region trap patch, not the gate-edge field. Proposed field-driven tests to Ian (no physics change made): (c) off-state pre-stress with `stressFreeze.tcl`, (a) Poole-Frenkel sqrt(E) capture option, (b) field-filled surface traps. Waiting on his choice.
+
+## 2026-10-04
+- HPG master connection dropped overnight (`ssh -O check hpg` fails). No jobs were running. Needs Ian to re-authenticate before any HPG work.
+- Dashboard updated for Oct 3 (version 4): new Oct 3 page, overview tiles (gate-bias tile replaces stall rescue), open items, timeline. https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd
