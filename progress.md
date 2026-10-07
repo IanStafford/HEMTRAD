@@ -1031,3 +1031,6 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 ## 2026-10-04
 - HPG master connection dropped overnight (`ssh -O check hpg` fails). No jobs were running. Needs Ian to re-authenticate before any HPG work.
 - Dashboard updated for Oct 3 (version 4): new Oct 3 page, overview tiles (gate-bias tile replaces stall rescue), open items, timeline. https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd
+
+## 2026-10-07
+- Exported a GaN starter package (trap-free I-V focus) to `~/flooxs-pyplot/Test/SimpDev/GaNSuite/` for Ian's FLOOXS work: model file + materials + equations, `rfdevice*.tcl`, `pulsedIV.tcl`, `calibIdVg.tcl`, new `quickIV.tcl` (trap-free Id-Vd 0-1 V, verified 136.9 mA/mm at 1 V in 2.5 min), measured Id-Vg CSV, README. Not committed in flooxs-pyplot.
