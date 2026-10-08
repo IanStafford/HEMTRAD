@@ -41,8 +41,8 @@ proc ElecTemperature {Mat} {
     #                       eV     cm-3                  / s  cm2 (integration in 2D) eV/ cm s
     set EnergyRelax "(1.5 * $keV * $Ele * (ETemp - Temp) / $tau)"
 
-    global etStats etThermo
-    if {$etStats && $etThermo} {
+    global etStats etThermo etThermoE
+    if {$etStats && $etThermo && $etThermoE} {
         # the current now has a grad(Te) part (Continuity.tcl ElecDelta); carry
         # it into the convective energy flux and the Joule heating J.grad(EFn)
         set D [ElecDelta]

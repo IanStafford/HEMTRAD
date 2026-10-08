@@ -1,7 +1,8 @@
 #!/bin/bash
 # Electron energy balance (ETemp.tcl, eTemp lever) tests, 2026-10-08.
 # One line per task in $PARAMS (default params_eTemp1.txt):
-#   tag|eTemp|etTau|etMob|etStats|trapEn|trapPeak|trapLevel|hotTau|hotEb|trapMeanY|Vg|Vd_max|teProfile
+#   tag|eTemp|etTau|etMob|etStats|trapEn|trapPeak|trapLevel|hotTau|hotEb|trapMeanY|Vg|Vd_max|teProfile[|extra]
+# extra (optional): more lever settings, ';'-separated, e.g. 'etThermoJ 0;etThermoE 1'
 # teProfile: comma-separated Vd list for ETemp cut dumps (or "-").
 # Output: results/$RUN/<tag>/ (RUN default 20261008_eTemp1). Submit with
 #   sbatch --array=0-N --export=ALL,PARAMS=params_x.txt,RUN=<run> pulsedIV_eTemp.slurm
@@ -21,7 +22,7 @@ REPO=/home/ianstafford/blue/ee1/ianstafford/HEMTRAD
 PARAMS=${PARAMS:-params_eTemp1.txt}
 RUN=${RUN:-20261008_eTemp1}
 LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/$PARAMS")
-IFS="|" read -r TAG ETEMP ETTAU ETMOB ETSTATS TRAPEN TRAPPEAK TRAPLEVEL HOTTAU HOTEB TRAPMEANY VG VDMAX TEPROF <<< "$LINE"
+IFS="|" read -r TAG ETEMP ETTAU ETMOB ETSTATS TRAPEN TRAPPEAK TRAPLEVEL HOTTAU HOTEB TRAPMEANY VG VDMAX TEPROF EXTRA <<< "$LINE"
 TASK_DIR=$REPO/results/$RUN/$TAG
 
 module restore flooxsenv
@@ -60,6 +61,7 @@ DRIVER="$TASK_DIR/pulsedIV_task.tcl"
     echo "set dampValue 0.05"
     echo "set mobModel  field"
     echo "set teProfile {$PROF}"
+    if [ -n "${EXTRA:-}" ]; then echo "$EXTRA" | tr ';' '\n' | sed 's/^ */set /'; fi
     echo "set ivCSV     \"pulsedIV_${TAG}.csv\""
     sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/pulsedIV.tcl"
 } > "$DRIVER"
@@ -70,7 +72,7 @@ cat > "$TASK_DIR/params.json" <<JSON
   "trapEn": $TRAPEN, "trapPeak": $TRAPPEAK, "trapSigma": 0.04, "trapLevel": $TRAPLEVEL,
   "hotEb": $HOTEB, "hotTau": $HOTTAU, "trapMeanX": 0.0, "trapMeanY": $TRAPMEANY,
   "Vg_meas": $VG, "Vd_max": $VDMAX, "Vd_step": 0.1, "dampValue": 0.05, "mobModel": "field",
-  "teProfile": "$TEPROF", "job": "${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
+  "teProfile": "$TEPROF", "extra": "${EXTRA:-}", "job": "${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
 }
 JSON
 

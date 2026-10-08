@@ -13,14 +13,14 @@ proc ElecDelta {} {
 }
 
 proc ElecContinuity {Mat} {
-    global Vt eTemp etStats etThermo
+    global Vt eTemp etStats etThermo etThermoJ
 
     pdbSetDouble $Mat Qfn Rel.Error 1.0e-2
     pdbSetDouble $Mat Qfn Abs.Error 1.0e-2
     pdbSetDouble $Mat Qfn DampValue 0.1
 
     set eqn "ddt(Elec) + ([pdbDelayDouble $Mat Elec mob]) * (Elec+1.0e2) * grad(Qfn)"
-    if {$eTemp && $etStats && $etThermo} {
+    if {$eTemp && $etStats && $etThermo && $etThermoJ} {
         # thermal diffusion (Seebeck) part of the current, consistent with
         # electron statistics at ETemp. Uses Elec without the 1e2 floor: n*Delta
         # -> 0 in depletion, where Delta ~ -eta is large
