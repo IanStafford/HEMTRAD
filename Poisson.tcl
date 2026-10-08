@@ -93,8 +93,11 @@ proc CaptureTraps {} {
 # v(E) = mu E / (1 + mu E / vsat). E is the driving field |grad Qfn| (V/cm), not
 # |grad DevPsi|, so the built-in polarization field doesn't heat electrons at
 # equilibrium.
+# With the eTemp lever on, the target is the solved electron temperature ETemp
+# instead (clamped at the lattice T, so cooled electrons don't raise the level).
 proc HotTeExpr {} {
-    global hotTau hotMu hotVsat kev
+    global hotTau hotMu hotVsat kev eTemp
+    if {$eTemp} { return "(Temp + 0.5 * (ETemp - Temp + abs(ETemp - Temp)))" }
     set E "sqrt(dot(Qfn,Qfn))"
     set v "($hotMu * $E / (1.0 + $hotMu * $E / $hotVsat))"
     return "(Temp + (2.0/3.0) * $hotTau * $v * $E / $kev)"

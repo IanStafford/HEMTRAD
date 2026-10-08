@@ -29,6 +29,18 @@ solution add name=DevPsi solve negative damp continuous
 solution add name=Qfp solve negative damp continuous
 solution add name=Qfn solve negative damp continuous
 
+# Electron energy balance (ETemp.tcl). eTemp 0 (default): ETemp is a constant
+# 300 K solution, so the electron statistics (which use ETemp) are unchanged.
+if {![info exists eTemp]}   { set eTemp 0 }       ;# 1 = solve the electron temperature PDE
+if {![info exists etTau]}   { set etTau 1.0e-12 } ;# energy relaxation time (s)
+if {![info exists etMob]}   { set etMob low }     ;# heating/flux mobility: low (low-field) or field (same as current)
+if {![info exists etStats]} { set etStats 1 }     ;# 1 = electron Fermi statistics at ETemp (Vt, Nc); 0 = at Temp
+if {$eTemp} {
+    solution add name=ETemp solve pde !negative continuous
+} else {
+    solution name=ETemp add const val=300.0
+}
+
 
 
 source Continuity.tcl
@@ -37,6 +49,15 @@ ElecContinuity AlGaN
 
 HoleContinuity GaN
 HoleContinuity AlGaN
+
+if {$eTemp} {
+    source ETemp.tcl
+    ElecTemperature GaN
+    ElecTemperature AlGaN
+    ETempContact S
+    ETempContact D
+    ETempContact B
+}
 
 # Is the interface charge constant everwhere all the time?
 #Add interface charge
@@ -147,6 +168,8 @@ proc Initialize {} {
     sel z=1.0e-30*(1.0+x*x) name=TrapFrozen
     sel z=1.0e-30*(1.0+x*x) name=FrozenFlag
     sel z=Temp+1.0e-12*(1.0+x*x) name=TeTrap
+    global eTemp
+    if {$eTemp} { sel z=Temp name=ETemp }
     sel z=0.0 name=Qfn
     sel z=0.0 name=Qfp
 

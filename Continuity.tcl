@@ -11,7 +11,17 @@ proc ElecContinuity {Mat} {
     set e "([pdbDelayDouble $Mat Elec Ec])"
     solution add name=Econd solve $Mat const val = ($e)
 
-    set e "([pdbDelayDouble $Mat Elec Nc]) * f12( -(Econd-Qfn) / ($Vt) )"
+    # electron statistics at the electron temperature ETemp (constant 300 K
+    # unless the eTemp lever solves it); etStats 0 keeps them at the lattice Temp
+    global etStats k q
+    if {$etStats} {
+        set VtE "($k*ETemp/$q)"
+        set Nc "([pdbDelayDouble $Mat Elec Nc]) * exp(1.5*log(ETemp/Temp))"
+    } else {
+        set VtE $Vt
+        set Nc "([pdbDelayDouble $Mat Elec Nc])"
+    }
+    set e "$Nc * f12( -(Econd-Qfn) / ($VtE) )"
     solution add name=Elec solve $Mat const val = "($e)"
 }
 

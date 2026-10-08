@@ -59,6 +59,10 @@ if {![info exists teRampMax]} { set teRampMax 300 }    ;# max ramp sub-steps per
 #==============================================
 
 source GaN_modelfile_masterD
+# Electron-temperature profiles (eTemp lever): at each Vd in this list, write
+# ETemp along cuts at the AlGaN top (x = 0, the trap row) and in the 2DEG
+# (x = 0.016 um) to <ivCSV root>_Te_Vd<Vd>.txt. Empty = none.
+if {![info exists teProfile]} { set teProfile {} }
 if {![info exists deviceDeck]} { set deviceDeck rfdevice.tcl } ;# device structure deck (rfdevice_SiN.tcl: SiN instead of HighK)
 source $deviceDeck
 
@@ -171,6 +175,21 @@ for {set i 0} {$i <= $n} {incr i} {
     set cur [expr {abs([contact name=D sol=Qfn flux])*1.0e6}]
     #FLOOXS GIVES A/um
     puts "PULSED Vd=$d Id=$cur peakTe=$te retries=$nRetry ramps=$nRamp"
+    if {$eTemp} {
+        sel z=ETemp
+        puts "ETEMP Vd=$d peakETemp(GaN)=[lindex [peak GaN] 1] peakETemp(AlGaN)=[lindex [peak AlGaN] 1]"
+    }
+    foreach v $teProfile {
+        if {abs($v - $d) < 1.0e-6} {
+            set pf [open "[file rootname $ivCSV]_Te_Vd[format %.2f $d].txt" w]
+            sel z=ETemp
+            foreach xc {0.0 0.016} {
+                puts $pf "# ETemp (K) along y (um) at x = $xc um, Vd = $d V"
+                puts $pf [print1d xv=$xc]
+            }
+            close $pf
+        }
+    }
     set f [open $ivCSV a]
     puts $f "$d, $cur, $te"
     close $f
