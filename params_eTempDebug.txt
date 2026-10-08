@@ -1,0 +1,2 @@
+thermo_full|etThermo 1
+no_thermo|etThermo 0
