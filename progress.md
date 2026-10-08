@@ -1034,3 +1034,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 ## 2026-10-07
 - Exported a GaN starter package (trap-free I-V focus) to `~/flooxs-pyplot/Test/SimpDev/GaNSuite/` for Ian's FLOOXS work: model file + materials + equations, `rfdevice*.tcl`, `pulsedIV.tcl`, `calibIdVg.tcl`, new `quickIV.tcl` (trap-free Id-Vd 0-1 V, verified 136.9 mA/mm at 1 V in 2.5 min), measured Id-Vg CSV, README. Not committed in flooxs-pyplot.
+
+## 2026-10-08
+
+### Electron energy balance (Ian: implement ElecTemperature, electron stats at ETemp; everything on HPG today)
+- Implemented (commit after 210c86f): `ETemp.tcl` (Ian's `ElecTemperature` proc as given, plus `ETempContact`: ETemp = 300 K at S/D/B; grad(k*ETemp) written as k*grad(ETemp)). Levers in `GaN_modelfile_masterD`: `eTemp` 0 (ETemp = const 300 -> old behaviour) / 1 (PDE in GaN + AlGaN), `etTau` 1e-12, `etMob` low (Ian's: lowfldmob in heating/flux) / field (same mobility as the current), `etStats` 1 (electron Vt and Nc at ETemp) / 0. Trap capture: `HotTeExpr` returns max(ETemp, T) when eTemp is on, so FillStep/UpdateTe/Te-ramp under-relax TeTrap toward the solved ETemp (hotTau/hotMu/hotVsat unused then). `pulsedIV.tcl`: `ETEMP` peak lines and `teProfile` cut dumps (x = 0 trap row, x = 0.016 2DEG).
+- Smoke test job 45185690 (trap-free, Vd 0-0.3 V, eTemp 1). Next: stage 1 (regression eTemp 0; trap-free eTemp 1 with tau 1e-12 / 3e-13 / 1e-13, etMob field, etStats 0) and stage 2 (Run F, late-onset set at y 1.0 / 2.4 µm with eTemp 1).
