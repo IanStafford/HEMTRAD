@@ -2,10 +2,13 @@
 #   J = n mu grad(EFn) + n mu k Delta grad(Te),  Delta = 2.5 F3/2(eta)/F1/2(eta) - eta,
 # eta = (EFn - Ec)/kTe (FLOOXS f12/f32 are normalized so F_j -> exp(eta)).
 # Boltzmann limit: Delta = 5/2 - eta; degenerate 2DEG: Delta -> 0.
+# The F3/2/F1/2 ratio uses eta clamped at -30 (where it is 1 to 1e-13) so a
+# large negative Newton excursion can't make it 0/0.
 proc ElecDelta {} {
     global k q
     set eta "((Qfn-Econd)/($k*ETemp/$q))"
-    return "(2.5*f32($eta)/f12($eta)-$eta)"
+    set etac "(0.5*($eta-30.0+abs($eta+30.0)))"
+    return "(2.5*f32($etac)/f12($etac)-$eta)"
 }
 
 proc ElecContinuity {Mat} {
@@ -18,8 +21,9 @@ proc ElecContinuity {Mat} {
     set eqn "ddt(Elec) + ([pdbDelayDouble $Mat Elec mob]) * (Elec+1.0e2) * grad(Qfn)"
     if {$eTemp && $etStats && $etThermo} {
         # thermal diffusion (Seebeck) part of the current, consistent with
-        # electron statistics at ETemp
-        append eqn " + ([pdbDelayDouble $Mat Elec mob]) * (Elec+1.0e2) * 8.617e-5 * [ElecDelta] * grad(ETemp)"
+        # electron statistics at ETemp. Uses Elec without the 1e2 floor: n*Delta
+        # -> 0 in depletion, where Delta ~ -eta is large
+        append eqn " + ([pdbDelayDouble $Mat Elec mob]) * Elec * 8.617e-5 * [ElecDelta] * grad(ETemp)"
     }
     pdbSetString $Mat Qfn Equation $eqn
 

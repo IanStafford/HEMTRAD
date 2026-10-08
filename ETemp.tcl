@@ -46,8 +46,9 @@ proc ElecTemperature {Mat} {
         # the current now has a grad(Te) part (Continuity.tcl ElecDelta); carry
         # it into the convective energy flux and the Joule heating J.grad(EFn)
         set D [ElecDelta]
-        set HeatFlux1 "(1.5 * $keV * ETemp * $Ele * $mob * grad(Qfn)) + (1.5 * $keV * ETemp * $Ele * $mob * $keV * $D * grad(ETemp))"
-        set HeatGen  "($Ele * $mob * (dot(Qfn,Qfn) + $keV * $D * dot(Qfn,ETemp)))"
+        # (thermoelectric parts use Elec without the floor, as in Continuity.tcl)
+        set HeatFlux1 "(1.5 * $keV * ETemp * $Ele * $mob * grad(Qfn)) + (1.5 * $keV * ETemp * Elec * $mob * $keV * $D * grad(ETemp))"
+        set HeatGen  "($Ele * $mob * dot(Qfn,Qfn) + Elec * $mob * $keV * $D * dot(Qfn,ETemp))"
     }
     set eqn "$HeatCap - $HeatFlux1 - $HeatFlux2 - $HeatGen + $EnergyRelax"
     pdbSetString $Mat ETemp Equation "$eqn"
