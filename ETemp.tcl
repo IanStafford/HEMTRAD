@@ -13,7 +13,7 @@
 # mobility the heating and flux terms use: low = low-field mobility, field = the
 # same field-dependent mobility as the current, so J.E is consistent).
 proc ElecTemperature {Mat} {
-    global etTau etMob mobModel
+    global etTau etMob mobModel etFloor
     set keV 8.625e-5
     set tau $etTau
 
@@ -27,7 +27,10 @@ proc ElecTemperature {Mat} {
     pdbSetDouble $Mat ETemp Rel.Error 1.0e-2
     pdbSetDouble $Mat ETemp Abs.Error 1.0e-2
     pdbSetDouble $Mat ETemp DampValue 5.0
-    set Ele "(Elec+1.0)"
+    # density floor: keeps the ETemp rows where there are almost no electrons
+    # from being ~18 decades smaller than the 2DEG rows (there ETemp then relaxes
+    # to the lattice T); negligible next to the 2DEG density (~1e19 cm^-3)
+    set Ele "(Elec+$etFloor)"
 
     #Sentaurus version with Qfn,Qfn as heat source
     #                   eV     cm-3   /s          cm2 (integration in 2D) = ev / cm s
