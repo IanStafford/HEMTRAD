@@ -2,12 +2,13 @@
 #   J = n mu grad(EFn) + n mu k Delta grad(Te),  Delta = 2.5 F3/2(eta)/F1/2(eta) - eta,
 # eta = (EFn - Ec)/kTe (FLOOXS f12/f32 are normalized so F_j -> exp(eta)).
 # Boltzmann limit: Delta = 5/2 - eta; degenerate 2DEG: Delta -> 0.
-# The F3/2/F1/2 ratio uses eta clamped at -30 (where it is 1 to 1e-13) so a
-# large negative Newton excursion can't make it 0/0.
+# The F3/2/F1/2 ratio uses eta smoothly clamped at -30 (softplus; the ratio is
+# 1 to 1e-13 there) so a large negative Newton excursion can't make it 0/0. A
+# max() via abs() has a kink that made Newton cycle where eta crosses -30.
 proc ElecDelta {} {
     global k q
     set eta "((Qfn-Econd)/($k*ETemp/$q))"
-    set etac "(0.5*($eta-30.0+abs($eta+30.0)))"
+    set etac "(-30.0+log(1.0+exp($eta+30.0)))"
     return "(2.5*f32($etac)/f12($etac)-$eta)"
 }
 
