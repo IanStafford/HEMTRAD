@@ -39,7 +39,9 @@ if {![info exists etThermo]} { set etThermo 1 }   ;# 1 = thermoelectric (grad Te
 if {![info exists etThermoJ]} { set etThermoJ 1 } ;# diagnostic: thermo term in the electron current
 if {![info exists etThermoE]} { set etThermoE 1 } ;# diagnostic: thermo term in the energy flux and heating
 if {$eTemp} {
-    solution add name=ETemp solve pde !negative continuous
+    # damp: Newton updates limited with ETemp DampValue (5 K, ETemp.tcl). Without it the
+    # first update of a bias step swung ETemp by 1e3-1e38 K or to ~0 K (debug job 45208486)
+    solution add name=ETemp solve pde !negative damp continuous
 } else {
     solution name=ETemp add const val=300.0
 }
