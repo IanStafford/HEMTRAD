@@ -119,7 +119,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
 
 <div class="wrap">
   <header class="top">
-    <div class="eyebrow">FLOOXS TCAD · AlGaN/GaN HEMT · HiPerGator sweeps · snapshot 2026-10-04, 09:00</div>
+    <div class="eyebrow">FLOOXS TCAD · AlGaN/GaN HEMT · HiPerGator sweeps · snapshot 2026-10-08, end of day</div>
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">What was run each day, with example figures, and what still needed work. Currents are in mA/mm, measured at Vg = −2 V unless noted. Work before Oct 1 used the old constant mobility and is archived; current work uses the calibrated field-dependent mobility.</p>
   </header>
@@ -129,6 +129,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
       <div class="sep"></div>
       <div class="era">Field mobility</div>
+      <a href="#oct08" data-page="oct08"><span class="d">Oct 7–8</span><span class="t">energy balance</span></a>
       <a href="#oct03" data-page="oct03"><span class="d">Oct 3</span><span class="t">level maps · Vg</span></a>
       <a href="#oct02" data-page="oct02"><span class="d">Oct 2</span><span class="t">late onset · stalls</span></a>
       <a href="#oct01" data-page="oct01"><span class="d">Oct 1</span><span class="t">calibration</span></a>
@@ -147,18 +148,19 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <section class="page" id="overview" data-title="Overview">
         <div class="pagehead">
           <h2>Where things stand</h2>
-          <p>Eleven working days. The model is now calibrated against a measured HfO₂ device, and the late-onset search with that model has pushed the deep collapse from 0.2 V (Run F) to 3.5 V. A solver stall that hid the latest collapses was fixed the same day. Oct 3 showed the collapse is current-driven in this model: a less negative gate moves it earlier, not later.</p>
+          <p>Thirteen working days. The model is now calibrated against a measured HfO₂ device, and the late-onset search with that model has pushed the deep collapse from 0.2 V (Run F) to 3.5 V. A solver stall that hid the latest collapses was fixed the same day. Oct 3 showed the collapse is current-driven in this model: a less negative gate moves it earlier, not later.</p>
         </div>
         <div class="tiles">
           <div class="tile ok"><span class="k">Calibration</span><span class="v">±2.4%</span><span class="s">Field-mobility model vs measured HfO₂ transfer curve, Vg −2.6 to +1 V at Vds = 10 V. No parameters changed.</span></div>
           <div class="tile"><span class="k">Latest deep collapse</span><span class="v">3.5 V</span><span class="s">0.30 eV / 5e18 cm⁻³ / hotTau 1e-14 / hotEb 1.0 at y = 2.4 µm: 177 → 0.0018 mA/mm in one 0.1 V step, then a slow creep. Up from 0.2 V for Run F.</span></div>
           <div class="tile warn"><span class="k">Gate bias, Vg −2 → 0 V</span><span class="v">3.5 → 1.8 V</span><span class="s">Same trap set at y = 2.4 µm collapses earlier at higher Vg: the collapse starts at ~165–205 mA/mm whatever the Vg. Opposite to a field-driven mechanism.</span></div>
-          <div class="tile"><span class="k">HPG burst runs</span><span class="v">~2,050</span><span class="s">Device simulations on <code>ee1-b</code> since Sep 24; zero <code>munmap</code> crashes since the Sep 27 retry driver.</span></div>
+          <div class="tile"><span class="k">HPG burst runs</span><span class="v">~2,100</span><span class="s">Device simulations on <code>ee1-b</code> since Sep 24; zero <code>munmap</code> crashes since the Sep 27 retry driver.</span></div>
         </div>
 
         <div class="panel">
           <h3>Open items</h3>
           <ul class="todo">
+            <li><span class="pill noted">parked</span><span>Electron energy balance (ETemp PDE): converges without the thermoelectric current term, but then inflates the trap-free current by up to 48%; with the term every run fails at the first 0.1 V step. Next step to try is in <code>progress.md</code>. <a class="daylink" href="#oct08">Oct 8</a></span></li>
             <li><span class="pill open">open</span><span>Is the measured collapse hot-electron (current-driven) or field-driven? In the model, raising Vg from −2 to 0 V moves the late collapses from 2.3/3.5 V to 1.5/1.8 V. Measuring the onset vs Vg on the curve tracer would settle it; three model tests proposed (off-state pre-stress, Poole–Frenkel capture, field-filled surface traps), awaiting a decision. <a class="daylink" href="#oct03">Oct 3</a></span></li>
             <li><span class="pill open">open</span><span>6 runs still stall at the runaway (all near y = 2.0 µm, 2.8–3.7 V; the Te-ramp step falls below its 0.002 floor at full current). A lower <code>teRampMin</code> is the next thing to try. <a class="daylink" href="#oct02">Oct 2</a></span></li>
             <li><span class="pill open">open</span><span>Insulator (nitride) trap charge has only been tested with static mobility; not yet repeated with the calibrated field mobility. <a class="daylink" href="#oct01">Oct 1</a></span></li>
@@ -174,6 +176,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           <h3>Timeline</h3>
           <div class="scroll-x">
             <table class="tl">
+              <tr><td>Oct 7–8</td><td>GaN starter decks exported for FLOOXS work; electron energy-balance model implemented and debugged, then parked.</td><td><a class="daylink" href="#oct08">open</a></td></tr>
               <tr><td>Oct 3</td><td>Position maps at five trap level / concentration sets with GIFs; curve tracer at Vg = −1 and 0 V (collapse moves earlier).</td><td><a class="daylink" href="#oct03">open</a></td></tr>
               <tr><td>Oct 2</td><td>Late-onset rounds 1–3 with field mobility (1.0 → 1.4 → 2.3 V); position-map surfaces and GIF; fixed the runaway stall (24/30 rescued), latest deep collapse 3.5 V.</td><td><a class="daylink" href="#oct02">open</a></td></tr>
               <tr><td>Oct 1</td><td>Insulator trap charge, deep traps, HighK vs SiN, calibration to the HfO₂ device, Run F map with field mobility, static work archived.</td><td><a class="daylink" href="#oct01">open</a></td></tr>
@@ -187,6 +190,39 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
             </table>
           </div>
         </div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- OCT 8 -->
+      <section class="page" id="oct08" data-title="Oct 7–8">
+        <div class="pagehead">
+          <h2>Oct 7–8 · Electron energy balance (parked)</h2>
+          <p>Replaced the local-field electron temperature with a solved energy-balance equation (Ian's <code>ElecTemperature</code>), with electron statistics at the electron temperature; it runs without the thermoelectric term but not with it, so it is parked.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 45185690 · 45186466 · 45189280 · 45193421 · 45197486 · 45202242 · 45207320 · 45208486 · 45209164 · 45209165 · 45210603 · 45210604</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Oct 7: exported a GaN starter package (model, device, Id-Vd and Id-Vg drivers, quick test) to the flooxs-pyplot repo; the quick test gives <span class="num">136.9 mA/mm</span> at Vd 1 V, as calibrated.</li>
+              <li>Energy balance behind an <code>eTemp</code> switch (off by default); with it off the trap-free sweep is byte-identical to the old model up to <span class="num">4 V</span>.</li>
+              <li>Without the thermoelectric term it converges: electrons reach <span class="num">1,800–3,900 K</span> by about 2 V. With statistics at the lattice temperature the current matches drift-diffusion exactly; with statistics at the electron temperature it rises by <span class="num">+17 to +48%</span> at 2 V (245 vs 168 mA/mm at τ 1 ps).</li>
+              <li>With τ = 0.1–1 ps the late-collapse trap set starts collapsing at <span class="num">0.2–0.6 V</span> instead of 2.3 / 3.5 V, but most of those runs stop at the runaway.</li>
+              <li>Added the thermoelectric (Seebeck) current term, then debugged it with capped-iteration field dumps: Newton damping and a density floor were added, but the first update still drives the electron temperature to about 0.3 K below the 2DEG in the access region.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill noted">parked</span><span>Every run with the thermoelectric term fails at the first 0.1 V step. Next to try: make the convective energy flux exactly 1.5·k·Te times the electron current (same mobility and floor), then rerun the debug job. Details in <code>progress.md</code>.</span></li>
+              <li><span class="pill noted">noted</span><span>The +17–48% current from statistics at the electron temperature is likely an artifact without the thermoelectric term; it would also shift the Vds = 10 V calibration.</span></li>
+              <li><span class="pill open">open</span><span>Trap runs with the energy balance stop at the runaway: the plain solve at the next Vd already fails, so the Te-ramp rescue never starts. Needs a continuation in τ or in the trap coupling.</span></li>
+              <li><span class="pill noted">stopped</span><span>Three test sets cancelled once they were clearly failing (45193421, 45209165, 45210604).</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs wide">
+          <figure><a class="img" href="fig/eTemp_IdVd.jpg" target="_blank" rel="noopener"><img src="fig/eTemp_IdVd.jpg" alt="Trap-free Id-Vd with the energy balance against drift-diffusion, and trap runs against the old model" loading="lazy"></a><figcaption><b>Energy balance without the thermoelectric term (job 45186466, cancelled early)</b>Left: statistics at the electron temperature lift the current well above drift-diffusion; at lattice temperature (st0) it matches. Right: trap runs collapse at 0.2–0.6 V and stop; dashed = old local-field model.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#oct03">Oct 3 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
@@ -226,7 +262,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
         <div class="figs wide">
           <figure><a class="img" href="fig/posMap_tl0.25_tp6e18.gif" target="_blank" rel="noopener"><img src="fig/posMap_tl0.25_tp6e18.gif" alt="Animation of the suppression surface for 0.25 eV, 6e18 as Vd sweeps 0.1 to 3.0 V" loading="lazy"></a><figcaption><b>0.25 eV / 6e18, animated (Vd 0.1 → 3.0 V)</b>The collapse front moves out from the field plate edge with Vd; 44 of 65 positions cut more than 10× by 3 V. GIFs for all sets are in <code>figures/posMap_*.gif</code>.</figcaption></figure>
         </div>
-        <div class="pager"><a href="#overview">← Overview</a><a href="#oct02">Oct 2 →</a></div>
+        <div class="pager"><a href="#oct08">← Oct 7–8</a><a href="#oct02">Oct 2 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
