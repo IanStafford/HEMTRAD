@@ -6,6 +6,7 @@
 #                  - div(1.5 k Te n mu grad(k Te))     heat conduction
 #                  - n mu |grad Qfn|^2                 Joule heating (J.E)
 #                  + 1.5 k n (Te - T) / tau            energy relaxation to the lattice
+#   (etThermo 1: J includes the thermoelectric grad(Te) part, see Continuity.tcl)
 #
 # Same form as Sentaurus' hydrodynamic electron energy equation with Qfn,Qfn as
 # the heat source. Levers (GaN_modelfile_masterD): etTau (tau), etMob (which
@@ -40,6 +41,14 @@ proc ElecTemperature {Mat} {
     #                       eV     cm-3                  / s  cm2 (integration in 2D) eV/ cm s
     set EnergyRelax "(1.5 * $keV * $Ele * (ETemp - Temp) / $tau)"
 
+    global etStats etThermo
+    if {$etStats && $etThermo} {
+        # the current now has a grad(Te) part (Continuity.tcl ElecDelta); carry
+        # it into the convective energy flux and the Joule heating J.grad(EFn)
+        set D [ElecDelta]
+        set HeatFlux1 "(1.5 * $keV * ETemp * $Ele * $mob * grad(Qfn)) + (1.5 * $keV * ETemp * $Ele * $mob * $keV * $D * grad(ETemp))"
+        set HeatGen  "($Ele * $mob * (dot(Qfn,Qfn) + $keV * $D * dot(Qfn,ETemp)))"
+    }
     set eqn "$HeatCap - $HeatFlux1 - $HeatFlux2 - $HeatGen + $EnergyRelax"
     pdbSetString $Mat ETemp Equation "$eqn"
 }
