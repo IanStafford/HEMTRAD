@@ -21,7 +21,7 @@ proc DbgDump {tag} {
             puts $f "# $fld along y at x = $xc um"
             puts $f [print1d xv=$xc]
         }
-        foreach yc {-0.4 -0.125 0.0 0.125 0.2 0.5 1.0 2.0} {
+        foreach yc {-0.401 -0.124 0.001 0.126 0.201 0.501 1.001 2.001} {
             puts $f "# $fld along x at y = $yc um"
             puts $f [print1d yv=$yc]
         }
