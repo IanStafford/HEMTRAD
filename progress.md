@@ -1063,3 +1063,6 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Next step to try (proposed, not approved yet):** make the convective energy flux exactly 1.5 k Te times the continuity flux (same mobility and the same 1e2 floor as `ElecContinuity`), so at uniform Te it has zero divergence; then rerun `eTempDebug.slurm` (thermo_full vs no_thermo) before any sweep. Other options: tau continuation (needs tau as a data field), or the thermo-free / etStats 0 configuration for trap studies.
 - Cancelled to free CPUs (Ian): 45209165 (pre-floor set) and 45210604 (floored set).
 - Dashboard updated for Oct 7–8 (version 5): https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd
+
+## 2026-10-12
+- Knowledge base (Ian): `kb/` Obsidian second brain, 38 atomic linked notes (index, status, glossary; device, model, numerics, workflow, tools, results) distilled from CLAUDE.md, archive/static_mobility/RESULTS.md and this log. Symlinked into the vault as `~/notes/HEMTRAD-vault/kb`. CLAUDE.md slimmed to the operating rules (329 -> ~110 lines) with a KB map and a rule to keep the KB current; the dashboard wrap-up procedure moved to `kb/workflow/dashboard.md`.
