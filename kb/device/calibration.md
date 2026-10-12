@@ -5,9 +5,9 @@ date: 2026-10-01
 ---
 # Calibration vs the measured HfO2 device
 
-**Target:** `figures/rfDeviceHFO2_Experimental.csv` (raw: `figures/RF_100nmHfOx_IdVgs_Example1.xlsx`): Id–Vgs at **Vds = 10 V**, 25 °C, 100 nm HfO2, standard FP. `Ids` is in A for a **200 µm** device → mA/mm = A·1e3/0.2 (634 mA/mm at Vg 0, 810 at +1 V). Gate leakage ≤2e-3 mA/mm; the off-state floor (~0.075 mA/mm) is drain leakage, not modelled (Ian: qualitative OFF vs ON only).
+**Target:** `data/rfDeviceHFO2_Experimental.csv` (raw: `data/RF_100nmHfOx_IdVgs_Example1.xlsx`): Id–Vgs at **Vds = 10 V**, 25 °C, 100 nm HfO2, standard FP. `Ids` is in A for a **200 µm** device → mA/mm = A·1e3/0.2 (634 mA/mm at Vg 0, 810 at +1 V). Gate leakage ≤2e-3 mA/mm; the off-state floor (~0.075 mA/mm) is drain leakage, not modelled (Ian: qualitative OFF vs ON only).
 
-**Driver:** `calibIdVg.tcl` (trap-free, Vd ramp then Vg +1 → −4 V; levers `Vd_cal`, `Rs_contact`/`Rd_contact` lumped series resistance via SolveRc, `deviceDeck`). Scored by `calib_score.py` (aligns by a rigid Vg shift = ΔphiB), plotted by `plot_calib.py` → `figures/calib_IdVg.png`.
+**Driver:** `drivers/calibIdVg.tcl` (trap-free, Vd ramp then Vg +1 → −4 V; levers `Vd_cal`, `Rs_contact`/`Rd_contact` lumped series resistance via SolveRc, `deviceDeck`). Scored by `analysis/calib_score.py` (aligns by a rigid Vg shift = ΔphiB), plotted by `analysis/plot_calib.py` → `figures/calib_IdVg.png`.
 
 **Result: the existing deck with `mobModel field` is the calibration; no parameters changed.** Id within ±2.4% from Vg −2.6 to +1 V (rms 1.9% to 0 V); −2 V: −1.5%; 0 V: 649 vs 634; +1 V: 802 vs 810. Threshold region ±15% (model turns on slightly steeper). Static mobility: 10% rms, wrong shape.
 

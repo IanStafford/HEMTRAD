@@ -1,6 +1,6 @@
 """Curve-tracer Id-Vd at other gate voltages (job 44573629), one folder per Vg.
 
-usage: python3 plot_curveTracer.py [run_dir]   (default results/20261003_curveTracer)
+usage: python3 analysis/plot_curveTracer.py [run_dir]   (default results/20261003_curveTracer)
 For each Vg in the run writes figures/Vg_<Vg>V/curveTracer_Vg<Vg>V.png (log and
 linear Id-Vd of the four key devices, with the Vg = -2 V curve of each device as
 a thin dashed line for reference) and copies the CSVs there. Vg = -2 V results

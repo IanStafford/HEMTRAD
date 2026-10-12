@@ -42,8 +42,13 @@ proc trapPlot {ivCSV} {
 window row=1 col=2
 set trapEn 1
 
-source GaN_modelfile_masterD
-source rfdevice.tcl
+# model/ next to drivers/ in the repo (run from the repo root); a sweep task dir has
+# the model files flat next to the driver
+if {![info exists modelDir]} {
+    if {[file exists GaN_modelfile_masterD]} { set modelDir . } elseif {[file isdirectory model]} { set modelDir model } else { set modelDir [file join [file dirname [info script]] .. model] }
+}
+source [file join $modelDir GaN_modelfile_masterD]
+source [file join $modelDir rfdevice.tcl]
 
 pdbSetDouble GaN Qfn DampValue 0.10
 pdbSetDouble GaN Qfp DampValue 0.10

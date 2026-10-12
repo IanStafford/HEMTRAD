@@ -5,7 +5,7 @@
 # extra (optional): more lever settings, ';'-separated, e.g. 'etThermoJ 0;etThermoE 1'
 # teProfile: comma-separated Vd list for ETemp cut dumps (or "-").
 # Output: results/$RUN/<tag>/ (RUN default 20261008_eTemp1). Submit with
-#   sbatch --array=0-N --export=ALL,PARAMS=params_x.txt,RUN=<run> pulsedIV_eTemp.slurm
+#   sbatch --array=0-N --export=ALL,PARAMS=params_x.txt,RUN=<run> sweeps/pulsedIV_eTemp.slurm   (from the repo root)
 #
 #SBATCH --job-name=pulsedIV_eTemp
 #SBATCH --account=ee1
@@ -21,7 +21,7 @@ set -euo pipefail
 REPO=/home/ianstafford/blue/ee1/ianstafford/HEMTRAD
 PARAMS=${PARAMS:-params_eTemp1.txt}
 RUN=${RUN:-20261008_eTemp1}
-LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/$PARAMS")
+LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/sweeps/$PARAMS")
 IFS="|" read -r TAG ETEMP ETTAU ETMOB ETSTATS TRAPEN TRAPPEAK TRAPLEVEL HOTTAU HOTEB TRAPMEANY VG VDMAX TEPROF EXTRA <<< "$LINE"
 TASK_DIR=$REPO/results/$RUN/$TAG
 
@@ -35,7 +35,7 @@ export PATH=$HOME/.local/flooxs/bin:$PATH
 
 mkdir -p "$TASK_DIR"
 for f in GaN_modelfile_masterD GaN.tcl AlGaN.tcl Insulator.tcl Metal.tcl Continuity.tcl Poisson.tcl ETemp.tcl rfdevice.tcl; do
-    cp "$REPO/$f" "$TASK_DIR/$f"
+    cp "$REPO/model/$f" "$TASK_DIR/$f"
 done
 
 PROF=""
@@ -63,7 +63,7 @@ DRIVER="$TASK_DIR/pulsedIV_task.tcl"
     echo "set teProfile {$PROF}"
     if [ -n "${EXTRA:-}" ]; then echo "$EXTRA" | tr ';' '\n' | sed 's/^ */set /'; fi
     echo "set ivCSV     \"pulsedIV_${TAG}.csv\""
-    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/pulsedIV.tcl"
+    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/drivers/pulsedIV.tcl"
 } > "$DRIVER"
 
 cat > "$TASK_DIR/params.json" <<JSON

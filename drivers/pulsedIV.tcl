@@ -58,13 +58,18 @@ if {![info exists teRampTol]} { set teRampTol 0.01 }   ;# stop when Te is within
 if {![info exists teRampMax]} { set teRampMax 300 }    ;# max ramp sub-steps per point
 #==============================================
 
-source GaN_modelfile_masterD
+# model/ next to drivers/ in the repo (run from the repo root); a sweep task dir has
+# the model files flat next to the driver
+if {![info exists modelDir]} {
+    if {[file exists GaN_modelfile_masterD]} { set modelDir . } elseif {[file isdirectory model]} { set modelDir model } else { set modelDir [file join [file dirname [info script]] .. model] }
+}
+source [file join $modelDir GaN_modelfile_masterD]
 # Electron-temperature profiles (eTemp lever): at each Vd in this list, write
 # ETemp along cuts at the AlGaN top (x = 0, the trap row) and in the 2DEG
 # (x = 0.016 um) to <ivCSV root>_Te_Vd<Vd>.txt. Empty = none.
 if {![info exists teProfile]} { set teProfile {} }
 if {![info exists deviceDeck]} { set deviceDeck rfdevice.tcl } ;# device structure deck (rfdevice_SiN.tcl: SiN instead of HighK)
-source $deviceDeck
+source [file join $modelDir $deviceDeck]
 
 pdbSetDouble GaN Qfn DampValue $dampValue
 pdbSetDouble GaN Qfp DampValue $dampValue

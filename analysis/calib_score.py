@@ -6,13 +6,13 @@ equation only as G - phiB, the shifted curve is what a run at
 phiB = phiB_run - dv gives (apart from the field plate, which also uses phiB;
 confirm the final value with a real run).
 
-usage: python3 calib_score.py [--phiB 1.65] label=sim.csv [label=sim.csv ...]
+usage: python3 analysis/calib_score.py [--phiB 1.65] label=sim.csv [label=sim.csv ...]
 """
 import sys
 
 import numpy as np
 
-EXP = "figures/rfDeviceHFO2_Experimental.csv"
+EXP = "data/rfDeviceHFO2_Experimental.csv"
 W_MM = 0.2
 
 args = sys.argv[1:]

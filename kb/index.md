@@ -40,7 +40,7 @@ Second brain for the FLOOXS model of **radiation-induced current collapse** in a
 - [[local-runs]] — running FLOOXS on the workstation
 - [[git-conventions]] — what to commit, CRLF files, archiving
 - [[dashboard]] — the work-log artifact and the "wrap up for the day" procedure
-- [[drivers]] — `pulsedIV.tcl`, `calibIdVg.tcl`, `stressFreeze.tcl` …
+- [[drivers]] — `drivers/pulsedIV.tcl`, `drivers/calibIdVg.tcl`, `drivers/stressFreeze.tcl` …
 - [[analysis-scripts]] — Python analysis and plotting
 - [[notebook]] — `figures.ipynb`
 - [[repo-locations]] — the three repo copies, Obsidian vault, flooxs checkouts

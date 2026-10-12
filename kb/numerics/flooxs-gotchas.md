@@ -16,6 +16,6 @@ tags: [numerics, reference]
 - `pdbSetDouble Math iterLimit N` caps Newton iterations (default 20) — handy for capped-iteration debug dumps.
 - **Headless runs segfault on `chart`/`plot1d`/`window`**: run a copy with `sed -i 's/^window.*//; s/^\(\s*\)chart /\1#chart /'` (the flooxs-pyplot build draws them with matplotlib instead).
 - FLOOXS source for checking behaviour: `~/flooxs/src` (e.g. Newton limits in `diffuse/Newton.cc`, Fermi integrals `f12`/`f32` in `math/Vector.cc`).
-- Three model files are **CRLF**: `GaN_modelfile_masterD`, `Metal.tcl`, `Continuity.tcl` ([[git-conventions]]).
+- Three model files are **CRLF**: `model/GaN_modelfile_masterD`, `model/Metal.tcl`, `model/Continuity.tcl` ([[git-conventions]]).
 
 Related: [[local-runs]], [[hpg-workflow]].

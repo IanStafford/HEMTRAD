@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
-# usage: python3 analyze_trapMapSets.py [run_dir [tag]]  (default: the 10n field-mobility
+# usage: python3 analysis/analyze_trapMapSets.py [run_dir [tag]]  (default: the 10n field-mobility
 # Run F map; the static 10f run is results/archive_static_mobility/20260927_trapMapSets)
 RUN = sys.argv[1] if len(sys.argv) > 1 else "results/20261001_trapMapF_field"
 TAG = sys.argv[2] if len(sys.argv) > 2 else "trapMapF_field"

@@ -8,7 +8,7 @@ trap-free current at Vd = 0.1 V are "off at rest" (no collapse to speak of).
 Runs that stop early (PULSED GAVE UP) with no recorded collapse are "stalled";
 their onset is the Vd they could not reach (the runaway, CLAUDE.md 10.5).
 
-usage: python3 analyze_onset.py run_dir tag [rows cols xpar ypar]
+usage: python3 analysis/analyze_onset.py run_dir tag [rows cols xpar ypar]
   defaults (round 1): rows=trapLevel cols=hotEb x=hotTau y=trapPeak
 Writes figures/<tag>_metrics.csv and figures/<tag>.png (one panel per
 rows x cols value; cells coloured by onset Vd, labelled by class).

@@ -1,28 +1,30 @@
 #!/bin/bash
-# Te-ramp rescue of runs that stalled (PULSED GAVE UP) at the runaway: rerun with
-# the current pulsedIV.tcl, whose TeRampPoint fallback continues in Te at fixed
-# Vd where the sweep used to give up (CLAUDE.md 10.5). Original solver settings
-# (dampValue 0.05, retryDepth 5), so the curve up to the old stall is identical.
-# The analysis scripts read <run>Retry* and keep whichever run got further.
+# Position maps at five trap level / concentration combinations (hot-electron
+# levers fixed at the late-onset set: hotTau 1e-14 / hotEb 1.0, sigma 0.04):
+# 5 sets x 65 positions (trapMeanX {0..15 nm} x trapMeanY {-0.4..2.4 um}). No
+# reference task: reuse the trap-free CSV of 20261002_posMapLate (task_65). Vd 0-3 V / 0.1 V.
 #
-# One line per task in params_onsetField3Ramp.txt:
-#   trapPeak|trapLevel|hotTau|hotEb|trapMeanY
+# One line per task in params_posMapLM.txt:
+#   setTag|trapPeak|trapLevel|hotTau|hotEb|trapMeanX|trapMeanY
+# Each set writes results/20261003_posMap_<setTag>/task_<0..64> (one plot_posVd.py run per set).
 #
-#SBATCH --job-name=pulsedIV_onsetField3Ramp
+#SBATCH --job-name=pulsedIV_posMapLM
 #SBATCH --account=ee1
 #SBATCH --qos=ee1-b
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4gb
-#SBATCH --time=03:00:00
-#SBATCH --array=0-18%20
-#SBATCH --output=results/20261002_onsetField3RetryRamp/slurm_%A_%a.out
-#SBATCH --error=results/20261002_onsetField3RetryRamp/slurm_%A_%a.err
+#SBATCH --time=06:00:00
+#SBATCH --array=0-324%170
+#SBATCH --output=results/20261003_posMapLM_logs/slurm_%A_%a.out
+#SBATCH --error=results/20261003_posMapLM_logs/slurm_%A_%a.err
 
 set -euo pipefail
 
 REPO=/home/ianstafford/blue/ee1/ianstafford/HEMTRAD
-RUN_DIR=$REPO/results/20261002_onsetField3RetryRamp
-TASK_DIR=$RUN_DIR/task_${SLURM_ARRAY_TASK_ID}
+LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/sweeps/params_posMapLM.txt")
+IFS="|" read -r SETTAG TRAPPEAK TRAPLEVEL HOTTAU HOTEB TRAPMEANX TRAPMEANY <<< "$LINE"
+RUN_DIR=$REPO/results/20261003_posMap_${SETTAG}
+TASK_DIR=$RUN_DIR/task_$((SLURM_ARRAY_TASK_ID % 65))
 
 module restore flooxsenv
 eval "$(conda shell.bash hook)"
@@ -34,18 +36,10 @@ export PATH=$HOME/.local/flooxs/bin:$PATH
 
 mkdir -p "$TASK_DIR"
 
-LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/params_onsetField3Ramp.txt")
-IFS='|' read -r TRAPPEAK TRAPLEVEL HOTTAU HOTEB TRAPMEANY <<< "$LINE"
-TRAPMEANX=0.0
-
-if [ "$TRAPPEAK" = "1e10" ]; then
-    TAG="notrap"
-else
-    TAG=$(printf 'tp%.2e_tl%.2f_ht%.2e_eb%.2f_my%.3e' "$TRAPPEAK" "$TRAPLEVEL" "$HOTTAU" "$HOTEB" "$TRAPMEANY")
-fi
+TAG=$(printf 'mx%.3e_my%.3e' "$TRAPMEANX" "$TRAPMEANY")
 
 for f in GaN_modelfile_masterD GaN.tcl AlGaN.tcl Insulator.tcl Metal.tcl Continuity.tcl Poisson.tcl rfdevice.tcl; do
-    cp "$REPO/$f" "$TASK_DIR/$f"
+    cp "$REPO/model/$f" "$TASK_DIR/$f"
 done
 
 DRIVER="$TASK_DIR/pulsedIV_task.tcl"
@@ -57,12 +51,12 @@ DRIVER="$TASK_DIR/pulsedIV_task.tcl"
     echo "set hotTau    $HOTTAU"
     echo "set trapMeanX $TRAPMEANX"
     echo "set trapMeanY $TRAPMEANY"
-    echo "set Vd_max    4.0"
+    echo "set Vd_max    3.0"
     echo "set Vd_step   0.1"
     echo "set dampValue 0.05"
     echo "set mobModel  field"
     echo "set ivCSV     \"pulsedIV_${TAG}.csv\""
-    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/pulsedIV.tcl"
+    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/drivers/pulsedIV.tcl"
 } > "$DRIVER"
 
 cat > "$TASK_DIR/params.json" <<JSON
@@ -74,10 +68,11 @@ cat > "$TASK_DIR/params.json" <<JSON
   "hotTau": $HOTTAU,
   "trapMeanX": $TRAPMEANX,
   "trapMeanY": $TRAPMEANY,
-  "Vd_max": 4.0,
+  "Vd_max": 3.0,
   "Vd_step": 0.1,
   "dampValue": 0.05,
   "mobModel": "field",
+  "setTag": "$SETTAG",
   "task_id": $SLURM_ARRAY_TASK_ID
 }
 JSON

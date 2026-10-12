@@ -1,6 +1,6 @@
 """Id-Vd of the latest deep collapses (round 3 + Te-ramp rescue) vs trap-free.
 
-usage: python3 plot_lateIdVd.py  ->  figures/lateOnset_IdVd.png
+usage: python3 analysis/plot_lateIdVd.py  ->  figures/lateOnset_IdVd.png
 """
 import matplotlib.pyplot as plt
 import numpy as np

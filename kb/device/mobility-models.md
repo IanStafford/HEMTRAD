@@ -1,7 +1,7 @@
 ---
 title: Mobility models
 tags: [device, model]
-source: GaN.tcl, AlGaN.tcl
+source: model/GaN.tcl, model/AlGaN.tcl
 ---
 # Mobility models (`mobModel` lever)
 

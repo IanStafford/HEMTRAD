@@ -1,9 +1,9 @@
 ---
 title: Trap model
 tags: [model]
-source: Poisson.tcl, GaN_modelfile_masterD
+source: model/Poisson.tcl, model/GaN_modelfile_masterD
 ---
-# Trap model (`Poisson.tcl`)
+# Trap model (`model/Poisson.tcl`)
 
 **`IonizedAcceptor Mat Ntrap Etrap Efwhm {g 2}`** — acceptor traps, **neutral when empty, −q when filled**. `IonAcceptor = Ntrap · f`, f = Fermi–Dirac occupancy of a level at `Econd − Etrap` (degeneracy g = 2), with a Gaussian energy spread (FWHM `trapWidth`) via 3-point Gauss–Hermite. Poisson uses `− IonAcceptor`. Spatial density from `TrapConc_<trapShape>` (Gaussian or cone; [[levers]]).
 

@@ -6,7 +6,7 @@ log10(Id_no-trap / Id), capped at the ~1e-8 mA/mm noise floor. A shared z-scale
 across all panels makes the frames comparable (and GIF-ready). Each point is
 also coloured on the floor by its collapse class / onset (CLAUDE.md §10.0).
 
-usage: python3 plot_posVd.py run_dir tag [Vd list, comma-separated]
+usage: python3 analysis/plot_posVd.py run_dir tag [Vd list, comma-separated]
   default Vd: 0.3,0.6,...,3.0
 Writes figures/<tag>_grid.png (all panels), figures/<tag>_frames/Vd_<v>.png
 (one per Vd, for a GIF) and figures/<tag>_onset.png (onset Vd vs position).

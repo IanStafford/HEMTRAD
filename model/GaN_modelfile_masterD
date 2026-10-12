@@ -1,3 +1,7 @@
+# Model files live together in model/ (or flat in a sweep task dir). modelDir is set
+# by the driver; standalone, default to this file's own folder.
+if {![info exists modelDir]} { set modelDir [file dirname [info script]] }
+
 #########################################################################################
 #constants for each material
 #########################################################################################
@@ -14,10 +18,10 @@ set egan 7.88e-13
 # electron mobility model: static (constant) or field (doping/temperature/field dependent)
 if {![info exists mobModel]} { set mobModel field }  ;# calibrated vs the HfO2 device (CLAUDE.md 10m); static = old constant 600
 
-source GaN.tcl
-source AlGaN.tcl
-source Insulator.tcl
-source Metal.tcl
+source [file join $modelDir GaN.tcl]
+source [file join $modelDir AlGaN.tcl]
+source [file join $modelDir Insulator.tcl]
+source [file join $modelDir Metal.tcl]
 
 
 #thermal domain
@@ -49,7 +53,7 @@ if {$eTemp} {
 
 
 
-source Continuity.tcl
+source [file join $modelDir Continuity.tcl]
 ElecContinuity GaN
 ElecContinuity AlGaN
 
@@ -57,7 +61,7 @@ HoleContinuity GaN
 HoleContinuity AlGaN
 
 if {$eTemp} {
-    source ETemp.tcl
+    source [file join $modelDir ETemp.tcl]
     ElecTemperature GaN
     ElecTemperature AlGaN
     ETempContact S
@@ -73,7 +77,7 @@ pdbSetString AlGaN_GaN DevPsi Equation "$polCharge"
 # excess of the AlGaN surface polarization charge (passivation-induced). Unset = none.
 if {[info exists surfCharge]} { pdbSetString AlGaN_Nitride DevPsi Equation "$surfCharge" }
 
-source Poisson.tcl
+source [file join $modelDir Poisson.tcl]
 Poisson AlGaN
 Poisson GaN
 InsPoisson Metal

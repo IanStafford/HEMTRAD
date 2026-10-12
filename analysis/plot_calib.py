@@ -1,10 +1,10 @@
 """Transfer-curve calibration plot: experiment vs FLOOXS (calibIdVg.tcl).
 
-Experiment: figures/rfDeviceHFO2_Experimental.csv, Id-Vg at Vds = 10 V, measured
+Experiment: data/rfDeviceHFO2_Experimental.csv, Id-Vg at Vds = 10 V, measured
 in A for a 200 um gate width -> mA/mm = A * 1e3 / 0.2. FLOOXS currents are per
 um of depth (A/um), written by calibIdVg.tcl as mA/mm already.
 
-usage: python3 plot_calib.py out.png label1=sim1.csv [label2=sim2.csv ...]
+usage: python3 analysis/plot_calib.py out.png label1=sim1.csv [label2=sim2.csv ...]
 Panels: Id-Vg (linear), Id-Vg (log), error vs experiment (%), gm (mS/mm).
 """
 import sys
@@ -12,7 +12,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-EXP = "figures/rfDeviceHFO2_Experimental.csv"
+EXP = "data/rfDeviceHFO2_Experimental.csv"
 W_MM = 0.2                      # measured device gate width, 200 um
 INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"
 CAT = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]

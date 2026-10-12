@@ -5,7 +5,7 @@ mobility 600). field: job 44342967, results/20261001_trapMapF_field (mobModel
 field, the model calibrated against the HfO2 device, CLAUDE.md 10m). Each is
 normalised to its own trap-free reference.
 
-usage: python3 analyze_mobCompare.py [trapPeak trapLevel field_run tag]
+usage: python3 analysis/analyze_mobCompare.py [trapPeak trapLevel field_run tag]
 Writes figures/<tag>_metrics.csv, _3d.png and _compare.png.
 """
 import glob

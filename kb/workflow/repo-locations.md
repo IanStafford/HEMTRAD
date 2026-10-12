@@ -4,6 +4,22 @@ tags: [workflow, reference]
 ---
 # Where things live
 
+## Repo layout (since 2026-10-12)
+| Folder | Contents |
+|---|---|
+| `model/` | model + device decks (sourced together; 3 CRLF files) |
+| `drivers/` | Tcl drivers ([[drivers]]) |
+| `sweeps/` | SLURM templates and `params_*.txt` ([[sweep-pattern]]) |
+| `analysis/` | Python analysis/plotting ([[analysis-scripts]]) |
+| `data/` | measured inputs (HfO2 Id–Vg, raw xlsx) |
+| `figures/` | outputs; `figures.ipynb` at the root ([[notebook]]) |
+| `dashboard/`, `kb/`, `archive/` | [[dashboard]], this KB, superseded work |
+| `results/` | raw sweep results (gitignored) |
+
+Before 2026-10-12 everything sat flat in the root; `progress.md` and old commits use those paths. `README.md` summarises the layout.
+
+## Machines and checkouts
+
 | What | Path |
 |---|---|
 | HEMTRAD working copy (agent edits here) | workstation `/home/staffian/HEMTRAD` |

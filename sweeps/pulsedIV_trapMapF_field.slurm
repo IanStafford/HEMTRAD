@@ -35,7 +35,7 @@ export PATH=$HOME/.local/flooxs/bin:$PATH
 
 mkdir -p "$TASK_DIR"
 
-LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/params_trapMapF_field.txt")
+LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/sweeps/params_trapMapF_field.txt")
 IFS='|' read -r TRAPPEAK TRAPLEVEL TRAPMEANX TRAPMEANY <<< "$LINE"
 
 if [ "$TRAPPEAK" = "1e10" ]; then
@@ -45,7 +45,7 @@ else
 fi
 
 for f in GaN_modelfile_masterD GaN.tcl AlGaN.tcl Insulator.tcl Metal.tcl Continuity.tcl Poisson.tcl rfdevice.tcl; do
-    cp "$REPO/$f" "$TASK_DIR/$f"
+    cp "$REPO/model/$f" "$TASK_DIR/$f"
 done
 
 DRIVER="$TASK_DIR/pulsedIV_task.tcl"
@@ -62,7 +62,7 @@ DRIVER="$TASK_DIR/pulsedIV_task.tcl"
     echo "set dampValue 0.05"
     echo "set mobModel  field"
     echo "set ivCSV     \"pulsedIV_${TAG}.csv\""
-    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/pulsedIV.tcl"
+    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/drivers/pulsedIV.tcl"
 } > "$DRIVER"
 
 cat > "$TASK_DIR/params.json" <<JSON

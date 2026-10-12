@@ -1,6 +1,6 @@
 """Electron energy balance (eTemp) runs vs the old local-field model.
 
-usage: python3 plot_eTemp.py [run_dir]   (default results/20261008_eTemp1)
+usage: python3 analysis/plot_eTemp.py [run_dir]   (default results/20261008_eTemp1)
 Writes figures/eTemp_IdVd.png (trap-free variants and trap runs vs the
 local-model / drift-diffusion counterparts) and figures/eTemp_profiles.png
 (ETemp along the 2DEG and the trap row at several Vd), and prints a summary.

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-FLOOXS (Tcl) TCAD decks for an AlGaN/GaN HEMT (HighK/HfO2-passivated, T-gate + field plate), driver scripts, HPG sweep templates, Python analysis scripts and `figures/`. Superseded work is in `archive/` (static-mobility era: `archive/static_mobility/`, also branch `static-mobility`).
+FLOOXS (Tcl) TCAD model of an AlGaN/GaN HEMT (HighK/HfO2-passivated, T-gate + field plate). Layout: `model/` (model + device decks), `drivers/` (Tcl drivers), `sweeps/` (SLURM templates + params), `analysis/` (Python), `data/` (measured inputs), `figures/` (outputs), `dashboard/`, `kb/`, `archive/` (superseded; static-mobility era also on branch `static-mobility`), `results/` (gitignored). See `README.md` and `kb/workflow/repo-locations.md`.
 
 **Context:** model the **radiation-induced current collapse** seen on a pulsed curve tracer: at Vgs = −2 V, Id–Vd runs normally, then drops ~1000× at a small Vd (~0.4–0.5 V), then creeps up slightly with Vd (the creep is physical). The deck is calibrated against a measured HfO2 transfer curve with the field-dependent mobility.
 
@@ -19,6 +19,7 @@ FLOOXS (Tcl) TCAD decks for an AlGaN/GaN HEMT (HighK/HfO2-passivated, T-gate + f
 - **Obsidian vault** `~/notes/HEMTRAD-vault` (outside the repo): symlinks only — `CLAUDE.md`, `progress.md`, `archive/static_mobility/RESULTS.md` and the `kb/` folder. Never copy or move repo files into it; never open the repo itself as a vault (`.obsidian/` is gitignored as a safety net). To add something, `ln -s` it there.
 - **Where things run:** short checks (a few points, syntax, debugging a deck) locally; sweeps, more than ~3 driver runs or anything long → SLURM on HPG. When Ian says to run everything on HPG for the day, don't run FLOOXS locally.
 - All paths, binaries and checkouts: `kb/workflow/repo-locations.md`.
+- **Run everything from the repo root:** `flooxs drivers/<driver>.tcl` (drivers find `model/` themselves, or the flat model files in a sweep task directory), `python3 analysis/<script>.py`, `sbatch sweeps/<template>.slurm`.
 
 ---
 
@@ -42,7 +43,7 @@ When you need Ian to decide something, write it in `progress.md` **and** send a 
 - `--account=ee1`. QOS `ee1` = 19 CPUs for the whole group; burst `ee1-b` ≈ 171 CPUs. Check `squeue -A ee1` before submitting; throttle arrays with `%N`.
 - **Ask Ian before any `sbatch`** unless he approved that specific run in the current task. **Ask before any `scancel`.** Only cancel your own job IDs, never `scancel -u`.
 - Poll every 5 minutes with a background `sleep 300` loop, never a busy loop.
-- Follow the sweep pattern exactly (per-task directories, never edit the repo copy in place, `params.json` per task, check **every** task's logs for crashes/OOM/timeouts/`PULSED GAVE UP`/core files before plotting, rsync back excluding cores).
+- Follow the sweep pattern exactly (submit from the repo root, per-task directories with the model files copied flat, never edit the repo copy in place, `params.json` per task, check **every** task's logs for crashes/OOM/timeouts/`PULSED GAVE UP`/core files before plotting, rsync back excluding cores).
 
 ---
 
@@ -57,9 +58,9 @@ When you need Ian to decide something, write it in `progress.md` **and** send a 
 ## 4. Git (details: `kb/workflow/git-conventions.md`)
 
 - `git pull` at session start; commit (message names runs/levers) and push after meaningful changes.
-- Commit decks, drivers, `.slurm`, `params_*.txt`, analysis scripts, `progress.md`, `kb/`, `dashboard/`, small final CSVs/figures. **Don't commit** `results/`, logs, meshes, build artifacts, `.obsidian/`.
-- **CRLF files:** `GaN_modelfile_masterD`, `Metal.tcl`, `Continuity.tcl` must keep CRLF. Edit from Python with `open(..., newline='')`; check `file <name>` afterwards.
-- **Commit before changing any model file** (`GaN_modelfile_masterD`, `Poisson.tcl`, `GaN.tcl`, `AlGaN.tcl`, `Metal.tcl`, `Insulator.tcl`, `Continuity.tcl`, `ETemp.tcl`, `rfdevice*.tcl`).
+- Commit `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/`, `progress.md`, `kb/`, `dashboard/`, `README.md`, small final CSVs/figures. Keep new files in the matching folder. **Don't commit** `results/`, logs, meshes, build artifacts, `.obsidian/`.
+- **CRLF files:** `model/GaN_modelfile_masterD`, `model/Metal.tcl`, `model/Continuity.tcl` must keep CRLF. Edit from Python with `open(..., newline='')`; check `file <name>` afterwards.
+- **Commit before changing any model file** (`model/GaN_modelfile_masterD`, `model/Poisson.tcl`, `model/GaN.tcl`, `model/AlGaN.tcl`, `model/Metal.tcl`, `model/Insulator.tcl`, `model/Continuity.tcl`, `model/ETemp.tcl`, `rfdevice*.tcl`).
 - Superseded work goes to `archive/<name>/` with a README, not deleted.
 
 ---
@@ -68,7 +69,7 @@ When you need Ian to decide something, write it in `progress.md` **and** send a 
 
 - **Don't change the physics to get convergence.** If a run diverges, first try solver-side fixes (smaller Vd step, damping, better initial guess, retry/continuation). Propose any change to trap physics, capture/emission, Poisson or transport terms to Ian (via `progress.md` + notification) before making it, and explain why.
 - Every lever keeps an `info exists` default; new options default to the old behaviour (`kb/model/levers.md`).
-- Sweeps always set the trap levers explicitly (`pulsedIV.tcl`'s defaults are not Run F).
+- Sweeps always set the trap levers explicitly (`drivers/pulsedIV.tcl`'s defaults are not Run F).
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Hot-electron capture
 tags: [model]
-source: Poisson.tcl
+source: model/Poisson.tcl
 ---
 # Hot-electron capture
 

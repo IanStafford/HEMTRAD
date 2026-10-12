@@ -2,11 +2,11 @@
 title: Retry with store/restore and Vd bisection
 tags: [numerics, driver]
 date: 2026-09-27
-source: pulsedIV.tcl
+source: drivers/pulsedIV.tcl
 ---
 # Retry: catch + store/restore + Vd bisection
 
-Built into `pulsedIV.tcl` since 2026-09-27. Each Vd point:
+Built into `drivers/pulsedIV.tcl` since 2026-09-27. Each Vd point:
 1. `SaveState`: `device store`, copy `TrapFrozen` → `TFsave`, `TeTrap` → `TEsave`.
 2. `TryPoint`: set Vd, `device`, then `FillStep` (inside `catch`).
 3. On failure: `RestoreState` (`device restore` — clears the solver queues, see [[munmap-crash]] — plus the trap memory fields), then **bisect** the Vd step (`retryDepth` levels, default 5; `retrySubFill` 1 = full FillStep at substeps, 0 = plain solve).

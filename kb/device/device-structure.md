@@ -1,9 +1,9 @@
 ---
 title: Device structure
 tags: [device]
-source: rfdevice.tcl
+source: model/rfdevice.tcl
 ---
-# Device structure (`rfdevice.tcl`)
+# Device structure (`model/rfdevice.tcl`)
 
 2D cross-section; **x = depth** (µm, 0 = AlGaN top, increasing into the device), **y = lateral** (µm, 0 = gate centre, source at −y, drain at +y). FLOOXS lengths are internally cm (so `peak` locations print in cm).
 
@@ -21,8 +21,10 @@ source: rfdevice.tcl
 | Gate width (for per-device numbers) | 200 µm |
 
 - Source/drain have Gaussian contact doping (1e19 peak, ~0.03 µm depth) so they are ohmic.
-- `rfdevice_SiN.tcl` = the same structure with every HighK region replaced by Nitride ([[highk-vs-sin]]); select it with the `deviceDeck` lever.
-- Barrier height `phiB` sets Vth rigidly ([[calibration]], `Metal.tcl`).
+- `model/rfdevice_SiN.tcl` = the same structure with every HighK region replaced by Nitride ([[highk-vs-sin]]); select it with the `deviceDeck` lever.
+- Barrier height `phiB` sets Vth rigidly ([[calibration]], `model/Metal.tcl`).
 - Contact-safe trap positions are ≥0.7 µm from the contact doping edges (y −0.425 … 2.585).
+
+Mesh/structure plot (PLplot, y −1.25…1.5 µm, depth to 1 µm): `figures/device_mesh.png`.
 
 Related: [[mesh]], [[levers]].

@@ -4,7 +4,7 @@ tags: [model, results]
 ---
 # Insulator trap charge (`insTrapSign`)
 
-The parts of the trap blob inside Nitride/HighK enter Poisson as **static charge** (`InsTrapCharge` in `Poisson.tcl`); no carriers or Qfn are solved there, so no Fermi or hot-electron filling.
+The parts of the trap blob inside Nitride/HighK enter Poisson as **static charge** (`InsTrapCharge` in `model/Poisson.tcl`); no carriers or Qfn are solved there, so no Fermi or hot-electron filling.
 - `insTrapSign` 0 (default): none; −1: fully filled (−q·N); +1: fixed positive (+q·N).
 
 **Static-era x–y map (§10j, jobs 44261474 + sign-0 companion 44274780):**

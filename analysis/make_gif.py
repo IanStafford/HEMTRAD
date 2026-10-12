@@ -1,6 +1,6 @@
 """Assemble plot_posVd.py frames into a GIF.
 
-usage: python3 make_gif.py frames_dir out.gif [ms_per_frame [hold_last_ms]]
+usage: python3 analysis/make_gif.py frames_dir out.gif [ms_per_frame [hold_last_ms]]
 Frames are named Vd_<v>.png and sorted by Vd. Uses one shared palette for all
 frames (the surfaces share a colour scale, so this avoids frame-to-frame
 dithering flicker). The last frame is held longer before the loop restarts.

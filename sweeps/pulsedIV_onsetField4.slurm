@@ -1,28 +1,29 @@
 #!/bin/bash
-# Late-onset search with field mobility, round 1 (Ian: push the collapse out
-# using the 10b methods). Trap blob at the Run F reference position
-# (trapMeanX 0, trapMeanY 0.2 um, trapSigma 0.04): trapLevel {0.35,0.45,0.55}
-# x trapPeak {2,3,4}e18 x hotTau {1e-14,3e-14,6e-14,1.3e-13} x hotEb {0.5,0.85}
-# = 72, plus task 72: trap-free reference. Vd 0-4 V / 0.1 V, dampValue 0.05,
-# retry driver, mobModel field (deck default).
+# Late-onset search with field mobility, round 4: refine around round 3's best
+# (0.30 eV / hotEb 1.0 / 5e18 / hotTau 1e-14 at y = 1.0 um: deep collapse at
+# 2.3 V from ~full trap-free current). trapPeak {4.5,5,5.5}e18 x hotTau
+# {0.8,1,1.2}e-14 x trapMeanY {0.85..1.7} at 0.30 eV / hotEb 1.0, plus the
+# 0.25 eV runner-up (6e18 / 1.5e-14 / y 1.5: 2.1 V) at 5.5-6.5e18, y 1.3/1.7.
+# Surface blob (trapMeanX 0, trapSigma 0.04). Last line: trap-free reference.
+# Vd 0-4 V / 0.1 V, dampValue 0.05, retry driver, mobModel field.
 #
-# One line per task in params_onsetField1.txt:
-#   trapPeak|trapLevel|hotTau|hotEb
+# One line per task in params_onsetField4.txt:
+#   trapPeak|trapLevel|hotTau|hotEb|trapMeanY
 #
-#SBATCH --job-name=pulsedIV_onsetField1
+#SBATCH --job-name=pulsedIV_onsetField4
 #SBATCH --account=ee1
 #SBATCH --qos=ee1-b
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4gb
 #SBATCH --time=03:00:00
-#SBATCH --array=0-72%80
-#SBATCH --output=results/20261002_onsetField1/slurm_%A_%a.out
-#SBATCH --error=results/20261002_onsetField1/slurm_%A_%a.err
+#SBATCH --array=0-60%64
+#SBATCH --output=results/20261002_onsetField4/slurm_%A_%a.out
+#SBATCH --error=results/20261002_onsetField4/slurm_%A_%a.err
 
 set -euo pipefail
 
 REPO=/home/ianstafford/blue/ee1/ianstafford/HEMTRAD
-RUN_DIR=$REPO/results/20261002_onsetField1
+RUN_DIR=$REPO/results/20261002_onsetField4
 TASK_DIR=$RUN_DIR/task_${SLURM_ARRAY_TASK_ID}
 
 module restore flooxsenv
@@ -35,19 +36,18 @@ export PATH=$HOME/.local/flooxs/bin:$PATH
 
 mkdir -p "$TASK_DIR"
 
-LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/params_onsetField1.txt")
-IFS='|' read -r TRAPPEAK TRAPLEVEL HOTTAU HOTEB <<< "$LINE"
+LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/sweeps/params_onsetField4.txt")
+IFS='|' read -r TRAPPEAK TRAPLEVEL HOTTAU HOTEB TRAPMEANY <<< "$LINE"
 TRAPMEANX=0.0
-TRAPMEANY=0.2
 
 if [ "$TRAPPEAK" = "1e10" ]; then
     TAG="notrap"
 else
-    TAG=$(printf 'tp%.2e_tl%.2f_ht%.2e_eb%.2f' "$TRAPPEAK" "$TRAPLEVEL" "$HOTTAU" "$HOTEB")
+    TAG=$(printf 'tp%.2e_tl%.2f_ht%.2e_eb%.2f_my%.3e' "$TRAPPEAK" "$TRAPLEVEL" "$HOTTAU" "$HOTEB" "$TRAPMEANY")
 fi
 
 for f in GaN_modelfile_masterD GaN.tcl AlGaN.tcl Insulator.tcl Metal.tcl Continuity.tcl Poisson.tcl rfdevice.tcl; do
-    cp "$REPO/$f" "$TASK_DIR/$f"
+    cp "$REPO/model/$f" "$TASK_DIR/$f"
 done
 
 DRIVER="$TASK_DIR/pulsedIV_task.tcl"
@@ -64,7 +64,7 @@ DRIVER="$TASK_DIR/pulsedIV_task.tcl"
     echo "set dampValue 0.05"
     echo "set mobModel  field"
     echo "set ivCSV     \"pulsedIV_${TAG}.csv\""
-    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/pulsedIV.tcl"
+    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/drivers/pulsedIV.tcl"
 } > "$DRIVER"
 
 cat > "$TASK_DIR/params.json" <<JSON

@@ -13,7 +13,7 @@
 #SBATCH --error=results/eTemp_logs/dbg_%A_%a.err
 set -euo pipefail
 REPO=/home/ianstafford/blue/ee1/ianstafford/HEMTRAD
-LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/params_eTempDebug.txt")
+LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/sweeps/params_eTempDebug.txt")
 IFS="|" read -r TAG EXTRA <<< "$LINE"
 TASK_DIR=$REPO/results/20261008_eTempDebug/$TAG
 module restore flooxsenv
@@ -24,7 +24,7 @@ export PL_LIBRARY=$(find "$CONDA_PREFIX/share" -maxdepth 3 -type d -name "tcl" |
 export PATH=$HOME/.local/flooxs/bin:$PATH
 mkdir -p "$TASK_DIR"
 for f in GaN_modelfile_masterD GaN.tcl AlGaN.tcl Insulator.tcl Metal.tcl Continuity.tcl Poisson.tcl ETemp.tcl rfdevice.tcl; do
-    cp "$REPO/$f" "$TASK_DIR/$f"
+    cp "$REPO/model/$f" "$TASK_DIR/$f"
 done
 {
     echo "set trapEn 0"
@@ -35,8 +35,8 @@ done
     echo "set dampValue 0.05"
     echo "set ivCSV dbg_iv.csv"
     if [ -n "${EXTRA:-}" ]; then echo "$EXTRA" | tr ';' '\n' | sed 's/^ */set /'; fi
-    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/pulsedIV.tcl"
-    cat "$REPO/eTempDebug_tail.tcl"
+    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/drivers/pulsedIV.tcl"
+    cat "$REPO/drivers/eTempDebug_tail.tcl"
 } > "$TASK_DIR/dbg_task.tcl"
 cd "$TASK_DIR"
 "$FLXSHOME/release/flooxs" dbg_task.tcl

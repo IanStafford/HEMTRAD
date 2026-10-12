@@ -1,4 +1,4 @@
-# Transfer-curve calibration against figures/rfDeviceHFO2_Experimental.csv
+# Transfer-curve calibration against data/rfDeviceHFO2_Experimental.csv
 # (Id-Vg at Vds = 10 V, 25 C, 100 nm HfO2, std field plate; measured in A for a 200 um gate width;
 # compared in mA/mm = A * 1e3 / 0.2).
 # Trap-free, field mobility by default. Ramp Vd to Vd_cal at Vg=0, ramp the gate up to
@@ -18,8 +18,13 @@ if {![info exists Rd_contact]} { set Rd_contact 0.0 }
 set trapEn 0
 if {![info exists mobModel]}   { set mobModel field }
 
-source GaN_modelfile_masterD
-source $deviceDeck
+# model/ next to drivers/ in the repo (run from the repo root); a sweep task dir has
+# the model files flat next to the driver
+if {![info exists modelDir]} {
+    if {[file exists GaN_modelfile_masterD]} { set modelDir . } elseif {[file isdirectory model]} { set modelDir model } else { set modelDir [file join [file dirname [info script]] .. model] }
+}
+source [file join $modelDir GaN_modelfile_masterD]
+source [file join $modelDir $deviceDeck]
 # Optional post-load overrides (a Tcl script string), e.g. pdbSetDouble calls.
 if {[info exists calHook]} { eval $calHook }
 

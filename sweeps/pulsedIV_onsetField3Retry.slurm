@@ -1,29 +1,27 @@
 #!/bin/bash
-# Late-onset search with field mobility, round 4: refine around round 3's best
-# (0.30 eV / hotEb 1.0 / 5e18 / hotTau 1e-14 at y = 1.0 um: deep collapse at
-# 2.3 V from ~full trap-free current). trapPeak {4.5,5,5.5}e18 x hotTau
-# {0.8,1,1.2}e-14 x trapMeanY {0.85..1.7} at 0.30 eV / hotEb 1.0, plus the
-# 0.25 eV runner-up (6e18 / 1.5e-14 / y 1.5: 2.1 V) at 5.5-6.5e18, y 1.3/1.7.
-# Surface blob (trapMeanX 0, trapSigma 0.04). Last line: trap-free reference.
-# Vd 0-4 V / 0.1 V, dampValue 0.05, retry driver, mobModel field.
+# Retry of the 19 round-3 tasks (job 44435511) that stopped with PULSED GAVE UP
+# before Vd_max (runaway stall, CLAUDE.md 10.5). Solver-side only, as for the
+# static-era 10f retry: dampValue 0.02 (was 0.05), retryDepth 7 (was 5).
+# Physics and levers unchanged. analyze_onset.py reads <run>Retry automatically
+# and keeps whichever run got further.
 #
-# One line per task in params_onsetField4.txt:
+# One line per task in params_onsetField3Retry.txt:
 #   trapPeak|trapLevel|hotTau|hotEb|trapMeanY
 #
-#SBATCH --job-name=pulsedIV_onsetField4
+#SBATCH --job-name=pulsedIV_onsetField3Retry
 #SBATCH --account=ee1
 #SBATCH --qos=ee1-b
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4gb
 #SBATCH --time=03:00:00
-#SBATCH --array=0-60%64
-#SBATCH --output=results/20261002_onsetField4/slurm_%A_%a.out
-#SBATCH --error=results/20261002_onsetField4/slurm_%A_%a.err
+#SBATCH --array=0-18%20
+#SBATCH --output=results/20261002_onsetField3Retry/slurm_%A_%a.out
+#SBATCH --error=results/20261002_onsetField3Retry/slurm_%A_%a.err
 
 set -euo pipefail
 
 REPO=/home/ianstafford/blue/ee1/ianstafford/HEMTRAD
-RUN_DIR=$REPO/results/20261002_onsetField4
+RUN_DIR=$REPO/results/20261002_onsetField3Retry
 TASK_DIR=$RUN_DIR/task_${SLURM_ARRAY_TASK_ID}
 
 module restore flooxsenv
@@ -36,7 +34,7 @@ export PATH=$HOME/.local/flooxs/bin:$PATH
 
 mkdir -p "$TASK_DIR"
 
-LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/params_onsetField4.txt")
+LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/sweeps/params_onsetField3Retry.txt")
 IFS='|' read -r TRAPPEAK TRAPLEVEL HOTTAU HOTEB TRAPMEANY <<< "$LINE"
 TRAPMEANX=0.0
 
@@ -47,7 +45,7 @@ else
 fi
 
 for f in GaN_modelfile_masterD GaN.tcl AlGaN.tcl Insulator.tcl Metal.tcl Continuity.tcl Poisson.tcl rfdevice.tcl; do
-    cp "$REPO/$f" "$TASK_DIR/$f"
+    cp "$REPO/model/$f" "$TASK_DIR/$f"
 done
 
 DRIVER="$TASK_DIR/pulsedIV_task.tcl"
@@ -61,10 +59,11 @@ DRIVER="$TASK_DIR/pulsedIV_task.tcl"
     echo "set trapMeanY $TRAPMEANY"
     echo "set Vd_max    4.0"
     echo "set Vd_step   0.1"
-    echo "set dampValue 0.05"
+    echo "set dampValue 0.02"
+    echo "set retryDepth 7"
     echo "set mobModel  field"
     echo "set ivCSV     \"pulsedIV_${TAG}.csv\""
-    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/pulsedIV.tcl"
+    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/drivers/pulsedIV.tcl"
 } > "$DRIVER"
 
 cat > "$TASK_DIR/params.json" <<JSON
@@ -78,7 +77,8 @@ cat > "$TASK_DIR/params.json" <<JSON
   "trapMeanY": $TRAPMEANY,
   "Vd_max": 4.0,
   "Vd_step": 0.1,
-  "dampValue": 0.05,
+  "dampValue": 0.02,
+  "retryDepth": 7,
   "mobModel": "field",
   "task_id": $SLURM_ARRAY_TASK_ID
 }
