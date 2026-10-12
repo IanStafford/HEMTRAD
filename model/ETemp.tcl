@@ -53,6 +53,19 @@ proc ElecTemperature {Mat} {
         set HeatFlux1 "(1.5 * $keV * ETemp * $Ele * $mob * grad(Qfn)) + (1.5 * $keV * ETemp * Elec * $mob * $keV * $D * grad(ETemp))"
         set HeatGen  "($Ele * $mob * dot(Qfn,Qfn) + Elec * $mob * $keV * $D * dot(Qfn,ETemp))"
     }
+    global etConv etThermoJ
+    if {$etConv} {
+        # consistent convective flux: exactly 1.5 k Te times the electron
+        # continuity flux (Continuity.tcl ElecContinuity: same field-dependent
+        # mobility, the same 1e2 floor and the same thermoelectric part), so the
+        # convective term carries no energy where the particle flux is
+        # divergence-free (uniform Te)
+        set mobC ([pdbDelayDouble $Mat Elec mob])
+        set HeatFlux1 "(1.5 * $keV * ETemp * $mobC * (Elec+1.0e2) * grad(Qfn))"
+        if {$etStats && $etThermo && $etThermoJ} {
+            append HeatFlux1 " + (1.5 * $keV * ETemp * $mobC * Elec * 8.617e-5 * [ElecDelta] * grad(ETemp))"
+        }
+    }
     set eqn "$HeatCap - $HeatFlux1 - $HeatFlux2 - $HeatGen + $EnergyRelax"
     pdbSetString $Mat ETemp Equation "$eqn"
 }

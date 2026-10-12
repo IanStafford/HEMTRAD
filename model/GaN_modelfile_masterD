@@ -42,6 +42,7 @@ if {![info exists etStats]} { set etStats 1 }     ;# 1 = electron Fermi statisti
 if {![info exists etThermo]} { set etThermo 1 }   ;# 1 = thermoelectric (grad Te) current term, needs etStats 1
 if {![info exists etNeg]}    { set etNeg 0 }       ;# 0 = ETemp '!negative damp'; 1 = 'negative damp' (damped both ways, but ETemp can go < 0: failed 2026-10-12)
 if {![info exists etDamp]}   { set etDamp 5.0 }    ;# ETemp Newton DampValue (K); only acts with the damp flag
+if {![info exists etConv]}   { set etConv 0 }      ;# 1 = convective energy flux = 1.5 k ETemp x the electron continuity flux (same mobility, 1e2 floor, thermo part)
 if {![info exists etFloor]}  { set etFloor 1.0e10 } ;# electron density floor (cm^-3) in the energy equation (Ian's original: 1)
 if {![info exists etThermoJ]} { set etThermoJ 1 } ;# diagnostic: thermo term in the electron current
 if {![info exists etThermoE]} { set etThermoE 1 } ;# diagnostic: thermo term in the energy flux and heating
