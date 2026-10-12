@@ -28,6 +28,14 @@ Second brain for the FLOOXS model of **radiation-induced current collapse** in a
 - [[levers]] — every model/driver knob and its default
 - [[model-caveats]] — what the model leaves out or gets wrong
 
+## FLOOXS (the simulator, `~/flooxs`)
+- [[flooxs-overview]] — what FLOOXS is, source layout
+- [[flooxs-commands]] — Tcl commands the decks use
+- [[flooxs-expressions]] — expression language (operators, functions, grad/ddt/dot, Fermi integrals)
+- [[flooxs-solver]] — Newton loop, convergence, iteration table, damping and positivity
+- [[flooxs-pdb]] — parameter database
+- [[flooxs-builds]] — binaries and builds
+
 ## Numerics
 - [[flooxs-gotchas]] — FLOOXS behaviours that bite
 - [[munmap-crash]] — root cause of the old crash

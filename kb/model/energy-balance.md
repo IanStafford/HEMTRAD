@@ -16,6 +16,8 @@ Ian's `ElecTemperature` proc (Sentaurus-style hydrodynamic energy equation with 
 
 **What fails:** every version with the thermo term stops at the first 0.1 V step, even with damping and the floor. Capped-iteration debug dumps (`sweeps/eTempDebug.slurm` + `drivers/eTempDebug_tail.tcl`) show the first Newton update driving ETemp to ~0.3 K (and up to 400–2,300 K) below the 2DEG in the access region; with ETemp in the statistics, Elec and the Fermi integrals then overflow. Learned on the way: the missing `damp` flag made DampValue a no-op; an `abs()` clamp kink made Newton cycle (use softplus); `(Elec+floor)·Δ` with Δ ~ −η in depletion makes a fake current (thermo terms use unfloored `Elec`).
 
+**Found in the FLOOXS survey (2026-10-12):** ETemp is declared `!negative`. In FLOOXS, a node whose update would go negative gets old·e^(−h) (h ≤ ~10) **instead of** the damped step ([[flooxs-solver]]), so `damp` never limited the large downward first updates — that is exactly the 300 → 0.3 K (≈ 300·e^−7) seen in the debug dumps. Cheap thing to try first: declare ETemp `negative damp` (or keep `!negative` but give it a smaller first step), so damping applies in both directions; it is a solver setting, not physics.
+
 **Next step (proposed, not approved):** make the convective energy flux exactly 1.5 k Te × the continuity flux (same mobility and the same 1e2 floor as `ElecContinuity`) so a uniform Te has zero divergence; rerun the debug pair before any sweep. Alternatives: τ continuation (τ as a data field), or use the thermo-free / `etStats 0` configuration for trap studies. Full log: `progress.md` "PARKED … electron energy balance"; dashboard Oct 7–8.
 
 Related: [[hot-electron-capture]], [[flooxs-gotchas]].

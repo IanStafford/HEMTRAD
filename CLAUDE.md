@@ -89,6 +89,7 @@ When you need Ian to decide something, write it in `progress.md` **and** send a 
 | Overview | `index.md`, `project-goal.md`, `current-status.md`, `glossary.md` |
 | Device | `device/device-structure.md`, `device/mesh.md`, `device/mobility-models.md`, `device/calibration.md` |
 | Model | `model/trap-model.md`, `model/hot-electron-capture.md`, `model/insulator-traps.md`, `model/energy-balance.md` (parked), `model/levers.md`, `model/model-caveats.md` |
+| FLOOXS (`~/flooxs`) | `flooxs/flooxs-overview.md`, `flooxs/flooxs-commands.md`, `flooxs/flooxs-expressions.md`, `flooxs/flooxs-solver.md`, `flooxs/flooxs-pdb.md`, `flooxs/flooxs-builds.md` |
 | Numerics | `numerics/flooxs-gotchas.md`, `numerics/munmap-crash.md`, `numerics/retry-bisection.md`, `numerics/te-ramp.md` |
 | Workflow | `workflow/hpg-workflow.md`, `workflow/sweep-pattern.md`, `workflow/local-runs.md`, `workflow/git-conventions.md`, `workflow/repo-locations.md`, `workflow/dashboard.md` |
 | Tools | `tools/drivers.md`, `tools/analysis-scripts.md`, `tools/notebook.md` |
