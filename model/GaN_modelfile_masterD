@@ -173,6 +173,10 @@ proc Initialize {} {
     sel z=300.00 name=Temp
     solution name=Qfn val=0 const
     solution name=Qfp val=0 const
+    # ETemp initial guess before anything evaluates Elec (a 'negative' ETemp starts at 0,
+    # and the ETemp statistics take log(ETemp/Temp))
+    global eTemp
+    if {$eTemp} { sel z=Temp name=ETemp }
 
     # charge-neutral initial potential in GaN, then AlGaN
     newton GaN eqn=Doping-Elec+Hole var=DevPsi damp=0.025
@@ -186,8 +190,6 @@ proc Initialize {} {
     sel z=1.0e-30*(1.0+x*x) name=TrapFrozen
     sel z=1.0e-30*(1.0+x*x) name=FrozenFlag
     sel z=Temp+1.0e-12*(1.0+x*x) name=TeTrap
-    global eTemp
-    if {$eTemp} { sel z=Temp name=ETemp }
     sel z=0.0 name=Qfn
     sel z=0.0 name=Qfp
 

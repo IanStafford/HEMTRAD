@@ -1073,3 +1073,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 ## 2026-10-12 (later)
 - Ian: try the negative-damp fix. New lever `etNeg` (default 1): ETemp declared `negative damp` so FLOOXS damps it both ways (with `!negative` a would-be-negative update is cut to old*exp(-h) instead of damped). Submitted on HPG: debug pair (`sweeps/eTempDebug.slurm`, thermo_full vs no_thermo) and the 7-task thermo set (`params_eTemp2`, `results/20261012_eTemp8/`).
+- Jobs 45691969 / 45691970 crashed at setup (6-10 s): with `negative`, ETemp starts at 0 and the first `newton` initial-guess call already evaluates Elec with log(ETemp/Temp). Fix (initial guess): `sel z=Temp name=ETemp` moved to the start of `Initialize`. Resubmitting both.
