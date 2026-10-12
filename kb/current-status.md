@@ -5,6 +5,8 @@ updated: 2026-10-12
 ---
 # Current status (as of 2026-10-12)
 
+**Repo:** reorganised 2026-10-12 into `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/` ([[repo-locations]]); FLOOXS internals in [[flooxs-overview]].
+
 **Model:** calibrated field mobility ([[calibration]]), local-field hot-electron capture ([[hot-electron-capture]]), Te-ramp stall rescue ([[te-ramp]]).
 
 **Key results**
@@ -13,7 +15,7 @@ updated: 2026-10-12
 - The model's collapse is **current-driven**: raising Vg moves it earlier ([[gate-bias]]).
 
 **Parked / open**
-- Electron energy balance: works without the thermoelectric term (but inflates Id), fails at the first step with it. Next step is written in [[energy-balance]] and `progress.md` ("PARKED").
+- Electron energy balance: works without the thermoelectric term (but inflates Id), fails at the first step with it; `negative damp` on ETemp (Oct 12) made it worse (fails at equilibrium). Remaining ideas in [[energy-balance]] and `progress.md` ("PARKED").
 - Field-driven trapping tests proposed, not chosen: off-state pre-stress, Poole–Frenkel capture, field-filled surface traps ([[field-driven-trapping]]).
 - 6 runs still stall near y = 2.0 µm; try a lower `teRampMin` ([[te-ramp]]).
 - Calibration covers saturation only (Vds = 10 V); low-Vd region unvalidated; gm above +0.5 V too low ([[calibration]]).
