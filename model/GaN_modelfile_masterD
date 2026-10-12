@@ -40,7 +40,7 @@ if {![info exists etTau]}   { set etTau 1.0e-12 } ;# energy relaxation time (s)
 if {![info exists etMob]}   { set etMob low }     ;# heating/flux mobility: low (low-field) or field (same as current)
 if {![info exists etStats]} { set etStats 1 }     ;# 1 = electron Fermi statistics at ETemp (Vt, Nc); 0 = at Temp
 if {![info exists etThermo]} { set etThermo 1 }   ;# 1 = thermoelectric (grad Te) current term, needs etStats 1
-if {![info exists etNeg]}    { set etNeg 1 }       ;# 1 = ETemp declared 'negative damp' (damped both ways); 0 = '!negative damp'
+if {![info exists etNeg]}    { set etNeg 0 }       ;# 0 = ETemp '!negative damp'; 1 = 'negative damp' (damped both ways, but ETemp can go < 0: failed 2026-10-12)
 if {![info exists etFloor]}  { set etFloor 1.0e10 } ;# electron density floor (cm^-3) in the energy equation (Ian's original: 1)
 if {![info exists etThermoJ]} { set etThermoJ 1 } ;# diagnostic: thermo term in the electron current
 if {![info exists etThermoE]} { set etThermoE 1 } ;# diagnostic: thermo term in the energy flux and heating
