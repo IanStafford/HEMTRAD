@@ -56,6 +56,11 @@ if {![info exists teRampW0]}  { set teRampW0  0.1 }    ;# first Te relaxation fr
 if {![info exists teRampMin]} { set teRampMin 0.002 }  ;# give up below this fraction
 if {![info exists teRampTol]} { set teRampTol 0.01 }   ;# stop when Te is within 1% of target
 if {![info exists teRampMax]} { set teRampMax 300 }    ;# max ramp sub-steps per point
+# Newton iteration limit during the Vd sweep (2026-10-13). The device deck sets
+# Math iterLimit 300, which the equilibrium/gate-ramp solves keep; in the sweep a
+# failing solve otherwise grinds 300 iterations before bisection (~60% of the
+# iterations in job 45768739). Smaller = fail fast and bisect sooner.
+if {![info exists sweepIterLimit]} { set sweepIterLimit 300 } ;# 300 = old behaviour
 #==============================================
 
 # model/ next to drivers/ in the repo (run from the repo root); a sweep task dir has
@@ -86,6 +91,7 @@ for {set g -0.1} {$g > $Vg_meas - 0.001} {set g [expr {$g - 0.1}]} {
     device
 }
 CaptureTraps
+pdbSetDouble Math iterLimit $sweepIterLimit
 
 set f [open $ivCSV w]
 close $f

@@ -35,6 +35,7 @@ Every lever has an `info exists` default, so a driver or array task sets it befo
 | `dampValue` | 0.10 | Newton damping (sweeps use 0.05) |
 | `retryDepth`, `retrySubFill` | 5, 1 | [[retry-bisection]] |
 | `teRamp`, `teRampW0`, `teRampMin`, `teRampTol`, `teRampMax` | 1, 0.1, 0.002, 0.01, 300 | [[te-ramp]] |
+| `sweepIterLimit` (pulsedIV.tcl) | 300 (= deck `Math iterLimit`; set during the Vd sweep only, after the gate ramp) | [[retry-bisection]] |
 | `deviceDeck` | rfdevice.tcl | or `model/rfdevice_SiN.tcl` |
 | `ivCSV` | figures/pulsedIV.csv | output (Vd, Id mA/mm, peak Te K); sweeps always set their own |
 | `teProfile` | {} | Vd list for ETemp cut dumps ([[energy-balance]]) |
