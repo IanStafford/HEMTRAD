@@ -1,0 +1,4 @@
+late24_t1e-12_it50|1|1e-12|low|-|1|5e18|0.30|1e-14|1.0|2.4|-2.0|2.0|-|sweepIterLimit 50
+late10_t1e-13_it50|1|1e-13|low|-|1|5e18|0.30|1e-14|1.0|1.0|-2.0|2.0|-|sweepIterLimit 50
+late24_t1e-12_it100|1|1e-12|low|-|1|5e18|0.30|1e-14|1.0|2.4|-2.0|2.0|-|sweepIterLimit 100
+late10_t1e-13_it100|1|1e-13|low|-|1|5e18|0.30|1e-14|1.0|1.0|-2.0|2.0|-|sweepIterLimit 100
