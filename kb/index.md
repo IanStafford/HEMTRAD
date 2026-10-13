@@ -24,7 +24,7 @@ Second brain for the FLOOXS model of **radiation-induced current collapse** in a
 - [[trap-model]] — `IonizedAcceptor`, trap memory, freeze/capture
 - [[hot-electron-capture]] — Te from the local field, capture barrier `hotEb`
 - [[insulator-traps]] — static charge in Nitride/HighK
-- [[energy-balance]] — ETemp PDE (parked)
+- [[energy-balance]] — ETemp PDE (in use thermo-free; thermo term parked)
 - [[levers]] — every model/driver knob and its default
 - [[model-caveats]] — what the model leaves out or gets wrong
 
