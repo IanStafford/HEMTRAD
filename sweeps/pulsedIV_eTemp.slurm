@@ -2,6 +2,7 @@
 # Electron energy balance (ETemp.tcl, eTemp lever) tests, 2026-10-08.
 # One line per task in $PARAMS (default params_eTemp1.txt):
 #   tag|eTemp|etTau|etMob|etStats|trapEn|trapPeak|trapLevel|hotTau|hotEb|trapMeanY|Vg|Vd_max|teProfile[|extra]
+# etStats '-' = keep the model default (0 since 2026-10-13).
 # extra (optional): more lever settings, ';'-separated, e.g. 'etThermoJ 0;etThermoE 1'
 # teProfile: comma-separated Vd list for ETemp cut dumps (or "-").
 # Output: results/$RUN/<tag>/ (RUN default 20261008_eTemp1). Submit with
@@ -46,7 +47,7 @@ DRIVER="$TASK_DIR/pulsedIV_task.tcl"
     echo "set eTemp     $ETEMP"
     echo "set etTau     $ETTAU"
     echo "set etMob     $ETMOB"
-    echo "set etStats   $ETSTATS"
+    [ "$ETSTATS" != "-" ] && echo "set etStats   $ETSTATS"   # "-" = model default
     echo "set trapEn    $TRAPEN"
     echo "set trapPeak  $TRAPPEAK"
     echo "set trapSigma 0.04"
@@ -68,7 +69,7 @@ DRIVER="$TASK_DIR/pulsedIV_task.tcl"
 
 cat > "$TASK_DIR/params.json" <<JSON
 {
-  "tag": "$TAG", "eTemp": $ETEMP, "etTau": $ETTAU, "etMob": "$ETMOB", "etStats": $ETSTATS,
+  "tag": "$TAG", "eTemp": $ETEMP, "etTau": $ETTAU, "etMob": "$ETMOB", "etStats": "$ETSTATS",
   "trapEn": $TRAPEN, "trapPeak": $TRAPPEAK, "trapSigma": 0.04, "trapLevel": $TRAPLEVEL,
   "hotEb": $HOTEB, "hotTau": $HOTTAU, "trapMeanX": 0.0, "trapMeanY": $TRAPMEANY,
   "Vg_meas": $VG, "Vd_max": $VDMAX, "Vd_step": 0.1, "dampValue": 0.05, "mobModel": "field",
