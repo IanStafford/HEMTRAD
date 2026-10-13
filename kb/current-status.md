@@ -1,21 +1,23 @@
 ---
 title: Current status
 tags: [status]
-updated: 2026-10-12
+updated: 2026-10-13
 ---
-# Current status (as of 2026-10-12)
+# Current status (as of 2026-10-13)
 
 **Repo:** reorganised 2026-10-12 into `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/` ([[repo-locations]]); FLOOXS internals in [[flooxs-overview]].
 
-**Model:** calibrated field mobility ([[calibration]]), local-field hot-electron capture ([[hot-electron-capture]]), Te-ramp stall rescue ([[te-ramp]]).
+**Model:** calibrated field mobility ([[calibration]]), local-field hot-electron capture ([[hot-electron-capture]]), Te-ramp stall rescue ([[te-ramp]]). Since 2026-10-13 the standard electron energy balance (`eTemp 1`, `etStats 0`, `etThermo 0`) is the default for new trap work ([[energy-balance]]).
 
 **Key results**
-- Latest deep collapse **3.5 V** (late-onset set at y = 2.4 µm), 177 → 0.0018 mA/mm in one step, then creep ([[late-onset-search]]).
+- With the standard energy balance the late set collapses at **0.4–0.7 V** (set by τ); at y = 2.4 µm a 60–4000× drop onto a creeping plateau, close to the measured shape ([[energy-balance]], job 45768739).
+- Local-field model: latest deep collapse **3.5 V** (late-onset set at y = 2.4 µm), 177 → 0.0018 mA/mm in one step, then creep ([[late-onset-search]]).
 - Trap **position** is the strongest onset lever near the charge threshold; deeper levels / more charge collapse early and uniformly ([[position-maps]]).
 - The model's collapse is **current-driven**: raising Vg moves it earlier ([[gate-bias]]).
 
 **Parked / open**
 - Electron energy balance: works without the thermoelectric term (but inflates Id), fails at the first step with it; `negative damp` on ETemp (Oct 12) made it worse (fails at equilibrium). A smaller ETemp damping (`etDamp` 0.5/1 with `etNeg 1`, job 45696870) reproduces the thermo-free result but does not fix the thermo term. The consistent convective flux (`etConv 1`, job 45711842) makes the thermo case fail already at equilibrium. **Decision (2026-10-13): continue with the thermo-free version; standard = `eTemp 1` with `etStats 0`, `etThermo 0` (now the defaults).** First trap study with it (job 45768739): collapse at 0.4–0.7 V set by τ; the late set at y 2.4 µm gives a 60–4000× drop to a creeping plateau, close to the measured shape (`figures/eTempStd_IdVd.png`). These runs are slow (1.9 s per Newton iteration, ~200 per post-collapse Vd point); a lower Newton limit does not help (job 45801978: keep `sweepIterLimit 300`), so future ETemp sweeps should stop at 1.5–2 V. Post-collapse Id depends on the step history (up to ~10x, [[retry-bisection]]). Remaining ideas in [[energy-balance]] and `progress.md` ("PARKED").
+- **Next:** fit trap position and τ with the standard energy balance to the measured ~1000× at 0.4–0.5 V; end sweeps at 1.5–2 V (`sweepIterLimit` stays 300).
 - Field-driven trapping tests proposed, not chosen: off-state pre-stress, Poole–Frenkel capture, field-filled surface traps ([[field-driven-trapping]]).
 - 6 runs still stall near y = 2.0 µm; try a lower `teRampMin` ([[te-ramp]]).
 - Calibration covers saturation only (Vds = 10 V); low-Vd region unvalidated; gm above +0.5 V too low ([[calibration]]).
