@@ -1,10 +1,12 @@
 ---
-title: Electron energy balance (parked)
+title: Electron energy balance
 tags: [model, parked]
 date: 2026-10-08
 source: model/ETemp.tcl, model/Continuity.tcl, model/GaN_modelfile_masterD
 ---
-# Electron energy balance — ETemp PDE (**parked 2026-10-08**)
+# Electron energy balance — ETemp PDE
+
+**Decision (Ian, 2026-10-13):** use the configuration that works — `eTemp 1` with the thermoelectric term off (`etThermo 0`). The thermo term stays parked (every fix tried failed; see below). Defaults are unchanged, so set `etThermo 0` explicitly in sweeps.
 
 Ian's `ElecTemperature` proc (Sentaurus-style hydrodynamic energy equation with Qfn,Qfn heat source), implemented in `model/ETemp.tcl`:
 

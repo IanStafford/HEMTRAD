@@ -15,7 +15,7 @@ updated: 2026-10-12
 - The model's collapse is **current-driven**: raising Vg moves it earlier ([[gate-bias]]).
 
 **Parked / open**
-- Electron energy balance: works without the thermoelectric term (but inflates Id), fails at the first step with it; `negative damp` on ETemp (Oct 12) made it worse (fails at equilibrium). A smaller ETemp damping (`etDamp` 0.5/1 with `etNeg 1`, job 45696870) reproduces the thermo-free result but does not fix the thermo term. The consistent convective flux (`etConv 1`, job 45711842) makes the thermo case fail already at equilibrium. Remaining ideas in [[energy-balance]] and `progress.md` ("PARKED").
+- Electron energy balance: works without the thermoelectric term (but inflates Id), fails at the first step with it; `negative damp` on ETemp (Oct 12) made it worse (fails at equilibrium). A smaller ETemp damping (`etDamp` 0.5/1 with `etNeg 1`, job 45696870) reproduces the thermo-free result but does not fix the thermo term. The consistent convective flux (`etConv 1`, job 45711842) makes the thermo case fail already at equilibrium. **Decision (2026-10-13): continue with the thermo-free version (`eTemp 1`, `etThermo 0`).** Remaining ideas in [[energy-balance]] and `progress.md` ("PARKED").
 - Field-driven trapping tests proposed, not chosen: off-state pre-stress, Poole–Frenkel capture, field-filled surface traps ([[field-driven-trapping]]).
 - 6 runs still stall near y = 2.0 µm; try a lower `teRampMin` ([[te-ramp]]).
 - Calibration covers saturation only (Vds = 10 V); low-Vd region unvalidated; gm above +0.5 V too low ([[calibration]]).
