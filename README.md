@@ -11,6 +11,7 @@ Knowledge base: **`kb/index.md`** (Obsidian second brain). Agent rules: `CLAUDE.
 | `model/` | the device model, sourced together: `GaN_modelfile_masterD` (levers, materials, equations), `GaN.tcl`, `AlGaN.tcl`, `Insulator.tcl`, `Metal.tcl`, `Continuity.tcl`, `Poisson.tcl` (traps), `ETemp.tcl` (energy balance), device decks `rfdevice.tcl` / `rfdevice_SiN.tcl`. Three files are CRLF (`GaN_modelfile_masterD`, `Metal.tcl`, `Continuity.tcl`) |
 | `drivers/` | Tcl drivers: `pulsedIV.tcl` (curve-tracer Id–Vd, main tool), `calibIdVg.tcl` (transfer curve), `stressFreeze.tcl`, `trapPlot.tcl`, `eTempDebug_tail.tcl` |
 | `sweeps/` | SLURM templates (`*.slurm`) and their `params_*.txt` |
+| `bin/` | workflow helpers (`hpg_reconnect.sh`: reopen the HPG connection with key + Duo push) |
 | `analysis/` | Python analysis and plotting (`analyze_*.py`, `plot_*.py`, `make_gif.py`, `calib_score.py`) |
 | `data/` | measured inputs: HfO2 device Id–Vg at Vds 10 V (`rfDeviceHFO2_Experimental.csv`, raw `.xlsx`) |
 | `figures/` | outputs (PNG/CSV/GIF); `figures.ipynb` (repo root) holds older paper plots |

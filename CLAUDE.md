@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-FLOOXS (Tcl) TCAD model of an AlGaN/GaN HEMT (HighK/HfO2-passivated, T-gate + field plate). Layout: `model/` (model + device decks), `drivers/` (Tcl drivers), `sweeps/` (SLURM templates + params), `analysis/` (Python), `data/` (measured inputs), `figures/` (outputs), `dashboard/`, `kb/`, `archive/` (superseded; static-mobility era also on branch `static-mobility`), `results/` (gitignored). See `README.md` and `kb/workflow/repo-locations.md`.
+FLOOXS (Tcl) TCAD model of an AlGaN/GaN HEMT (HighK/HfO2-passivated, T-gate + field plate). Layout: `model/` (model + device decks), `drivers/` (Tcl drivers), `sweeps/` (SLURM templates + params), `analysis/` (Python), `data/` (measured inputs), `bin/` (workflow helpers), `figures/` (outputs), `dashboard/`, `kb/`, `archive/` (superseded; static-mobility era also on branch `static-mobility`), `results/` (gitignored). See `README.md` and `kb/workflow/repo-locations.md`.
 
 **Context:** model the **radiation-induced current collapse** seen on a pulsed curve tracer: at Vgs = −2 V, Id–Vd runs normally, then drops ~1000× at a small Vd (~0.4–0.5 V), then creeps up slightly with Vd (the creep is physical). The deck is calibrated against a measured HfO2 transfer curve with the field-dependent mobility.
 
@@ -11,7 +11,7 @@ FLOOXS (Tcl) TCAD model of an AlGaN/GaN HEMT (HighK/HfO2-passivated, T-gate + fi
 ## 0. How this system is set up
 
 - **You (the agent) run on Ian's workstation** (personal, off campus), inside `tmux`. Ian checks in from his laptop or phone via Remote Control. Assume he is **not watching** in real time.
-- **HiPerGator (HPG) is reached only through `ssh hpg`**, a multiplexed master connection that Ian authenticates (password + Duo). You cannot answer Duo.
+- **HiPerGator (HPG) is reached only through `ssh hpg`**, a multiplexed master connection. Since 2026-10-13 it authenticates with the workstation key `~/.ssh/id_ed25519_hpg` (no password) **plus one Duo push that Ian approves on his phone**. You can trigger the push (`bin/hpg_reconnect.sh`), but only Ian can approve it.
 - **The repo exists in three places**, synced through GitHub (`IanStafford/HEMTRAD`, branch `main`):
   - Workstation `/home/staffian/HEMTRAD`: your working copy. Edit here.
   - HPG `/home/ianstafford/blue/ee1/ianstafford/HEMTRAD`: only `git pull` there. Never edit files on HPG.
@@ -36,7 +36,9 @@ When you need Ian to decide something, write it in `progress.md` **and** send a 
 
 ## 2. HPG rules (details: `kb/workflow/hpg-workflow.md`, `kb/workflow/sweep-pattern.md`)
 
-- **Check the connection first:** `ssh -O check hpg`. If it fails, or an `ssh hpg` command hangs or fails to authenticate: **stop, note it in `progress.md`, notify Ian, and wait.** Don't retry in a loop or open a new connection (it would stall on Duo).
+- **Check the connection first:** `ssh -O check hpg`. Every other agent ssh uses `-o BatchMode=yes` (fails instead of prompting).
+- **If the master is down:** push-notify Ian ("HPG reconnect: Duo push coming"), then run `bin/hpg_reconnect.sh` **once** (inside tmux; answers the Duo menu with option 1 = push to XXX-8915, waits 2 min). If it fails or the push isn't approved: **stop, note it in `progress.md`, notify Ian, and wait.** No loops, no second attempt until Ian says so. If any prompt ever asks for a **password**, stop: never type, store or ask for Ian's UF password.
+- **Persistent tmux on HPG:** session `hemtrad` on `login7` (`ssh hpg-tmux` attaches; `ssh hpg-login7 <cmd>` runs on that node). For rsyncs, builds, `srun --pty` debugging; never `flooxs` itself. Details: `kb/workflow/hpg-workflow.md`.
 - Run remote commands in a login shell with a quoted heredoc (`ssh hpg bash -l <<'REMOTE' … REMOTE`), delimiter `REMOTE`, not `EOF`.
 - Job scripts use the environment block in `kb/workflow/hpg-workflow.md`. A job that dies immediately with a library/Tcl/plplot error is an environment problem, not the deck.
 - **Never run `flooxs` on an HPG login node** (only via `sbatch`/`srun`).

@@ -13,6 +13,7 @@ tags: [workflow, reference]
 | `analysis/` | Python analysis/plotting ([[analysis-scripts]]) |
 | `data/` | measured inputs (HfO2 Id–Vg, raw xlsx) |
 | `figures/` | outputs; `figures.ipynb` at the root ([[notebook]]) |
+| `bin/` | workflow helpers (`hpg_reconnect.sh`, [[hpg-workflow]]) |
 | `dashboard/`, `kb/`, `archive/` | [[dashboard]], this KB, superseded work |
 | `results/` | raw sweep results (gitignored) |
 
@@ -34,6 +35,8 @@ Before 2026-10-12 everything sat flat in the root; `progress.md` and old commits
 | Crash-fix build | `~/flooxs-crashfix` (branch `crash-fix`), patch `flooxs-crashfix.patch` |
 | flooxs-pyplot (workstation) | `~/flooxs-pyplot` (private `IanStafford/flooxs-pyplot`; matplotlib plot windows, regression suite; `Test/SimpDev/GaNSuite` = GaN starter decks) |
 | GaN regression results | `~/flooxs-pyplot/Test/Regression/hpg_results/20261008/` (not committed) |
+| HPG SSH key / config | workstation `~/.ssh/id_ed25519_hpg` (no passphrase), `~/.ssh/config` hosts `hpg`, `hpg-login7`, `hpg-tmux` ([[hpg-workflow]]) |
+| HPG persistent tmux | session `hemtrad` on `login7` |
 | Dashboard | [[dashboard]] |
 | Static-era write-ups | `archive/static_mobility/RESULTS.md` |
 | Progress-report deck (Sep 30) | https://claude.ai/artifact/4RfyrQi58v7pD8NH6aFLqc |
