@@ -56,9 +56,9 @@ if {![info exists teRampW0]}  { set teRampW0  0.1 }    ;# first Te relaxation fr
 if {![info exists teRampMin]} { set teRampMin 0.002 }  ;# give up below this fraction
 if {![info exists teRampTol]} { set teRampTol 0.01 }   ;# stop when Te is within 1% of target
 if {![info exists teRampMax]} { set teRampMax 300 }    ;# max ramp sub-steps per point
-# Newton iteration limit during the Vd sweep (2026-10-13). The device deck sets
-# Math iterLimit 300, which the equilibrium/gate-ramp solves keep; in the sweep a
-# failing solve otherwise grinds 300 iterations before bisection (~60% of the
+# Newton iteration limit after Initialize (2026-10-13; gate ramp + Vd sweep). The
+# device deck sets Math iterLimit 300 (kept by Initialize's equilibrium solves); in
+# the sweep a failing solve otherwise grinds 300 iterations before bisection (~60% of the
 # iterations in job 45768739). Smaller = fail fast and bisect sooner.
 if {![info exists sweepIterLimit]} { set sweepIterLimit 300 } ;# 300 = old behaviour
 #==============================================
@@ -83,6 +83,10 @@ pdbSetDouble Nitride DevPsi DampValue $dampValue
 pdbSetDouble AlGaN DevPsi DampValue $dampValue
 
 Initialize
+# FLOOXS reads Math iterLimit only when it builds the Newton solver, at the first
+# `device` after `device init` (DevControl.cc); setting it later has no effect.
+# So the limit covers the gate ramp too (those solves take <= 19 iterations).
+pdbSetDouble Math iterLimit $sweepIterLimit
 device init
 
 # rest at the measurement gate bias with the traps in steady state
@@ -91,7 +95,6 @@ for {set g -0.1} {$g > $Vg_meas - 0.001} {set g [expr {$g - 0.1}]} {
     device
 }
 CaptureTraps
-pdbSetDouble Math iterLimit $sweepIterLimit
 
 set f [open $ivCSV w]
 close $f

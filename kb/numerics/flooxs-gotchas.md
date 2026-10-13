@@ -21,3 +21,5 @@ How FLOOXS works in general: [[flooxs-overview]], [[flooxs-commands]], [[flooxs-
 - Three model files are **CRLF**: `model/GaN_modelfile_masterD`, `model/Metal.tcl`, `model/Continuity.tcl` ([[git-conventions]]).
 
 Related: [[local-runs]], [[hpg-workflow]].
+
+**`Math iterLimit` is read once per Newton solver** (2026-10-13): FLOOXS builds the Newton object (and reads `iterLimit`, `updateLimit`, `rhsLimit`) at the first `device` solve after `device init` (`DevControl.cc` `Solve`; `device init` calls `Clear()`). Changing `pdbSetDouble Math iterLimit` later has no effect until the next `device init`. Job 45791746 (the first `sweepIterLimit` test) ran with 300 for that reason; `drivers/eTempDebug_tail.tcl`'s 1/2-iteration caps were therefore not real caps either.
