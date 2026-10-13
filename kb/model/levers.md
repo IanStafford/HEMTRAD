@@ -24,7 +24,7 @@ Every lever has an `info exists` default, so a driver or array task sets it befo
 | `phiB` | 1.65 | gate/FP barrier vs Nitride Ec (eV); rigid Vth shift (`model/Metal.tcl`) |
 | `surfCharge` | unset | fixed charge at the AlGaN/SiN surface (cm⁻²) |
 | `hotEb`, `hotTau`, `hotMu`, `hotVsat` | 0.3, 1e-13, 600, 1.9e7 | [[hot-electron-capture]] |
-| `eTemp`, `etTau`, `etMob`, `etStats`, `etThermo`, `etThermoJ`, `etThermoE`, `etFloor`, `etNeg`, `etDamp`, `etConv` | 0, 1e-12, low, 1, 1, 1, 1, 1e10, 0, 5.0, 0 | [[energy-balance]] |
+| `eTemp`, `etTau`, `etMob`, `etStats`, `etThermo`, `etThermoJ`, `etThermoE`, `etFloor`, `etNeg`, `etDamp`, `etConv` | 0, 1e-12, low, 0, 0, 1, 1, 1e10, 0, 5.0, 0 (etStats/etThermo defaults 1 → 0 on 2026-10-13) | [[energy-balance]] |
 
 ## Driver (`drivers/pulsedIV.tcl`)
 | Lever | Default | Meaning |

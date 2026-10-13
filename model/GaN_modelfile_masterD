@@ -38,8 +38,8 @@ solution add name=Qfn solve negative damp continuous
 if {![info exists eTemp]}   { set eTemp 0 }       ;# 1 = solve the electron temperature PDE
 if {![info exists etTau]}   { set etTau 1.0e-12 } ;# energy relaxation time (s)
 if {![info exists etMob]}   { set etMob low }     ;# heating/flux mobility: low (low-field) or field (same as current)
-if {![info exists etStats]} { set etStats 1 }     ;# 1 = electron Fermi statistics at ETemp (Vt, Nc); 0 = at Temp
-if {![info exists etThermo]} { set etThermo 1 }   ;# 1 = thermoelectric (grad Te) current term, needs etStats 1
+if {![info exists etStats]} { set etStats 0 }     ;# 0 = electron Fermi statistics at Temp (standard, Ian 2026-10-13); 1 = at ETemp (Vt, Nc; inflates Id without the thermo term)
+if {![info exists etThermo]} { set etThermo 0 }   ;# 1 = thermoelectric (grad Te) current term, needs etStats 1 (does not converge, parked); 0 = standard
 if {![info exists etNeg]}    { set etNeg 0 }       ;# 0 = ETemp '!negative damp'; 1 = 'negative damp' (damped both ways, but ETemp can go < 0: failed 2026-10-12)
 if {![info exists etDamp]}   { set etDamp 5.0 }    ;# ETemp Newton DampValue (K); only acts with the damp flag
 if {![info exists etConv]}   { set etConv 0 }      ;# 1 = convective energy flux = 1.5 k ETemp x the electron continuity flux (same mobility, 1e2 floor, thermo part)
