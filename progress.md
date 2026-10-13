@@ -1105,3 +1105,17 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - iterLimit test job 45791746 is **invalid**: Newton iteration counts to each Vd are identical to the limit-300 run (e.g. late24_t1e-12: 2321 iterations to 1.4 V in all three) and 300-iteration solves still appear. Cause: FLOOXS reads `Math iterLimit` only when it builds the Newton solver at the first `device` after `device init` (DevControl.cc), so setting it after the gate ramp did nothing. Fixed in `drivers/pulsedIV.tcl`: set right after Initialize, before `device init` (setup solves need <= 19 iterations). late10_t1e-13 tasks (1, 3) completed; late24_t1e-12 tasks (0, 2) still running as duplicates of the baseline. Asking Ian to cancel them and resubmit the test.
 - Ian: cancelled 45791746_0/_2 (duplicates); invalid run moved to `results/20261013_iterLimit_invalid/` on HPG. Resubmitted the corrected test as job 45801978 (same `params_iterLimit.txt`, `results/20261013_iterLimit2/`).
 - Slide deck (Ian): 13 slides on the work since Sep 30 (trap x-y map, calibration, late-onset search + Te ramp, position maps, gate bias, energy balance, ETemp trap study, run time / Newton limit, tooling, caveats, next steps): https://claude.ai/artifact/GXaJFrxHnuC97g8SzKPvjN (private until shared). New figure `figures/eTempStd_IdVd.png` used there.
+- Newton-limit retest done (job 45801978, `results/20261013_iterLimit2/`, Vd 0-2 V, all 4 COMPLETED, 0 core files, no give-ups; limit now really applied: max iterations per solve = 50 / 100). Compared to the limit-300 baseline (job 45768739), to 2 V:
+
+  | Run | Limit | Iterations | Retries | FLOOXS wall to 2 V | Id at 1 V / 2 V (mA/mm) |
+  |---|---|---|---|---|---|
+  | late24_t1e-12 | 300 | 4450 | 10 | 53 min | 2.23e-3 / 1.18e-5 |
+  | | 100 | 2450 | 10 | 58 min | 2.23e-3 / 1.18e-5 (identical) |
+  | | 50 | 1962 | 15 | 45 min | 2.04e-2 / 6.06e-5 (9x / 5x higher) |
+  | late10_t1e-13 | 300 | 2435 | 2 | 83 min | 4.0e-7 / 3.2e-7 |
+  | | 100 | 3404 | 16 | 81 min | 9.2e-7 / 2.1e-7 |
+  | | 50 | 2998 | 21 | 65 min | 1.0e-6 / 2.3e-7 |
+
+  - Limit 100: the saved 300-iteration failures are offset by extra bisection; no wall-time gain (node-to-node scatter is ~10%: identical iteration tables ran 53 vs 58 min).
+  - Limit 50: 15-20% faster, but it changes the result: extra bisections add pulse steps, and the trap fill (and TeTrap relaxation) is updated per accepted solve, so the post-collapse Id depends on the step history (late24 0.5 V: 0.40 vs 0.13 mA/mm; 9x at 1 V). late10 differences are at the noise floor.
+  - **Recommendation: keep `sweepIterLimit 300` (default).** A lower Newton limit is not a useful speed lever; ending sweeps at 1.5-2 V is (to 2 V the runs take 1.2-2.5 h vs 3.8-5.8 h to 4 V). Side finding worth noting: post-collapse Id is step-history dependent (up to ~10x), so curves compared against each other should use the same Vd step and limit.

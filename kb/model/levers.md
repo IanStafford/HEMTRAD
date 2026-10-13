@@ -35,7 +35,7 @@ Every lever has an `info exists` default, so a driver or array task sets it befo
 | `dampValue` | 0.10 | Newton damping (sweeps use 0.05) |
 | `retryDepth`, `retrySubFill` | 5, 1 | [[retry-bisection]] |
 | `teRamp`, `teRampW0`, `teRampMin`, `teRampTol`, `teRampMax` | 1, 0.1, 0.002, 0.01, 300 | [[te-ramp]] |
-| `sweepIterLimit` (pulsedIV.tcl) | 300 (= deck `Math iterLimit`; set after Initialize, before `device init`, so it covers the gate ramp and the Vd sweep — see [[flooxs-gotchas]]) | [[retry-bisection]] |
+| `sweepIterLimit` (pulsedIV.tcl) | 300 (= deck `Math iterLimit`; set after Initialize, before `device init`, so it covers the gate ramp and the Vd sweep — see [[flooxs-gotchas]]). Tested 50/100 (job 45801978): 100 = no wall-time gain, 50 = 15-20% faster but changes post-collapse Id up to 9x (extra bisections change the trap-fill history); keep 300 | [[retry-bisection]] |
 | `deviceDeck` | rfdevice.tcl | or `model/rfdevice_SiN.tcl` |
 | `ivCSV` | figures/pulsedIV.csv | output (Vd, Id mA/mm, peak Te K); sweeps always set their own |
 | `teProfile` | {} | Vd list for ETemp cut dumps ([[energy-balance]]) |
