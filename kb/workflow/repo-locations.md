@@ -40,3 +40,4 @@ Before 2026-10-12 everything sat flat in the root; `progress.md` and old commits
 | Dashboard | [[dashboard]] |
 | Static-era write-ups | `archive/static_mobility/RESULTS.md` |
 | Progress-report deck (Sep 30) | https://claude.ai/artifact/4RfyrQi58v7pD8NH6aFLqc |
+| Progress deck (Sep 30 – Oct 13, 13 slides) | https://claude.ai/artifact/GXaJFrxHnuC97g8SzKPvjN |
