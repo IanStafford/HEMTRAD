@@ -120,7 +120,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
   <header class="top">
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">FLOOXS model of an AlGaN/GaN HEMT: what ran each day and what is still open. Id in <span style="white-space:nowrap">mA/mm</span> at Vg = −2 V unless noted; work before Oct 1 used constant mobility and is archived.</p>
-    <p class="meta">Snapshot Oct 13, end of day</p>
+    <p class="meta">Snapshot Oct 14, midday</p>
   </header>
 
   <div class="layout">
@@ -128,6 +128,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
       <div class="sep"></div>
       <div class="era">Field mobility</div>
+      <a href="#oct14" data-page="oct14"><span class="d">Oct 14</span><span class="t">onset view · deck</span></a>
       <a href="#oct13" data-page="oct13"><span class="d">Oct 13</span><span class="t">standard ETemp · traps</span></a>
       <a href="#oct12" data-page="oct12"><span class="d">Oct 12</span><span class="t">KB · repo cleanup</span></a>
       <a href="#oct08" data-page="oct08"><span class="d">Oct 7–8</span><span class="t">energy balance</span></a>
@@ -180,6 +181,41 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       </section>
       <div class="no-js-sep"></div>
 
+      <!-- OCT 14 -->
+      <section class="page" id="oct14" data-title="Oct 14">
+        <div class="pagehead">
+          <h2>Oct 14 · Onset view of the position maps, deck redesign</h2>
+          <p>A new way to read the position maps: each trap position either stays flat (no collapse in the sweep) or rises to its collapse voltage, earliest highest. Also a redesigned progress deck and a leaner Overview here.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">reanalysis of jobs 44441813 · 44452289 · 44573468</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Onset surfaces (<code>analysis/plot_posOnset.py</code>): x, y = trap position; a position collapses if one 0.1 V step loses ≥50% or it stalls at the runaway, and then sits at height <span class="num">3.1 V − onset</span>. GIFs raise positions as Vd sweeps 0.1 → 3.0 V.</li>
+              <li>Collapsing positions by 3.0 V (of 65): <span class="num">0.30 eV / 4e18: 7</span>, 0.25 / 6e18: 36, 0.30 / 5e18: 45, 0.30 / 6e18: 47, 0.40 / 5e18: 50, 0.55 / 4e18: 50.</li>
+              <li>At 0.30 eV / 5e18 and 0.25 eV / 6e18 the surface is a ridge at the gate (<span class="num">0.2 V</span>) sloping down toward the drain (to 3.0 V); at 0.30 / 6e18 the slope ends at 1.9 V. Deeper levels form a high, flat plateau: <span class="num">0.7–1.2 V</span> everywhere at 0.40 eV.</li>
+              <li>Progress deck redesigned as a conference talk that opens on the result, with a new headline figure (<code>figures/eTempStd_headline.png</code>). <a href="https://claude.ai/artifact/GXaJFrxHnuC97g8SzKPvjN" target="_blank" rel="noopener">Open the deck</a></li>
+              <li>This dashboard's Overview distilled: no timeline, 5 live open items, older questions collapsed.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill noted">noted</span><span>These maps use the local-field hot-electron model (Oct 2–3). The same view with the standard energy balance needs a new position-map sweep (Vd 0–2 V); not submitted.</span></li>
+              <li><span class="pill noted">noted</span><span>0.55 eV / 4e18 has isolated late pits inside the early plateau; single-position outliers, not yet checked against their Id–Vd.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs wide">
+          <figure><a class="img" href="fig/posMap_onset3d_sets.jpg" target="_blank" rel="noopener"><img src="fig/posMap_onset3d_sets.jpg" alt="Six 3D onset surfaces, one per trap level and concentration set, flat where positions do not collapse and raised to the onset voltage where they do" loading="lazy"></a><figcaption><b>Onset surfaces for all six sets</b>Top: 0.30 / 5e18, 0.25 / 6e18, 0.30 / 4e18. Bottom: 0.30 / 6e18, 0.40 / 5e18, 0.55 / 4e18. Higher = earlier collapse; flat = none by 3 V.</figcaption></figure>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/posMapLate_onset3d.gif" target="_blank" rel="noopener"><img src="fig/posMapLate_onset3d.gif" alt="Animation: trap positions of the 0.30 eV 5e18 set rising to their onset height as Vd sweeps 0.1 to 3.0 V" loading="lazy"></a><figcaption><b>0.30 eV / 5e18, animated</b>The gate positions rise first (0.2 V); the slope fills in toward the drain until 45/65 have collapsed at 3.0 V.</figcaption></figure>
+          <figure><a class="img" href="fig/posMap_tl0.25_tp6e18_onset3d.gif" target="_blank" rel="noopener"><img src="fig/posMap_tl0.25_tp6e18_onset3d.gif" alt="Animation: trap positions of the 0.25 eV 6e18 set rising to their onset height as Vd sweeps" loading="lazy"></a><figcaption><b>0.25 eV / 6e18, animated</b>Same ridge-and-slope shape; 36/65 collapse by 3.0 V. GIFs for every set are in <code>figures/posMap_*_onset3d.gif</code>.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#oct13">Oct 13 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
       <!-- OCT 13 -->
       <section class="page" id="oct13" data-title="Oct 13">
         <div class="pagehead">
@@ -210,7 +246,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
         <div class="figs">
           <figure><a class="img" href="fig/eTempStd_IdVd.jpg" target="_blank" rel="noopener"><img src="fig/eTempStd_IdVd.jpg" alt="Id versus Vd on a log scale for Run F and the late trap set at y 1.0 and 2.4 micrometres, three tau values each, standard energy balance" loading="lazy"></a><figcaption><b>Trap study with the standard energy balance</b>The collapse moves to 0.4–0.7 V, set by τ (the local-field model collapsed at 2.3–3.5 V). At y = 2.4 µm it drops 60–4000× onto a creeping plateau of 0.01–0.1 mA/mm.</figcaption></figure>
         </div>
-        <div class="pager"><a href="#overview">← Overview</a><a href="#oct12">Oct 12 →</a></div>
+        <div class="pager"><a href="#oct14">← Oct 14</a><a href="#oct12">Oct 12 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
