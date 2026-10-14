@@ -10,6 +10,7 @@ tags: [tools]
 | `analysis/analyze_trapMapSets.py [run tag]` | 3D depth/suppression surfaces over (depth, y) | `figures/trapMapF_field_*.png` |
 | `analysis/analyze_mobCompare.py` | static vs field Run F maps, each vs its own trap-free device | `figures/mobCompare_F_*` |
 | `analysis/plot_posVd.py <run> <tag> [Vd list]` | per-Vd 3D suppression surfaces (shared z), frames, onset map; stalled points as orange × | `<tag>_grid.png`, `<tag>_frames/`, `<tag>_onset.png` |
+| `analysis/plot_posOnset.py <run> <tag>` | 3D onset surface: positions that collapse in the sweep (deep, medium or stalled) rise to height Vd_max + 0.1 − onset, so the earliest collapse is the highest peak; non-collapsing positions stay flat; frames rise as Vd sweeps | `<tag>_onset3d.png`, `<tag>_onset3d_frames/` (GIF via make_gif.py) |
 | `analysis/make_gif.py frames out.gif [ms hold]` | GIF from `Vd_*.png` frames (shared palette, last frame held) | `figures/*.gif` |
 | `analysis/plot_lateIdVd.py` | latest deep collapses vs trap-free | `figures/lateOnset_IdVd.png` |
 | `analysis/plot_curveTracer.py [run]` | Id–Vd at other Vg, one folder per Vg, −2 V dashed | `figures/Vg_-1V/`, `figures/Vg_0V/` |
