@@ -6,3 +6,6 @@ _probe_*.csv
 _probe_*.log
 __pycache__/
 .obsidian/
+
+# GIF frames from plot_posOnset.py (regenerate; only the GIFs are committed)
+figures/*_onset3d_frames/
