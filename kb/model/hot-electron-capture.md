@@ -16,4 +16,4 @@ Levers ([[levers]]): `hotEb` (larger → earlier, deeper collapse; strongest dep
 
 Collapse mechanism in this model is **current-driven** (semi-ON hot-electron trapping), see [[gate-bias]].
 
-Related: [[te-ramp]], [[run-F]].
+Related: [[te-ramp]], [[run-F]]. Full derivation (capture barrier → level shift E_b(1 − T/Te), local-field Te from the energy balance, emission-time estimate) with references: https://claude.ai/artifact/4KLdks2Sd8t9zs8wb8wWJ9
