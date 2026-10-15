@@ -110,13 +110,14 @@ proc HotTeExpr {} {
     # dE = capBeta*sqrt(Fg)*exp(-(y - 0.125)/injLen) for y > 0.125, capped at 0.99*hotEb.
     global injLen
     if {$capMode eq "gate"} {
-        set w "exp(-((y - 0.14) / 0.03)^2) * exp(-(x / 0.004)^2)"
+        # (no unary minus before ^: FLOOXS reads -(a)^2 as (-a)^2)
+        set w "exp(0.0 - ((y - 0.14) / 0.03) * ((y - 0.14) / 0.03)) * exp(0.0 - (x / 0.004) * (x / 0.004))"
         sel z=abs(grady(DevPsi))*$w name=FgTmp
         sel z=FgTmp
         set Fg [lindex [peak AlGaN] 1]
         set ::capFg $Fg
         set d "(0.5 * ((y - 0.125) + abs(y - 0.125)))"
-        set dE "([expr {$capBeta * sqrt($Fg)}] * exp(-$d / $injLen))"
+        set dE "([expr {$capBeta * sqrt($Fg)}] * exp((0.0 - $d) / $injLen))"
         set cap [expr {0.99 * $hotEb}]
         set dEc "(0.5 * ($dE + $cap - abs($dE - $cap)))"
         return "(Temp / (1.0 - $dEc / $hotEb))"
