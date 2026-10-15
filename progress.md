@@ -1180,3 +1180,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - `fangs-hpg-tests/config.env`: COMMIT=92b55cee (TAG unchanged, env reused: python 3.13, eigen 3.4). Next: make_bundle.sh, then the build job (waiting on Ian's OK for sbatch).
 - make_bundle.sh failed on the rerun (fetch used a bundle path relative to the checkout); fixed in d504b24, rerun ends "HPG checkout: 92b55cee". **Waiting on Ian's OK to sbatch the build job** (`submit.sh build`, 8 CPUs, ~1-2 h).
 - Build job **46081205** submitted (Ian OK) at 92b55cee. Expect both builds rc 0, selftest rc 0, ctest 86/86 and 165/165.
+- Build job 46081205 done (33 min): builds rc 0, selftest rc 0. **ctest build 83/86, build-tcl 164/165** (run 1: 5/86, 81/165). TDR, erfc and goldens are fixed. Remaining failures:
+  - Regression-Fast and Regression-Fast-Py: not rounding. The fast-tier children run under the system conda Python 3.14 (`/apps/conda/26.7`), not the env's 3.13, so `fangs._core` isn't found.
+  - Py-POD-Speed-Test (build only): sign flip of a 3e-10 POD mode coefficient in the trace.
+  - Py-Device-Failed-Build (build only): all 10 .str output files differ.
+  Stopped before the tier array (per Ian's rule). Logs are in `~/flooxs-pyplot/Test/Regression/hpg_results/20261015-fangs/`; sent to the FANGS Development session. Waiting for a fixed commit.
