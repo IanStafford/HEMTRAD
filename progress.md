@@ -1190,3 +1190,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - POD: the LAPACK `dsyev` eigenvector sign is now fixed.
   - Device-Failed-Build: the scratch .str files that depend on BLAS are now deleted.
   Next, when Ian gives the commit: rename `results` → `results-run2` and the workstation folder → `20261015-fangs-run2`, set COMMIT, rebundle, build job (ask Ian before sbatch).
+- **FANGS rerun 3 at flooxs-pyplot 2de5aaee** (Ian): run 2 kept as `results-run2` / `20261015-fangs-run2`; config.env COMMIT=2de5aaee. Next: bundle, then build job (ask Ian).
