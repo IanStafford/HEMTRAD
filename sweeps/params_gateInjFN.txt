@@ -1,0 +1,15 @@
+gfn_y1.0_th1.3e5_F5e6_vg-2|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|-2.0|4.0|-|capMode gate;capForm fn;capF0 5e6;capFth 1.3e5;injLen 1.5
+gfn_y1.0_th1.3e5_F5e6_vg-1|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|-1.0|4.0|-|capMode gate;capForm fn;capF0 5e6;capFth 1.3e5;injLen 1.5
+gfn_y1.0_th1.3e5_F5e6_vg0|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|0.0|4.0|-|capMode gate;capForm fn;capF0 5e6;capFth 1.3e5;injLen 1.5
+gfn_y1.0_th1.3e5_F2e7_vg-2|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|-2.0|4.0|-|capMode gate;capForm fn;capF0 2e7;capFth 1.3e5;injLen 1.5
+gfn_y1.0_th1.3e5_F2e7_vg-1|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|-1.0|4.0|-|capMode gate;capForm fn;capF0 2e7;capFth 1.3e5;injLen 1.5
+gfn_y1.0_th1.3e5_F2e7_vg0|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|0.0|4.0|-|capMode gate;capForm fn;capF0 2e7;capFth 1.3e5;injLen 1.5
+gfn_y1.0_th1.4e5_F5e6_vg-2|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|-2.0|4.0|-|capMode gate;capForm fn;capF0 5e6;capFth 1.4e5;injLen 1.5
+gfn_y1.0_th1.4e5_F5e6_vg-1|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|-1.0|4.0|-|capMode gate;capForm fn;capF0 5e6;capFth 1.4e5;injLen 1.5
+gfn_y1.0_th1.4e5_F5e6_vg0|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|0.0|4.0|-|capMode gate;capForm fn;capF0 5e6;capFth 1.4e5;injLen 1.5
+gfn_y1.0_th1.4e5_F2e7_vg-2|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|-2.0|4.0|-|capMode gate;capForm fn;capF0 2e7;capFth 1.4e5;injLen 1.5
+gfn_y1.0_th1.4e5_F2e7_vg-1|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|-1.0|4.0|-|capMode gate;capForm fn;capF0 2e7;capFth 1.4e5;injLen 1.5
+gfn_y1.0_th1.4e5_F2e7_vg0|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|1.0|0.0|4.0|-|capMode gate;capForm fn;capF0 2e7;capFth 1.4e5;injLen 1.5
+gfn_y2.4_th1.4e5_F2e7_vg-2|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|2.4|-2.0|4.0|-|capMode gate;capForm fn;capF0 2e7;capFth 1.4e5;injLen 1.5
+gfn_y2.4_th1.4e5_F2e7_vg-1|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|2.4|-1.0|4.0|-|capMode gate;capForm fn;capF0 2e7;capFth 1.4e5;injLen 1.5
+gfn_y2.4_th1.4e5_F2e7_vg0|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|2.4|0.0|4.0|-|capMode gate;capForm fn;capF0 2e7;capFth 1.4e5;injLen 1.5
