@@ -30,7 +30,7 @@ Before 2026-10-12 everything sat flat in the root; `progress.md` and old commits
 | Obsidian vault | `~/notes/HEMTRAD-vault` — symlinks only: `CLAUDE.md`, `progress.md`, `RESULTS.md`, and `kb/` (this knowledge base). Never copy repo files in; `.obsidian/` stays out of the repo |
 | Sweep results (not in git) | `results/` on both machines; static era in `results/archive_static_mobility/` |
 | Stock FLOOXS on HPG | `/home/ianstafford/blue/ee1/ianstafford/flooxs` (`release/flooxs`) — HEMTRAD jobs use it; don't modify |
-| flooxs-pyplot on HPG | none: the old checkout `/home/ianstafford/blue/ee1/ianstafford/flooxs-pyplot` (da619c4c) was deleted 2026-10-15 (Ian); copy a new one as a git bundle if needed |
+| flooxs-pyplot on HPG | none: the old checkout `/home/ianstafford/blue/ee1/ianstafford/flooxs-pyplot` (da619c4c) was deleted 2026-10-15 (Ian), with the Oct 8 bundle and `gan_regress_results/`; nothing from flooxs-pyplot is left on HPG. Copy a new one as a git bundle if needed |
 | FLOOXS source (workstation) | `~/flooxs/src` |
 | Crash-fix build | `~/flooxs-crashfix` (branch `crash-fix`), patch `flooxs-crashfix.patch` |
 | flooxs-pyplot (workstation) | `~/flooxs-pyplot` (private `IanStafford/flooxs-pyplot`; matplotlib plot windows, regression suite; `Test/SimpDev/GaNSuite` = GaN starter decks) |

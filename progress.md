@@ -1207,3 +1207,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - Also deleted the old HPG checkout `blue/.../flooxs-pyplot` (da619c4c, 181 MB): no jobs or scripts used it, and Ian confirmed.
   - `fangs-hpg-tests/` moved to `archive/fangs-hpg-tests/`.
   - Still on HPG, untouched: `gan_regress_results/` and `blue/.../flooxs-pyplot.bundle` (the Oct 8 bundle).
+- Ian: "remove anything related to flooxs-pyplot". Deleted on HPG: `gan_regress_results/` (2.2 MB, Oct 8 run) and `flooxs-pyplot.bundle` (131 MB, da619c4c). The 163 Oct 8 result files already matched the workstation copy; the 27 build/ctest/smoke scripts and logs were first saved to `hpg_results/20261008/hpg-setup/` and verified. Nothing from flooxs-pyplot is left on HPG (no conda env or job used it).
