@@ -1185,3 +1185,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - Py-POD-Speed-Test (build only): sign flip of a 3e-10 POD mode coefficient in the trace.
   - Py-Device-Failed-Build (build only): all 10 .str output files differ.
   Stopped before the tier array (per Ian's rule). Logs are in `~/flooxs-pyplot/Test/Regression/hpg_results/20261015-fangs/`; sent to the FANGS Development session. Waiting for a fixed commit.
+- FANGS Development session: all three causes are fixed in flooxs-pyplot (verification running, ~40 min).
+  - Regression-Fast*: ctest used FindPython3's interpreter (it found the system 3.14), not `Python_EXECUTABLE`. Needs a fresh cmake configure, which build.slurm does.
+  - POD: the LAPACK `dsyev` eigenvector sign is now fixed.
+  - Device-Failed-Build: the scratch .str files that depend on BLAS are now deleted.
+  Next, when Ian gives the commit: rename `results` → `results-run2` and the workstation folder → `20261015-fangs-run2`, set COMMIT, rebundle, build job (ask Ian before sbatch).
