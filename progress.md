@@ -1171,3 +1171,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - `TDR-Read`, `TDR-Diff` (build-tcl): fail in 0.2 s with no output; probably HDF5 2.2.0 (conda-forge's new major) vs what flooxs-pyplot was written against.
   - STRUMPACK tests not registered, as expected.
 - **Stopped per the README** (any failure other than Regression-Fast* → report). Tier array not requested. Waiting for Ian / the flooxs-pyplot session.
+- Ian: hand FANGS to flooxs-pyplot. Raw logs copied (rsync, no manifest) to `~/flooxs-pyplot/Test/Regression/hpg_results/20261015-fangs/` (gitignored there) with a handoff `REPORT.md`; message sent to the "FANGS Development" session. HPG folder `fangs-hpg-20261015/` left in place until Ian says to delete it (cleanup.sh needs a manifest, so removal would be by hand).

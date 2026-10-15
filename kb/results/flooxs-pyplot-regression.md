@@ -23,3 +23,6 @@ Ian's side task: run flooxs-pyplot's `Test/Regression/gan_hpg` cases on HPG and 
 | gan_rescue | 1309.8 | 955 | 985.5 | 293.9 | 2.77e-4 at 2.4 V | 6/19 |
 
 Sanity: `gan_quickIV` 17.57962 mA/mm at 0.1 V, 136.8518 at 1.0 V — matches.
+
+## 2026-10-15: HPG campaign for FANGS (commit 28d8af2b), stopped after the build
+Campaign `fangs-hpg-tests/` (conda env per flooxs-pyplot's HPG runbook, hpg-milan). The runbook needs `eigen=3.4` (conda-forge now gives Eigen 5) and Python ≥ 3.13 (`core.cc` uses `Py_IsFinalizing`); with both, the two builds compile and the selftest passes. ctest: `build` 5/86, `build-tcl` 81/165. All 77 `Py-*` deck tests fail (Python side exits 1, "trace not written"); `Native-Cmd`/`Expr-Diff` fail on `erfc(26.6–27.2)` (conda libm underflow); `TDR-Read`/`TDR-Diff` fail (HDF5 2.2.0?). Jobs 46060195, 46062866, 46064444. Tier array not run. Handed to the flooxs-pyplot session: `~/flooxs-pyplot/Test/Regression/hpg_results/20261015-fangs/REPORT.md`. HPG folder `/home/ianstafford/blue/ee1/ianstafford/fangs-hpg-20261015/` still there.
