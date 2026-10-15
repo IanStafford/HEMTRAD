@@ -21,3 +21,5 @@ Field-driven trapping: electrons reach traps by tunnelling/injection set by the 
 Caution: the measured collapse is at Vd 0.4–0.5 V, Vdg ≈ 2.5 V, far below typical injection voltages — the collapse may be largely set before the sweep (radiation-created charge or curve-tracer pulses).
 
 **Proposed tests (awaiting Ian):** (c) off-state pre-stress with `drivers/stressFreeze.tcl` (no physics change) first; (a) a Poole–Frenkel capture option; (b) field-filled surface traps via `insTrapSign`/`surfCharge`. Measurement: onset vs Vg on the curve tracer.
+
+**2026-10-15:** measured onset reported **later at higher Vg**, the field-driven signature. Tests (Poole–Frenkel, Fowler–Nordheim gate injection, virtual-gate surface sheet) in exploratory worktrees: [[vg-dependence]].

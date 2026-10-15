@@ -17,3 +17,5 @@ Job 44573629 (`sweeps/pulsedIV_curveTracer.slurm`, `analysis/plot_curveTracer.py
 - **Why:** the collapse starts at about the **same current** (165–205 mA/mm) at every Vg. At −2 V the gate caps the current near that level, so it creeps up to it by 2.2–3.4 V; at −1/0 V the current passes it by ~1.6 V (trap-free 407/513 mA/mm at 4 V vs 184).
 - The **peak** field is lower at higher Vg (trap-free peak Te 703 K at −2 vs 335 K at −1 at 3 V), but these traps sit in the access region, where the local field scales with current. Likely mechanism (inferred, not yet checked with a field dump): ~85% of traps are filled at rest, locally depleting the channel; current through that spot makes a field spike ∝ current → heating → more capture → runaway. Uniform access-region heating would be <1 K.
 - So the model's collapse is **semi-ON hot-electron trapping** (cf. Meneghini et al.). A **field-driven** mechanism would move the onset later with higher Vg — a discriminating measurement ([[field-driven-trapping]]).
+
+**2026-10-15:** the measured device does the opposite (later at higher Vg); the energy balance keeps access-region traps current-driven too. See [[vg-dependence]].

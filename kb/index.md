@@ -61,6 +61,7 @@ Second brain for the FLOOXS model of **radiation-induced current collapse** in a
 - [[position-maps]] — onset vs trap position, GIF surfaces, level/conc sets
 - [[gate-bias]] — Vg −1 / 0 V: current-driven collapse
 - [[field-driven-trapping]] — candidate mechanisms, proposed tests
+- [[vg-dependence]] — measured onset later at higher Vg; EB vs field-driven / virtual-gate worktrees (Oct 15)
 - [[static-era-lessons]] — what the constant-mobility era (Sep 23 – Oct 1) taught
 - [[highk-vs-sin]] — passivation dielectric does not matter at ≤3 V
 - [[critical-strike]] — strike probability at 1e7 ions/cm²
