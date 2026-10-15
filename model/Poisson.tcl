@@ -103,6 +103,23 @@ proc HotTeExpr {} {
     # Returned as the equivalent TeTrap, T/(1 - dE/hotEb), so IonizedAcceptor,
     # FillStep and the Te ramp are unchanged. capField: lat = |dPsi/dy| (lateral,
     # no polarization field at rest), tot = |grad Psi|, qfn = |grad Qfn|.
+    # Gate injection ("virtual gate", capMode gate, exploratory 2026-10-15): electrons
+    # leak from the gate's drain edge into surface states and hop along the surface.
+    # The supply is set by the peak lateral field at the gate drain edge, Fg (one
+    # number per update, ~ Vd - Vg), and decays with distance from the edge:
+    # dE = capBeta*sqrt(Fg)*exp(-(y - 0.125)/injLen) for y > 0.125, capped at 0.99*hotEb.
+    global injLen
+    if {$capMode eq "gate"} {
+        set w "exp(-((y - 0.14) / 0.03)^2) * exp(-(x / 0.004)^2)"
+        sel z=abs(grady(DevPsi))*$w name=FgTmp
+        set Fg [lindex [peak AlGaN] 1]
+        set ::capFg $Fg
+        set d "(0.5 * ((y - 0.125) + abs(y - 0.125)))"
+        set dE "([expr {$capBeta * sqrt($Fg)}] * exp(-$d / $injLen))"
+        set cap [expr {0.99 * $hotEb}]
+        set dEc "(0.5 * ($dE + $cap - abs($dE - $cap)))"
+        return "(Temp / (1.0 - $dEc / $hotEb))"
+    }
     if {$capMode eq "field"} {
         switch -- $capField {
             lat { set F "abs(grady(DevPsi))" }

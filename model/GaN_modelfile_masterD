@@ -156,9 +156,10 @@ if {![info exists hotTau]}  { set hotTau 1.0e-13 }  ;# energy relaxation time (s
 if {![info exists hotMu]}   { set hotMu 600.0 }     ;# GaN electron mobility (cm2/Vs), matches GaN.tcl
 if {![info exists hotVsat]} { set hotVsat 1.9e7 }   ;# saturation velocity (cm/s)
 # field-driven capture (exploratory, branch explore/field-capture; Poisson.tcl HotTeExpr)
-if {![info exists capMode]}  { set capMode hot }      ;# hot = hot-electron capture (default); field = barrier lowered by the local field
+if {![info exists capMode]}  { set capMode hot }      ;# hot = hot-electron capture (default); field = barrier lowered by the local field; gate = gate injection
 if {![info exists capField]} { set capField lat }     ;# field used in capMode field: lat |dPsi/dy|, tot |grad Psi|, qfn |grad Qfn|
 if {![info exists capBeta]}  { set capBeta 2.46e-4 }  ;# eV per sqrt(V/cm); 2.46e-4 = Poole-Frenkel in GaN (eps_r 9.5)
+if {![info exists injLen]}   { set injLen 0.5 }        ;# capMode gate: surface hopping decay length from the gate drain edge (um)
 
 # Traps in the insulators (Nitride, HighK): static charge only, since no
 # carriers or Qfn are solved there. 0 = none (default, unchanged behavior);
