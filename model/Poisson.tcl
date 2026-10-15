@@ -112,6 +112,7 @@ proc HotTeExpr {} {
     if {$capMode eq "gate"} {
         set w "exp(-((y - 0.14) / 0.03)^2) * exp(-(x / 0.004)^2)"
         sel z=abs(grady(DevPsi))*$w name=FgTmp
+        sel z=FgTmp
         set Fg [lindex [peak AlGaN] 1]
         set ::capFg $Fg
         set d "(0.5 * ((y - 0.125) + abs(y - 0.125)))"
