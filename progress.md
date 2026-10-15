@@ -1200,3 +1200,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - vs the Oct 8 Intel baseline, only gan_quickIV is ok. The other 6 FAIL at rtol 1e-6 with small deviations: 2.6e-6 to 1e-4 relative, calibIdVg 1e-6 absolute on a near-zero value. They are identical for Tcl, Python and DAG, so platform/compiler.
   - Fetched; all 520 data files match the manifest. Fixed the manifest self-hash in compare/fetch/cleanup.
   - Report: `~/flooxs-pyplot/Test/Regression/hpg_results/20261015-fangs/REPORT.md`. HPG copy kept; waiting for Ian on deletion.
+- FANGS Development accepted run 3 (D1 HPG item met; first HPG run of the Python ports). It reads the 6 baseline deviations as toolchain-only (calibIdVg: the sub-threshold floor, ~1e-8 mA/mm). flooxs-pyplot 49ae8de8 adds per-case tolerances; recomputed on the fetched results, 7/7 are ok for tcl, py and dag. Nothing more to run. Waiting for Ian on deleting the HPG folder and archiving `fangs-hpg-tests/`.
