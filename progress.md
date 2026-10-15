@@ -1193,3 +1193,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **FANGS rerun 3 at flooxs-pyplot 2de5aaee** (Ian): run 2 kept as `results-run2` / `20261015-fangs-run2`; config.env COMMIT=2de5aaee. Next: bundle, then build job (ask Ian).
 - Rerun 3 bundle OK (HPG checkout 2de5aaee). Build job **46085435** submitted (Ian OK).
 - FANGS session: 25a10277 (one commit after 2de5aaee) adds a ctest RESOURCE_LOCK to the Tcl mesh tests (scratch-file race under ctest -j). Local verification of 2de5aaee passed, so nothing to cancel; 46085435 continues at 2de5aaee. A lone Mesh-* failure would be that race; Ian decides whether it stops the campaign.
+- Ian: a lone Mesh-* ctest failure does not stop the campaign. Until 18:30 today, work with the FANGS Development session without asking (campaign sbatches for this task approved).
