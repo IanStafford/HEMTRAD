@@ -19,7 +19,7 @@
 
 set -euo pipefail
 
-REPO=/home/ianstafford/blue/ee1/ianstafford/HEMTRAD
+REPO=${REPO:-/home/ianstafford/blue/ee1/ianstafford/HEMTRAD}   # override (--export) to run from an HPG worktree
 PARAMS=${PARAMS:-params_eTemp1.txt}
 RUN=${RUN:-20261008_eTemp1}
 LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/sweeps/$PARAMS")
