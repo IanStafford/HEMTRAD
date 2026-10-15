@@ -10,7 +10,7 @@ date: 2026-10-15
 ## A. Can the present model explain it?
 - **Access-region traps, energy balance (job 46040979):** late set at y 2.4 µm, τ 1 ps collapses at **0.3–0.4 V at Vg −2, −1 and 0** (`figures/vgOnset_EB.png`); τ 0.1 ps: 0.7 V at −2, 0.6 V at −1. Same as the local-field result: current-driven, no later onset at higher Vg.
 - **Why:** trap-free Te at Vd 0.4 V (τ 1 ps) is 304 / 306 / 307 K at y 2.4 µm for Vg −2/−1/0, with no Vg dependence, but **346 / 314 / 309 K at the gate drain edge** (y 0.14 µm). Only traps at the gate edge would see less heating at higher Vg.
-- **Gate-edge traps with the energy balance** (y 0.2 / 0.3 µm, 4e18 / 5e18, job 46052606): running; very slow (still at Vd 0.2 V after 20 min).
+- **Gate-edge traps with the energy balance** (y 0.2 / 0.3 µm, 4e18 / 5e18, job 46052606): **all collapse at 0.3–0.4 V at Vg −2, −1 and 0** (4e18 → ~1e-4 mA/mm, 5e18 → ~1e-6). The lower gate-edge Te at higher Vg is offset by the larger current. So within the present hot-electron model **no trap position gives a later onset at higher Vg**.
 
 ## B. Field-driven models (exploratory worktrees, not in main)
 Branches `explore/field-capture` and `explore/gate-injection` (workstation `~/HEMTRAD-wt/`, HPG `…/ianstafford/HEMTRAD-wt/`). New levers, default off (`capMode hot`): `capMode field|gate`, `capField lat|tot|qfn`, `capForm pf|fn`, `capBeta`, `capF0`, `capFth`, `injLen`; plus a `fieldProfile` dump in `drivers/pulsedIV.tcl`. The field lowers the capture barrier, entered as an equivalent TeTrap so `IonizedAcceptor`, `FillStep` and the Te ramp are unchanged. pf = capBeta·√F (Poole–Frenkel), fn = kT·capF0·(1/capFth − 1/F) ≥ 0 (tunnelling rate ∝ exp(−F0/F)).
