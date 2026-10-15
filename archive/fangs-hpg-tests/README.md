@@ -1,5 +1,7 @@
 # FANGS (flooxs-pyplot) tests on HiPerGator, October 2026
 
+> **Archived 2026-10-15.** Finished at flooxs-pyplot `2de5aaee` (run 3: ctest 86/86 and 165/165, tier 23/23, tape/Python/DAG exact; accepted by the flooxs-pyplot session). The HPG folder `fangs-hpg-20261015` and the bundle were deleted with `cleanup.sh`; results are in `~/flooxs-pyplot/Test/Regression/hpg_results/20261015-fangs*` (summary: `kb/results/flooxs-pyplot-regression.md`). The scripts expect to sit at `fangs-hpg-tests/` in the repo root; move them back to reuse them.
+
 A one-off test campaign for Ian's other project, **flooxs-pyplot** (FLOOXS being turned into FANGS: Python front end,
 compiled expression tape, threaded assembly). It is not HEMTRAD physics; it lives here because this repo is the one with
 the HPG workflow. When it is done, the results go to the flooxs-pyplot checkout on the workstation and everything on HPG

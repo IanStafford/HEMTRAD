@@ -7,7 +7,7 @@ date: 2026-10-08
 
 Ian's side task: run flooxs-pyplot's `Test/Regression/gan_hpg` cases on HPG and hand back the results; the flooxs-pyplot session turns them into baselines. **Nothing committed** to either repo.
 
-- Code: flooxs-pyplot **da619c4c**, copied to HPG as a git bundle (HPG has no GitHub credentials) at `/home/ianstafford/blue/ee1/ianstafford/flooxs-pyplot`.
+- Code: flooxs-pyplot **da619c4c**, copied to HPG as a git bundle (HPG has no GitHub credentials) at `/home/ianstafford/blue/ee1/ianstafford/flooxs-pyplot` (deleted 2026-10-15).
 - Build: Intel icpx 2025.1 (`flooxsenv`), `-O2`, `-DEigen3_DIR=/apps/eigen3/3.4.0/share/eigen3/cmake` (HPG `eigen3/3.4.0` module, not installed into the conda env), SuiteSparse/OpenBLAS/Tcl from conda `flooxs`; no FFTW3. Ctests KP-Silicon, Stress-Elastic, Matrix-UMF pass (needs `FLXSHOME` set).
 - Runs: array job **45216096**, `hpg-milan` (EPYC 75F3), **16 cores, threads capped at 16, not exclusive** (Ian's option 3: whole nodes weren't being scheduled and the QOS counts every core of an exclusive node; FLOOXS is mostly single-threaded on this device). An exclusive attempt (45214746) was cancelled before starting.
 - Results: `~/flooxs-pyplot/Test/Regression/hpg_results/20261008/` (README.txt there); HPG copy `/home/ianstafford/blue/ee1/ianstafford/gan_regress_results/hpg_20261008/`.
@@ -35,4 +35,5 @@ Runs 1 (28d8af2b) and 2 (92b55cee) stopped at ctest; the flooxs-pyplot session f
 - **Against the 2026-10-08 Intel baseline (da619c4c):** only gan_quickIV is `ok`. The other 6 FAIL at the default tolerance (rtol 1e-6, atol 0). Max relative deviations: trapF 4.2e-6, vg0 5.6e-6, vgm1 2.6e-6, sin 8.3e-6, rescue 1.0e-4; calibIdVg is 21 relative but 1e-6 absolute (a near-zero value). Newton counts are equal except vgm1 317/318, sin 344/343, rescue 986/955. Tcl, Python and DAG give the same deviations, so they come from the compiler/platform and code since da619c4c, not from the tape or the Python port.
 - Manifest: all 520 data files match. `MANIFEST.sha256` had hashed itself and the compare log while they were still being written; fixed in `compare.slurm`, `fetch_results.sh` and `cleanup.sh`.
 - Accepted by the flooxs-pyplot session: 49ae8de8 gives the six cases per-case tolerances (toolchain only; calibIdVg differs in its ~1e-8 mA/mm sub-threshold floor), and all 7 are then ok for tcl, py and dag; the 2026-10-08 baselines stay.
-- Results: `~/flooxs-pyplot/Test/Regression/hpg_results/20261015-fangs/REPORT.md`. HPG copy kept at `/home/ianstafford/blue/ee1/ianstafford/fangs-hpg-20261015/` until Ian says to delete it.
+- Results: `~/flooxs-pyplot/Test/Regression/hpg_results/20261015-fangs/REPORT.md`. The six regress reports there were recomputed by the flooxs-pyplot session with the new tolerances; the HPG originals are in `hpg-original/`.
+- **Cleaned up 2026-10-15 (Ian):** HPG `fangs-hpg-20261015/` (4.6 GB) and the workstation bundle were deleted with `cleanup.sh`, and the old HPG checkout (da619c4c) was deleted too. The campaign scripts are in `archive/fangs-hpg-tests/`.

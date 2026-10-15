@@ -12,7 +12,15 @@ source "$here/config.env"
 go=0; [ "${1:-}" = --yes ] && go=1
 
 [ -s "$WS_RESULTS/MANIFEST.sha256" ] || { echo "no fetched results at $WS_RESULTS: run fetch_results.sh first" >&2; exit 1; }
-( cd "$WS_RESULTS" && grep -vE '  \./(MANIFEST\.sha256|logs/compare-[0-9]+\.(out|err))$' MANIFEST.sha256 | sha256sum --quiet -c - ) || { echo "fetched results do not match the manifest: not deleting" >&2; exit 1; }
+# every manifest file must match in the fetched copy, or (when a later recompute rewrote it there, e.g. the regress.py
+# reports) its original saved under hpg-original/
+bad=$( cd "$WS_RESULTS" && grep -vE '  \./(MANIFEST\.sha256|logs/compare-[0-9]+\.(out|err))$' MANIFEST.sha256 \
+       | sha256sum -c - 2>/dev/null | sed -n 's/: FAILED.*$//p' || true )
+for f in $bad; do
+  ( cd "$WS_RESULTS/hpg-original" 2>/dev/null && grep -F "  $f" ../MANIFEST.sha256 | grep -E "  ${f//./\\.}$" | sha256sum --quiet -c - ) \
+    || { echo "fetched results do not match the manifest ($f): not deleting" >&2; exit 1; }
+  echo "$f: changed after the fetch; original kept in hpg-original/"
+done
 case "$BASE" in "$HPG_USER_BLUE"/fangs-hpg-*) ;; *) echo "refusing: BASE=$BASE is not a fangs-hpg-* folder" >&2; exit 1 ;; esac
 
 ssh -o BatchMode=yes hpg "squeue -h -u \$USER -n fangs-build,fangs-hpg,fangs-cmp" | grep -q . && { echo "campaign jobs still queued or running" >&2; exit 1; }

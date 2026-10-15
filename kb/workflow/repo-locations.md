@@ -30,11 +30,12 @@ Before 2026-10-12 everything sat flat in the root; `progress.md` and old commits
 | Obsidian vault | `~/notes/HEMTRAD-vault` — symlinks only: `CLAUDE.md`, `progress.md`, `RESULTS.md`, and `kb/` (this knowledge base). Never copy repo files in; `.obsidian/` stays out of the repo |
 | Sweep results (not in git) | `results/` on both machines; static era in `results/archive_static_mobility/` |
 | Stock FLOOXS on HPG | `/home/ianstafford/blue/ee1/ianstafford/flooxs` (`release/flooxs`) — HEMTRAD jobs use it; don't modify |
-| flooxs-pyplot on HPG | `/home/ianstafford/blue/ee1/ianstafford/flooxs-pyplot` (da619c4c, built with Intel + eigen3 module) |
+| flooxs-pyplot on HPG | none: the old checkout `/home/ianstafford/blue/ee1/ianstafford/flooxs-pyplot` (da619c4c) was deleted 2026-10-15 (Ian); copy a new one as a git bundle if needed |
 | FLOOXS source (workstation) | `~/flooxs/src` |
 | Crash-fix build | `~/flooxs-crashfix` (branch `crash-fix`), patch `flooxs-crashfix.patch` |
 | flooxs-pyplot (workstation) | `~/flooxs-pyplot` (private `IanStafford/flooxs-pyplot`; matplotlib plot windows, regression suite; `Test/SimpDev/GaNSuite` = GaN starter decks) |
-| GaN regression results | `~/flooxs-pyplot/Test/Regression/hpg_results/20261008/` (not committed) |
+| GaN regression results | `~/flooxs-pyplot/Test/Regression/hpg_results/20261008/` and `20261015-fangs*` (FANGS HPG campaign, runs 1-3; not committed) |
+| FANGS HPG campaign scripts | `archive/fangs-hpg-tests/` (finished 2026-10-15; HPG folder `fangs-hpg-20261015` deleted) |
 | HPG SSH key / config | workstation `~/.ssh/id_ed25519_hpg` (no passphrase), `~/.ssh/config` hosts `hpg`, `hpg-login7`, `hpg-tmux` ([[hpg-workflow]]) |
 | HPG persistent tmux | session `hemtrad` on `login7` |
 | Exploratory worktrees | workstation `~/HEMTRAD-wt/{field-capture,gate-injection}` (branches `explore/*`), HPG `/home/ianstafford/blue/ee1/ianstafford/HEMTRAD-wt/` (created with `git worktree add`; pull only) ([[vg-dependence]]) |

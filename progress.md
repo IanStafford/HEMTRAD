@@ -1201,3 +1201,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - Fetched; all 520 data files match the manifest. Fixed the manifest self-hash in compare/fetch/cleanup.
   - Report: `~/flooxs-pyplot/Test/Regression/hpg_results/20261015-fangs/REPORT.md`. HPG copy kept; waiting for Ian on deletion.
 - FANGS Development accepted run 3 (D1 HPG item met; first HPG run of the Python ports). It reads the 6 baseline deviations as toolchain-only (calibIdVg: the sub-threshold floor, ~1e-8 mA/mm). flooxs-pyplot 49ae8de8 adds per-case tolerances; recomputed on the fetched results, 7/7 are ok for tcl, py and dag. Nothing more to run. Waiting for Ian on deleting the HPG folder and archiving `fangs-hpg-tests/`.
+- **FANGS clean-up (Ian approved here):**
+  - The fetched results check refused at first: the flooxs-pyplot session had recomputed 6 regress reports (`{py,tcl,tcl-dag}/report.{json,md}`) after the fetch. Their HPG originals are now saved in `20261015-fangs/hpg-original/` and match the manifest, and `cleanup.sh` accepts a file there.
+  - `cleanup.sh --yes` deleted HPG `fangs-hpg-20261015/` (4.6 GB) and the workstation bundle.
+  - Also deleted the old HPG checkout `blue/.../flooxs-pyplot` (da619c4c, 181 MB): no jobs or scripts used it, and Ian confirmed.
+  - `fangs-hpg-tests/` moved to `archive/fangs-hpg-tests/`.
+  - Still on HPG, untouched: `gan_regress_results/` and `blue/.../flooxs-pyplot.bundle` (the Oct 8 bundle).
