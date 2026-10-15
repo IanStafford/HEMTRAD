@@ -1135,3 +1135,7 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - New `analysis/plot_posSlides.py` → `figures/posSlide_lateral.png` (0.30 eV/5e18: device strip with the 65-position grid, onset vs y per depth, Id drop at 3 V) and `figures/posSlide_sets.png` (all six sets at the surface).
 - Deck (https://claude.ai/artifact/GXaJFrxHnuC97g8SzKPvjN) now 18 slides: new section "Trap placement" (poslateral, possets) before the backup slide.
 - Zone summary (0.30/5e18): source side none (≤100×); under gate off at rest; gate drain edge 0.2–0.3 V (~1e5×); under field plate 1.4–1.7 V but only 5–80× at 3 V; access region 1.7 → 3.0 V (20–1e8×); near drain only buried traps, 2.6–2.9 V. Why the field plate keeps the drop shallow is not checked.
+
+## 2026-10-15 — agent-up follows the key + Duo-push login
+- `~/bin/agent-up` (Ian's start-up script, outside the repo) updated to the Oct 13 login rules. It opens `ssh -MN hpg` without askpass, answers the Duo menu with 1 (push) and waits 2 min for approval, then makes sure the login7 tmux session `hemtrad` exists. On a password prompt it stops and leaves it to Ian (it never handles the password). Old copy in the session scratchpad. Syntax and prompt detection checked; not run end to end (it would trigger a Duo push).
+- KB: `kb/workflow/hpg-workflow.md` (agent-up paragraph), `kb/workflow/repo-locations.md` (row).
