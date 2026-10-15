@@ -17,7 +17,7 @@ ssh -o BatchMode=yes hpg bash -l <<REMOTE
 set -euo pipefail
 cd $BASE
 if [ -d flooxs-pyplot/.git ]; then
-  git -C flooxs-pyplot fetch -q flooxs-pyplot.bundle main
+  git -C flooxs-pyplot fetch -q $BASE/flooxs-pyplot.bundle main   # absolute: -C would resolve a relative path inside the checkout
 else
   git clone -q flooxs-pyplot.bundle flooxs-pyplot
 fi
