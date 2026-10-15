@@ -1208,3 +1208,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - `fangs-hpg-tests/` moved to `archive/fangs-hpg-tests/`.
   - Still on HPG, untouched: `gan_regress_results/` and `blue/.../flooxs-pyplot.bundle` (the Oct 8 bundle).
 - Ian: "remove anything related to flooxs-pyplot". Deleted on HPG: `gan_regress_results/` (2.2 MB, Oct 8 run) and `flooxs-pyplot.bundle` (131 MB, da619c4c). The 163 Oct 8 result files already matched the workstation copy; the 27 build/ctest/smoke scripts and logs were first saved to `hpg_results/20261008/hpg-setup/` and verified. Nothing from flooxs-pyplot is left on HPG (no conda env or job used it).
+
+## 2026-10-15 evening: Vg study, final results of the remaining jobs
+- 46040979 (EB vs Vg) done: τ 0.1 ps onset 0.7 V at Vg −1 and 0.6 V at Vg 0 (earlier note said 0.6 at −1; corrected), τ 1 ps 0.3 V at −1 and 0. No later onset at higher Vg.
+- 46052606 (EB gate-edge traps) done: 4e18 → 0.4 V, 5e18 → 0.3 V at every Vg; task 1 (y 0.2, 4e18, Vg −1) hit the 6 h limit at Vd 1.4 V, after its collapse.
+- 46054851 (virtual gate) done: Vg −1 (Fth 1.4e5) and Vg −1.5 (Fth 1.6e5) both drop by ~20% at 3.5–3.6 V, then `PULSED GAVE UP` at 3.7 V, so the late collapse is unresolved. The others run normally to 4 V.
+- Conclusion unchanged: within the present model, nothing gives a later onset at higher Vg; the virtual gate gives the right ordering, but with a switch-like shift.
