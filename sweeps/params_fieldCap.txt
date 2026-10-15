@@ -1,0 +1,18 @@
+prof_vg-2|0|1e-12|low|-|0|5e18|0.30|1e-14|1.0|0.2|-2.0|1.5|-|fieldProfile {0.1 0.5 1.0 1.5}
+prof_vg-1|0|1e-12|low|-|0|5e18|0.30|1e-14|1.0|0.2|-1.0|1.5|-|fieldProfile {0.1 0.5 1.0 1.5}
+prof_vg0|0|1e-12|low|-|0|5e18|0.30|1e-14|1.0|0.2|0.0|1.5|-|fieldProfile {0.1 0.5 1.0 1.5}
+f_y0.2_b2.46e-4_vg-2|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.2|-2.0|2.0|-|capMode field;capField lat;capBeta 2.46e-4
+f_y0.2_b2.46e-4_vg-1|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.2|-1.0|2.0|-|capMode field;capField lat;capBeta 2.46e-4
+f_y0.2_b2.46e-4_vg0|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.2|0.0|2.0|-|capMode field;capField lat;capBeta 2.46e-4
+f_y0.2_b1e-3_vg-2|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.2|-2.0|2.0|-|capMode field;capField lat;capBeta 1e-3
+f_y0.2_b1e-3_vg-1|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.2|-1.0|2.0|-|capMode field;capField lat;capBeta 1e-3
+f_y0.2_b1e-3_vg0|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.2|0.0|2.0|-|capMode field;capField lat;capBeta 1e-3
+f_y0.2_b3e-3_vg-2|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.2|-2.0|2.0|-|capMode field;capField lat;capBeta 3e-3
+f_y0.2_b3e-3_vg-1|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.2|-1.0|2.0|-|capMode field;capField lat;capBeta 3e-3
+f_y0.2_b3e-3_vg0|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.2|0.0|2.0|-|capMode field;capField lat;capBeta 3e-3
+f_y0.5_b1e-3_vg-2|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.5|-2.0|2.0|-|capMode field;capField lat;capBeta 1e-3
+f_y0.5_b1e-3_vg-1|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.5|-1.0|2.0|-|capMode field;capField lat;capBeta 1e-3
+f_y0.5_b1e-3_vg0|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.5|0.0|2.0|-|capMode field;capField lat;capBeta 1e-3
+f_y0.5_b3e-3_vg-2|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.5|-2.0|2.0|-|capMode field;capField lat;capBeta 3e-3
+f_y0.5_b3e-3_vg-1|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.5|-1.0|2.0|-|capMode field;capField lat;capBeta 3e-3
+f_y0.5_b3e-3_vg0|0|1e-12|low|-|1|5e18|0.30|1e-14|1.0|0.5|0.0|2.0|-|capMode field;capField lat;capBeta 3e-3
