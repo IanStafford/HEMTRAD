@@ -108,7 +108,7 @@ proc HotTeExpr {} {
     # The supply is set by the peak lateral field at the gate drain edge, Fg (one
     # number per update, ~ Vd - Vg), and decays with distance from the edge:
     # dE = capBeta*sqrt(Fg)*exp(-(y - 0.125)/injLen) for y > 0.125, capped at 0.99*hotEb.
-    global injLen
+    global injLen capForm capF0 capFth
     if {$capMode eq "gate"} {
         # (no unary minus before ^: FLOOXS reads -(a)^2 as (-a)^2)
         set w "exp(0.0 - ((y - 0.14) / 0.03) * ((y - 0.14) / 0.03)) * exp(0.0 - (x / 0.004) * (x / 0.004))"
@@ -117,7 +117,14 @@ proc HotTeExpr {} {
         set Fg [lindex [peak AlGaN] 1]
         set ::capFg $Fg
         set d "(0.5 * ((y - 0.125) + abs(y - 0.125)))"
-        set dE "([expr {$capBeta * sqrt($Fg)}] * exp((0.0 - $d) / $injLen))"
+        if {$capForm eq "fn"} {
+            # tunnelling supply ~ exp(-capF0/Fg): level shift kT*capF0*(1/capFth - 1/Fg), >= 0
+            set e0 [expr {8.617e-5 * 300.0 * $capF0 * (1.0 / $capFth - 1.0 / ($Fg + 1.0))}]
+            if {$e0 < 0.0} { set e0 0.0 }
+        } else {
+            set e0 [expr {$capBeta * sqrt($Fg)}]
+        }
+        set dE "($e0 * exp((0.0 - $d) / $injLen))"
         set cap [expr {0.99 * $hotEb}]
         set dEc "(0.5 * ($dE + $cap - abs($dE - $cap)))"
         return "(Temp / (1.0 - $dEc / $hotEb))"
@@ -129,7 +136,13 @@ proc HotTeExpr {} {
             qfn { set F "sqrt(dot(Qfn,Qfn))" }
             default { error "capField must be lat, tot or qfn" }
         }
-        set dE "($capBeta * sqrt($F + 1.0e-6))"
+        if {$capForm eq "fn"} {
+            # local tunnelling capture ~ exp(-capF0/F): shift kT*capF0*(1/capFth - 1/F), >= 0
+            set r "(8.617e-5 * Temp * $capF0 * (1.0 / $capFth - 1.0 / ($F + 1.0)))"
+            set dE "(0.5 * ($r + abs($r)))"
+        } else {
+            set dE "($capBeta * sqrt($F + 1.0e-6))"
+        }
         set cap [expr {0.99 * $hotEb}]
         set dEc "(0.5 * ($dE + $cap - abs($dE - $cap)))"
         return "(Temp / (1.0 - $dEc / $hotEb))"
