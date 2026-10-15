@@ -16,7 +16,7 @@ if [ ! -x "$ENV/bin/python" ]; then
   installer=$(command -v mamba || command -v conda)
   "$installer" create -y -p "$ENV" -c conda-forge --override-channels \
       python=3.12 cmake make c-compiler cxx-compiler \
-      eigen suitesparse "libblas=*=*openblas" liblapack openblas \
+      "eigen=3.4" suitesparse "libblas=*=*openblas" liblapack openblas \
       hdf5 fftw tk numpy matplotlib nanobind
 fi
 [ "${1:-}" = create ] && exit 0
