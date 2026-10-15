@@ -1139,3 +1139,6 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 ## 2026-10-15 — agent-up follows the key + Duo-push login
 - `~/bin/agent-up` (Ian's start-up script, outside the repo) updated to the Oct 13 login rules. It opens `ssh -MN hpg` without askpass, answers the Duo menu with 1 (push) and waits 2 min for approval, then makes sure the login7 tmux session `hemtrad` exists. On a password prompt it stops and leaves it to Ian (it never handles the password). Old copy in the session scratchpad. Syntax and prompt detection checked; not run end to end (it would trigger a Duo push).
 - KB: `kb/workflow/hpg-workflow.md` (agent-up paragraph), `kb/workflow/repo-locations.md` (row).
+
+## 2026-10-15 — HPG reconnect failed before reaching HPG
+- Ian: "connect to hpg". `ssh -O check hpg`: master down. Ran `bin/hpg_reconnect.sh` once: exit 1, "no server running" — this Claude session is not inside tmux and no tmux server exists, so the script's `tmux new-window` failed and **no ssh / Duo push was attempted**. Not retrying (one-attempt rule); waiting for Ian. Script fix to consider: fall back to `tmux new-session -d` when no server is running.
