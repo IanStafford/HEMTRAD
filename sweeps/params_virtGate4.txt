@@ -1,0 +1,4 @@
+vg4_th1.4e5_vg-1.0_fine|0|1e-12|low|-|1|2e19|0.15|1e-14|2.0|1.2|-1.0|4.2|-|trapSigma 0.005;trapSigmaY 0.8;capMode field;capField lat;capForm fn;capF0 2e7;capFth 1.4e5;Vd_step 0.05;retryDepth 7;teRampMin 5e-4
+vg4_th1.6e5_vg-1.5_fine|0|1e-12|low|-|1|2e19|0.15|1e-14|2.0|1.2|-1.5|4.2|-|trapSigma 0.005;trapSigmaY 0.8;capMode field;capField lat;capForm fn;capF0 2e7;capFth 1.6e5;Vd_step 0.05;retryDepth 7;teRampMin 5e-4
+vg4_th1.4e5_vg-1.75_fine|0|1e-12|low|-|1|2e19|0.15|1e-14|2.0|1.2|-1.75|4.2|-|trapSigma 0.005;trapSigmaY 0.8;capMode field;capField lat;capForm fn;capF0 2e7;capFth 1.4e5;Vd_step 0.05;retryDepth 7;teRampMin 5e-4
+vg4_th1.4e5_vg-1.25_fine|0|1e-12|low|-|1|2e19|0.15|1e-14|2.0|1.2|-1.25|4.2|-|trapSigma 0.005;trapSigmaY 0.8;capMode field;capField lat;capForm fn;capF0 2e7;capFth 1.4e5;Vd_step 0.05;retryDepth 7;teRampMin 5e-4
