@@ -37,7 +37,7 @@ When you need Ian to decide something, write it in `progress.md` **and** send a 
 ## 2. HPG rules (details: `kb/workflow/hpg-workflow.md`, `kb/workflow/sweep-pattern.md`)
 
 - **Check the connection first:** `ssh -O check hpg`. Every other agent ssh uses `-o BatchMode=yes` (fails instead of prompting).
-- **If the master is down:** push-notify Ian ("HPG reconnect: Duo push coming"), then run `bin/hpg_reconnect.sh` **once** (inside tmux; answers the Duo menu with option 1 = push to XXX-8915, waits 2 min). If it fails or the push isn't approved: **stop, note it in `progress.md`, notify Ian, and wait.** No loops, no second attempt until Ian says so. If any prompt ever asks for a **password**, stop: never type, store or ask for Ian's UF password.
+- **If the master is down:** push-notify Ian ("HPG reconnect: Duo push coming"), then run `bin/hpg_reconnect.sh` **once** (answers the Duo menu with option 1 = push to XXX-8915, waits 2 min). If it fails or the push isn't approved: **stop, note it in `progress.md`, notify Ian, and wait.** No loops, no second attempt until Ian says so. If any prompt ever asks for a **password**, stop: never type, store or ask for Ian's UF password.
 - **Persistent tmux on HPG:** session `hemtrad` on `login7` (`ssh hpg-tmux` attaches; `ssh hpg-login7 <cmd>` runs on that node). For rsyncs, builds, `srun --pty` debugging; never `flooxs` itself. Details: `kb/workflow/hpg-workflow.md`.
 - Run remote commands in a login shell with a quoted heredoc (`ssh hpg bash -l <<'REMOTE' … REMOTE`), delimiter `REMOTE`, not `EOF`.
 - Job scripts use the environment block in `kb/workflow/hpg-workflow.md`. A job that dies immediately with a library/Tcl/plplot error is an environment problem, not the deck.

@@ -1142,3 +1142,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 ## 2026-10-15 — HPG reconnect failed before reaching HPG
 - Ian: "connect to hpg". `ssh -O check hpg`: master down. Ran `bin/hpg_reconnect.sh` once: exit 1, "no server running" — this Claude session is not inside tmux and no tmux server exists, so the script's `tmux new-window` failed and **no ssh / Duo push was attempted**. Not retrying (one-attempt rule); waiting for Ian. Script fix to consider: fall back to `tmux new-session -d` when no server is running.
+- Retry (Ian: "retry"): `bin/hpg_reconnect.sh` now opens its own detached tmux session when no tmux server is running. Second attempt: Duo push approved, master up (pid 14353). No jobs queued; login7 tmux `hemtrad` still alive.
