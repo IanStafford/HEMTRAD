@@ -96,7 +96,25 @@ proc CaptureTraps {} {
 # With the eTemp lever on, the target is the solved electron temperature ETemp
 # instead (clamped at the lattice T, so cooled electrons don't raise the level).
 proc HotTeExpr {} {
-    global hotTau hotMu hotVsat kev eTemp
+    global hotTau hotMu hotVsat kev eTemp hotEb capMode capField capBeta
+    # Field-driven capture (capMode field, exploratory 2026-10-15): the capture
+    # barrier is lowered by the local electric field instead of by hot electrons,
+    # Poole-Frenkel-like: dE = capBeta*sqrt(F) (eV, F in V/cm), capped at 0.99*hotEb.
+    # Returned as the equivalent TeTrap, T/(1 - dE/hotEb), so IonizedAcceptor,
+    # FillStep and the Te ramp are unchanged. capField: lat = |dPsi/dy| (lateral,
+    # no polarization field at rest), tot = |grad Psi|, qfn = |grad Qfn|.
+    if {$capMode eq "field"} {
+        switch -- $capField {
+            lat { set F "abs(grady(DevPsi))" }
+            tot { set F "sqrt(dot(DevPsi,DevPsi))" }
+            qfn { set F "sqrt(dot(Qfn,Qfn))" }
+            default { error "capField must be lat, tot or qfn" }
+        }
+        set dE "($capBeta * sqrt($F + 1.0e-6))"
+        set cap [expr {0.99 * $hotEb}]
+        set dEc "(0.5 * ($dE + $cap - abs($dE - $cap)))"
+        return "(Temp / (1.0 - $dEc / $hotEb))"
+    }
     if {$eTemp} { return "(Temp + 0.5 * (ETemp - Temp + abs(ETemp - Temp)))" }
     set E "sqrt(dot(Qfn,Qfn))"
     set v "($hotMu * $E / (1.0 + $hotMu * $E / $hotVsat))"
