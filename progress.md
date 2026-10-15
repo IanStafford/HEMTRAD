@@ -1178,3 +1178,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 ## 2026-10-15 — FANGS HPG campaign rerun at flooxs-pyplot 92b55cee
 - Ian's rerun plan, step 1: run-1 results renamed (HPG `fangs-hpg-20261015/results-run1`, workstation `hpg_results/20261015-fangs-run1`); the two `build-tcl/core.test_tdr_write-*` files deleted.
 - `fangs-hpg-tests/config.env`: COMMIT=92b55cee (TAG unchanged, env reused: python 3.13, eigen 3.4). Next: make_bundle.sh, then the build job (waiting on Ian's OK for sbatch).
+- make_bundle.sh failed on the rerun (fetch used a bundle path relative to the checkout); fixed in d504b24, rerun ends "HPG checkout: 92b55cee". **Waiting on Ian's OK to sbatch the build job** (`submit.sh build`, 8 CPUs, ~1-2 h).
