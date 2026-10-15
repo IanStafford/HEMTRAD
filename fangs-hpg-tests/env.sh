@@ -15,7 +15,7 @@ if [ ! -x "$ENV/bin/python" ]; then
   mkdir -p "$BASE" "$PKGS"
   installer=$(command -v mamba || command -v conda)
   "$installer" create -y -p "$ENV" -c conda-forge --override-channels \
-      python=3.12 cmake make c-compiler cxx-compiler \
+      python=3.13 cmake make c-compiler cxx-compiler \
       "eigen=3.4" suitesparse "libblas=*=*openblas" liblapack openblas \
       hdf5 fftw tk numpy matplotlib nanobind
 fi
