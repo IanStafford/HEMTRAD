@@ -73,6 +73,10 @@ source [file join $modelDir GaN_modelfile_masterD]
 # ETemp along cuts at the AlGaN top (x = 0, the trap row) and in the 2DEG
 # (x = 0.016 um) to <ivCSV root>_Te_Vd<Vd>.txt. Empty = none.
 if {![info exists teProfile]} { set teProfile {} }
+# Field profiles (exploratory, 2026-10-15): at each Vd in this list, write |dPsi/dy|
+# and |grad Psi| (V/cm) along cuts at x = 0 (AlGaN top), 0.0075 (mid-barrier) and
+# 0.03 um (GaN below the 2DEG) to <ivCSV root>_F_Vd<Vd>.txt. Empty = none.
+if {![info exists fieldProfile]} { set fieldProfile {} }
 if {![info exists deviceDeck]} { set deviceDeck rfdevice.tcl } ;# device structure deck (rfdevice_SiN.tcl: SiN instead of HighK)
 source [file join $modelDir $deviceDeck]
 
@@ -200,6 +204,19 @@ for {set i 0} {$i <= $n} {incr i} {
             foreach xc {0.0 0.016} {
                 puts $pf "# ETemp (K) along y (um) at x = $xc um, Vd = $d V"
                 puts $pf [print1d xv=$xc]
+            }
+            close $pf
+        }
+    }
+    foreach v $fieldProfile {
+        if {abs($v - $d) < 1.0e-6} {
+            set pf [open "[file rootname $ivCSV]_F_Vd[format %.2f $d].txt" w]
+            foreach {nm ex} {lat "abs(grady(DevPsi))" tot "sqrt(dot(DevPsi,DevPsi))"} {
+                sel z=$ex
+                foreach xc {0.0 0.0075 0.03} {
+                    puts $pf "# $nm field (V/cm) along y (um) at x = $xc um, Vd = $d V"
+                    puts $pf [print1d xv=$xc]
+                }
             }
             close $pf
         }
