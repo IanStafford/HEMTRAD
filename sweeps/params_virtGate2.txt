@@ -1,0 +1,6 @@
+vg_l0.15_p2e19_th1.4e5_vg-1.5|0|1e-12|low|-|1|2e19|0.15|1e-14|2.0|1.2|-1.5|4.0|-|trapSigma 0.005;trapSigmaY 0.8;capMode field;capField lat;capForm fn;capF0 2e7;capFth 1.4e5
+vg_l0.15_p2e19_th1.4e5_vg-1.0|0|1e-12|low|-|1|2e19|0.15|1e-14|2.0|1.2|-1.0|4.0|-|trapSigma 0.005;trapSigmaY 0.8;capMode field;capField lat;capForm fn;capF0 2e7;capFth 1.4e5
+vg_l0.15_p2e19_th1.4e5_vg-0.5|0|1e-12|low|-|1|2e19|0.15|1e-14|2.0|1.2|-0.5|4.0|-|trapSigma 0.005;trapSigmaY 0.8;capMode field;capField lat;capForm fn;capF0 2e7;capFth 1.4e5
+vg_l0.15_p2e19_th1.6e5_vg-1.5|0|1e-12|low|-|1|2e19|0.15|1e-14|2.0|1.2|-1.5|4.0|-|trapSigma 0.005;trapSigmaY 0.8;capMode field;capField lat;capForm fn;capF0 2e7;capFth 1.6e5
+vg_l0.15_p2e19_th1.6e5_vg-1.0|0|1e-12|low|-|1|2e19|0.15|1e-14|2.0|1.2|-1.0|4.0|-|trapSigma 0.005;trapSigmaY 0.8;capMode field;capField lat;capForm fn;capF0 2e7;capFth 1.6e5
+vg_l0.15_p2e19_th1.6e5_vg-0.5|0|1e-12|low|-|1|2e19|0.15|1e-14|2.0|1.2|-0.5|4.0|-|trapSigma 0.005;trapSigmaY 0.8;capMode field;capField lat;capForm fn;capF0 2e7;capFth 1.6e5
