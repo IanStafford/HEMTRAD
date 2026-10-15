@@ -116,6 +116,7 @@ proc HotTeExpr {} {
         sel z=FgTmp
         set Fg [lindex [peak AlGaN] 1]
         set ::capFg $Fg
+        puts "CAPFG $Fg"
         set d "(0.5 * ((y - 0.125) + abs(y - 0.125)))"
         if {$capForm eq "fn"} {
             # tunnelling supply ~ exp(-capF0/Fg): level shift kT*capF0*(1/capFth - 1/Fg), >= 0
