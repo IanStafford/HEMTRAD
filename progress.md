@@ -1195,3 +1195,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - FANGS session: 25a10277 (one commit after 2de5aaee) adds a ctest RESOURCE_LOCK to the Tcl mesh tests (scratch-file race under ctest -j). Local verification of 2de5aaee passed, so nothing to cancel; 46085435 continues at 2de5aaee. A lone Mesh-* failure would be that race; Ian decides whether it stops the campaign.
 - Ian: a lone Mesh-* ctest failure does not stop the campaign. Until 18:30 today, work with the FANGS Development session without asking (campaign sbatches for this task approved).
 - Build job 46085435 done (52 min, on an EPYC 7702 node under heavy load, so tests ran 1.4-4x slower than run 2): builds rc 0, selftest rc 0, **ctest build 86/86, build-tcl 165/165**. Submitted the tier array **46090409** (23 tasks, %6, hpg-milan) and compare **46090410** (afterany). Next: fetch, REPORT.md, notify.
+- **FANGS rerun 3 done.** Tier 46090409: 23/23 RC=0, no OOM/timeouts/cores. Compare 46090410:
+  - tcl-vs-dag 0 deviation 7/7; py-vs-tcl 0 deviation 7/7; thr4v identical, all VERIFY `diffs=0`.
+  - vs the Oct 8 Intel baseline, only gan_quickIV is ok. The other 6 FAIL at rtol 1e-6 with small deviations: 2.6e-6 to 1e-4 relative, calibIdVg 1e-6 absolute on a near-zero value. They are identical for Tcl, Python and DAG, so platform/compiler.
+  - Fetched; all 520 data files match the manifest. Fixed the manifest self-hash in compare/fetch/cleanup.
+  - Report: `~/flooxs-pyplot/Test/Regression/hpg_results/20261015-fangs/REPORT.md`. HPG copy kept; waiting for Ian on deletion.

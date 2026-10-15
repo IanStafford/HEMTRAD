@@ -9,7 +9,7 @@ source "$here/config.env"
 ssh -o BatchMode=yes hpg "test -s $RUN/MANIFEST.sha256" || { echo "no $RUN/MANIFEST.sha256 on HPG: has compare.slurm run?" >&2; exit 1; }
 mkdir -p "$WS_RESULTS"
 rsync -a --exclude 'core*' --exclude '*.bundle' "hpg:$RUN/" "$WS_RESULTS/"
-( cd "$WS_RESULTS" && sha256sum --quiet -c MANIFEST.sha256 ) && echo "all $(wc -l < "$WS_RESULTS/MANIFEST.sha256") files match the HPG manifest"
+( cd "$WS_RESULTS" && grep -vE '  \./(MANIFEST\.sha256|logs/compare-[0-9]+\.(out|err))$' MANIFEST.sha256 | sha256sum --quiet -c - ) && echo "all $(wc -l < "$WS_RESULTS/MANIFEST.sha256") files match the HPG manifest"
 
 {
   echo "# FANGS on HiPerGator, $TAG"

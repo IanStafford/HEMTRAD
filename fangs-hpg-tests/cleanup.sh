@@ -12,7 +12,7 @@ source "$here/config.env"
 go=0; [ "${1:-}" = --yes ] && go=1
 
 [ -s "$WS_RESULTS/MANIFEST.sha256" ] || { echo "no fetched results at $WS_RESULTS: run fetch_results.sh first" >&2; exit 1; }
-( cd "$WS_RESULTS" && sha256sum --quiet -c MANIFEST.sha256 ) || { echo "fetched results do not match the manifest: not deleting" >&2; exit 1; }
+( cd "$WS_RESULTS" && grep -vE '  \./(MANIFEST\.sha256|logs/compare-[0-9]+\.(out|err))$' MANIFEST.sha256 | sha256sum --quiet -c - ) || { echo "fetched results do not match the manifest: not deleting" >&2; exit 1; }
 case "$BASE" in "$HPG_USER_BLUE"/fangs-hpg-*) ;; *) echo "refusing: BASE=$BASE is not a fangs-hpg-* folder" >&2; exit 1 ;; esac
 
 ssh -o BatchMode=yes hpg "squeue -h -u \$USER -n fangs-build,fangs-hpg,fangs-cmp" | grep -q . && { echo "campaign jobs still queued or running" >&2; exit 1; }

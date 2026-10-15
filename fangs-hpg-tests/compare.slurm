@@ -20,5 +20,6 @@ cmp dag-vs-baseline     --run-dir "$RUN/tcl-dag"                            # DA
 cmp thr4v-vs-tcl        --run-dir "$RUN/tcl-thr4v" --reference "$RUN/tcl" --case gan_quickIV gan_trapF
 grep -h "VERIFY" "$RUN"/tcl-thr4v/*/flooxs.log > "$O/thr4v-verify-lines.txt" 2>/dev/null
 echo "== threaded-assembly VERIFY lines (every diffs= must be 0):"; cat "$O/thr4v-verify-lines.txt"
-( cd "$RUN" && find . -type f ! -name 'core*' ! -name '*.bundle' -print0 | sort -z | xargs -0 sha256sum ) > "$RUN/MANIFEST.sha256"
+# not the manifest itself, nor this job's own logs (still being written)
+( cd "$RUN" && find . -type f ! -name 'core*' ! -name '*.bundle' ! -name MANIFEST.sha256 ! -name 'compare-*.out' ! -name 'compare-*.err' -print0 | sort -z | xargs -0 sha256sum ) > "$RUN/MANIFEST.sha256.tmp" && mv "$RUN/MANIFEST.sha256.tmp" "$RUN/MANIFEST.sha256"
 echo "manifest: $(wc -l < "$RUN/MANIFEST.sha256") files"
