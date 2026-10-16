@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ssh -O check hpg)",
+      "Bash(ssh -o BatchMode=yes hpg:*)"
+    ]
+  }
+}
