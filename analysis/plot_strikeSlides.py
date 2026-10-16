@@ -6,7 +6,7 @@ Writes:
   figures/strikeSlide_placement.png  mid-barrier (7.5 nm) row of 20261002_posMapLate: strip,
                                      onset Vd vs y, Id drop at 3 V vs y with its definition
   figures/fieldSlide_highk.png       lateral field along the 2DEG, HighK vs SiN, Vd 3/10/20 V
-                                     (archive/static_mobility/figures/fieldPlate_cuts.csv)
+                                     (figures/fieldPlateFM_cuts.csv: field mobility, job 46241088)
 """
 import glob
 import json
@@ -173,7 +173,7 @@ fig.savefig("figures/strikeSlide_placement.png", dpi=200)
 plt.close(fig)
 
 # ------------------------------------------------------------ HighK vs SiN lateral field
-cuts = np.genfromtxt("archive/static_mobility/figures/fieldPlate_cuts.csv", delimiter=",",
+cuts = np.genfromtxt("figures/fieldPlateFM_cuts.csv", delimiter=",",
                      names=True)
 fig, axs = plt.subplots(1, 3, figsize=(16.8, 5.6), sharey=True)
 for ax, v in zip(axs, (3, 10, 20)):
@@ -193,11 +193,11 @@ axs[0].text(0.5, 330, "curves overlap", color=MUTED, fontsize=16)
 axs[0].text(1.1, 120, "HighK (εr 35)", color=BLUE, fontsize=17)
 axs[0].text(1.1, 70, "SiN (εr 6.3)", color=ORANGE, fontsize=17)
 a = axs[2]
-a.annotate("416 → 202\n−51%", (0.53, 416), xytext=(0.95, 450), color=INK, fontsize=16,
+a.annotate("403 → 193\n−52%", (0.53, 403), xytext=(0.95, 450), color=INK, fontsize=16,
            va="center", arrowprops=dict(arrowstyle="-", color=MUTED, lw=1))
-a.annotate("9 → 116", (1.0, 116), xytext=(1.3, 230), color=INK, fontsize=16, va="center",
+a.annotate("8 → 138", (1.0, 138), xytext=(1.3, 230), color=INK, fontsize=16, va="center",
            arrowprops=dict(arrowstyle="-", color=MUTED, lw=1))
-axs[1].annotate("140 → 98\n−30%", (0.49, 140), xytext=(0.95, 300), color=INK, fontsize=16,
+axs[1].annotate("183 → 117\n−36%", (0.49, 183), xytext=(0.95, 300), color=INK, fontsize=16,
                 va="center", arrowprops=dict(arrowstyle="-", color=MUTED, lw=1))
 fig.subplots_adjust(left=0.06, right=0.995, top=0.92, bottom=0.14, wspace=0.08)
 fig.savefig("figures/fieldSlide_highk.png", dpi=200)
