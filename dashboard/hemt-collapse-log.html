@@ -120,7 +120,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
   <header class="top">
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">FLOOXS model of an AlGaN/GaN HEMT: what ran each day and what is still open. Id in <span style="white-space:nowrap">mA/mm</span> at Vg = −2 V unless noted; work before Oct 1 used constant mobility and is archived.</p>
-    <p class="meta">Snapshot Oct 14, midday</p>
+    <p class="meta">Snapshot Oct 15, end of day</p>
   </header>
 
   <div class="layout">
@@ -128,6 +128,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
       <div class="sep"></div>
       <div class="era">Field mobility</div>
+      <a href="#oct15" data-page="oct15"><span class="d">Oct 15</span><span class="t">Vg trend · virtual gate</span></a>
       <a href="#oct14" data-page="oct14"><span class="d">Oct 14</span><span class="t">onset view · deck</span></a>
       <a href="#oct13" data-page="oct13"><span class="d">Oct 13</span><span class="t">standard ETemp · traps</span></a>
       <a href="#oct12" data-page="oct12"><span class="d">Oct 12</span><span class="t">KB · repo cleanup</span></a>
@@ -150,19 +151,19 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <section class="page" id="overview" data-title="Overview">
         <div class="pagehead">
           <h2>Where things stand</h2>
-          <p>The calibrated model with the standard energy balance now collapses at the measured voltage, 0.4–0.7 V, with the measured drop-then-creep shape. Next: fit trap position and τ to the measured ~1000× drop.</p>
+          <p>The model collapses at the measured voltage (0.4–0.7 V) with the measured drop-then-creep shape, but the measured onset moves later at higher Vg and the present hot-electron model cannot do that. A field-driven virtual gate gives the right ordering; next, find why its late onsets depend on the Vd step, and compare with the new measured onset-vs-Vg data.</p>
         </div>
         <div class="tiles">
           <div class="tile"><span class="k">Calibration</span><span class="v">±2.4%</span><span class="s">vs the measured HfO₂ transfer curve, Vg −2.6 to +1 V at Vds = 10 V.</span></div>
           <div class="tile"><span class="k">Collapse onset</span><span class="v">0.4–0.7 V</span><span class="s">Energy-balance model, traps at y = 2.4 µm: 60–4000× drop, then creep. Measured: ~1000× at 0.4–0.5 V.</span></div>
-          <div class="tile"><span class="k">Gate bias, Vg −2 → 0 V</span><span class="v">3.5 → 1.8 V</span><span class="s">Onset moves earlier at higher Vg (local-field model): the collapse is current-driven.</span></div>
+          <div class="tile"><span class="k">Onset vs Vg</span><span class="v">0.3–0.4 V at all Vg</span><span class="s">Present model (energy balance). Measured: later at higher Vg. Virtual gate: 0.6 V at Vg −1.5, 3.8 V at −1.25.</span></div>
         </div>
 
         <div class="panel">
           <h3>Open items</h3>
           <ul class="todo">
             <li><span class="pill open">open</span><span>Fit trap position and τ with the standard energy-balance model to the measured collapse. The late set at y = 2.4 µm already collapses at 0.4–0.7 V with a creeping plateau. Sweeps should end at 1.5–2 V; Id after the collapse depends on the Vd step history by up to ~10×. <a class="daylink" href="#oct13">Oct 13</a></span></li>
-            <li><span class="pill open">open</span><span>Is the measured collapse hot-electron (current-driven) or field-driven? In the model, raising Vg from −2 to 0 V moves the late collapses from 2.3/3.5 V to 1.5/1.8 V. Measuring the onset vs Vg on the curve tracer would settle it; three model tests proposed (off-state pre-stress, Poole–Frenkel capture, field-filled surface traps), awaiting a decision. <a class="daylink" href="#oct03">Oct 3</a></span></li>
+            <li><span class="pill open">open</span><span>Measured onset is later at higher Vg; the present model is not (0.3–0.4 V at every Vg). A virtual gate (surface trap sheet, tunnelling capture) gets the order, but the onset jumps from 0.6 V to 3.8 V between Vg −1.5 and −1.25, late drops depend on the Vd step, and there is no creep. Waiting for the measured onset at each Vg. <a class="daylink" href="#oct15">Oct 15</a></span></li>
             <li><span class="pill open">open</span><span>Mesh in the access region (25–40 nm) is too coarse for narrow traps; needs refinement before TRIM or cascade-shape work. <a class="daylink" href="#sep27">Sep 27</a></span></li>
             <li><span class="pill open">open</span><span>Calibration only covers saturation (Vds = 10 V). The low-Vd linear region where collapses happen is unvalidated, and gm above +0.5 V is too low (88 vs 160 mS/mm). <a class="daylink" href="#oct01">Oct 1</a></span></li>
             <li><span class="pill noted">parked</span><span>Thermoelectric term in the energy balance: six fixes tried, none converge (the last two on Oct 13). By Ian's decision the standard model runs without it (<code>etThermo 0</code>, <code>etStats 0</code>), giving drift-diffusion Id. <a class="daylink" href="#oct08">Oct 8</a> · <a class="daylink" href="#oct13">Oct 13</a></span></li>
@@ -178,6 +179,40 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
             </ul>
           </details>
         </div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- OCT 15 -->
+      <section class="page" id="oct15" data-title="Oct 15">
+        <div class="pagehead">
+          <h2>Oct 15 · Onset vs gate bias: the model is backwards, a virtual gate is not</h2>
+          <p>The measured collapse comes later at more positive Vg. No trap position in the present hot-electron model does that; a field-driven "virtual gate" (a surface trap sheet that fills by tunnelling in the lateral field) gives the measured ordering, though the shift is a jump rather than a slope.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 46040979 · 46052606 · 46052532 · 46054851 · 46057777 · 46106674</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Energy balance, access-region traps (y 2.4 µm): collapse at <span class="num">0.3–0.4 V</span> at Vg −2, −1 and 0 (τ 1 ps); τ 0.1 ps: 0.7 / 0.7 / 0.6 V, slightly <i>earlier</i> at higher Vg. Te there is 304–307 K at every Vg.</li>
+              <li>Gate-edge traps (y 0.2–0.3 µm): <span class="num">0.3–0.4 V at every Vg</span>. The gate edge runs cooler at higher Vg (346 → 309 K) but carries more current, which cancels it.</li>
+              <li>Field-driven tests on branches <code>explore/field-capture</code> and <code>explore/gate-injection</code>: Poole–Frenkel capture is all-or-nothing; tunnelling injection from the gate has the right order but no sharp collapse.</li>
+              <li>Virtual gate (surface sheet ~1.2e13 cm⁻², tunnelling capture in the lateral field): <span class="num">Vg −1.75 / −1.5 collapse at 0.25 / 0.6 V</span>, Vg −1.25 drops 334 → 130 mA/mm at 3.8 V, Vg −1 runs to 4.1 V. Late drops move with the Vd step (3.6 → 4.1 V at Vg −1 for 0.1 → 0.05 V steps), and the solver gives up right after each.</li>
+              <li>Side task: the flooxs-pyplot (FANGS) test campaign on HPG finished on its third run (ctest 86/86 and 165/165, tier 23/23, Python and tape outputs exact) and was cleaned up.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill open">open</span><span>Why do the virtual gate's late drops depend on the Vd step? Check whether trap occupation carries over between Vd points before trusting a late-onset map.</span></li>
+              <li><span class="pill open">open</span><span>The onset jumps from 0.6 V to 3.8 V between Vg −1.5 and −1.25. Compare with the new measured onset at each Vg: gradual or switch-like?</span></li>
+              <li><span class="pill open">open</span><span>Virtual gate misfits: Id ~40% low before the collapse at Vg −2; after it, Id sits at the 1e-8 noise floor with no creep (measured: ~1000× drop, then creep).</span></li>
+              <li><span class="pill progress">in progress</span><span>Last task of 46106674 (threshold 1.6e5 V/cm at Vg −1.5) still running at Vd 3.85 V.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/vgOnset_virtGate4.jpg" target="_blank" rel="noopener"><img src="fig/vgOnset_virtGate4.jpg" alt="Id-Vd on a log scale for the virtual gate at Vg -1.75, -1.5, -1.25 and -1 V: the first two collapse below 0.6 V, -1.25 drops at 3.8 V, -1 does not collapse" loading="lazy"></a><figcaption><b>Virtual gate: onset vs Vg</b>Collapse at 0.25 V (Vg −1.75) and 0.6 V (−1.5), then a jump to 3.8 V at −1.25; none by 4.1 V at −1.</figcaption></figure>
+          <figure><a class="img" href="fig/vgOnset_EB.jpg" target="_blank" rel="noopener"><img src="fig/vgOnset_EB.jpg" alt="Id-Vd on a log scale for the energy-balance model with access-region traps at Vg -2, -1 and 0 V, all collapsing at 0.3 to 0.4 V" loading="lazy"></a><figcaption><b>Present model: no Vg trend</b>Access-region traps with the energy balance collapse at 0.3–0.4 V at every Vg.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#oct14">Oct 14 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
@@ -212,7 +247,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           <figure><a class="img" href="fig/posMapLate_onset3d.gif" target="_blank" rel="noopener"><img src="fig/posMapLate_onset3d.gif" alt="Animation: trap positions of the 0.30 eV 5e18 set rising to their onset height as Vd sweeps 0.1 to 3.0 V" loading="lazy"></a><figcaption><b>0.30 eV / 5e18, animated</b>The gate positions rise first (0.2 V); the slope fills in toward the drain until 45/65 have collapsed at 3.0 V.</figcaption></figure>
           <figure><a class="img" href="fig/posMap_tl0.25_tp6e18_onset3d.gif" target="_blank" rel="noopener"><img src="fig/posMap_tl0.25_tp6e18_onset3d.gif" alt="Animation: trap positions of the 0.25 eV 6e18 set rising to their onset height as Vd sweeps" loading="lazy"></a><figcaption><b>0.25 eV / 6e18, animated</b>Same ridge-and-slope shape; 36/65 collapse by 3.0 V. GIFs for every set are in <code>figures/posMap_*_onset3d.gif</code>.</figcaption></figure>
         </div>
-        <div class="pager"><a href="#overview">← Overview</a><a href="#oct13">Oct 13 →</a></div>
+        <div class="pager"><a href="#oct15">← Oct 15</a><a href="#oct13">Oct 13 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
