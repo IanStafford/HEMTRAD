@@ -38,10 +38,12 @@ if {![info exists Vd_step]}   { set Vd_step   0.1 }
 if {![info exists fillIters]} { set fillIters 4 }   ;# Te/solve/capture iterations per Vd point
 if {![info exists fillRelax]} { set fillRelax 0.5 } ;# Te under-relaxation per iteration
 # Self-consistent fill per Vd point (exploratory 2026-10-16, see FillConverge in Poisson.tcl):
-# 1 = relax TeTrap and re-solve without capturing until TeTrap is within fillTol of its
-# target, then capture once; 0 = fillIters rounds of FillStep (old behaviour).
+# 1 = relax TeTrap (fraction fillW per round) and re-solve without capturing until the
+# trapped charge is self-consistent to fillTol of trapPeak, then capture once;
+# 0 = fillIters rounds of FillStep (old behaviour).
 if {![info exists fillConv]}     { set fillConv     0 }
-if {![info exists fillTol]}      { set fillTol      0.01 }
+if {![info exists fillTol]}      { set fillTol      1.0e-3 }
+if {![info exists fillW]}        { set fillW        0.2 }
 if {![info exists fillMaxIters]} { set fillMaxIters 100 }
 
 if {![info exists ivCSV]} { set ivCSV "figures/pulsedIV.csv" } ;# columns: Vd, Id (mA/mm), peak Te (K)
@@ -111,13 +113,13 @@ close $f
 # One attempt at Vd=d. fill=1 runs the hot-electron FillStep (a measured
 # point); fill=0 is a plain solve (a bisection substep with retrySubFill=0).
 proc TryPoint {d fill} {
-    global fillIters fillRelax fillConv fillTol fillMaxIters
+    global fillIters fillRelax fillConv fillTol fillW fillMaxIters
     if {[catch {
         contact name=D supply=$d
         device
         if {$fill} {
             if {$fillConv} {
-                set ::te [FillConverge $fillTol $fillMaxIters $fillRelax]
+                set ::te [FillConverge $fillTol $fillMaxIters $fillW]
             } else {
                 set ::te [FillStep $fillIters $fillRelax]
             }
