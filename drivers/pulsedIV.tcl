@@ -37,6 +37,12 @@ if {![info exists Vd_max]}    { set Vd_max    1.6 }
 if {![info exists Vd_step]}   { set Vd_step   0.1 }
 if {![info exists fillIters]} { set fillIters 4 }   ;# Te/solve/capture iterations per Vd point
 if {![info exists fillRelax]} { set fillRelax 0.5 } ;# Te under-relaxation per iteration
+# Self-consistent fill per Vd point (exploratory 2026-10-16, see FillConverge in Poisson.tcl):
+# 1 = relax TeTrap and re-solve without capturing until TeTrap is within fillTol of its
+# target, then capture once; 0 = fillIters rounds of FillStep (old behaviour).
+if {![info exists fillConv]}     { set fillConv     0 }
+if {![info exists fillTol]}      { set fillTol      0.01 }
+if {![info exists fillMaxIters]} { set fillMaxIters 100 }
 
 if {![info exists ivCSV]} { set ivCSV "figures/pulsedIV.csv" } ;# columns: Vd, Id (mA/mm), peak Te (K)
 if {![info exists dampValue]} { set dampValue 0.10 } ;# Newton damping on Qfn/Qfp/DevPsi; smaller = more damped/stable, slower
@@ -105,11 +111,17 @@ close $f
 # One attempt at Vd=d. fill=1 runs the hot-electron FillStep (a measured
 # point); fill=0 is a plain solve (a bisection substep with retrySubFill=0).
 proc TryPoint {d fill} {
-    global fillIters fillRelax
+    global fillIters fillRelax fillConv fillTol fillMaxIters
     if {[catch {
         contact name=D supply=$d
         device
-        if {$fill} { set ::te [FillStep $fillIters $fillRelax] }
+        if {$fill} {
+            if {$fillConv} {
+                set ::te [FillConverge $fillTol $fillMaxIters $fillRelax]
+            } else {
+                set ::te [FillStep $fillIters $fillRelax]
+            }
+        }
     }]} { return 0 }
     return 1
 }
@@ -176,6 +188,7 @@ proc TeRampPoint {dPrev d} {
 }
 
 set nRetry 0
+set fillConvIters 0
 set nRamp 0
 set dPrev 0.0
 set n [expr {int(round($Vd_max / $Vd_step))}]
@@ -193,6 +206,7 @@ for {set i 0} {$i <= $n} {incr i} {
     set cur [expr {abs([contact name=D sol=Qfn flux])*1.0e6}]
     #FLOOXS GIVES A/um
     puts "PULSED Vd=$d Id=$cur peakTe=$te retries=$nRetry ramps=$nRamp"
+    if {$fillConv} { puts "FILLCONV Vd=$d rounds=$fillConvIters" }
     if {$eTemp} {
         sel z=ETemp
         puts "ETEMP Vd=$d peakETemp(GaN)=[lindex [peak GaN] 1] peakETemp(AlGaN)=[lindex [peak AlGaN] 1]"

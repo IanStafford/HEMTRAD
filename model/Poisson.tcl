@@ -159,3 +159,34 @@ proc FillStep {{iters 4} {w 0.5}} {
     }
     return $te
 }
+
+# Self-consistent fill point (fillConv lever in pulsedIV.tcl, exploratory 2026-10-16).
+# FillStep captures after each of a fixed number of rounds, so charge captured on the
+# field just after a Vd step (solved with the previous point's charge) is kept by the
+# fill-only ratchet, and the late onset depends on the Vd step. Here TeTrap is relaxed
+# and the device re-solved WITHOUT capturing in between: the trapped charge stays
+# max(TrapFrozen, live) and the live part can go back down while the field settles.
+# The charge is captured once, when max |TeTarget - TeTrap| / TeTrap over the trap
+# regions (GaN, AlGaN) is below tol. Not converged after maxIters rounds: capture
+# anyway and say so (FILLCONV line). Returns the peak TeTrap; ::fillConvIters = rounds.
+proc TeMismatch {} {
+    sel z=[HotTeExpr] name=TeTarget
+    sel z=abs(TeTarget-TeTrap)/TeTrap
+    return [expr {max([lindex [peak GaN] 1], [lindex [peak AlGaN] 1])}]
+}
+proc FillConverge {{tol 0.01} {maxIters 100} {w 0.5}} {
+    for {set i 1} {$i <= $maxIters} {incr i} {
+        set te [UpdateTe $w]
+        device
+        set r [TeMismatch]
+        if {$r < $tol} {
+            CaptureTraps
+            set ::fillConvIters $i
+            return $te
+        }
+    }
+    puts "FILLCONV not converged after $maxIters rounds (mismatch $r)"
+    CaptureTraps
+    set ::fillConvIters $maxIters
+    return $te
+}
