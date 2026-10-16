@@ -1218,3 +1218,7 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - 21:00 Virtual-gate onset map (46106674, 3 of 4 tasks done): Fth 1.4e5 onsets 0.25 V (Vg −1.75), ~3.8 V (−1.25, 334 → 130, then gave up at 3.85 V), ~4.1 V (−1, 377 → 328, gave up at 4.2 V). Late drops depend on the Vd step (Vg −1: 3.6 V at 0.1 V steps vs 4.1 V at 0.05 V). Figure `figures/vgOnset_virtGate4.png`. Task 1 (Fth 1.6e5, Vg −1.5) still running at 3.85 V. Next: check whether trap occupation carries over between Vd points (step-history dependence) before trusting late onsets; compare with the new measured onset-vs-Vg data.
 - Wrap-up: dashboard Oct 15 page + Overview updated and republished (https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd); current-status refreshed.
 - HPG connection closed at Ian's request (`ssh -O exit hpg`); the background check on 46106674 was stopped first. Task 1 (Fth 1.6e5, Vg −1.5) keeps running on HPG; pick up its results after the next reconnect.
+
+## 2026-10-16
+- HPG reconnected (Duo push; bin/hpg_reconnect.sh, one attempt).
+- 46106674 complete: task 1 (Fth 1.6e5, Vg −1.5, Vd step 0.05) runs to 273 mA/mm at 3.7 V, drops to 258 at 3.85 V, then `PULSED GAVE UP` at 3.9 V (2 h 52 min). No cores. So all three late drops (Vg −1.25, −1, and −1.5 at Fth 1.6e5) end in a solver give-up within 1–3 steps, with the drop position shifted by the Vd step. Next (proposed): find out why the late onset depends on the step (trap occupation carried between Vd points?) before mapping more.
