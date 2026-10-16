@@ -6,7 +6,7 @@ source: model/ETemp.tcl, model/Continuity.tcl, model/GaN_modelfile_masterD
 ---
 # Electron energy balance — ETemp PDE
 
-**Decision (Ian, 2026-10-13):** use the configuration that works — `eTemp 1` with the thermoelectric term off (`etThermo 0`). The thermo term stays parked (every fix tried failed; see below). **Standard (Ian, 2026-10-13): `etStats 0` and `etThermo 0` are now the defaults** — electron statistics at the lattice Temp (Id = drift-diffusion; ETemp drives the hot-electron trap capture through `HotTeExpr`). With `eTemp 0` the model is unchanged (`etStats 0` is the original `Nc·f12(…/Vt)` expression). To reproduce the Oct 8–12 runs, set `etStats 1` (column in `params_eTemp*.txt`) and `etThermo 1` explicitly; their thermo tasks relied on the old default.
+**Decision (Ian, 2026-10-16): back to the local-field model (`eTemp 0`) as the standard, to save computation time; the energy balance stays available with `eTemp 1`.** Earlier decision (Ian, 2026-10-13): use the configuration that works — `eTemp 1` with the thermoelectric term off (`etThermo 0`). The thermo term stays parked (every fix tried failed; see below). **Standard (Ian, 2026-10-13): `etStats 0` and `etThermo 0` are now the defaults** — electron statistics at the lattice Temp (Id = drift-diffusion; ETemp drives the hot-electron trap capture through `HotTeExpr`). With `eTemp 0` the model is unchanged (`etStats 0` is the original `Nc·f12(…/Vt)` expression). To reproduce the Oct 8–12 runs, set `etStats 1` (column in `params_eTemp*.txt`) and `etThermo 1` explicitly; their thermo tasks relied on the old default.
 
 Ian's `ElecTemperature` proc (Sentaurus-style hydrodynamic energy equation with Qfn,Qfn heat source), implemented in `model/ETemp.tcl`:
 
