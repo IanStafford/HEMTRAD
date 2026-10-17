@@ -1241,3 +1241,14 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Waiting: the HPG `git pull` + `sbatch` were blocked by the session's permission classifier; needs Ian to allow it or run `sbatch sweeps/fieldPlate.slurm` from the HPG repo root after `git pull`.
 - Submitted: job **46241088** (2 tasks, HighK / SiN, `ee1-b`), `results/20261016_fieldPlate/`. Next: check both logs (FP DONE / GAVE UP), rsync, redo the HighK-vs-SiN figure with field mobility and update the slide-2 numbers and `kb/results/highk-vs-sin.md`.
 - **Job 46241088 done** (both tasks COMPLETED, 40/40 Vd points, no retries, ~7 min). Field mobility gives the same picture as Oct 1: gate-edge peak unchanged by HighK (≤2%; 305 kV/cm at 3 V), T-gate-head/field-plate peak 183 → 117 kV/cm at 10 V (−36%) and 403 → 193 at 20 V (−52%), field spread toward the drain at 20 V (8 → 138 kV/cm at y = 1 µm). Slide-2 figure redrawn (`figures/fieldSlide_highk.png`), deck https://claude.ai/artifact/W5YiXYBDygEsnzCqu2TWQX updated; KB `highk-vs-sin` updated.
+
+## 2026-10-17 — HPG reconnected; fillConv jobs 46209709 / 46224198 finished
+
+- HPG master had dropped (poll bdm3v6w8b lost it); `bin/hpg_reconnect.sh` succeeded on the first push.
+- Both jobs ran to the end (branch `explore/field-capture`, logs `HEMTRAD-wt/field-capture/results/eTemp_logs/`).
+- **46224198 (revised FillConverge, ChargeMismatch, fillTol 1e-3):**
+  - Vg −2 (task 0): Id 4e-10 mA/mm at Vd 0.1, then PULSED GAVE UP at 0.2. It gets one step further than 46209709 (which died at 0.1) but is off from the first step, not a late onset.
+  - Vg −1.5 (task 1): already 2e-8 mA/mm at 0.1 V, climbs erratically to 0.06 at 1.4 V, then jumps between 1e-7 and 1e-4 and gives up at 3.2 V. No clean onset.
+  - Vg −1 (tasks 2 and 3, 0.1 and 0.05 V steps): no collapse up to 4.2 V, 380 mA/mm, identical at both steps. FillConverge hit its 100-round cap 17 and 30 times.
+- **46209709 (first version):** Vg −2 and −1.5 gave up at 0.1 V. The other four tasks have no collapse up to 3.6–4.2 V (331–380 mA/mm).
+- Verdict: fillConv does not give the measured late onset (~0.4–0.5 V at Vg −2). Low Vg is off from the start, Vg −1 never collapses, and in between it is noisy. Next: compare against the measured onset-vs-Vg data, then decide whether to drop or rework the fillConv lever (Ian's call).
