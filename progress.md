@@ -1252,3 +1252,25 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - Vg −1 (tasks 2 and 3, 0.1 and 0.05 V steps): no collapse up to 4.2 V, 380 mA/mm, identical at both steps. FillConverge hit its 100-round cap 17 and 30 times.
 - **46209709 (first version):** Vg −2 and −1.5 gave up at 0.1 V. The other four tasks have no collapse up to 3.6–4.2 V (331–380 mA/mm).
 - Verdict: fillConv does not give the measured late onset (~0.4–0.5 V at Vg −2). Low Vg is off from the start, Vg −1 never collapses, and in between it is noisy. Next: compare against the measured onset-vs-Vg data, then decide whether to drop or rework the fillConv lever (Ian's call).
+
+## 2026-10-17 — Trap-model sensitivity sweep ready, submit blocked by auto mode
+
+- Ian asked for a one-at-a-time sensitivity sweep of every trap-model lever, with the Gaussian and its placement fixed.
+- **Baseline:** late set at y = 1.0 µm, round 3, deep collapse at 2.3 V.
+  - Fixed Gaussian: trapPeak 5e18, trapSigma 0.04, trapMeanX 0, trapMeanY 1.0.
+  - Trap and capture levers: trapLevel 0.30, trapWidth 0.1, hotEb 1.0, hotTau 1e-14, hotMu 600, hotVsat 1.9e7.
+  - Fill: fillIters 4, fillRelax 0.5.
+  - Sweep: eTemp 0, field mobility, Vg −2, Vd 0–4 V in 0.1 V steps.
+- **Varied, one lever per task:**
+  - trapLevel {0.20, 0.25, 0.35, 0.40, 0.50}
+  - trapWidth {0.02, 0.05, 0.2, 0.3}
+  - hotEb {0.5, 0.75, 1.25, 1.5}
+  - hotTau {5e-15, 7e-15, 1.5e-14, 2e-14, 3e-14}
+  - hotMu {300, 450, 900, 1200}
+  - hotVsat {1e7, 1.5e7, 2.5e7, 3e7}
+  - fillIters {1, 2, 8}
+  - fillRelax {0.25, 0.75, 1.0}
+- **Tasks:** 32 lever tasks + baseline + trap-free = 34.
+  - Files: `sweeps/pulsedIV_sensitivity.slurm`, `sweeps/params_sensitivity.txt` (c3d9403); run dir `results/20261017_sensitivity`.
+  - Analysis: `analysis/plot_sensitivity.py`. It plots onset, Id drop at 4 V and the pre-collapse ratio per lever, plus Id–Vd per lever. Tested on synthetic data.
+- **Blocked:** `sbatch` was denied by the auto-mode classifier ("Shared Cluster Mutation"). Waiting for Ian to submit it or switch out of auto mode.
