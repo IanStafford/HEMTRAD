@@ -1,9 +1,9 @@
 ---
 title: Current status
 tags: [status]
-updated: 2026-10-16
+updated: 2026-10-17
 ---
-# Current status (as of 2026-10-16)
+# Current status (as of 2026-10-17)
 
 **Repo:** reorganised 2026-10-12 into `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/` ([[repo-locations]]); FLOOXS internals in [[flooxs-overview]].
 
@@ -13,6 +13,7 @@ updated: 2026-10-16
 - With the standard energy balance the late set collapses at **0.4–0.7 V** (set by τ); at y = 2.4 µm a 60–4000× drop onto a creeping plateau, close to the measured shape ([[energy-balance]], job 45768739).
 - Local-field model: latest deep collapse **3.5 V** (late-onset set at y = 2.4 µm), 177 → 0.0018 mA/mm in one step, then creep ([[late-onset-search]]).
 - Trap **position** is the strongest onset lever near the charge threshold; deeper levels / more charge collapse early and uniformly ([[position-maps]]).
+- **Lever sensitivity** (job 46462234, one lever at a time around the late set at y 1.0 µm, onset 2.3 V): `trapLevel`, `hotEb`, `hotTau` set onset and depth (1–2 V, orders of magnitude); `hotMu`/`hotVsat` move the onset 1.4–1.7 V; `trapWidth`, `fillIters`, `fillRelax` ≤ 0.6 V. Below a capture threshold (level ≤ 0.25 eV, `hotEb` ≤ 0.75, `hotTau` ≤ 7e-15) the collapse disappears; sets just above it recover strongly after the drop ([[trap-sensitivity]]).
 - The model's collapse is **current-driven**: raising Vg moves it earlier ([[gate-bias]]).
 - **Measured onset is later at higher Vg** (reported Oct 15): opposite to the model, also with the energy balance (access-region traps 0.3–0.4 V at every Vg at τ 1 ps, 0.7/0.7/0.6 V at Vg −2/−1/0 for τ 0.1 ps; gate-edge traps 0.3–0.4 V at every Vg). A field-driven **virtual gate** (surface trap sheet, Fowler–Nordheim lateral-field capture; branch `explore/field-capture`) gives the measured ordering: collapse at 0.25 / 0.6 V for Vg −1.75 / −1.5, then a jump to ~3.8 V at −1.25 and ~4.1 V at −1 (job 46106674, `figures/vgOnset_virtGate4.png`). Those late drops move with the Vd step (3.6 → 4.1 V at Vg −1 for 0.1 → 0.05 V) and the solver gives up right after each, so they are not yet reliable. Still too deep and without creep ([[vg-dependence]]). Waiting for the new measured data.
 

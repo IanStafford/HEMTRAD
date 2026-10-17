@@ -64,5 +64,6 @@ Second brain for the FLOOXS model of **radiation-induced current collapse** in a
 - [[vg-dependence]] — measured onset later at higher Vg; EB vs field-driven / virtual-gate worktrees (Oct 15)
 - [[static-era-lessons]] — what the constant-mobility era (Sep 23 – Oct 1) taught
 - [[highk-vs-sin]] — passivation dielectric does not matter at ≤3 V
+- [[trap-sensitivity]] — one-at-a-time sweep of every trap lever (Oct 17)
 - [[critical-strike]] — strike probability at 1e7 ions/cm²
 - [[flooxs-pyplot-regression]] — GaN regression baselines run on HPG for the solver work

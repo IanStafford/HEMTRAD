@@ -1275,3 +1275,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - Analysis: `analysis/plot_sensitivity.py`. It plots onset, Id drop at 4 V and the pre-collapse ratio per lever, plus Id–Vd per lever. Tested on synthetic data.
 - **Blocked:** `sbatch` was denied by the auto-mode classifier ("Shared Cluster Mutation").
 - **Submitted** at Ian's explicit request: **job 46462234** (34 tasks). Polling every 5 min.
+- **Done (46462234):** all 34 tasks completed to 4 V, no give-ups, errors or cores; rsynced to `results/20261017_sensitivity/`.
+  - The baseline reproduces round 3: deep collapse at 2.3 V, down 1.85e4×, then a recovery to 23× by 4 V.
+  - Onset ranges: trapLevel 0.30→0.50 moves it 2.3→0.4 V, and ≤ 0.25 eV gives no collapse. hotEb 0.75→1.5: 3.2→1.6 V (0.5 none). hotTau 7e-15→3e-14: 3.3→1.1 V (5e-15 none). hotVsat 1e7→3e7: 3.6→1.9 V. hotMu 300→1200: 3.2→1.8 V. trapWidth 2.6→2.0 V; fillIters 2.8→2.2 V; fillRelax 2.5→2.2 V.
+  - Depth follows trapLevel, hotEb and hotTau (up to 3e11×).
+  - Figures: `figures/sensitivity.png`, `figures/sensitivity_IdVd.png`. KB: [[trap-sensitivity]].
+- Next: Ian to review. One option is a second one-at-a-time pass around a baseline nearer the measured onset (e.g. level 0.45–0.5 or hotTau 3e-14), since this baseline sits just above the capture threshold.

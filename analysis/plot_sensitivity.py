@@ -2,7 +2,7 @@
 
 Each task changes one lever from the baseline (late set at y = 1.0 um). For every
 lever: collapse onset (classes as in analyze_onset.py / [[collapse-classification]]),
-Id drop at Vd 4 V (trap-free / trapped) and the pre-collapse current relative to
+the deepest Id drop and the drop at Vd 4 V (trap-free / trapped) and the pre-collapse current relative to
 trap-free.
 
 usage: python3 analysis/plot_sensitivity.py [run_dir]
@@ -71,8 +71,9 @@ def metrics(d, p):
     elif cls == "shallow":
         onset = np.nan                     # no collapse to speak of
     drop = float(iref(VD_DROP) / idd[-1]) if vd[-1] >= VD_DROP - 1e-6 else np.nan
+    maxdrop = float(np.max(iref(v) / i))   # deepest point vs trap-free
     return dict(label=p["label"], cls=cls, onset=onset, maxloss=maxloss,
-                drop4V=drop, pre_ratio=pre_ratio, at_rest=at_rest, last_vd=float(vd[-1]))
+                maxdrop=maxdrop, drop4V=drop, pre_ratio=pre_ratio, at_rest=at_rest, last_vd=float(vd[-1]))
 
 
 bm = metrics(*base)
@@ -93,8 +94,8 @@ with open("figures/sensitivity_metrics.csv", "w", newline="") as f:
     w.writeheader()
     w.writerows(rows)
 for r in rows:
-    print(f"{r['lever']:>10} {str(r['value']):>8}  {r['cls']:<11} onset {r['onset']:<5} "
-          f"drop@4V {r['drop4V']:.3g}  pre {r['pre_ratio']:.2f}  last {r['last_vd']}")
+    print(f"{r['lever']:>10} {str(r['value']):>8}  {r['cls']:<11} onset {r['onset']:<5.2g} "
+          f"maxdrop {r['maxdrop']:.3g}  drop@4V {r['drop4V']:.3g}  pre {r['pre_ratio']:.2f}  last {r['last_vd']}")
 
 plt.rcParams.update({"font.family": "sans-serif", "font.size": 10, "axes.edgecolor": MUTED,
                      "axes.labelcolor": INK, "xtick.color": MUTED, "ytick.color": MUTED})
@@ -106,18 +107,21 @@ for c, lev in enumerate(LEVERS):
     x = np.array([r["value"] for r, _ in pts])
     bx = float(base[1][lev])
     for rr, (key, lab, logy) in enumerate([("onset", "onset Vd (V)", False),
-                                           ("drop4V", "Id drop at 4 V", True),
+                                           ("maxdrop", "Id drop: deepest (—), at 4 V (--)", True),
                                            ("pre_ratio", "Id before / trap-free", False)]):
         ax = axs[rr, c]
         y = np.array([r[key] for r, _ in pts], float)
         ax.plot(x, y, "-", color=BLUE, lw=2, zorder=2)
         ax.plot(x, y, "o", ms=6, color=BLUE, mec="white", mew=1.5, zorder=3)
+        if key == "maxdrop":
+            y4 = np.array([r["drop4V"] for r, _ in pts], float)
+            ax.plot(x, y4, "--", color=MUTED, lw=1.5, zorder=1)
+            ax.plot(x, y4, "o", ms=4, color=MUTED, zorder=1)
         bi = int(np.argmin(abs(x - bx)))
         ax.plot(x[bi], y[bi], "o", ms=8, color=ORANGE, mec="white", mew=1.5, zorder=4)
         for xi, (r, _) in zip(x, pts):       # mark points with no onset
-            if key == "onset" and np.isnan(r["onset"]):
-                ax.annotate("off" if r["cls"] == "off at rest" else "none", (xi, 0.15),
-                            ha="center", fontsize=8, color=MUTED)
+            if key == "onset" and np.isnan(r["onset"]):   # open marker = no collapse to 4 V
+                ax.plot(xi, 0.12, "o", ms=6, mfc="white", mec=BLUE, mew=1.5, clip_on=False, zorder=3)
         if lev in LOGX:
             ax.set_xscale("log")
             ax.xaxis.set_minor_formatter(plt.NullFormatter())
@@ -126,6 +130,11 @@ for c, lev in enumerate(LEVERS):
             ax.set_yscale("log")
         if key == "onset":
             ax.set_ylim(0, 4.2)
+            pad = 0.05 * (x.max() - x.min())
+            if lev not in LOGX:
+                ax.set_xlim(x.min() - pad, x.max() + pad)
+            else:
+                ax.set_xlim(x.min() / 1.15, x.max() * 1.15)
         ax.grid(color=GRID, lw=0.8)
         ax.spines[["top", "right"]].set_visible(False)
         if c == 0:
@@ -133,7 +142,7 @@ for c, lev in enumerate(LEVERS):
         if rr == 2:
             ax.set_xlabel(f"{lev} ({UNITS[lev]})" if UNITS[lev] else lev)
 fig.suptitle("Trap-model sensitivity, one lever at a time (orange = baseline: "
-             "0.30 eV, 5e18, hotEb 1.0, hotTau 1e-14, y 1.0 µm, Vg −2 V)", color=INK, fontsize=11)
+             "0.30 eV, 5e18, hotEb 1.0, hotTau 1e-14, y 1.0 µm, Vg −2 V; open = no collapse to 4 V)", color=INK, fontsize=11)
 fig.tight_layout()
 fig.savefig("figures/sensitivity.png", dpi=150)
 
