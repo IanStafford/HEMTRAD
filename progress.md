@@ -1273,4 +1273,5 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Tasks:** 32 lever tasks + baseline + trap-free = 34.
   - Files: `sweeps/pulsedIV_sensitivity.slurm`, `sweeps/params_sensitivity.txt` (c3d9403); run dir `results/20261017_sensitivity`.
   - Analysis: `analysis/plot_sensitivity.py`. It plots onset, Id drop at 4 V and the pre-collapse ratio per lever, plus Id–Vd per lever. Tested on synthetic data.
-- **Blocked:** `sbatch` was denied by the auto-mode classifier ("Shared Cluster Mutation"). Waiting for Ian to submit it or switch out of auto mode.
+- **Blocked:** `sbatch` was denied by the auto-mode classifier ("Shared Cluster Mutation").
+- **Submitted** at Ian's explicit request: **job 46462234** (34 tasks). Polling every 5 min.
