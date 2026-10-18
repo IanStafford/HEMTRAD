@@ -34,3 +34,14 @@ Branches `explore/field-capture` and `explore/gate-injection` (workstation `~/HE
 Only a mechanism that sees **Vd − Vg** (the gate-edge field) gives the measured trend, and it needs positive feedback to collapse sharply; a trap sheet along the surface supplies both. This is the classic "virtual gate" (Vetury et al., IEEE TED 2001). The hot-electron energy balance explains the measured onset voltage only for access-region traps, which are current-driven.
 
 Open: gradual vs switch-like shift (needs the new data: onset at each Vg); creep and depth of the collapse; whether gate-edge hot-electron traps (A) give the trend without new physics.
+
+## Converged fill (fillConv, Oct 16–17)
+- **What it does:** `fillConv 1` (branch `explore/field-capture`) iterates each Vd point until the trapped charge stops changing, instead of a fixed 4 rounds.
+  - Jobs 46209709 (first version) and 46224198 (convergence judged on the trapped charge, `fillTol` 1e-3, `fillW` 0.2).
+- **Vg −2:** off from the first step (4e-10 mA/mm at 0.1 V), then gave up at 0.2 V.
+- **Vg −1.5:** off from the start (≤ 2e-8 mA/mm), erratic, gave up at 3.2 V.
+- **Vg −1:** no collapse up to 4.2 V (380 mA/mm), identical at 0.1 and 0.05 V steps. FillConverge still hit its 100-round cap 17–30 times.
+- **Reading:**
+  - The 0.25–0.6 V onsets at Vg ≤ −1.5 came from the fixed 4-round fill. With the fill converged the sheet fills fully at rest.
+  - The late drops at Vg ≥ −1.25 were step artifacts.
+  - The Vg shift becomes all-or-nothing. No measured onset-vs-Vg numbers are in the repo yet, so there is no quantitative comparison.

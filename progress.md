@@ -1281,3 +1281,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - Depth follows trapLevel, hotEb and hotTau (up to 3e11×).
   - Figures: `figures/sensitivity.png`, `figures/sensitivity_IdVd.png`. KB: [[trap-sensitivity]].
 - Next: Ian to review. One option is a second one-at-a-time pass around a baseline nearer the measured onset (e.g. level 0.45–0.5 or hotTau 3e-14), since this baseline sits just above the capture threshold.
+
+## 2026-10-17 — Wrap-up
+- Dashboard: Oct 16–17 page added (lever sweep, fillConv verdict, HighK field check), Overview refreshed (snapshot Oct 17, tiles, open items; energy-balance fit moved to older questions as parked). Published v11 to https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd.
+- KB: current-status (fillConv verdict, next steps), vg-dependence (converged-fill section).
+- No jobs running. Waiting on Ian: second lever pass around a baseline nearer the measured onset? keep/drop fillConv? measured onset-vs-Vg numbers.
