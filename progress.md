@@ -1306,3 +1306,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - calibIdVg at Vds 10 V.
 - Source jobs: 46462234, 44573629, 46241088, 46040979, 45768739, Oct 1 calibration.
 - All but the two Oct 3 Vg 0 cases match main 580cf5f model files.
+
+## 2026-10-21 — TRIM (SRIM-2013) installed on the workstation
+- SRIM-2013-Pro from srim.org, extracted with 7z, in its own Wine prefix `~/.wine-srim` (VB5 runtime and 5 OCX controls registered). HPG has no SRIM.
+- `bin/trim_run.sh <TRIM.IN> <out_dir>` runs TRIM in batch mode (TRIMAUTO 1) and collects the outputs. Tested on the bundled example (200 ions, 54 s) and `drivers/trim/TRIM_HEMT_template.IN` (HfO2/Si3N4/AlGaN/GaN stack, 20-ion placeholder Au ion, 6 s).
+- Waiting on Ian: ion species/energy/fluence (with the experimental data). Before production runs, review the displacement energies (template uses SRIM-style defaults). KB [[trim]].

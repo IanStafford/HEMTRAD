@@ -51,6 +51,7 @@ Second brain for the FLOOXS model of **radiation-induced current collapse** in a
 - [[drivers]] — `drivers/pulsedIV.tcl`, `drivers/calibIdVg.tcl`, `drivers/stressFreeze.tcl` …
 - [[analysis-scripts]] — Python analysis and plotting
 - [[notebook]] — `figures.ipynb`
+- [[trim]] — SRIM-2013 TRIM under Wine on the workstation, batch wrapper, HEMT template
 - [[repo-locations]] — the three repo copies, Obsidian vault, flooxs checkouts
 
 ## Results

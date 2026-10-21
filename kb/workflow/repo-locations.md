@@ -33,6 +33,7 @@ Before 2026-10-12 everything sat flat in the root; `progress.md` and old commits
 | flooxs-pyplot on HPG | none: the old checkout `/home/ianstafford/blue/ee1/ianstafford/flooxs-pyplot` (da619c4c) was deleted 2026-10-15 (Ian), with the Oct 8 bundle and `gan_regress_results/`; nothing from flooxs-pyplot is left on HPG. Copy a new one as a git bundle if needed |
 | FLOOXS source (workstation) | `~/flooxs/src` |
 | Crash-fix build | `~/flooxs-crashfix` (branch `crash-fix`), patch `flooxs-crashfix.patch` |
+| SRIM / TRIM (workstation) | `~/.wine-srim/drive_c/SRIM` (Wine prefix `~/.wine-srim`), package in `~/opt/srim-2013/`; run with `bin/trim_run.sh` ([[trim]]) |
 | flooxs-pyplot (workstation) | `~/flooxs-pyplot` (private `IanStafford/flooxs-pyplot`; matplotlib plot windows, regression suite; `Test/SimpDev/GaNSuite` = GaN starter decks) |
 | GaN regression results | `~/flooxs-pyplot/Test/Regression/hpg_results/20261008/` and `20261015-fangs*` (FANGS HPG campaign, runs 1-3; not committed) |
 | FANGS HPG campaign scripts | `archive/fangs-hpg-tests/` (finished 2026-10-15; HPG folder `fangs-hpg-20261015` deleted) |
