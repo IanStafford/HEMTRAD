@@ -1293,3 +1293,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - capF0 1e7: soft knee at Vg −2 (flat 45–59 mA/mm from 0.4 V, creeping) and at −1.5 (73.8 → 52.8 mA/mm at 0.8–1.3 V, then creep back to 71.7); Vg ≥ −1 unaffected.
 - So softer capture gives a gradual knee with creep and the right Vg ordering, but only ≤ 1.4× deep (measured ~1000×). KB [[vg-dependence]] updated.
 - Measured onset-vs-Vg data still pending at another lab (Ian). Proposed next: time-limited (pulse-integrated) capture instead of fixed fill rounds — needs Ian's OK and the curve-tracer pulse width/period.
+- **PARKED (Ian, 2026-10-21): time-limited (pulse-integrated) capture.** Waiting for the curve-tracer pulse width/period and the measured onset-vs-Vg data (another lab). Pick up: new worktree, per-Vd capture Δn = (n_eq − n)(1 − exp(−t_pulse/τ_c)) with τ_c from the existing capture law, default off; sweep t_pulse if the instrument values are still unknown.
