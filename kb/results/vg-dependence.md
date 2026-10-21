@@ -45,3 +45,12 @@ Open: gradual vs switch-like shift (needs the new data: onset at each Vg); creep
   - The 0.25–0.6 V onsets at Vg ≤ −1.5 came from the fixed 4-round fill. With the fill converged the sheet fills fully at rest.
   - The late drops at Vg ≥ −1.25 were step artifacts.
   - The Vg shift becomes all-or-nothing. No measured onset-vs-Vg numbers are in the repo yet, so there is no quantitative comparison.
+
+## Softer capture (job 46057777, read 2026-10-21)
+- **Setup:** `params_virtGate3.txt`, Fth 1.2e5 with capF0 5e6 or 1e7, Vg −2 … 0, fixed 4 fill rounds. All 10 tasks completed to 4 V in 7–15 min, no give-ups.
+- **capF0 5e6:** no collapse at any Vg. At Vg −2 Id is ~10–18% below the other runs (123 vs 150 mA/mm at 1 V, 171 at 4 V). Vg −1.5 reaches 280 mA/mm at 4 V, and Vg ≥ −1 are unaffected.
+- **capF0 1e7:**
+  - Vg −2: rises normally to 0.3 V, then flattens at 45–59 mA/mm from 0.4 V to 4 V, a soft current limit with a slow creep.
+  - Vg −1.5: rises to 73.8 mA/mm at 0.8 V, falls to 52.8 at 1.3 V (−28%), then creeps back to 71.7 by 4 V.
+  - Vg ≥ −1: unaffected.
+- **Reading:** a softer capture law keeps the right Vg ordering (only Vg ≤ −1.5 are affected). It gives a gradual knee with creep instead of a sharp drop, but far too shallow (≤ 1.4× vs ~1000×). So the capture form trades sharpness against how Vg-switch-like the shift is. No setting tried so far gives a sharp ~1000× drop with a gradual Vg shift.

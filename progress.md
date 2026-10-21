@@ -1286,3 +1286,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Dashboard: Oct 16–17 page added (lever sweep, fillConv verdict, HighK field check), Overview refreshed (snapshot Oct 17, tiles, open items; energy-balance fit moved to older questions as parked). Published v11 to https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd.
 - KB: current-status (fillConv verdict, next steps), vg-dependence (converged-fill section).
 - No jobs running. Waiting on Ian: second lever pass around a baseline nearer the measured onset? keep/drop fillConv? measured onset-vs-Vg numbers.
+
+## 2026-10-21 — Softer virtual-gate capture (job 46057777) read
+- HPG reconnected (one Duo push). 46057777 (`params_virtGate3.txt`, Fth 1.2e5, capF0 5e6 / 1e7, Vg −2 … 0): all 10 tasks done to 4 V.
+- capF0 5e6: no collapse at any Vg; only a 10–18% lower Id at Vg −2.
+- capF0 1e7: soft knee at Vg −2 (flat 45–59 mA/mm from 0.4 V, creeping) and at −1.5 (73.8 → 52.8 mA/mm at 0.8–1.3 V, then creep back to 71.7); Vg ≥ −1 unaffected.
+- So softer capture gives a gradual knee with creep and the right Vg ordering, but only ≤ 1.4× deep (measured ~1000×). KB [[vg-dependence]] updated.
+- Measured onset-vs-Vg data still pending at another lab (Ian). Proposed next: time-limited (pulse-integrated) capture instead of fixed fill rounds — needs Ian's OK and the curve-tracer pulse width/period.
