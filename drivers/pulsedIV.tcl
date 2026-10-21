@@ -90,7 +90,8 @@ pdbSetDouble Math iterLimit $sweepIterLimit
 device init
 
 # rest at the measurement gate bias with the traps in steady state
-for {set g -0.1} {$g > $Vg_meas - 0.001} {set g [expr {$g - 0.1}]} {
+set gStep [expr {$Vg_meas < 0 ? -0.1 : 0.1}] ;# ramp toward Vg_meas of either sign
+for {set g $gStep} {abs($g) < abs($Vg_meas) + 0.001} {set g [expr {$g + $gStep}]} {
     contact name=G supply=$g
     device
 }

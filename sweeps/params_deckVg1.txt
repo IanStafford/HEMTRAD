@@ -1,0 +1,8 @@
+highk_notrap|rfdevice.tcl|1.0|1e10
+sin_notrap|rfdevice_SiN.tcl|1.0|1e10
+highk_y0.3|rfdevice.tcl|0.3|5e18
+sin_y0.3|rfdevice_SiN.tcl|0.3|5e18
+highk_y1.0|rfdevice.tcl|1.0|5e18
+sin_y1.0|rfdevice_SiN.tcl|1.0|5e18
+highk_y2.4|rfdevice.tcl|2.4|5e18
+sin_y2.4|rfdevice_SiN.tcl|2.4|5e18
