@@ -1311,3 +1311,12 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - SRIM-2013-Pro from srim.org, extracted with 7z, in its own Wine prefix `~/.wine-srim` (VB5 runtime and 5 OCX controls registered). HPG has no SRIM.
 - `bin/trim_run.sh <TRIM.IN> <out_dir>` runs TRIM in batch mode (TRIMAUTO 1) and collects the outputs. Tested on the bundled example (200 ions, 54 s) and `drivers/trim/TRIM_HEMT_template.IN` (HfO2/Si3N4/AlGaN/GaN stack, 20-ion placeholder Au ion, 6 s).
 - Waiting on Ian: ion species/energy/fluence (with the experimental data). Before production runs, review the displacement energies (template uses SRIM-style defaults). KB [[trim]].
+
+## 2026-10-21 — HighK vs SiN deck with traps at Vg +1, Vd 0–10 V (set up; submit blocked)
+- Ian approved one array: does the trap model collapse the SiN deck at high Vd but not the HighK deck? The earlier HighK/SiN comparisons stopped at 3 V.
+- `sweeps/pulsedIV_deckVg1.slurm` + `params_deckVg1.txt`, 8 tasks:
+  - decks `rfdevice.tcl` / `rfdevice_SiN.tcl`;
+  - trap-free, plus the sensitivity-baseline trap set at y 0.3 / 1.0 / 2.4 µm;
+  - Vg +1, Vd 0–10 / 0.1, local field, 24 h on ee1-b.
+- Fix in `drivers/pulsedIV.tcl`: the gate ramp went only downward, so a positive `Vg_meas` was never applied. It now steps toward Vg_meas of either sign; −2 and 0 behave as before (checked in tclsh). Commit f4f091f.
+- sbatch blocked by auto mode again; waiting for Ian to run the submit command.
