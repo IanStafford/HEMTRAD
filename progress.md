@@ -1294,3 +1294,15 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - So softer capture gives a gradual knee with creep and the right Vg ordering, but only ≤ 1.4× deep (measured ~1000×). KB [[vg-dependence]] updated.
 - Measured onset-vs-Vg data still pending at another lab (Ian). Proposed next: time-limited (pulse-integrated) capture instead of fixed fill rounds — needs Ian's OK and the curve-tracer pulse width/period.
 - **PARKED (Ian, 2026-10-21): time-limited (pulse-integrated) capture.** Waiting for the curve-tracer pulse width/period and the measured onset-vs-Vg data (another lab). Pick up: new worktree, per-Vd capture Δn = (n_eq − n)(1 − exp(−t_pulse/τ_c)) with τ_c from the existing capture law, default off; sweep t_pulse if the instrument values are still unknown.
+
+## 2026-10-21 — GaN decks exported to flooxs-pyplot for the Python port
+- Ian asked for the GaN decks we've been running, with numerical references, in a flooxs-pyplot folder, so the FANGS agent can translate and test them.
+- `~/flooxs-pyplot/Test/SimpDev/GaNSuite_HEMTRAD_20261021/` (untracked, not committed in flooxs-pyplot): 10 self-contained task folders (model files flat, CRLF kept, `*_task.tcl` driver, `params.json`, `reference/` outputs + SLURM logs where available), `reference_summary.csv`, `measured/`, README.
+- Cases:
+  - trap-free Id–Vd at Vg −2 and 0;
+  - late set at y 1.0 (Vg −2 and 0) and trapLevel 0.50;
+  - field plate HighK/SiN to 20 V;
+  - energy balance trap-free and late set y 2.4 τ 1 ps;
+  - calibIdVg at Vds 10 V.
+- Source jobs: 46462234, 44573629, 46241088, 46040979, 45768739, Oct 1 calibration.
+- All but the two Oct 3 Vg 0 cases match main 580cf5f model files.
