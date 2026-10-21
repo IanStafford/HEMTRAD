@@ -1319,4 +1319,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - trap-free, plus the sensitivity-baseline trap set at y 0.3 / 1.0 / 2.4 µm;
   - Vg +1, Vd 0–10 / 0.1, local field, 24 h on ee1-b.
 - Fix in `drivers/pulsedIV.tcl`: the gate ramp went only downward, so a positive `Vg_meas` was never applied. It now steps toward Vg_meas of either sign; −2 and 0 behave as before (checked in tclsh). Commit f4f091f.
-- sbatch blocked by auto mode again; waiting for Ian to run the submit command.
+- Submitted at Ian's request (his exact command): **job 47062225**.
