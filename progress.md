@@ -1345,3 +1345,16 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Job 47311016 (10 tasks, `params_radCal1.txt`):**
   - polCharge 7/8/9/10e12 × mobNref 1e17/1e18 (phiB pre-shifted ~0.43 V per 1e12);
   - plus 2 post-damage smoke tests (HighK/SiN).
+
+## 2026-10-23 — rad-model: pre-irradiation calibration rounds 1–2 done; damage round D1 submitted
+- Round 1 (47311016): Vth within 0.03 V in all 8 variants (phiB pre-shift works). polCharge 9e12 + mobNref 1e18 matches the low-Vd transfer currents, but Id–Vd at Vg +1 saturates too high.
+- Round 2 (47324103, vsat 1.5/2.0/2.5e7): best pre baseline = **polCharge 1e13, phiB 2.94, mobNref 1e18, mobVsat 2e7**.
+  - Vth −3.00 V;
+  - Id–Vd shape within about ±9% of measured (low by 7% at 1–2 V, high by 9% at 10 V);
+  - gm max 65 vs ~50–54 mS/mm measured: the model turns on too steeply, as in the Oct 1 calibration.
+- Both post smoke tests (47311016 tasks 8–9) failed in the stress ramp near Vd 17.5 V at Vg −10. Newton gives NaN in the minority quasi-Fermi levels in the depleted AlGaN.
+  - Solver-side fix: the stress uses the highest converged Vd (≥ `Vd_stressMin` 12 V), which is recorded in the summary. The damage scale absorbs the field magnitude.
+- `radIV.tcl` `damList`: several damage settings after one stress solve.
+- **Submitted:**
+  - **D1 = job 47327524** (6 tasks): non-biased (surfCharge −4e11) on both decks; biased on both decks × trapLevel 0.30/0.45, each with 9 settings (damM 1/2/4 × damPeak 1e17/3e17/1e18 at 1 MV/cm, depth ≤ 50 nm);
+  - **calibration round 3 = job 47327599** (4 tasks): SiN-deck pre, vsat 1.75e7, mumax 2100.
