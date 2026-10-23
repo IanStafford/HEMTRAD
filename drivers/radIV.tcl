@@ -43,6 +43,7 @@ if {![info exists doIdVd]}    { set doIdVd 1 }
 # irradiation bias and damage
 if {![info exists Vg_stress]} { set Vg_stress -10.0 }
 if {![info exists Vd_stress]} { set Vd_stress 28.0 }
+if {![info exists Vd_stressMin]} { set Vd_stressMin 12.0 } ;# accept a stress Vd down to this if the solve fails above
 if {![info exists damPeak]}   { set damPeak 0.0 }     ;# cm^-3 at E = damEref
 if {![info exists damEref]}   { set damEref 1.0e6 }   ;# V/cm
 if {![info exists damM]}      { set damM 2.0 }
@@ -128,10 +129,19 @@ if {$radState eq "post"} {
     if {[info exists surfCharge]} { puts $sf "surfCharge $surfCharge" }
     if {$useTraps} {
         if {![Ramp G 0.0 $Vg_stress 0.5]} { error "stress gate ramp failed" }
-        if {![Ramp D 0.0 $Vd_stress 1.0]} { error "stress drain ramp failed" }
+        # The off-state solve stops converging near Vdg ~ 27 V (minority quasi-Fermi
+        # levels in the depleted AlGaN, job 47311016). Use the highest converged Vd if it
+        # is at least Vd_stressMin; the damage law's scale absorbs the field magnitude.
+        set dS 0.0
+        for {set d 1.0} {$d <= $Vd_stress + 1e-9} {set d [expr {$d + 1.0}]} {
+            if {![Reach D $dS $d $retryDepth 0]} { break }
+            set dS $d
+        }
+        if {$dS < $Vd_stressMin} { error "stress drain ramp failed at $dS" }
         sel z=abs(dot(DevPsi,y*1e-4)) name=Estress
-        puts $sf "stress Vg=$Vg_stress Vd=$Vd_stress peakElat(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakElat(AlGaN)=[lindex [peak AlGaN] 1]"
-        if {![Ramp D $Vd_stress 0.0 1.0]} { error "stress drain ramp-down failed" }
+        puts $sf "stress Vg=$Vg_stress Vd=$dS (target $Vd_stress) peakElat(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakElat(AlGaN)=[lindex [peak AlGaN] 1]"
+        flush $sf
+        if {![Ramp D $dS 0.0 1.0]} { error "stress drain ramp-down failed" }
         if {![Ramp G $Vg_stress 0.0 0.5]} { error "stress gate ramp-down failed" }
     }
 }
