@@ -29,6 +29,9 @@ mater add name=GaN
     pdbSetDouble GaN Elec beta3 3.02
     pdbSetDouble GaN Elec beta4 0.81
     pdbSetDouble GaN Elec Nref 1e17
+    # calibration levers (branch explore/rad-model; unset = values above)
+    if {[info exists mobMumax]} { pdbSetDouble GaN Elec mumax $mobMumax }
+    if {[info exists mobNref]}  { pdbSetDouble GaN Elec Nref $mobNref }
 
     #parameters for GaN high field mobility from Farahmand (hfalpha is Farahmand's alpha)
     pdbSetDouble GaN Elec hfalpha 6.1973
@@ -57,7 +60,7 @@ mater add name=GaN
         #Heller high field: mu = mulow / (1 + (mulow E / vsat)^beta)^(1/beta), E along the channel (V/cm)
         set mulow "([pdbGetDouble GaN Elec lowfldmob])"
         set E "(abs(dot(DevPsi,y*1e-4))+1)"
-        set vs "(3.3e7-(3.0e6*$Tn))"
+        if {[info exists mobVsat]} { set vs "($mobVsat)" } else { set vs "(3.3e7-(3.0e6*$Tn))" }
         set b "(0.85*exp(log($Tn)*(0.4)))"
         pdbSetDouble GaN Elec mob "($mulow/exp(log(1+exp(log($mulow*$E/$vs)*$b))/$b))"
     } else {

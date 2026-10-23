@@ -145,6 +145,11 @@ proc TrapConc_cone {} {
     return "$trapPeak*$lat*$top*$bot"
 }
 
+# field - radiation damage created during a biased irradiation: the density is
+#         the data field TrapN, written by the driver from the lateral field at
+#         the stress bias (drivers/radIV.tcl). Initialize makes it ~0.
+proc TrapConc_field {} { return "TrapN" }
+
 if {[info procs TrapConc_$trapShape] eq ""} {
     error "unknown trapShape '$trapShape' (no proc TrapConc_$trapShape)"
 }
@@ -179,6 +184,8 @@ proc Initialize {} {
     # and the ETemp statistics take log(ETemp/Temp))
     global eTemp
     if {$eTemp} { sel z=Temp name=ETemp }
+    global trapShape
+    if {[info exists trapShape] && $trapShape eq "field"} { sel z=1.0e-30*(1.0+x*x) name=TrapN }
 
     # charge-neutral initial potential in GaN, then AlGaN
     newton GaN eqn=Doping-Elec+Hole var=DevPsi damp=0.025
