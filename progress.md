@@ -1358,3 +1358,11 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Submitted:**
   - **D1 = job 47327524** (6 tasks): non-biased (surfCharge −4e11) on both decks; biased on both decks × trapLevel 0.30/0.45, each with 9 settings (damM 1/2/4 × damPeak 1e17/3e17/1e18 at 1 MV/cm, depth ≤ 50 nm);
   - **calibration round 3 = job 47327599** (4 tasks): SiN-deck pre, vsat 1.75e7, mumax 2100.
+
+## 2026-10-23 (late) — rad-model: calibration round 3 done, D1 biased partial
+- Round 3 (47327599): tasks 1–3 done, task 0 (pre_sin) still running. Best pre fit is now p10_vs1.75_mu2100 (polCharge 1e13, phiB 2.94, mobNref 1e18, vsat 1.75e7, mumax 2100). Vth and the Id–Vd shape both fit; gm is still ~25% high.
+- D1 biased (47327524 tasks 2–5): very slow, about 1 of 9 damage configs per task in 2.5 h.
+  - The stress ramp stops at Vd 17 V (target 28).
+  - The peak lateral field is the same in HighK and SiN: 6.96e5 V/cm in GaN at y ≈ 1.53 µm, within 0.1%. So field-weighted damage can't separate the decks either (same lesson as deckVg1).
+  - The first configs (m1, 1e17) give a uniform −5% Id, all from surfCharge; no collapse.
+- Next: let D1 finish overnight. The deck-separating mechanism has to come from something other than the bulk lateral field, e.g. the dielectric/interface (passivation charge or traps at the SiN interface).
