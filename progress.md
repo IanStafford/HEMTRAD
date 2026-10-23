@@ -1320,3 +1320,16 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - Vg +1, Vd 0–10 / 0.1, local field, 24 h on ee1-b.
 - Fix in `drivers/pulsedIV.tcl`: the gate ramp went only downward, so a positive `Vg_meas` was never applied. It now steps toward Vg_meas of either sign; −2 and 0 behave as before (checked in tclsh). Commit f4f091f.
 - Submitted at Ian's request (his exact command): **job 47062225**.
+
+## 2026-10-23 — deckVg1 (job 47062225) done: HighK and SiN collapse identically
+- HPG master was down; one Duo reconnect (`bin/hpg_reconnect.sh`) worked. All 8 tasks COMPLETED (28–66 min), with no `GAVE UP`, errors or cores. rsynced to `results/20261021_deckVg1/`. Figure `figures/deckVg1_IdVd.png` (`analysis/plot_deckVg1.py`).
+- Trap-free Id at Vg +1, 10 V: 802.2 (HighK, = calibration) / 813.3 mA/mm (SiN).
+- Onsets identical on both decks:
+  - y 0.3: −83% at 1.3 V, recovering to ~9% of trap-free;
+  - y 1.0: −100% at 1.5 V;
+  - y 2.4: −100% at 1.7 V.
+- The decks differ only in the post-collapse recovery above ~4 V (SiN 20–60× lower at 10 V).
+- So the trap model does not reproduce the measured HighK/SiN contrast. Its collapse is also earlier and far deeper than the measured stepwise ~3× from 4 V. KB [[highk-vs-sin]].
+- Next (Ian's call):
+  - the model may need a field-triggered damage/trapping mechanism (the measured damage was bias-dependent and event-like); or
+  - test traps under the field plate / drain-side FP edge where HighK lowers the field (y ≈ 0.7–1.0 µm at 10–20 V).

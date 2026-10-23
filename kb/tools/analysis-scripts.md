@@ -22,3 +22,4 @@ tags: [tools]
 GIF recipe: `python3 analysis/plot_posVd.py <run> <tag>_gif $(python3 -c "print(','.join(f'{0.1*k:.1f}' for k in range(1,31)))")` then `python3 analysis/make_gif.py figures/<tag>_gif_frames figures/<tag>.gif` (GIF frames not committed). Archived static-era scripts: `archive/static_mobility/analyze_*.py`, `critical_strike.py`.
 
 Plot style used throughout: recessive grid/axes, one-hue sequential blue ramp for magnitude, text in ink colours, legends kept off the data.
+- `analysis/plot_deckVg1.py [run_dir]`: HighK vs SiN Id–Vd at Vg +1 per trap position (job 47062225) → `figures/deckVg1_IdVd.png` ([[highk-vs-sin]]).

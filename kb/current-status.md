@@ -1,15 +1,16 @@
 ---
 title: Current status
 tags: [status]
-updated: 2026-10-17
+updated: 2026-10-23
 ---
-# Current status (as of 2026-10-17)
+# Current status (as of 2026-10-23)
 
 **Repo:** reorganised 2026-10-12 into `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/` ([[repo-locations]]); FLOOXS internals in [[flooxs-overview]].
 
 **Model:** calibrated field mobility ([[calibration]]), local-field hot-electron capture ([[hot-electron-capture]]), Te-ramp stall rescue ([[te-ramp]]). **Since 2026-10-16 (Ian) the local-field model (`eTemp 0`, the model-file default) is the standard again, to save computation time.** The standard electron energy balance (`eTemp 1`, `etStats 0`, `etThermo 0`; standard Oct 13–16) is kept as an option: it collapses at the measured voltage but costs ~1.9 s per Newton iteration ([[energy-balance]]).
 
 **Key results**
+- **HighK vs SiN with traps at Vg +1, Vd to 10 V** (job 47062225): identical onsets on both decks (1.3 / 1.5 / 1.7 V for traps at y 0.3 / 1.0 / 2.4). Only the post-collapse recovery differs (SiN 20–60× lower at 10 V). The trap model can't make SiN collapse while HighK doesn't ([[highk-vs-sin]]).
 - With the standard energy balance the late set collapses at **0.4–0.7 V** (set by τ); at y = 2.4 µm a 60–4000× drop onto a creeping plateau, close to the measured shape ([[energy-balance]], job 45768739).
 - Local-field model: latest deep collapse **3.5 V** (late-onset set at y = 2.4 µm), 177 → 0.0018 mA/mm in one step, then creep ([[late-onset-search]]).
 - Trap **position** is the strongest onset lever near the charge threshold; deeper levels / more charge collapse early and uniformly ([[position-maps]]).
