@@ -15,6 +15,10 @@
 #     Id_ext = Id_dev + (Vd - Vg)/Rgd.
 # Traps fill but never empty after the rest point (fill-only, CaptureTraps), with
 # hot-electron FillStep at each Id-Vd point.
+# damList (optional): several damage settings after ONE stress solve, e.g.
+#   set damList {{d1 {damPeak 1e17 damM 2}} {d2 {damPeak 3e17 damM 3}}}
+# each entry {suffix {lever value ...}} (damPeak/damM/damEref/damMax/damXmax/Rgd/hotTau);
+# outputs get the prefix ${tag}_<suffix>. Traps are reset (ThawTraps) between entries.
 # Outputs (prefix $tag): <tag>_IdVg.csv (Vg, Id_dev, Id_ext mA/mm),
 # <tag>_IdVd.csv (Vd, Id_dev, Id_ext, peak Te), <tag>_cuts.txt (Estress, TrapN,
 # IonAcceptor along x = 0.001 / 0.016 um), <tag>_summary.txt.
@@ -45,6 +49,7 @@ if {![info exists damM]}      { set damM 2.0 }
 if {![info exists damMax]}    { set damMax 1.0e19 }
 if {![info exists damXmax]}   { set damXmax 0.05 }    ;# um below the AlGaN top
 if {![info exists Rgd]}       { set Rgd 0.0 }
+if {![info exists damList]}   { set damList {} }
 # trap / capture (sensitivity baseline)
 if {![info exists trapLevel]} { set trapLevel 0.30 }
 if {![info exists trapWidth]} { set trapWidth 0.1 }
@@ -53,7 +58,7 @@ if {![info exists hotTau]}    { set hotTau 1.0e-14 }
 if {![info exists fillIters]} { set fillIters 4 }
 if {![info exists fillRelax]} { set fillRelax 0.5 }
 
-set useTraps [expr {$radState eq "post" && $damPeak > 0.0}]
+set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || [llength $damList] > 0)}]
 set trapEn $useTraps
 set trapShape field
 
@@ -123,71 +128,100 @@ if {$radState eq "post"} {
     if {[info exists surfCharge]} { puts $sf "surfCharge $surfCharge" }
     if {$useTraps} {
         if {![Ramp G 0.0 $Vg_stress 0.5]} { error "stress gate ramp failed" }
-        if {![Ramp D 0.0 $Vd_stress 0.5]} { error "stress drain ramp failed" }
+        if {![Ramp D 0.0 $Vd_stress 1.0]} { error "stress drain ramp failed" }
         sel z=abs(dot(DevPsi,y*1e-4)) name=Estress
         puts $sf "stress Vg=$Vg_stress Vd=$Vd_stress peakElat(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakElat(AlGaN)=[lindex [peak AlGaN] 1]"
         if {![Ramp D $Vd_stress 0.0 1.0]} { error "stress drain ramp-down failed" }
         if {![Ramp G $Vg_stress 0.0 0.5]} { error "stress gate ramp-down failed" }
-        # damage, switched in gradually at rest (live occupancy)
-        set n "($damPeak*exp($damM*log(Estress/$damEref+1.0e-30)))"
-        set n "(0.5*($n+$damMax-abs($n-$damMax)))*(x>=0.0)*(x<=$damXmax)"
-        foreach s {0.01 0.03 0.1 0.3 0.6 1.0} {
-            sel z=$s*$n+1.0e-30*(1.0+x*x) name=TrapN
-            SaveState
-            if {[catch {device}]} { RestoreState; puts "DAMAGE solve failed at scale $s"; error "damage" }
-        }
-        sel z=TrapN
-        puts $sf "damage peakN(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakN(AlGaN)=[lindex [peak AlGaN] 1]"
-        CaptureTraps
-        set c [open ${tag}_cuts.txt w]
-        foreach fld {Estress TrapN IonAcceptor} {
-            sel z=$fld
-            foreach xc {0.001 0.016} { puts $c "# $fld along y at x = $xc"; puts $c [print.1d x.value=$xc] }
-        }
-        close $c
     }
 }
 flush $sf
 
-#---------------- transfer at Vd_lin ----------------
-if {$doIdVg} {
-    if {![Ramp D 0.0 $Vd_lin 0.05]} { error "Vd_lin ramp failed" }
-    if {![Ramp G 0.0 $Vg_hi 0.1]} { error "Vg_hi ramp failed" }
-    if {$useTraps} { CaptureTraps }
-    set f [open ${tag}_IdVg.csv w]
-    set gPrev $Vg_hi
-    set n [expr {int(round(($Vg_hi - $Vg_lo) / $Vg_step))}]
-    for {set i 0} {$i <= $n} {incr i} {
-        set g [expr {$Vg_hi - $i * $Vg_step}]
-        if {$i > 0 && ![Reach G $gPrev $g $retryDepth 0]} { puts "IDVG GAVE UP at Vg=$g"; break }
-        if {$useTraps} { CaptureTraps }
-        set gPrev $g
-        puts $f "$g, [IdDev], [IdExt $Vd_lin $g]"
-        flush $f
-        puts "IDVG Vg=$g Id=[IdDev]"
+# Switch the damage in at rest (Vg = Vd = 0) for the present damage levers.
+proc DamageIn {tg} {
+    global damPeak damM damEref damMax damXmax sf
+    ThawTraps
+    set n "($damPeak*exp($damM*log(Estress/$damEref+1.0e-30)))"
+    set n "(0.5*($n+$damMax-abs($n-$damMax)))*(x>=0.0)*(x<=$damXmax)"
+    foreach s {0.0 0.01 0.03 0.1 0.3 0.6 1.0} {
+        sel z=$s*$n+1.0e-30*(1.0+x*x) name=TrapN
+        SaveState
+        if {[catch {device}]} { RestoreState; puts "DAMAGE solve failed at scale $s"; return 0 }
     }
-    close $f
-    if {![Ramp G $gPrev 0.0 0.1]} { error "gate return failed" }
-    if {![Ramp D $Vd_lin 0.0 0.05]} { error "drain return failed" }
+    sel z=TrapN
+    puts $sf "$tg damPeak=$damPeak damM=$damM damEref=$damEref damXmax=$damXmax peakN(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakN(AlGaN)=[lindex [peak AlGaN] 1]"
+    CaptureTraps
+    set c [open ${tg}_cuts.txt w]
+    foreach fld {Estress TrapN IonAcceptor} {
+        sel z=$fld
+        foreach xc {0.001 0.016} { puts $c "# $fld along y at x = $xc"; puts $c [print1d xv=$xc] }
+    }
+    close $c
+    return 1
 }
 
-#---------------- output at Vg_out ----------------
-if {$doIdVd} {
-    if {![Ramp G 0.0 $Vg_out 0.1]} { error "Vg_out ramp failed" }
-    if {$useTraps} { CaptureTraps }
-    set f [open ${tag}_IdVd.csv w]
-    puts $f "0.0, [IdDev], [IdExt 0.0 $Vg_out], 300.0"
-    set dPrev 0.0
-    set n [expr {int(round($Vd_max / $Vd_step))}]
-    for {set i 1} {$i <= $n} {incr i} {
-        set d [expr {$i * $Vd_step}]
-        if {![Reach D $dPrev $d $retryDepth 1]} { puts "IDVD GAVE UP at Vd=$d"; break }
-        set dPrev $d
-        puts $f "$d, [IdDev], [IdExt $d $Vg_out], $te"
-        flush $f
-        puts "IDVD Vd=$d Id=[IdDev] peakTe=$te"
+proc Measure {tg} {
+    global doIdVg doIdVd Vd_lin Vg_hi Vg_lo Vg_step Vg_out Vd_max Vd_step retryDepth useTraps te
+    if {$doIdVg} {
+        if {![Ramp D 0.0 $Vd_lin 0.05]} { return 0 }
+        if {![Ramp G 0.0 $Vg_hi 0.1]} { return 0 }
+        if {$useTraps} { CaptureTraps }
+        set f [open ${tg}_IdVg.csv w]
+        set gPrev $Vg_hi
+        set n [expr {int(round(($Vg_hi - $Vg_lo) / $Vg_step))}]
+        for {set i 0} {$i <= $n} {incr i} {
+            set g [expr {$Vg_hi - $i * $Vg_step}]
+            if {$i > 0 && ![Reach G $gPrev $g $retryDepth 0]} { puts "IDVG GAVE UP at Vg=$g"; break }
+            if {$useTraps} { CaptureTraps }
+            set gPrev $g
+            puts $f "$g, [IdDev], [IdExt $Vd_lin $g]"
+            flush $f
+            puts "IDVG $tg Vg=$g Id=[IdDev]"
+        }
+        close $f
+        if {![Ramp G $gPrev 0.0 0.1]} { return 0 }
+        if {![Ramp D $Vd_lin 0.0 0.05]} { return 0 }
     }
-    close $f
+    if {$doIdVd} {
+        if {![Ramp G 0.0 $Vg_out 0.1]} { return 0 }
+        if {$useTraps} { CaptureTraps }
+        set f [open ${tg}_IdVd.csv w]
+        puts $f "0.0, [IdDev], [IdExt 0.0 $Vg_out], 300.0"
+        set dPrev 0.0
+        set n [expr {int(round($Vd_max / $Vd_step))}]
+        for {set i 1} {$i <= $n} {incr i} {
+            set d [expr {$i * $Vd_step}]
+            if {![Reach D $dPrev $d $retryDepth 1]} { puts "IDVD GAVE UP at Vd=$d"; break }
+            set dPrev $d
+            puts $f "$d, [IdDev], [IdExt $d $Vg_out], $te"
+            flush $f
+            puts "IDVD $tg Vd=$d Id=[IdDev] peakTe=$te"
+        }
+        close $f
+        # back to rest for the next damage setting
+        if {![Ramp D $dPrev 0.0 0.5]} { return 0 }
+        if {![Ramp G $Vg_out 0.0 0.1]} { return 0 }
+    }
+    return 1
+}
+
+if {$useTraps && [llength $damList] > 0} {
+    foreach e $damList {
+        foreach {k v} [lindex $e 1] { set $k $v }
+        set tg ${tag}_[lindex $e 0]
+        if {![DamageIn $tg]} { puts $sf "$tg damage failed"; flush $sf; continue }
+        flush $sf
+        if {![Measure $tg]} { puts $sf "$tg measurement failed"; flush $sf; break }
+        puts $sf "$tg measured"; flush $sf
+        # traps out again before the next setting
+        ThawTraps
+        sel z=1.0e-30*(1.0+x*x) name=TrapN
+        SaveState
+        if {[catch {device}]} { RestoreState; puts $sf "reset solve failed"; break }
+    }
+} else {
+    if {$useTraps && ![DamageIn $tag]} { error "damage" }
+    Measure $tag
 }
 puts $sf "done"
 close $sf
