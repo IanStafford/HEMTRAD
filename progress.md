@@ -1333,3 +1333,15 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Next (Ian's call):
   - the model may need a field-triggered damage/trapping mechanism (the measured damage was bias-dependent and event-like); or
   - test traps under the field plate / drain-side FP edge where HighK lowers the field (y ≈ 0.7–1.0 µm at 10–20 V).
+
+## 2026-10-23 — Goal (Ian): model that reproduces the measured pre- and post-irradiation behaviour
+- Ian set the goal; work runs independently in worktree `~/HEMTRAD-wt/rad-model` (branch `explore/rad-model`, HPG `…/HEMTRAD-wt/rad-model`). HPG jobs are allowed; notify Ian above 50 tasks.
+- **Pre-irradiation:** the trap-free deck has about 2× the measured on-resistance (Vd 0.1, Vg +1: 21 mA/mm model vs ~42 measured; Vg +1, Vd 1 V: 187 vs ~375). The measured Vth (≈ −2.96 V at Vd 0.1) is close. The transfer measurement is at Vd ≈ 0.1 V, not 10 V. Recalibrating on the branch.
+- **Branch changes:**
+  - mobility levers `mobMumax`/`mobNref`/`mobVsat` (GaN.tcl);
+  - `trapShape field` (density from the data field `TrapN`);
+  - driver `drivers/radIV.tcl`: pre/post transfer at Vd 0.1 and Id–Vd at Vg +1. Post adds a fixed surface charge (`surfCharge`), traps generated from the lateral field at the irradiation bias (Vg −10, Vd 28: `damPeak`·(E/`damEref`)^`damM`), and an optional lumped gate–drain leakage `Rgd`;
+  - generic `sweeps/radIV.slurm`; `analysis/radCompare.py`.
+- **Job 47311016 (10 tasks, `params_radCal1.txt`):**
+  - polCharge 7/8/9/10e12 × mobNref 1e17/1e18 (phiB pre-shifted ~0.43 V per 1e12);
+  - plus 2 post-damage smoke tests (HighK/SiN).
