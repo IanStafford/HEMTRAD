@@ -1,7 +1,7 @@
 """Compare radIV runs (drivers/radIV.tcl, sweeps/radIV.slurm) with the measured
 pre/post-irradiation set.
 
-usage: python3 analysis/radCompare.py <run_dir> [targets.csv] [--plot out.png] [--ref LABEL]
+usage: python3 analysis/radCompare.py <run_or_task_dir>... [--targets t.csv] [--plot out.png] [--ref LABEL]
   targets.csv: digitized measured curves (curve,x,y; kept outside git, default
   ~/HEMTRAD/data/rad_y2/targets.csv).
 Per task: Vth (linear extrapolation at max gm, Vd 0.1), gm max (mS/mm), Id at
@@ -23,8 +23,9 @@ if "--plot" in args:
     i = args.index("--plot"); plot = args[i + 1]; del args[i:i + 2]
 if "--ref" in args:
     i = args.index("--ref"); ref = args[i + 1]; del args[i:i + 2]
-RUN = args[0]
-TGT = args[1] if len(args) > 1 else os.path.expanduser("~/HEMTRAD/data/rad_y2/targets.csv")
+TGT = os.path.expanduser("~/HEMTRAD/data/rad_y2/targets.csv")
+if "--targets" in args:
+    i = args.index("--targets"); TGT = args[i + 1]; del args[i:i + 2]
 VG_PTS = (-2.6, -2.0, -1.4)
 VD_PTS = (1.0, 2.0, 4.0, 6.0, 10.0)
 
@@ -71,7 +72,12 @@ def metrics(t):
 
 
 T = load_targets(TGT)
-tasks = sorted(glob.glob(f"{RUN}/task_*"), key=lambda s: int(s.rsplit("_", 1)[1]))
+tasks = []
+for a in args:
+    if os.path.exists(os.path.join(a, "params.json")):
+        tasks.append(a)
+    else:
+        tasks += sorted(glob.glob(f"{a}/task_*"), key=lambda s: int(s.rsplit("_", 1)[1]))
 res = []
 for t in tasks:
     p = json.load(open(os.path.join(t, "params.json")))
