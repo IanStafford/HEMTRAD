@@ -17,7 +17,8 @@
 # hot-electron FillStep at each Id-Vd point.
 # damList (optional): several damage settings after ONE stress solve, e.g.
 #   set damList {{d1 {damPeak 1e17 damM 2}} {d2 {damPeak 3e17 damM 3}}}
-# each entry {suffix {lever value ...}} (damPeak/damM/damEref/damMax/damXmax/Rgd/hotTau);
+# each entry {suffix {lever value ...}} (damPeak/damM/damEref/damMax/damXmax/damY*/damIns*/Rgd/hotTau);
+# (insTrapSign must be set before the model is sourced, i.e. as a task lever, not in damList)
 # outputs get the prefix ${tag}_<suffix>. Traps are reset (ThawTraps) between entries.
 # Outputs (prefix $tag): <tag>_IdVg.csv (Vg, Id_dev, Id_ext mA/mm),
 # <tag>_IdVd.csv (Vd, Id_dev, Id_ext, peak Te), <tag>_cuts.txt (Estress, TrapN,
@@ -51,6 +52,18 @@ if {![info exists damMax]}    { set damMax 1.0e19 }
 if {![info exists damXmax]}   { set damXmax 0.05 }    ;# um below the AlGaN top
 if {![info exists damYmin]}   { set damYmin -1.0e3 }  ;# um; damage window along y (diagnostic,
 if {![info exists damYmax]}   { set damYmax 1.0e3 }   ;#   default = whole device)
+# passivation damage (branch, 2026-10-24): fixed charge in the insulator layer
+# damInsXmin <= x < 0 (um above the AlGaN top), density from the field there at the
+# stress bias: N = min(damMax, damInsPeak*(E/damInsEref)^damInsM), charge sign
+# insTrapSign (-1 = trapped electrons). damInsField / damField pick the stress field:
+# lat = |dpsi/dy| (default for the semiconductor part, as before), tot = |grad psi|.
+if {![info exists damInsPeak]}  { set damInsPeak 0.0 }  ;# 0 = none (old behaviour)
+if {![info exists damInsEref]}  { set damInsEref 1.0e6 }
+if {![info exists damInsM]}     { set damInsM 2.0 }
+if {![info exists damInsXmin]}  { set damInsXmin -0.05 } ;# um; -0.05 = the 50 nm SiN under the HfO2
+if {![info exists damField]}    { set damField lat }
+if {![info exists damInsField]} { set damInsField tot }
+if {$damInsPeak > 0.0 && ![info exists insTrapSign]} { set insTrapSign -1 }
 if {![info exists Rgd]}       { set Rgd 0.0 }
 if {![info exists damList]}   { set damList {} }
 # trap / capture (sensitivity baseline)
@@ -61,7 +74,7 @@ if {![info exists hotTau]}    { set hotTau 1.0e-14 }
 if {![info exists fillIters]} { set fillIters 4 }
 if {![info exists fillRelax]} { set fillRelax 0.5 }
 
-set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || [llength $damList] > 0)}]
+set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || $damInsPeak > 0.0 || [llength $damList] > 0)}]
 set trapEn $useTraps
 set trapShape field
 
@@ -141,6 +154,7 @@ if {$radState eq "post"} {
         }
         if {$dS < $Vd_stressMin} { error "stress drain ramp failed at $dS" }
         sel z=abs(dot(DevPsi,y*1e-4)) name=Estress
+        sel z=sqrt(dot(DevPsi,DevPsi)) name=EstressT
         puts $sf "stress Vg=$Vg_stress Vd=$dS (target $Vd_stress) peakElat(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakElat(AlGaN)=[lindex [peak AlGaN] 1]"
         flush $sf
         if {![Ramp D $dS 0.0 1.0]} { error "stress drain ramp-down failed" }
@@ -152,21 +166,34 @@ flush $sf
 # Switch the damage in at rest (Vg = Vd = 0) for the present damage levers.
 proc DamageIn {tg} {
     global damPeak damM damEref damMax damXmax damYmin damYmax sf
+    global damInsPeak damInsM damInsEref damInsXmin damField damInsField
     ThawTraps
-    set n "($damPeak*exp($damM*log(Estress/$damEref+1.0e-30)))"
+    set fld [expr {$damField eq "tot" ? "EstressT" : "Estress"}]
+    set n "($damPeak*exp($damM*log($fld/$damEref+1.0e-30)))"
     set n "(0.5*($n+$damMax-abs($n-$damMax)))*(x>=0.0)*(x<=$damXmax)*(y>=$damYmin)*(y<=$damYmax)"
+    if {$damInsPeak > 0.0} {
+        set fi [expr {$damInsField eq "lat" ? "Estress" : "EstressT"}]
+        set ni "($damInsPeak*exp($damInsM*log($fi/$damInsEref+1.0e-30)))"
+        set n "$n+(0.5*($ni+$damMax-abs($ni-$damMax)))*(x<0.0)*(x>=$damInsXmin)*(y>=$damYmin)*(y<=$damYmax)"
+    }
     foreach s {0.0 0.01 0.03 0.1 0.3 0.6 1.0} {
-        sel z=$s*$n+1.0e-30*(1.0+x*x) name=TrapN
+        sel z=$s*($n)+1.0e-30*(1.0+x*x) name=TrapN
         SaveState
         if {[catch {device}]} { RestoreState; puts "DAMAGE solve failed at scale $s"; return 0 }
     }
     sel z=TrapN
-    puts $sf "$tg damPeak=$damPeak damM=$damM damEref=$damEref damXmax=$damXmax damY=$damYmin..$damYmax peakN(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakN(AlGaN)=[lindex [peak AlGaN] 1]"
+    puts $sf "$tg damPeak=$damPeak damM=$damM damEref=$damEref damField=$damField damXmax=$damXmax damY=$damYmin..$damYmax peakN(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakN(AlGaN)=[lindex [peak AlGaN] 1]"
+    if {$damInsPeak > 0.0} {
+        puts $sf "$tg damInsPeak=$damInsPeak damInsM=$damInsM damInsEref=$damInsEref damInsField=$damInsField damInsXmin=$damInsXmin insTrapSign=$::insTrapSign peakN(Nitride)=[lindex [peak Nitride] 1] at [lrange [peak Nitride] 2 3]"
+    }
     CaptureTraps
     set c [open ${tg}_cuts.txt w]
-    foreach fld {Estress TrapN IonAcceptor} {
+    foreach fld {Estress EstressT TrapN IonAcceptor} {
         sel z=$fld
-        foreach xc {0.001 0.016} { puts $c "# $fld along y at x = $xc"; puts $c [print1d xv=$xc] }
+        foreach xc {-0.04 -0.01 0.001 0.016} {
+            if {$xc < 0.0 && $fld eq "IonAcceptor"} { continue }
+            puts $c "# $fld along y at x = $xc"; puts $c [print1d xv=$xc]
+        }
     }
     close $c
     return 1
