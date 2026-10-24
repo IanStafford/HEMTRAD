@@ -1392,3 +1392,16 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Next (needs Ian):
   - (a) run the y-window diagnostic: damage only near the drain-side FP edge vs only in the drift region, to see which location gives the late, deck-dependent drop;
   - (b) move to a dielectric/interface mechanism (charge/traps at the SiN interface), as noted 10-23.
+
+## 2026-10-24 — rad-model: y-window (a) and passivation-charge (b) arrays submitted
+- Ian: "try both" (a) and (b) and keep iterating on the goal.
+- Stress-field map (D2, top 50 nm, Vd 17): SiN > HighK only at y 0.35–0.65 µm (up to 2× at 0.5); HighK 5–10× higher from the FP edge (0.7) to the drain.
+- Branch `explore/rad-model` 3fa478d:
+  - `radIV.tcl` `damYmin/damYmax` committed;
+  - new passivation-damage levers `damInsPeak/damInsM/damInsEref/damInsXmin`: fixed charge (`insTrapSign`, default −1 when used) in the 50 nm SiN under the HfO2, density ∝ (|E| in the dielectric at stress)^m;
+  - `damField lat|tot`; cuts now include x −0.04/−0.01. Defaults leave the old behaviour.
+  - Local smoke test (stress Vd 4) OK.
+- **Submitted:**
+  - **radWin = job 47458256** (16 tasks): both decks × windows y 0.125–0.30 / 0.30–0.65 / 0.65–1.0 / 1.0–3.2 × {field-weighted m4 3e18, uniform 5e17};
+  - **radIns = job 47458257** (14 tasks): both decks × nitride charge {1e17, 1e18} × m {2, 4} at 1 MV/cm, + nitride charge 1e17 m2 combined with semiconductor m4 1e18, + D2 m6 3e18 at hotEb 1.5 / 2.0 (does a higher capture barrier move the onset from ~1 V toward the measured 4 V?).
+- Base levers as D2 (round-3 calibration, surfCharge −1.2e12, trapLevel 0.30). Expect ~3–4 h per task.
