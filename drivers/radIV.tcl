@@ -49,6 +49,8 @@ if {![info exists damEref]}   { set damEref 1.0e6 }   ;# V/cm
 if {![info exists damM]}      { set damM 2.0 }
 if {![info exists damMax]}    { set damMax 1.0e19 }
 if {![info exists damXmax]}   { set damXmax 0.05 }    ;# um below the AlGaN top
+if {![info exists damYmin]}   { set damYmin -1.0e3 }  ;# um; damage window along y (diagnostic,
+if {![info exists damYmax]}   { set damYmax 1.0e3 }   ;#   default = whole device)
 if {![info exists Rgd]}       { set Rgd 0.0 }
 if {![info exists damList]}   { set damList {} }
 # trap / capture (sensitivity baseline)
@@ -149,17 +151,17 @@ flush $sf
 
 # Switch the damage in at rest (Vg = Vd = 0) for the present damage levers.
 proc DamageIn {tg} {
-    global damPeak damM damEref damMax damXmax sf
+    global damPeak damM damEref damMax damXmax damYmin damYmax sf
     ThawTraps
     set n "($damPeak*exp($damM*log(Estress/$damEref+1.0e-30)))"
-    set n "(0.5*($n+$damMax-abs($n-$damMax)))*(x>=0.0)*(x<=$damXmax)"
+    set n "(0.5*($n+$damMax-abs($n-$damMax)))*(x>=0.0)*(x<=$damXmax)*(y>=$damYmin)*(y<=$damYmax)"
     foreach s {0.0 0.01 0.03 0.1 0.3 0.6 1.0} {
         sel z=$s*$n+1.0e-30*(1.0+x*x) name=TrapN
         SaveState
         if {[catch {device}]} { RestoreState; puts "DAMAGE solve failed at scale $s"; return 0 }
     }
     sel z=TrapN
-    puts $sf "$tg damPeak=$damPeak damM=$damM damEref=$damEref damXmax=$damXmax peakN(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakN(AlGaN)=[lindex [peak AlGaN] 1]"
+    puts $sf "$tg damPeak=$damPeak damM=$damM damEref=$damEref damXmax=$damXmax damY=$damYmin..$damYmax peakN(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakN(AlGaN)=[lindex [peak AlGaN] 1]"
     CaptureTraps
     set c [open ${tg}_cuts.txt w]
     foreach fld {Estress TrapN IonAcceptor} {
