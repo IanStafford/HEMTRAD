@@ -1405,3 +1405,24 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - **radWin = job 47458256** (16 tasks): both decks × windows y 0.125–0.30 / 0.30–0.65 / 0.65–1.0 / 1.0–3.2 × {field-weighted m4 3e18, uniform 5e17};
   - **radIns = job 47458257** (14 tasks): both decks × nitride charge {1e17, 1e18} × m {2, 4} at 1 MV/cm, + nitride charge 1e17 m2 combined with semiconductor m4 1e18, + D2 m6 3e18 at hotEb 1.5 / 2.0 (does a higher capture barrier move the onset from ~1 V toward the measured 4 V?).
 - Base levers as D2 (round-3 calibration, surfCharge −1.2e12, trapLevel 0.30). Expect ~3–4 h per task.
+
+## 2026-10-24 (evening) — rad-model: radWin (47458256) and radIns (47458257) analysed; radPost submitted
+- All 30 tasks COMPLETED. radIns tasks 3 and 10 (nitride charge 1e18 m4) didn't produce an Id–Vd (gate ramp / IdVg GAVE UP); task 9 had an IdVg GAVE UP. No cores.
+- Ratios to the round-3 pre are Id(Vg +1) at Vd 1 / 4 / 10 V; low = Id(Vg −1.4, Vd 0.1).
+- **radWin (y-window damage):**
+  - **w1 (gate edge, y 0.125–0.30), field-weighted:** early collapse from ~1.5 V in *both* decks (HighK 0.79 / 0.47 / 0.43, SiN 0.78 / 0.41 / 0.38). This is the deck-independent part that D2 showed. It isn't seen in the measurement, so the gate-edge damage must stay small.
+  - **w2 (y 0.30–0.65), field-weighted:**
+    - SiN 0.83 / 0.80 / 0.74: flat to ~3 V, then a drop starting at **~4 V**.
+    - HighK 0.86 / 0.86 / 0.88: no drop.
+    - This is the first config with the measured *signature* (late onset, SiN only). Magnitude ~3× too small.
+  - **w3/w4 field-weighted:** ~0.87 flat in both.
+  - **Uniform damage (all windows):** uniform low-field loss (0.73–0.86) with no collapse. It's the right kind of term for the HPD-like Ron loss, but doesn't separate the decks.
+- **radIns (fixed charge in the bottom 50 nm SiN from the dielectric field):**
+  - uniform losses, nearly identical in HighK and SiN (p1e17 m4: 0.72 vs 0.71 at 10 V; p1e18 m2: 0.13 vs 0.10). Doesn't separate the decks; dropped.
+  - Higher hotEb (1.5 / 2.0) with D2 m6: collapse moves *earlier* (≤ 2 V), not later; dropped.
+- Reviewed 3fa478d (damIns*, insTrapSign, damField, EstressT, extra cuts): defaults keep the old behaviour; no issues found.
+- **Submitted radPost = job 47523721** (10 tasks, `sweeps/params_radPost.txt`):
+  - both decks × field-weighted damage at y ≥ 0.30 × {m4 1e19, m4 3e19, m6 1e19, m6 3e19, m4 1e19 at trapLevel 0.45}, damMax 1e20;
+  - other levers as D2.
+  - Goal: scale the w2 SiN drop to the measured ~3× while HighK stays flat.
+- The y ≥ 0.30 restriction is a fitting choice (it excludes gate-edge damage that the data don't show). It needs a physical reason before it goes in the KB (candidate: at the real stress Vd 28 V the peak moves to the FP-side edge; our stress solve stops at 17 V).
