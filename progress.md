@@ -1369,3 +1369,26 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Correction (same day): the *peak* stress field is identical in the two decks, but its *distribution* is not. At x = 0.001 µm, y = 0.5 µm the lateral field is 5.5e5 V/cm in SiN vs 2.9e5 in HighK, and in the drift region (y 0.8–2.0 µm) HighK holds 4–20× more. So SiN concentrates the field and HighK spreads it, which is what the hypothesis needs. Field-weighted damage can still separate the decks, but only for steep damM (m4 configs, still pending in D1). Watching 47327524 to completion (round-3 watcher stopped; task 0 pre_sin isn't needed).
 - 19:40 HPG master had dropped; reconnected once via Duo (approved).
 - D2 submitted: job 47356193, 8 tasks (`sweeps/params_radDam2.txt` on explore/rad-model), one damage config per task. Settings: HighK/SiN × {m4 1e18, m4 3e18, m4 1e19, m6 3e18}, damEref 5e5, surfCharge −1.2e12, trapLevel 0.30, round-3 calibration (vsat 1.75e7, mumax 2100). D1 (47327524) keeps running as a backup. Waiting on both.
+
+## 2026-10-24 — rad-model: D1 (47327524) and D2 (47356193) done; field-weighted damage does not separate the decks
+- HPG master was down at session start (no tmux server on the workstation); one Duo reconnect via `bin/hpg_reconnect.sh` worked (master in tmux `hpg-master`).
+- All tasks COMPLETED: D1 6/6, D2 8/8, round 3 4/4. No cores and clean .err files. The only `GAVE UP`s are D1 tasks 2–3 (Id–Vd at Vd 9.25 / 9.5 V in one config each). Every stress ramp stops at Vd 17 V (target 28).
+- rsynced to `results/20261023_radDam{1,2}`, `…_radCal3` in the worktree. Figures: `figures/radDam{1,2}_compare.png` (worktree, not committed).
+- Reference pre (round 3, p10_vs1.75_mu2100): Id(Vg −1.4, Vd 0.1) 39.5, Id(Vg +1, 10 V) 1029 mA/mm.
+- **D1:** no collapse in any task. The best case is −1% at 10 V; nb shows only the surfCharge shift.
+- **D2** (Id at Vg −1.4, Vd 0.1 / Id at Vg +1, 10 V, mA/mm; HighK vs SiN):
+
+  | Config | HighK | SiN |
+  |---|---|---|
+  | m4 1e18 | 33.3 / 858 | 32.9 / 847 |
+  | m4 3e18 | 29.4 / 437 | 27.8 / 389 |
+  | m6 3e18 | 27.4 / 281 | 25.3 / 218 |
+  | m4 1e19 | Vth +1 V, Id ≈ 0 | same |
+
+- So steeper damM separates the decks by only 1.1–1.3×. Measured: HPD biased is unchanged at 10 V (970) while SiN falls ~3× (320).
+- Shape is also wrong. In the model, Id dips right after 1–1.5 V and then stays flat, so the drop is uniform in Vd. Measured SiN holds until 4 V and then drops in steps.
+- The low-field loss (−16 to −36%) has the right size for both devices (meas −32% HPD, −20% SiN), but it does not separate the decks.
+- The worktree has an **uncommitted** `damYmin/damYmax` damage window in `drivers/radIV.tcl` from the previous session: a diagnostic to localise the damage along y. It is not run or committed yet.
+- Next (needs Ian):
+  - (a) run the y-window diagnostic: damage only near the drain-side FP edge vs only in the drift region, to see which location gives the late, deck-dependent drop;
+  - (b) move to a dielectric/interface mechanism (charge/traps at the SiN interface), as noted 10-23.
