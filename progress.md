@@ -1426,3 +1426,14 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - other levers as D2.
   - Goal: scale the w2 SiN drop to the measured ~3× while HighK stays flat.
 - The y ≥ 0.30 restriction is a fitting choice (it excludes gate-edge damage that the data don't show). It needs a physical reason before it goes in the KB (candidate: at the real stress Vd 28 V the peak moves to the FP-side edge; our stress solve stops at 17 V).
+
+## 2026-10-24 20:15 — rad-model: radPost (47523721) partial; radFine submitted
+- radPost: 7/10 done (tasks 0, 6, 7, 8 still running; task 6 has reached Vd 4.5). Damage is field-weighted at y ≥ 0.30, damEref 5e5. Ratios to the round-3 pre, Id(Vg +1) at Vd 1 / 4 / 10 V:
+  - **HighK stays flat in every config:** m4 1e19 0.84 / 0.84 / – (Vd 9); m6 1e19 0.86 / 0.86 / 0.88; m6 3e19 0.85 / 0.85 / 0.87; L0.45 0.83 / 0.83 / 0.85. The one exception is m4 3e19, which droops to 0.67.
+  - **SiN collapses fully** from ~1.5 V at m4 1e19 (0.49 at 1 V, ≈ 0 from 2 V) and at m4 1e19 L0.45.
+  - So the deck separation is now large and in the right direction. SiN is overdamaged: radWin w2 at 3e18 gave 0.74 at 10 V with the onset ~4 V.
+- **Submitted radFine = job 47554718** (8 tasks, `params_radFine.txt`): both decks × m4 damPeak {4, 5, 6, 7.5}e18, y ≥ 0.30, otherwise as radPost. Brackets the SiN drop to the measured ~3× at 10 V with onset ~4 V.
+- Still open after that:
+  - HPD low-field loss (model −16% from surfCharge alone, measured larger) → a uniform damage term;
+  - gate–drain leakage Rgd;
+  - physical justification for y ≥ 0.30.
