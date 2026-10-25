@@ -64,6 +64,13 @@ if {![info exists damInsXmin]}  { set damInsXmin -0.05 } ;# um; -0.05 = the 50 n
 if {![info exists damField]}    { set damField lat }
 if {![info exists damInsField]} { set damInsField tot }
 if {$damInsPeak > 0.0 && ![info exists insTrapSign]} { set insTrapSign -1 }
+# second semiconductor damage site (branch, 2026-10-25): same law and depth as the
+# first, own peak/exponent/y-window; e.g. a second ion-strike site farther toward
+# the drain. dam2Peak 0 = none (old behaviour).
+if {![info exists dam2Peak]}  { set dam2Peak 0.0 }
+if {![info exists dam2M]}     { set dam2M 0.0 }
+if {![info exists dam2Ymin]}  { set dam2Ymin 0.65 }
+if {![info exists dam2Ymax]}  { set dam2Ymax 1.0 }
 if {![info exists Rgd]}       { set Rgd 0.0 }
 if {![info exists damList]}   { set damList {} }
 # trap / capture (sensitivity baseline)
@@ -74,7 +81,7 @@ if {![info exists hotTau]}    { set hotTau 1.0e-14 }
 if {![info exists fillIters]} { set fillIters 4 }
 if {![info exists fillRelax]} { set fillRelax 0.5 }
 
-set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || $damInsPeak > 0.0 || [llength $damList] > 0)}]
+set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || $damInsPeak > 0.0 || $dam2Peak > 0.0 || [llength $damList] > 0)}]
 set trapEn $useTraps
 set trapShape field
 
@@ -167,10 +174,15 @@ flush $sf
 proc DamageIn {tg} {
     global damPeak damM damEref damMax damXmax damYmin damYmax sf
     global damInsPeak damInsM damInsEref damInsXmin damField damInsField
+    global dam2Peak dam2M dam2Ymin dam2Ymax
     ThawTraps
     set fld [expr {$damField eq "tot" ? "EstressT" : "Estress"}]
     set n "($damPeak*exp($damM*log($fld/$damEref+1.0e-30)))"
     set n "(0.5*($n+$damMax-abs($n-$damMax)))*(x>=0.0)*(x<=$damXmax)*(y>=$damYmin)*(y<=$damYmax)"
+    if {$dam2Peak > 0.0} {
+        set n2 "($dam2Peak*exp($dam2M*log($fld/$damEref+1.0e-30)))"
+        set n "$n+(0.5*($n2+$damMax-abs($n2-$damMax)))*(x>=0.0)*(x<=$damXmax)*(y>=$dam2Ymin)*(y<=$dam2Ymax)"
+    }
     if {$damInsPeak > 0.0} {
         set fi [expr {$damInsField eq "lat" ? "Estress" : "EstressT"}]
         set ni "($damInsPeak*exp($damInsM*log($fi/$damInsEref+1.0e-30)))"
@@ -183,6 +195,9 @@ proc DamageIn {tg} {
     }
     sel z=TrapN
     puts $sf "$tg damPeak=$damPeak damM=$damM damEref=$damEref damField=$damField damXmax=$damXmax damY=$damYmin..$damYmax peakN(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakN(AlGaN)=[lindex [peak AlGaN] 1]"
+    if {$dam2Peak > 0.0} {
+        puts $sf "$tg dam2Peak=$dam2Peak dam2M=$dam2M dam2Y=$dam2Ymin..$dam2Ymax"
+    }
     if {$damInsPeak > 0.0} {
         puts $sf "$tg damInsPeak=$damInsPeak damInsM=$damInsM damInsEref=$damInsEref damInsField=$damInsField damInsXmin=$damInsXmin insTrapSign=$::insTrapSign peakN(Nitride)=[lindex [peak Nitride] 1] at [lrange [peak Nitride] 2 3]"
     }

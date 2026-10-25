@@ -4,9 +4,11 @@ usage: python3 analysis/radFit.py <pre_task> <post_task>:<curve> ... [--targets 
   pre_task   radIV task dir of the pre-irradiation model (reference for ratios)
   post_task  radIV task dir of a post model; curve = measured curve name in targets.csv
              (e.g. IdVd_b_SiN); ratios are taken to the measured IdVd_pre_SiN.
-Adds a lumped series access resistance R (ohm mm) to the post model,
-Vd_ext = Vd + Id*R (Id in A/mm), scans R and reports the R that minimises the rms
-of log(model post/pre) - log(measured post/pre) over Vd 0.5-10 V.
+Adds lumped post-irradiation drain-access elements to the post model,
+Vd_ext = Vd + V0*(1 - exp(-Id/Ic)) + Id*R  (Id in A/mm, Ic = 50 mA/mm):
+a series resistance R (ohm mm) and a rectifying contact-like offset V0 (V) that
+saturates above Ic. Scans (V0, R) and reports the pair that minimises the rms of
+log(model post/pre) - log(measured post/pre) over Vd 0.5-10 V.
 """
 import csv
 import glob
@@ -23,7 +25,9 @@ if "--targets" in args:
 if "--plot" in args:
     i = args.index("--plot"); plot = args[i + 1]; del args[i:i + 2]
 VD = np.linspace(0.5, 10.0, 39)
-RS = np.arange(0.0, 2.01, 0.05)
+RS = np.arange(0.0, 1.01, 0.05)
+V0S = np.arange(0.0, 1.01, 0.05)
+IC = 0.05
 
 
 def targets(path):
@@ -39,8 +43,8 @@ def idvd(task):
     return d[:, 0], d[:, 2]
 
 
-def with_r(v, i, r):
-    return v + i * 1e-3 * r, i
+def with_r(v, i, r, v0=0.0):
+    return v + v0 * (1.0 - np.exp(-i * 1e-3 / IC)) + i * 1e-3 * r, i
 
 
 T = targets(TGT)
@@ -53,16 +57,17 @@ for a in args[1:]:
     meas = np.interp(VD, *T[curve].T) / np.interp(VD, *mpre.T)
     ok = VD <= v[-1]
     best = None
-    for r in RS:
-        x, y = with_r(v, i, r)
-        mod = np.interp(VD[ok], x, y) / np.interp(VD[ok], pv, pi)
-        rms = float(np.sqrt(np.mean((np.log(mod) - np.log(meas[ok])) ** 2)))
-        if best is None or rms < best[1]:
-            best = (r, rms, mod)
+    for v0 in V0S:
+        for r in RS:
+            x, y = with_r(v, i, r, v0)
+            mod = np.interp(VD[ok], x, y) / np.interp(VD[ok], pv, pi)
+            rms = float(np.sqrt(np.mean((np.log(mod) - np.log(meas[ok])) ** 2)))
+            if best is None or rms < best[1]:
+                best = ((v0, r), rms, mod)
     res.append((task, curve, best, meas, ok))
     pts = [1, 2, 3, 4, 6, 8, 10]
     sel = [int(np.argmin(abs(VD - p))) for p in pts]
-    print(f"{os.path.basename(task.rstrip('/'))} vs {curve}: best R {best[0]:.2f} ohm mm, rms(log) {best[1]:.3f}")
+    print(f"{os.path.basename(task.rstrip('/'))} vs {curve}: best V0 {best[0][0]:.2f} V, R {best[0][1]:.2f} ohm mm, rms(log) {best[1]:.3f}")
     print("   Vd    " + " ".join(f"{p:>5}" for p in pts))
     print("   model " + " ".join(f"{best[2][k]:5.2f}" if ok[k] else "   --" for k in sel))
     print("   meas  " + " ".join(f"{meas[k]:5.2f}" for k in sel))
@@ -71,7 +76,7 @@ if plot:
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots(figsize=(6.5, 4.2))
     for task, curve, best, meas, ok in res:
-        l, = ax.plot(VD[ok], best[2], lw=2, label=f"{os.path.basename(task)} R={best[0]:.2f}")
+        l, = ax.plot(VD[ok], best[2], lw=2, label=f"{os.path.basename(task)} V0={best[0][0]:.2f} R={best[0][1]:.2f}")
         ax.plot(VD, meas, "o", ms=4, color=l.get_color(), label=curve)
     ax.set_xlabel("Vd (V)"); ax.set_ylabel("Id post / pre at Vg +1")
     ax.grid(alpha=0.3); ax.legend(fontsize=7)
