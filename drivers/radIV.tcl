@@ -72,6 +72,8 @@ if {![info exists dam2Peak]}  { set dam2Peak 0.0 }
 if {![info exists dam2M]}     { set dam2M 0.0 }
 if {![info exists dam2Ymin]}  { set dam2Ymin 0.65 }
 if {![info exists dam2Ymax]}  { set dam2Ymax 1.0 }
+if {![info exists dam2Field]} { set dam2Field "" }   ;# "" = same field/Eref as the first site
+if {![info exists dam2Eref]}  { set dam2Eref "" }
 if {![info exists Rgd]}       { set Rgd 0.0 }
 if {![info exists damList]}   { set damList {} }
 # trap / capture (sensitivity baseline)
@@ -181,13 +183,16 @@ flush $sf
 proc DamageIn {tg} {
     global damPeak damM damEref damMax damXmax damYmin damYmax sf
     global damInsPeak damInsM damInsEref damInsXmin damField damInsField
-    global dam2Peak dam2M dam2Ymin dam2Ymax
+    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref
     ThawTraps
     set fld [expr {$damField eq "tot" ? "EstressT" : ($damField eq "ne" ? "EstressNE" : "Estress")}]
     set n "($damPeak*exp($damM*log($fld/$damEref+1.0e-30)))"
     set n "(0.5*($n+$damMax-abs($n-$damMax)))*(x>=0.0)*(x<=$damXmax)*(y>=$damYmin)*(y<=$damYmax)"
     if {$dam2Peak > 0.0} {
-        set n2 "($dam2Peak*exp($dam2M*log($fld/$damEref+1.0e-30)))"
+        set f2 $fld
+        if {$dam2Field ne ""} { set f2 [expr {$dam2Field eq "tot" ? "EstressT" : ($dam2Field eq "ne" ? "EstressNE" : "Estress")}] }
+        set e2 [expr {$dam2Eref eq "" ? $damEref : $dam2Eref}]
+        set n2 "($dam2Peak*exp($dam2M*log($f2/$e2+1.0e-30)))"
         set n "$n+(0.5*($n2+$damMax-abs($n2-$damMax)))*(x>=0.0)*(x<=$damXmax)*(y>=$dam2Ymin)*(y<=$dam2Ymax)"
     }
     if {$damInsPeak > 0.0} {
@@ -203,7 +208,7 @@ proc DamageIn {tg} {
     sel z=TrapN
     puts $sf "$tg damPeak=$damPeak damM=$damM damEref=$damEref damField=$damField damXmax=$damXmax damY=$damYmin..$damYmax peakN(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakN(AlGaN)=[lindex [peak AlGaN] 1]"
     if {$dam2Peak > 0.0} {
-        puts $sf "$tg dam2Peak=$dam2Peak dam2M=$dam2M dam2Y=$dam2Ymin..$dam2Ymax"
+        puts $sf "$tg dam2Peak=$dam2Peak dam2M=$dam2M dam2Field=$dam2Field dam2Eref=$dam2Eref dam2Y=$dam2Ymin..$dam2Ymax"
     }
     if {$damInsPeak > 0.0} {
         puts $sf "$tg damInsPeak=$damInsPeak damInsM=$damInsM damInsEref=$damInsEref damInsField=$damInsField damInsXmin=$damInsXmin insTrapSign=$::insTrapSign peakN(Nitride)=[lindex [peak Nitride] 1] at [lrange [peak Nitride] 2 3]"
