@@ -1438,3 +1438,21 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - gate–drain leakage Rgd;
   - physical justification for y ≥ 0.30.
 - 21:20: radFine 47554718 FAILED within seconds: `params_radFine.txt` wasn't on HPG. Pushes from the new tmux session were failing silently (`git-credential-libsecret` isn't installed, and the push was run with `-q 2>/dev/null`). Pushed both checkouts with `-c credential.helper='!gh auth git-credential'`, and **resubmitted radFine = job 47562303**. radPost tasks 6 and 8 are still running.
+
+## 2026-10-25 01:30 — rad-model: radFine (47562303) analysed; radFit1 submitted
+- radFine: 6/8 done; HighK 6e18 and 7.5e18 are still running, both flat so far. Damage is m4, y ≥ 0.30, surfCharge −1.2e12.
+- Model ratios to the round-3 pre, Id(Vg +1) at Vd 1 / 2 / 3 / 4 / 6 / 10 V:
+  - **HighK:** flat 0.85–0.88 at 4e18 and at 5e18.
+  - **SiN 4e18:** 0.82 / 0.81 / 0.76 / 0.67 / 0.62 / 0.63
+  - **SiN 5e18:** 0.80 / 0.78 / 0.58 / 0.55 / 0.52 / 0.52
+  - **SiN 6e18:** 0.78 / 0.61 / 0.43 / 0.41 / 0.41 / 0.44
+  - **SiN 7.5e18:** 0.74 / 0.20 / 0.20 / … / 0.28
+- **Measured ratios** (biased post / pre, from the untracked targets):
+  - SiN: rises to ~4 V, then steps down; ends ~1/3 at 10 V.
+  - HPD: a low-Vd loss that recovers fully by ~4 V.
+  - Non-biased: the same Ron-like shape, smaller.
+- **Mismatches:**
+  - (1) The model's uniform 0.85 loss (mostly surfCharge −1.2e12) is the wrong shape for HPD. The measured shape is Ron-like.
+  - (2) The SiN collapse sets in ~1 V too early, and the final level needs ~6–7e18.
+- **Post-processing test:** a lumped series access resistance (Vd_ext = Vd + Id·R) on D1 nb (surfCharge −4e11) with R = 0.5 Ω·mm gives 0.80 / 0.85 / 0.89 / 0.92 / 0.97 / 1.00. That's close to the measured HPD shape. So the plan is a small surfCharge plus a lumped access resistance R, with field damage only for the SiN collapse.
+- **Submitted radFit1 = job 47593908** (8 tasks): surfCharge −4e11 with the round-3 calibration: nb HighK/SiN + both decks × m4 {5, 5.5, 6}e18 (y ≥ 0.30). Next: fit R (and Rgd) in post-processing (new `analysis/radFit.py`). Then decide whether the onset can be moved toward 4 V.
