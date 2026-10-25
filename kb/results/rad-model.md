@@ -34,7 +34,28 @@ Result: Vth within 0.03 V, Id–Vd at Vg +1 within ~4%, gm ~25% high.
 3. **n·E damage in the gate–drain access region:** N = dam2Peak·(n·E_lat / peak) for y 0.125–3.0. This gives a Ron-like loss that is largest at low Vd and recovers toward 10 V, in both decks (radNE2: HighK 0.78 → 0.94 at 3e20).
 4. **Gate–drain leakage:** a lumped `Rgd` (post-processing in `IdExt`), not physical.
 
-Consolidated run: radFinal, job 47693156 (pre / nb / biased × both decks).
+## Consolidated run: radFinal (job 47693156, `sweeps/params_radFinal.txt`)
+All 8 tasks COMPLETED, no GAVE UP. Figure: `figures/radFinal_model.png` (model only; the overlay with measured curves is kept untracked on the workstation, `data/rad_y2/radFinal_overlay.png`). Plot script: `analysis/plot_radFinal.py`.
+
+Ratios to each deck's pre run, Id(Vg +1) at Vd 1 / 2 / 4 / 6 / 10 V, and low-field Id(Vg −1.4, Vd 0.1):
+- pre: HighK and SiN within 1% of each other, Vth −3.00 V.
+- nb (both decks): 0.96 flat, low field −4%, Vth +0.057 V.
+- **biased HighK** (damPeak 5e18, n·E 3e20): 0.77 / 0.78 / 0.81 / 0.85 / 0.93. This is a Ron-like loss that recovers toward high Vd, with no collapse. Low field −23%, Vth +0.049 V, gm −10%.
+- **biased SiN** (same levers): 0.71 / 0.72 / 0.57 / 0.55 / 0.56. Flat to ~3 V, then a collapse step at ~3.3 V. Low field −29%, Vth +0.049 V.
+- damPeak 5.5e18: HighK unchanged, SiN step to 0.50.
+
+**Qualitative comparison with the measured set** (Ian accepted a qualitative fit, 2026-10-25):
+
+| Phenomenon | Model | Measured | |
+|---|---|---|---|
+| pre transfer/output | matches | — | ✓ |
+| +Vth after irradiation, all devices | +0.05–0.06 V | larger | ✓ sign, smaller size |
+| SiN biased: collapse above the knee | one step at ~3.3 V | two steps (~4.5 and ~7 V), deeper | ✓ qualitative |
+| HPD biased: no collapse | ✓ | ✓ | ✓ |
+| biased low-field loss, recovering with Vd | ✓ | ✓ (recovers faster) | ✓ |
+| deck order of the low-field loss | SiN > HPD | HPD > SiN | ✗ |
+| nb low-Vd loss | flat −4% | SiN has a low-Vd dip | partial |
+| off-state gate–drain leakage (biased) | lumped `Rgd` only | ~linear in Vgd, steps during irradiation | lumped |
 
 ## What each run showed
 
