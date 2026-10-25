@@ -1471,3 +1471,15 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - SiN p6e18 + 3e18 at y 0.65–1.0;
   - HighK p5e18 + 3e18 in each window (does HighK stay flat with the same uniform damage?);
   - SiN p6.5e18 and p7e18 alone.
+
+## 2026-10-25 06:50 — rad-model: radFit2 (47606666) analysed; n·E damage weighting being smoke-tested
+- radFit2: 9/9 COMPLETED, no GAVE UP. Fitted with `radFit.py` (V0/R contact elements), rms(log) vs measured.
+  - **SiN:**
+    - p5e18 + 3e18 uniform at y 1.0–1.6 is best (0.246): a *second, later step* appears (0.61 at 4 V → 0.53 at 6 → 0.47 at 8 V);
+    - p5e18 + 3e18 at y 0.65–1.0: 0.260;
+    - p6.5e18 and p7e18 alone are too deep and too early (0.45, 0.61).
+    - So the damage *position* sets the onset Vd: farther toward the drain = later step.
+  - **HighK with the same uniform second site collapses too** (0.55 at 4 V for y 0.65–1.0; 0.49 at 6 V for 1.0–1.6). The measurement-time field doesn't protect HighK, so the deck difference has to come from *where the stress puts the damage*. Uniform sites are ruled out as the explanation.
+- But the lateral stress field at y 0.65–1.6 is *higher* in HighK, so lateral-field weighting can't put the drain-side damage in SiN only.
+- **New candidate:** damage ∝ n·E_lat at stress (normalised to its peak). It peaks where the depleted high-field region meets the 2DEG, which should sit nearer the gate in SiN than in HighK (HighK spreads the depletion).
+- Added `damField ne` to radIV (commit on branch). **Smoke test = job 47625503** (1 task, SiN, stress Vd 4, no measurement), checking that `Elec*Estress` evaluates across all regions. If it passes, the next array is both decks × damPeak levels with damField ne.
