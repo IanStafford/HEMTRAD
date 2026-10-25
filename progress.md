@@ -1497,3 +1497,15 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - The identical contact and source damage dominates the drift-band difference.
 - **Submitted radNE2 = job 47662463** (6 tasks): n·E damage limited to the gate–drain access region (y 0.125–3.0, which excludes the ohmic-contact edges and the source side), m1 {1e20, 3e20, 1e21}, both decks. Question: does the drift-band difference alone give SiN-first collapse?
 - 13:45: the HPG master dropped again after ~20 h (this time it was in tmux `hpg-master`, so the drop is server/network-side, not the terminal). One Duo reconnect via `bin/hpg_reconnect.sh` worked.
+
+## 2026-10-25 14:50 — rad-model: radNE2 (47662463) analysed; consolidated radFinal submitted
+- radNE2: 6/6 COMPLETED, no GAVE UP. n·E damage limited to the gate–drain region (y 0.125–3.0). Ratios to the pre, Id(Vg +1) at Vd 1 / 4 / 10 V:
+  - **HighK:** 1e20 0.87 / 0.89 / 0.96; 3e20 0.78 / 0.82 / 0.94; 1e21 0.54 / 0.52 / 0.61.
+  - **SiN:** 1e20 0.88 / 0.91 / 0.96; 3e20 0.76 / 0.78 / 0.90; 1e21 0.00 / 0.10 / 0.26 (channel blocked).
+  - So n·E damage gives a **Ron-like low-field loss that recovers at high Vd** in both decks, which is the measured HPD shape. SiN is more sensitive (its damage band is denser and nearer the gate), but n·E alone gives no late SiN collapse.
+- **Model chosen (qualitative, as Ian agreed). Two damage terms set at the stress bias:**
+  1. lateral-field E⁴ damage beyond the gate edge (y ≥ 0.30, damEref 5e5) → SiN-only late collapse;
+  2. n·E damage in the gate–drain access region (3e20) → Ron-like loss in both decks.
+  - Also surfCharge −4e11 (+Vth) and hot-electron fill-only capture at trapLevel 0.30.
+- radIV: `dam2Field/dam2Eref` added, so the second site can use another weighting (default = same as the first).
+- **Submitted radFinal = job 47693156** (8 tasks): pre / nb / biased × both decks, biased at damPeak 5e18 and 5.5e18, all with the round-3 calibration. Next: radFit (V0/R) and a lumped Rgd for the leakage on top. Then the KB note and an untracked overlay figure.
