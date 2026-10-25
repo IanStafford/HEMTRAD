@@ -1509,3 +1509,22 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - Also surfCharge −4e11 (+Vth) and hot-electron fill-only capture at trapLevel 0.30.
 - radIV: `dam2Field/dam2Eref` added, so the second site can use another weighting (default = same as the first).
 - **Submitted radFinal = job 47693156** (8 tasks): pre / nb / biased × both decks, biased at damPeak 5e18 and 5.5e18, all with the round-3 calibration. Next: radFit (V0/R) and a lumped Rgd for the leakage on top. Then the KB note and an untracked overlay figure.
+
+## 2026-10-25 18:15 — rad-model: radFinal (47693156) done — qualitative model in place
+- 8/8 COMPLETED, no GAVE UP, no cores.
+- Model: round-3 calibration; post adds surfCharge −4e11 + lateral-field E⁴ damage beyond the gate edge (damPeak 5e18, y ≥ 0.30) + n·E access damage gate–drain (3e20) + hot-electron fill-only capture.
+- Ratios to pre, Id(Vg +1) at Vd 1 / 2 / 4 / 6 / 10 V:
+  - nb 0.96 flat, Vth +0.057 V;
+  - **biased HighK** 0.77 / 0.78 / 0.81 / 0.85 / 0.93: no collapse, Ron-like recovery;
+  - **biased SiN** 0.71 / 0.72 / 0.57 / 0.55 / 0.56: collapse step at ~3.3 V.
+- Qualitative check against the measured set:
+  - **matches:** pre; +Vth sign; SiN-only late collapse; HPD no collapse; biased low-field loss recovering with Vd.
+  - **misses:** single vs double SiN step; low-field deck order reversed (model SiN > HPD); nb SiN low-Vd dip; leakage only as a lumped Rgd.
+- Branch commits:
+  - `analysis/plot_radFinal.py`;
+  - `figures/radFinal_model.png` (model only);
+  - `kb/results/rad-model.md` (full run history, comparison table, caveats).
+  - The overlay with measured data is untracked: `data/rad_y2/radFinal_overlay.png`.
+- Next (needs Ian):
+  - merge `explore/rad-model` into main, or keep it as a branch;
+  - whether to push further on the double step / stress at 28 V (the no-holes stress solve would be a physics change).
