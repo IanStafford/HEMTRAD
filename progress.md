@@ -1456,3 +1456,18 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - (2) The SiN collapse sets in ~1 V too early, and the final level needs ~6–7e18.
 - **Post-processing test:** a lumped series access resistance (Vd_ext = Vd + Id·R) on D1 nb (surfCharge −4e11) with R = 0.5 Ω·mm gives 0.80 / 0.85 / 0.89 / 0.92 / 0.97 / 1.00. That's close to the measured HPD shape. So the plan is a small surfCharge plus a lumped access resistance R, with field damage only for the SiN collapse.
 - **Submitted radFit1 = job 47593908** (8 tasks): surfCharge −4e11 with the round-3 calibration: nb HighK/SiN + both decks × m4 {5, 5.5, 6}e18 (y ≥ 0.30). Next: fit R (and Rgd) in post-processing (new `analysis/radFit.py`). Then decide whether the onset can be moved toward 4 V.
+
+## 2026-10-25 03:40 — rad-model: radFit1 (47593908) analysed; radFit2 submitted
+- radFit1: 7/8 done (SiN 6e18 still running). surfCharge −4e11 with the round-3 calibration. Ratios to the pre, Id(Vg +1) at Vd 1 / 2 / 3 / 4 / 6 / 8 / 10 V:
+  - **nb:** 0.96 flat in both decks; Vth +0.057 V.
+  - **HighK biased:** 0.94 flat (5–6e18). Measured HPD has a low-Vd loss that recovers by 3–4 V.
+  - **SiN biased, 5e18:** 0.88 / 0.86 / … / 0.60 / 0.57 / 0.59, onset 2–3 V. The weaker surfCharge moved the onset ~1 V later than at −1.2e12.
+  - With the fitted drain-contact offset (`analysis/radFit.py`, V0 0.20 V, R 0.9 Ω·mm): 0.58 / 0.70 / 0.67 / 0.57 / 0.56 / 0.57 / 0.59, rms(log) 0.31.
+  - For HPD the fit picks V0 = R = 0 because of the uniform −6% loss.
+- **Remaining SiN mismatch:** the measured curve steps down twice (~4.5 V and ~7 V) and ends lower. Interpretation: discrete ion-strike damage sites (the leakage also steps during irradiation).
+- radIV gets an optional second damage site, `dam2Peak/dam2M/dam2Ymin/dam2Ymax` (default off). radFit gets the contact offset V0.
+- **Submitted radFit2 = job 47606666** (9 tasks):
+  - SiN p5e18 + uniform second site {1e18, 3e18} × {y 0.65–1.0, 1.0–1.6};
+  - SiN p6e18 + 3e18 at y 0.65–1.0;
+  - HighK p5e18 + 3e18 in each window (does HighK stay flat with the same uniform damage?);
+  - SiN p6.5e18 and p7e18 alone.
