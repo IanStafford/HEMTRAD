@@ -68,6 +68,8 @@ if {$damInsPeak > 0.0 && ![info exists insTrapSign]} { set insTrapSign -1 }
 # second semiconductor damage site (branch, 2026-10-25): same law and depth as the
 # first, own peak/exponent/y-window; e.g. a second ion-strike site farther toward
 # the drain. dam2Peak 0 = none (old behaviour).
+if {![info exists damNexp]}   { set damNexp 0.0 }   ;# first site also scales with (Elec/damNref)^damNexp at stress
+if {![info exists damNref]}   { set damNref 1.0e17 } ;#   (hot-electron rate ~ n*E^m); 0 = field only (old behaviour)
 if {![info exists dam2Peak]}  { set dam2Peak 0.0 }
 if {![info exists dam2M]}     { set dam2M 0.0 }
 if {![info exists dam2Ymin]}  { set dam2Ymin 0.65 }
@@ -166,6 +168,7 @@ if {$radState eq "post"} {
         sel z=abs(dot(DevPsi,y*1e-4)) name=Estress
         sel z=sqrt(dot(DevPsi,DevPsi)) name=EstressT
         # n*E at stress, normalised to its peak in the semiconductor (damField ne)
+        sel z=Elec name=ElecStress
         sel z=Elec*Estress name=EstressNE
         set neMax [expr {max([lindex [peak GaN] 1], [lindex [peak AlGaN] 1])}]
         sel z=EstressNE/$neMax name=EstressNE
@@ -183,10 +186,11 @@ flush $sf
 proc DamageIn {tg} {
     global damPeak damM damEref damMax damXmax damYmin damYmax sf
     global damInsPeak damInsM damInsEref damInsXmin damField damInsField
-    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref
+    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref damNexp damNref
     ThawTraps
     set fld [expr {$damField eq "tot" ? "EstressT" : ($damField eq "ne" ? "EstressNE" : "Estress")}]
     set n "($damPeak*exp($damM*log($fld/$damEref+1.0e-30)))"
+    if {$damNexp != 0.0} { set n "($n*exp($damNexp*log(ElecStress/$damNref+1.0e-30)))" }
     set n "(0.5*($n+$damMax-abs($n-$damMax)))*(x>=0.0)*(x<=$damXmax)*(y>=$damYmin)*(y<=$damYmax)"
     if {$dam2Peak > 0.0} {
         set f2 $fld
@@ -206,7 +210,7 @@ proc DamageIn {tg} {
         if {[catch {device}]} { RestoreState; puts "DAMAGE solve failed at scale $s"; return 0 }
     }
     sel z=TrapN
-    puts $sf "$tg damPeak=$damPeak damM=$damM damEref=$damEref damField=$damField damXmax=$damXmax damY=$damYmin..$damYmax peakN(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakN(AlGaN)=[lindex [peak AlGaN] 1]"
+    puts $sf "$tg damPeak=$damPeak damM=$damM damEref=$damEref damField=$damField damNexp=$damNexp damNref=$damNref damXmax=$damXmax damY=$damYmin..$damYmax peakN(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakN(AlGaN)=[lindex [peak AlGaN] 1]"
     if {$dam2Peak > 0.0} {
         puts $sf "$tg dam2Peak=$dam2Peak dam2M=$dam2M dam2Field=$dam2Field dam2Eref=$dam2Eref dam2Y=$dam2Ymin..$dam2Ymax"
     }
