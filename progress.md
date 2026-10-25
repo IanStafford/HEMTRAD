@@ -1437,3 +1437,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - HPD low-field loss (model −16% from surfCharge alone, measured larger) → a uniform damage term;
   - gate–drain leakage Rgd;
   - physical justification for y ≥ 0.30.
+- 21:20: radFine 47554718 FAILED within seconds: `params_radFine.txt` wasn't on HPG. Pushes from the new tmux session were failing silently (`git-credential-libsecret` isn't installed, and the push was run with `-q 2>/dev/null`). Pushed both checkouts with `-c credential.helper='!gh auth git-credential'`, and **resubmitted radFine = job 47562303**. radPost tasks 6 and 8 are still running.
