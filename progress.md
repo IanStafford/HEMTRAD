@@ -1496,3 +1496,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - m1 1e20: 0.58 at 1 V, 0 from 4 V, in both.
   - The identical contact and source damage dominates the drift-band difference.
 - **Submitted radNE2 = job 47662463** (6 tasks): n·E damage limited to the gate–drain access region (y 0.125–3.0, which excludes the ohmic-contact edges and the source side), m1 {1e20, 3e20, 1e21}, both decks. Question: does the drift-band difference alone give SiN-first collapse?
+- 13:45: the HPG master dropped again after ~20 h (this time it was in tmux `hpg-master`, so the drop is server/network-side, not the terminal). One Duo reconnect via `bin/hpg_reconnect.sh` worked.
