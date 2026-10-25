@@ -56,7 +56,8 @@ if {![info exists damYmax]}   { set damYmax 1.0e3 }   ;#   default = whole devic
 # damInsXmin <= x < 0 (um above the AlGaN top), density from the field there at the
 # stress bias: N = min(damMax, damInsPeak*(E/damInsEref)^damInsM), charge sign
 # insTrapSign (-1 = trapped electrons). damInsField / damField pick the stress field:
-# lat = |dpsi/dy| (default for the semiconductor part, as before), tot = |grad psi|.
+# lat = |dpsi/dy| (default for the semiconductor part, as before), tot = |grad psi|,
+# ne = Elec*|dpsi/dy| at stress normalised to its semiconductor peak (use damEref 1).
 if {![info exists damInsPeak]}  { set damInsPeak 0.0 }  ;# 0 = none (old behaviour)
 if {![info exists damInsEref]}  { set damInsEref 1.0e6 }
 if {![info exists damInsM]}     { set damInsM 2.0 }
@@ -162,6 +163,12 @@ if {$radState eq "post"} {
         if {$dS < $Vd_stressMin} { error "stress drain ramp failed at $dS" }
         sel z=abs(dot(DevPsi,y*1e-4)) name=Estress
         sel z=sqrt(dot(DevPsi,DevPsi)) name=EstressT
+        # n*E at stress, normalised to its peak in the semiconductor (damField ne)
+        sel z=Elec*Estress name=EstressNE
+        set neMax [expr {max([lindex [peak GaN] 1], [lindex [peak AlGaN] 1])}]
+        sel z=EstressNE/$neMax name=EstressNE
+        puts $sf "stress n*Elat peak $neMax at [lrange [peak GaN] 2 3]"
+        sel z=Estress
         puts $sf "stress Vg=$Vg_stress Vd=$dS (target $Vd_stress) peakElat(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakElat(AlGaN)=[lindex [peak AlGaN] 1]"
         flush $sf
         if {![Ramp D $dS 0.0 1.0]} { error "stress drain ramp-down failed" }
@@ -176,7 +183,7 @@ proc DamageIn {tg} {
     global damInsPeak damInsM damInsEref damInsXmin damField damInsField
     global dam2Peak dam2M dam2Ymin dam2Ymax
     ThawTraps
-    set fld [expr {$damField eq "tot" ? "EstressT" : "Estress"}]
+    set fld [expr {$damField eq "tot" ? "EstressT" : ($damField eq "ne" ? "EstressNE" : "Estress")}]
     set n "($damPeak*exp($damM*log($fld/$damEref+1.0e-30)))"
     set n "(0.5*($n+$damMax-abs($n-$damMax)))*(x>=0.0)*(x<=$damXmax)*(y>=$damYmin)*(y<=$damYmax)"
     if {$dam2Peak > 0.0} {
@@ -203,7 +210,7 @@ proc DamageIn {tg} {
     }
     CaptureTraps
     set c [open ${tg}_cuts.txt w]
-    foreach fld {Estress EstressT TrapN IonAcceptor} {
+    foreach fld {Estress EstressT EstressNE TrapN IonAcceptor} {
         sel z=$fld
         foreach xc {-0.04 -0.01 0.001 0.016} {
             if {$xc < 0.0 && $fld eq "IonAcceptor"} { continue }
