@@ -1485,3 +1485,14 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Added `damField ne` to radIV (commit on branch). **Smoke test = job 47625503** (1 task, SiN, stress Vd 4, no measurement), checking that `Elec*Estress` evaluates across all regions. If it passes, the next array is both decks × damPeak levels with damField ne.
 - 07:45: smoke 47625503 passed (stress Vd 4). The `damField ne` weight peaks at the drain-contact edge (y 3.285), with ~0.03 of the peak at y 0.3–0.5 at the 2DEG depth. **Submitted radNE1 = job 47628955** (8 tasks): both decks × ne damage {m1 1e18, 1e19, 1e20; m2 1e20}, surfCharge −4e11, full stress (Vd 17). Question: where does n·E put the damage in SiN vs HighK at 17 V, and does that give SiN-only collapse plus a HighK Ron-like loss?
 - 2026-10-25 08:35 Ian: "I'm good with a qualitative fit for many of the phenomena." So the target is now qualitative: each measured phenomenon with the right sign, onset region and deck dependence. Plan: once radNE1 is in, pick the physically best-motivated damage law, run one final consolidated set (pre, nb, biased × both decks), and write up the model and its caveats (KB note on the branch, measured overlays kept untracked).
+
+## 2026-10-25 11:35 — rad-model: radNE1 (47628955) analysed; radNE2 submitted
+- radNE1: 6/8 done (both m1 1e20 still running; already collapsed to 0 at Vd ≥ 4).
+- **Damage maps:** at the 2DEG depth, n·E puts SiN damage in a narrow band at y 0.6–0.8 (peak at 0.7) and HighK damage in a broader band at y 0.8–1.6 (peak at 1.0). There is no damage at the gate edge (no electrons there at stress). Both decks also get large, identical damage at the drain-contact edge (4e19 at m1 1e20) and the source access (2e18).
+- **Id–Vd: the decks are identical at every level.**
+  - m1 1e18 0.95 flat;
+  - m1 1e19 0.90–0.92 flat;
+  - m2 1e20 0.91–0.94 flat;
+  - m1 1e20: 0.58 at 1 V, 0 from 4 V, in both.
+  - The identical contact and source damage dominates the drift-band difference.
+- **Submitted radNE2 = job 47662463** (6 tasks): n·E damage limited to the gate–drain access region (y 0.125–3.0, which excludes the ohmic-contact edges and the source side), m1 {1e20, 3e20, 1e21}, both decks. Question: does the drift-band difference alone give SiN-first collapse?
