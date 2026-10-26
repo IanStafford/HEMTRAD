@@ -1555,3 +1555,6 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - merge decision;
   - OK for a no-holes stress solve to 28 V.
 - Housekeeping: redacted measured numbers that had slipped into earlier progress entries (10-24 D1/D2 entry, 10-25 20:40 entry). They remain in git history; rewriting history needs Ian's OK.
+- 01:15 **radFinal3 = job 47773690** (8 tasks, `params_radFinal3.txt`):
+  - under-gate fixed acceptor damage (uniform, y −0.125–0.125, top 50 nm) {1e18, 3e18} on top of the final model, both decks, plus an nb HighK check. Can a gate-local charge give the measured Vth size without a flat access loss?
+  - SiN onset levers on the final model: SiN/HighK hotEb 0.7, SiN hotTau 1e-12.
