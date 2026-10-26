@@ -80,6 +80,7 @@ if {![info exists dam3Peak]}  { set dam3Peak 0.0 }
 if {![info exists dam3Ymin]}  { set dam3Ymin 1.0 }
 if {![info exists dam3Ymax]}  { set dam3Ymax 1.6 }
 if {![info exists dam2Eref]}  { set dam2Eref "" }
+if {![info exists dam2Xmax]}  { set dam2Xmax "" }    ;# depth of the second site (um); "" = damXmax
 if {![info exists Rgd]}       { set Rgd 0.0 }
 if {![info exists damList]}   { set damList {} }
 # trap / capture (sensitivity baseline)
@@ -190,7 +191,7 @@ flush $sf
 proc DamageIn {tg} {
     global damPeak damM damEref damMax damXmax damYmin damYmax sf
     global damInsPeak damInsM damInsEref damInsXmin damField damInsField
-    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref damNexp damNref dam3Peak dam3Ymin dam3Ymax
+    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref dam2Xmax damNexp damNref dam3Peak dam3Ymin dam3Ymax
     ThawTraps
     set fld [expr {$damField eq "tot" ? "EstressT" : ($damField eq "ne" ? "EstressNE" : "Estress")}]
     set n "($damPeak*exp($damM*log($fld/$damEref+1.0e-30)))"
@@ -201,7 +202,8 @@ proc DamageIn {tg} {
         if {$dam2Field ne ""} { set f2 [expr {$dam2Field eq "tot" ? "EstressT" : ($dam2Field eq "ne" ? "EstressNE" : "Estress")}] }
         set e2 [expr {$dam2Eref eq "" ? $damEref : $dam2Eref}]
         set n2 "($dam2Peak*exp($dam2M*log($f2/$e2+1.0e-30)))"
-        set n "$n+(0.5*($n2+$damMax-abs($n2-$damMax)))*(x>=0.0)*(x<=$damXmax)*(y>=$dam2Ymin)*(y<=$dam2Ymax)"
+        set x2 [expr {$dam2Xmax eq "" ? $damXmax : $dam2Xmax}]
+        set n "$n+(0.5*($n2+$damMax-abs($n2-$damMax)))*(x>=0.0)*(x<=$x2)*(y>=$dam2Ymin)*(y<=$dam2Ymax)"
     }
     if {$dam3Peak > 0.0} {
         set n "$n+$dam3Peak*(x>=0.0)*(x<=$damXmax)*(y>=$dam3Ymin)*(y<=$dam3Ymax)"
