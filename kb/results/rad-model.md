@@ -123,3 +123,9 @@ Base: round-3 calibration.
 - The leakage is lumped.
 - The gate-edge exclusion is a fitting choice.
 - The stress solve stops at 17 V.
+
+## Second discrete damage site (2026-10-26, radFinal6 job 47829928)
+The optional third site `dam3Peak/dam3Ymin/dam3Ymax` (uniform, default off) puts an ion-strike-like damage spot at y 1.0–1.6 µm on top of the final set.
+- **SiN p6e18 + 4e18:** 0.60 at 1 V, then a *first step* near 5 V (0.53 → 0.44 at the Id–Vd level) and a *second step* near 6.3 V, followed by a slow creep up. The two-step shape, onset region and low-Vd loss now resemble the measured SiN biased curve qualitatively.
+- **SiN p7e18 + 2e18 / 4e18:** steps merge or come earlier.
+- **HighK p7e18 + 4e18:** the same uniform site collapses HighK too (0.63 → 0.39 near 6 V). So the second site is device-specific (a random strike location in that SiN device) and can't be derived from the deck. It's a fitting choice, documented as such. The leakage stepping during irradiation supports event-like damage.
