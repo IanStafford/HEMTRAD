@@ -1593,3 +1593,6 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - gate-edge exclusion;
   - stress at 17 V.
 - The open decisions for Ian (merge, history scrub, no-holes stress solve) are unchanged.
+- 12:05 **radFinal6 = job 47829928** (4 tasks). radIV gets an optional third damage site (`dam3Peak/dam3Ymin/dam3Ymax`, uniform, default off): a discrete ion-strike site at y 1.0–1.6 µm on top of the final set.
+  - SiN p7e18 + {2e18, 4e18}; SiN p6e18 + 4e18; HighK p7e18 + 4e18 for reference.
+  - Question: does a second discrete site reproduce the second, later SiN step? Its location is stochastic per device, so it's a fitting choice, documented as such.
