@@ -1385,7 +1385,7 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   | m6 3e18 | 27.4 / 281 | 25.3 / 218 |
   | m4 1e19 | Vth +1 V, Id ≈ 0 | same |
 
-- So steeper damM separates the decks by only 1.1–1.3×. Measured: HPD biased is unchanged at 10 V (970) while SiN falls ~3× (320).
+- So steeper damM separates the decks by only 1.1–1.3×. Measured: HPD biased is ~unchanged at 10 V while SiN falls several-fold (numbers in the untracked note).
 - Shape is also wrong. In the model, Id dips right after 1–1.5 V and then stays flat, so the drop is uniform in Vd. Measured SiN holds until 4 V and then drops in steps.
 - The low-field loss (−16 to −36%) has the right size for both devices (meas −32% HPD, −20% SiN), but it does not separate the decks.
 - The worktree has an **uncommitted** `damYmin/damYmax` damage window in `drivers/radIV.tcl` from the previous session: a diagnostic to localise the damage along y. It is not run or committed yet.
@@ -1532,8 +1532,26 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 ## 2026-10-25 20:40 — rad-model: radPhys1 (47725314) — n·E⁴ damage has no effect
 - 7/8 done. The first damage site is weighted by (n/1e18)·(E_lat/5e5)⁴ at stress (`damNexp 1`, no y window), plus the n·E Ron term as in radFinal. The result is identical at every damPeak 1e17–1e20 (HighK 0.78 → 0.94, SiN 0.76 → 0.89), i.e. only the Ron term acts. Where E_lat is high at the stress bias, the channel is fully depleted (n ≈ 0), so n·E⁴ is negligible everywhere. Electron weighting can't replace the y ≥ 0.30 exclusion. It stays a documented fitting choice in the radFinal model.
 - Re-check of the measured set (each device against its own pre, from the untracked targets):
-  - biased HPD keeps gm (≈ 0%) and shifts Vth +0.15 V;
-  - biased SiN loses ~25% gm and shifts +0.17 V.
+  - biased HPD keeps its gm and shifts Vth positive;
+  - biased SiN loses clearly more gm and shifts Vth positive by a similar amount.
   - So SiN degrades more, the same order as the model (gm −12% SiN vs −10% HighK). The earlier "reversed deck order" came from using the SiN pre as the reference for HPD.
   - The non-biased devices are different parts: gm differs by up to ~50% from the pre devices. Their curves mostly show device spread, not radiation.
-  - Lumped Rgd from Ioff at Vg −5 / Vd 0.1: HPD ~1.0e6 Ω·mm, SiN ~5.5e6 Ω·mm.
+  - Lumped Rgd sized from the measured off-state current at Vg −5 / Vd 0.1 (values in the untracked note).
+
+## 2026-10-26 01:00 — rad-model: radFinal2 (47752290) — final model without the n·E term
+- 4/4 COMPLETED, no GAVE UP.
+- dam2Peak 0:
+  - HighK biased 0.94 flat, gm −2%: qualitatively on the measured HPD biased curve.
+  - SiN biased: low field 0.88, collapse from ~2.3 V to 0.58, gm −5%.
+- dam2Peak 1e20: HighK 0.86 → 0.95. The n·E band is larger in HighK (wrong deck direction), so the term is dropped.
+- Final model = surfCharge −4e11 + lateral-field E⁴ damage (y ≥ 0.30, 5e18) + hot-electron fill-only capture + lumped Rgd. KB note on the branch updated.
+- Comparison figures (untracked, include lab data): `data/rad_y2/compare/1–4_*.png`, sent to Ian.
+- Open:
+  - SiN one step vs two;
+  - SiN onset early;
+  - Vth shift smaller than measured;
+  - SiN gm loss smaller than measured.
+- Needs Ian:
+  - merge decision;
+  - OK for a no-holes stress solve to 28 V.
+- Housekeeping: redacted measured numbers that had slipped into earlier progress entries (10-24 D1/D2 entry, 10-25 20:40 entry). They remain in git history; rewriting history needs Ian's OK.
