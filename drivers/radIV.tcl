@@ -49,6 +49,9 @@ if {![info exists Vd_stress]} { set Vd_stress 28.0 }
 # damage/measurement). Holes are negligible off-state; this removes the minority-Qfp
 # divergence near Vdg ~ 27 V so the stress can reach Vd_stress. 0 = old behaviour.
 if {![info exists stressNoHoles]} { set stressNoHoles 0 }
+# holes are removed only above this depth (um below the AlGaN top); deeper, Qfp is frozen
+# at its rest value 0 (the Fe buffer needs its equilibrium holes). 0 = freeze at 0 everywhere.
+if {![info exists stressNoHolesX]} { set stressNoHolesX 0.1 }
 if {![info exists Vd_stressMin]} { set Vd_stressMin 12.0 } ;# accept a stress Vd down to this if the solve fails above
 if {![info exists damPeak]}   { set damPeak 0.0 }     ;# cm^-3 at E = damEref
 if {![info exists damEref]}   { set damEref 1.0e6 }   ;# V/cm
@@ -167,10 +170,10 @@ if {$radState eq "post"} {
     if {$useTraps} {
         if {$stressNoHoles} {
             solution name=Qfp nosolve
-            sel z=50.0+1.0e-12*(1.0+x*x) name=Qfp
+            sel z=50.0*(x<$stressNoHolesX)+1.0e-12*(1.0+x*x) name=Qfp
             SaveState
             if {[catch {device}]} { RestoreState; error "no-holes rest solve failed" }
-            puts $sf "stress without holes (Qfp frozen at +50 V)"
+            puts $sf "stress without holes above x=$stressNoHolesX um (Qfp frozen: +50 V there, 0 below)"
         }
         if {![Ramp G 0.0 $Vg_stress 0.5]} { error "stress gate ramp failed" }
         # The off-state solve stops converging near Vdg ~ 27 V (minority quasi-Fermi
