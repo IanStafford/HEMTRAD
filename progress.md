@@ -1558,3 +1558,13 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - 01:15 **radFinal3 = job 47773690** (8 tasks, `params_radFinal3.txt`):
   - under-gate fixed acceptor damage (uniform, y −0.125–0.125, top 50 nm) {1e18, 3e18} on top of the final model, both decks, plus an nb HighK check. Can a gate-local charge give the measured Vth size without a flat access loss?
   - SiN onset levers on the final model: SiN/HighK hotEb 0.7, SiN hotTau 1e-12.
+
+## 2026-10-26 06:10 — rad-model: radFinal3 (47773690) analysed; radFinal4 submitted
+- radFinal3: 8/8 COMPLETED. Ratios to pre, Id(Vg +1).
+- **Under-gate acceptor damage:** Vth +0.80 V at 1e18 and +1.67 V at 3e18, far too much. It also adds hot-electron capture in HighK (gradual droop to 0.74 / 0.46). Target ~2e17.
+- **hotEb 0.7:** SiN onset later and gentler: 0.87 at 2 V, 0.83 at 2.5, 0.74 at 3, 0.68 at 4, 0.63 at 10. HighK still flat at 0.94. An improvement toward the measured late onset.
+- **hotTau 1e-12:** SiN fully collapses from Vd 1 V. Dropped.
+- **Submitted radFinal4 = job 47797775** (8 tasks):
+  - hotEb 0.7 + under-gate {2e17, 4e17} on both decks, plus an nb HighK check;
+  - hotEb 0.5 on SiN and HighK;
+  - SiN hotEb 0.7 with damPeak 6e18 (deeper).
