@@ -94,3 +94,32 @@ With `dam2Peak 0` (no n·E access damage), otherwise as radFinal:
   - Compare each device with its own pre.
   - The non-biased devices are different parts, and their device spread is larger than the radiation effect.
   - The biased HPD Id–Vg at Vd 0.1 loses more than its Id–Vd suggests, possibly a measurement-order or recovery effect that a static model can't reproduce.
+
+## Final parameter set (2026-10-26, radFinal5 job 47806744)
+Base: round-3 calibration.
+
+**Post-irradiation:**
+- surfCharge −4e11;
+- under-gate fixed acceptor damage 1.5e17 cm⁻³ (uniform, y −0.125…0.125, top 50 nm; `dam2Field lat dam2M 0`);
+- lateral-field E⁴ damage damPeak 7e18 (damEref 5e5, y ≥ 0.30, acceptors at 0.30 eV);
+- hot-electron fill-only capture, hotEb 0.5, hotTau 1e-14;
+- lumped Rgd for the leakage.
+
+**Model results** (ratios to each deck's pre):
+- Vth +0.19 V on every irradiated device (nb and biased, both decks); the measured shifts have the same scale.
+- nb: 0.95 → 0.93 across Vd, gm −7%.
+- **Biased HighK:** 0.92 flat (no collapse), gm −8%.
+- **Biased SiN:** 0.83 at 1 V, 0.75 at 2 V, 0.62 at 2.5 V, 0.53 at 4 V, 0.48 at 10 V; gm −12%.
+- SiN damPeak 6e18 / 8e18 brackets the depth (0.57 / 0.40 at 10 V).
+
+**Lever findings (radFinal3–5):**
+- **Capture barrier hotEb:** lowering it from 1.0 to 0.7 to 0.5 moves the SiN onset later and makes it gentler. HighK is unaffected.
+- **Under-gate charge:** sets the Vth shift, about +0.24 V at 2e17, +0.40 V at 4e17 and +0.80 V at 1e18.
+- **hotTau 1e-12:** collapses SiN completely. Not used.
+
+**Remaining differences (qualitative):**
+- The SiN collapse starts ~2 V earlier than measured and is a single step. The measured collapse comes in two steps and goes deeper.
+- The model gm loss is similar in both decks (−8% / −12%), whereas measured shows a clear SiN > HPD difference.
+- The leakage is lumped.
+- The gate-edge exclusion is a fitting choice.
+- The stress solve stops at 17 V.
