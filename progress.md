@@ -1612,3 +1612,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Caveats: gate-edge exclusion, second-site placement and lumped leakage are fitting choices; stress at 17 V.
 - Waiting on Ian: no-holes stress solve, merge, history scrub.
 - 15:20 **radFinal7** submitted (5 tasks): under-gate fixed charge confined to the AlGaN (`dam2Xmax 0.014`) at 5e17 / 1e18 — does it shift Vth without the ~7% gm loss of the top-50-nm version? Plus SiN at damPeak 7e18 / 8e18 for a deeper gm loss.
+
+## 2026-10-26 15:40 — Ian's decisions
+- Ian: (1) "Go for it" on the no-holes stress solve; (2) don't merge `explore/rad-model` yet; (3) not concerned about the measured numbers in the git history (leave them).
+- radIV `stressNoHoles` (default 0): for the stress step only, `solution name=Qfp nosolve` with Qfp frozen at +50 V, so Hole ∝ F((Eval − Qfp)/kT) ≈ 0. Restored to Qfp = 0 + `solve` at rest before damage/measurement.
+- **Smoke = job 47860677** (2 tasks, stress-only, HighK/SiN, target Vd 28): does the stress reach 28 V, and how does the field map change vs 17 V?
