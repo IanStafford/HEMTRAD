@@ -1528,3 +1528,12 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Next (needs Ian):
   - merge `explore/rad-model` into main, or keep it as a branch;
   - whether to push further on the double step / stress at 28 V (the no-holes stress solve would be a physics change).
+
+## 2026-10-25 20:40 — rad-model: radPhys1 (47725314) — n·E⁴ damage has no effect
+- 7/8 done. The first damage site is weighted by (n/1e18)·(E_lat/5e5)⁴ at stress (`damNexp 1`, no y window), plus the n·E Ron term as in radFinal. The result is identical at every damPeak 1e17–1e20 (HighK 0.78 → 0.94, SiN 0.76 → 0.89), i.e. only the Ron term acts. Where E_lat is high at the stress bias, the channel is fully depleted (n ≈ 0), so n·E⁴ is negligible everywhere. Electron weighting can't replace the y ≥ 0.30 exclusion. It stays a documented fitting choice in the radFinal model.
+- Re-check of the measured set (each device against its own pre, from the untracked targets):
+  - biased HPD keeps gm (≈ 0%) and shifts Vth +0.15 V;
+  - biased SiN loses ~25% gm and shifts +0.17 V.
+  - So SiN degrades more, the same order as the model (gm −12% SiN vs −10% HighK). The earlier "reversed deck order" came from using the SiN pre as the reference for HPD.
+  - The non-biased devices are different parts: gm differs by up to ~50% from the pre devices. Their curves mostly show device spread, not radiation.
+  - Lumped Rgd from Ioff at Vg −5 / Vd 0.1: HPD ~1.0e6 Ω·mm, SiN ~5.5e6 Ω·mm.
