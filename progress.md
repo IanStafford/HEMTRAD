@@ -1568,3 +1568,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - hotEb 0.7 + under-gate {2e17, 4e17} on both decks, plus an nb HighK check;
   - hotEb 0.5 on SiN and HighK;
   - SiN hotEb 0.7 with damPeak 6e18 (deeper).
+
+## 2026-10-26 08:05 — rad-model: radFinal4 (47797775) analysed; radFinal5 submitted
+- radFinal4: 8/8 COMPLETED.
+- **Under-gate charge 2e17 (hotEb 0.7):** Vth +0.24 V on all devices; HighK biased ~0.92 flat; nb ~0.94; SiN unchanged (0.87 → 0.63). 4e17: Vth +0.40 V. Use ~1.5e17.
+- **hotEb 0.5:** SiN holds to ~3 V, then 0.74 at 4 V → 0.68 at 10 V (latest onset, shallow); HighK flat 0.94.
+- **hotEb 0.7 with damPeak 6e18:** SiN 0.65 at 2.5 V → 0.53 (deeper, earlier).
+- **Submitted radFinal5 = job 47806744** (6 tasks): hotEb 0.5 + under-gate 1.5e17; SiN damPeak {6, 7, 8}e18; HighK 7e18; nb HighK/SiN.
