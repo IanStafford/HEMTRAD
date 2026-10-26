@@ -1596,3 +1596,18 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - 12:05 **radFinal6 = job 47829928** (4 tasks). radIV gets an optional third damage site (`dam3Peak/dam3Ymin/dam3Ymax`, uniform, default off): a discrete ion-strike site at y 1.0–1.6 µm on top of the final set.
   - SiN p7e18 + {2e18, 4e18}; SiN p6e18 + 4e18; HighK p7e18 + 4e18 for reference.
   - Question: does a second discrete site reproduce the second, later SiN step? Its location is stochastic per device, so it's a fitting choice, documented as such.
+
+## 2026-10-26 15:05 — rad-model: radFinal6 (47829928) — two SiN steps with a second discrete site
+- 4/4 COMPLETED (SiN p7e18 + s4e18 gave up at Vd 8).
+- SiN p6e18 + uniform site 4e18 at y 1.0–1.6: low-Vd loss, then a first step near 5 V and a second near 6.3 V, then a slow creep. Qualitatively the measured two-step SiN curve. Figure `data/rad_y2/compare/5_SiN_two_sites.png` (untracked), sent to Ian.
+- The same site collapses HighK too, so it's a device-specific strike location (fitting choice, documented in the KB note).
+- **Model status (qualitative):** reproduced:
+  - pre;
+  - +Vth on all irradiated devices;
+  - HPD biased no collapse;
+  - SiN biased late two-step collapse with low-Vd loss (with the second site);
+  - nb small change;
+  - leakage via lumped Rgd.
+- Not reproduced: the gm contrast HPD vs SiN (model similar in both decks).
+- Caveats: gate-edge exclusion, second-site placement and lumped leakage are fitting choices; stress at 17 V.
+- Waiting on Ian: no-holes stress solve, merge, history scrub.
