@@ -49,6 +49,8 @@ if {![info exists Vd_stress]} { set Vd_stress 28.0 }
 # damage/measurement). Holes are negligible off-state; this removes the minority-Qfp
 # divergence near Vdg ~ 27 V so the stress can reach Vd_stress. 0 = old behaviour.
 if {![info exists stressNoHoles]} { set stressNoHoles 0 }
+# Qfn Newton DampValue during the stress drain ramp only (solver-side; model default 0.1)
+if {![info exists stressQfnDamp]} { set stressQfnDamp 0.1 }
 # holes are removed only above this depth (um below the AlGaN top); deeper, Qfp is frozen
 # at its rest value 0 (the Fe buffer needs its equilibrium holes). 0 = freeze at 0 everywhere.
 if {![info exists stressNoHolesX]} { set stressNoHolesX 0.1 }
@@ -179,11 +181,13 @@ if {$radState eq "post"} {
         # The off-state solve stops converging near Vdg ~ 27 V (minority quasi-Fermi
         # levels in the depleted AlGaN, job 47311016). Use the highest converged Vd if it
         # is at least Vd_stressMin; the damage law's scale absorbs the field magnitude.
+        foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue $stressQfnDamp }
         set dS 0.0
         for {set d 1.0} {$d <= $Vd_stress + 1e-9} {set d [expr {$d + 1.0}]} {
             if {![Reach D $dS $d $retryDepth 0]} { break }
             set dS $d
         }
+        foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue 0.1 }
         if {$dS < $Vd_stressMin} { error "stress drain ramp failed at $dS" }
         sel z=abs(dot(DevPsi,y*1e-4)) name=Estress
         sel z=sqrt(dot(DevPsi,DevPsi)) name=EstressT
