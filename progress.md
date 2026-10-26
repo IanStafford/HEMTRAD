@@ -1575,3 +1575,21 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **hotEb 0.5:** SiN holds to ~3 V, then 0.74 at 4 V → 0.68 at 10 V (latest onset, shallow); HighK flat 0.94.
 - **hotEb 0.7 with damPeak 6e18:** SiN 0.65 at 2.5 V → 0.53 (deeper, earlier).
 - **Submitted radFinal5 = job 47806744** (6 tasks): hotEb 0.5 + under-gate 1.5e17; SiN damPeak {6, 7, 8}e18; HighK 7e18; nb HighK/SiN.
+
+## 2026-10-26 11:50 — rad-model: radFinal5 (47806744) — final parameter set
+- 6/6 COMPLETED. nb HighK gave up at Vd 8.5 (Id–Vd), harmless.
+- Final set: hotEb 0.5, under-gate 1.5e17, field damage 7e18 (y ≥ 0.30), surfCharge −4e11.
+- Results:
+  - Vth +0.19 V on all irradiated devices;
+  - nb ~0.95;
+  - HighK biased 0.92 flat;
+  - SiN biased collapses from ~2 V to 0.48;
+  - gm −8% HighK / −12% SiN.
+- Figures regenerated (untracked `data/rad_y2/compare/`), sent to Ian. KB note on the branch updated with the final set and lever findings.
+- Remaining:
+  - SiN onset early, single step, shallower;
+  - gm deck contrast smaller than measured;
+  - lumped leakage;
+  - gate-edge exclusion;
+  - stress at 17 V.
+- The open decisions for Ian (merge, history scrub, no-holes stress solve) are unchanged.
