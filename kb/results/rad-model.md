@@ -78,3 +78,19 @@ Ratios to each deck's pre run, Id(Vg +1) at Vd 1 / 2 / 4 / 6 / 10 V, and low-fie
 - The leakage (Rgd) and the low-Vd contact offset (V0, from radFit) are lumped elements.
 
 Related: [[highk-vs-sin]], [[hot-electron-capture]], [[trap-model]], [[levers]].
+
+## Final model (2026-10-26, radFinal2 job 47752290): n·E access term dropped
+With `dam2Peak 0` (no n·E access damage), otherwise as radFinal:
+- **Biased HighK:** 0.94 flat (Id ratios at Vd 1–10 V 0.93–0.96), gm −2%, Vth +0.057 V. Qualitatively on the measured HPD biased Id–Vd curve; the measured HPD gm is essentially unchanged.
+- **Biased SiN:** low field 0.88, then a collapse from ~2.3 V to 0.57–0.59, gm −5%, Vth +0.054 V. Measured SiN loses clearly more gm and collapses in two steps, deeper.
+- With the n·E term (1e20 / 3e20), HighK loses 10–23% at mid Vd: the n·E band is *larger* in HighK, the wrong deck direction, so the term was dropped.
+- radPhys1 (job 47725314): weighting the field damage by electron density (n·E⁴) has no effect at any damPeak, because the high-field region is fully depleted at the stress bias. It can't replace the y ≥ 0.30 exclusion.
+- **Final post-irradiation model:**
+  - surfCharge −4e11;
+  - lateral-field E⁴ damage at y ≥ 0.30 (damPeak 5e18, damEref 5e5, top 50 nm, acceptors at 0.30 eV);
+  - hot-electron fill-only capture;
+  - a lumped Rgd for the gate–drain leakage, sized per device from the measured off-state current (values kept with the untracked data).
+- **Notes on the measured set (qualitative; details in the untracked note):**
+  - Compare each device with its own pre.
+  - The non-biased devices are different parts, and their device spread is larger than the radiation effect.
+  - The biased HPD Id–Vg at Vd 0.1 loses more than its Id–Vd suggests, possibly a measurement-order or recovery effect that a static model can't reproduce.
