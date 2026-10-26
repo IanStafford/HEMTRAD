@@ -1618,3 +1618,14 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - radIV `stressNoHoles` (default 0): for the stress step only, `solution name=Qfp nosolve` with Qfp frozen at +50 V, so Hole ∝ F((Eval − Qfp)/kT) ≈ 0. Restored to Qfp = 0 + `solve` at rest before damage/measurement.
 - **Smoke = job 47860677** (2 tasks, stress-only, HighK/SiN, target Vd 28): does the stress reach 28 V, and how does the field map change vs 17 V?
 - 16:35: smoke 47860677 FAILED at once. Freezing Qfp at +50 V everywhere broke the rest solve (Poisson residual 1e31 in region B, the Fe buffer, whose acceptors need their equilibrium holes). Added `stressNoHolesX`: holes removed only above that depth (default 0.1 µm); deeper, Qfp is frozen at its rest value 0. **Smoke2 = job 47861047** (3 tasks): HighK/SiN with X 0.1, and SiN with X 0 (Qfp frozen at 0 everywhere).
+
+## 2026-10-26 19:40 — no-holes stress doesn't help; Qfn damping smoke; radFinal7 analysed
+- **Smoke2 (47861047):** all 3 COMPLETED. Holes removed above 0.1 µm (or Qfp frozen at 0 everywhere) still stops at **Vd 17 V**, with fields identical to the with-holes run, so holes were negligible. The Newton log at 17 → 18 V diverges in **Qfn** (electrons) in the depleted AlGaN/GaN, not in Qfp. The no-holes lever stays in (default off) but doesn't solve the limit.
+- **Next, solver-side:** `stressQfnDamp` (Qfn DampValue during the stress drain ramp only). **Smoke = job 47875456** (SiN, 0.02 / 0.005).
+- **radFinal7 (47852523):** 5/5 COMPLETED. The under-gate charge confined to the AlGaN (`dam2Xmax 0.014`) shifts Vth without the gm loss:
+  - nb HighK 5e17: Vth +0.21 V, gm −1%;
+  - nb HighK 1e18: +0.33 V, −1%;
+  - biased HighK 1e18: gm −2% (measured HPD: unchanged);
+  - biased SiN: gm −5% / −6% (p7e18 / p8e18).
+  - So the deck order of the gm loss is right; the SiN size is smaller than measured.
+  - New final set: AlGaN-only under-gate charge 5e17.
