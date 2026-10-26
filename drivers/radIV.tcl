@@ -44,6 +44,11 @@ if {![info exists doIdVd]}    { set doIdVd 1 }
 # irradiation bias and damage
 if {![info exists Vg_stress]} { set Vg_stress -10.0 }
 if {![info exists Vd_stress]} { set Vd_stress 28.0 }
+# stressNoHoles 1 (Ian, 2026-10-26): solve the off-state stress bias without holes
+# (Qfp frozen far above the bands so Hole ~ 0; restored and re-solved at rest before
+# damage/measurement). Holes are negligible off-state; this removes the minority-Qfp
+# divergence near Vdg ~ 27 V so the stress can reach Vd_stress. 0 = old behaviour.
+if {![info exists stressNoHoles]} { set stressNoHoles 0 }
 if {![info exists Vd_stressMin]} { set Vd_stressMin 12.0 } ;# accept a stress Vd down to this if the solve fails above
 if {![info exists damPeak]}   { set damPeak 0.0 }     ;# cm^-3 at E = damEref
 if {![info exists damEref]}   { set damEref 1.0e6 }   ;# V/cm
@@ -160,6 +165,13 @@ set sf [open ${tag}_summary.txt w]
 if {$radState eq "post"} {
     if {[info exists surfCharge]} { puts $sf "surfCharge $surfCharge" }
     if {$useTraps} {
+        if {$stressNoHoles} {
+            solution name=Qfp nosolve
+            sel z=50.0+1.0e-12*(1.0+x*x) name=Qfp
+            SaveState
+            if {[catch {device}]} { RestoreState; error "no-holes rest solve failed" }
+            puts $sf "stress without holes (Qfp frozen at +50 V)"
+        }
         if {![Ramp G 0.0 $Vg_stress 0.5]} { error "stress gate ramp failed" }
         # The off-state solve stops converging near Vdg ~ 27 V (minority quasi-Fermi
         # levels in the depleted AlGaN, job 47311016). Use the highest converged Vd if it
@@ -183,6 +195,13 @@ if {$radState eq "post"} {
         flush $sf
         if {![Ramp D $dS 0.0 1.0]} { error "stress drain ramp-down failed" }
         if {![Ramp G $Vg_stress 0.0 0.5]} { error "stress gate ramp-down failed" }
+        if {$stressNoHoles} {
+            sel z=0.0+1.0e-12*(1.0+x*x) name=Qfp
+            solution name=Qfp solve
+            SaveState
+            if {[catch {device}]} { RestoreState; error "holes back: rest solve failed" }
+            puts $sf "holes restored at rest"
+        }
     }
 }
 flush $sf
