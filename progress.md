@@ -1611,3 +1611,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Not reproduced: the gm contrast HPD vs SiN (model similar in both decks).
 - Caveats: gate-edge exclusion, second-site placement and lumped leakage are fitting choices; stress at 17 V.
 - Waiting on Ian: no-holes stress solve, merge, history scrub.
+- 15:20 **radFinal7** submitted (5 tasks): under-gate fixed charge confined to the AlGaN (`dam2Xmax 0.014`) at 5e17 / 1e18 — does it shift Vth without the ~7% gm loss of the top-50-nm version? Plus SiN at damPeak 7e18 / 8e18 for a deeper gm loss.
