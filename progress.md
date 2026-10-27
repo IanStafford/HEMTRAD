@@ -1639,3 +1639,17 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - field damage 7e18 (y ≥ 0.30);
   - hotEb 0.5.
   - Runs: nb HighK/SiN; biased HighK/SiN; SiN with a second discrete site (6e18 + 4e18). Pre comes from radFinal (47693156).
+
+## 2026-10-27 02:00 — rad-model: consolidated final model (radFinal8, 47887339)
+- 5/5 COMPLETED (two Id–Vd GAVE UP at Vd 9–10, at the very end).
+- One parameter set:
+  - nb: Vth +0.21 V, gm −1%, 0.95 flat;
+  - biased HighK: +0.21 V, gm −2%, 0.93 flat, no collapse;
+  - biased SiN: one site 0.83 → 0.48, gm −5%; with the second strike site, 0.60 then steps near 5 and 6.5 V, gm −17%.
+- Qualitatively reproduces the measured pre/post set: +Vth everywhere, HPD no collapse and gm kept, SiN late two-step collapse with the largest gm loss, nb small changes.
+- Figures regenerated (untracked `data/rad_y2/compare/1–4`), sent to Ian. KB note on the branch (`kb/results/rad-model.md`) has the final set, the table and the caveats.
+- Caveats:
+  - stress limited to 17 V (hard Qfn limit, after the approved no-holes test and the damping test);
+  - gate-edge exclusion, second-site placement and lumped Rgd are fitting choices;
+  - SiN final level shallower than measured.
+- Branch not merged (Ian: not yet).
