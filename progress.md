@@ -1658,3 +1658,11 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - radFinal9 = job 47908735 (3 tasks: SiN second site 5e18 / 6e18, and p6.5e18 + 5e18; deeper SiN final level) was submitted at 02:10. The master dropped at ~02:15.
 - One Duo reconnect attempt via `bin/hpg_reconnect.sh`: the push wasn't approved within 2 min. Per the rules: no retry. Waiting for Ian.
 - radFinal9 keeps running on HPG regardless. To pick up: once Ian reconnects, rsync `results/20261027_radFinal9`, compare with radFinal8 task_4 (SiN two sites), and adopt the closest set into the figures/KB if it's deeper without losing the late onset.
+
+## 2026-10-27 07:55 — reconnected (Ian); radFinal9 (47908735) analysed — radFinal8 stays final
+- Ian said "reconnect"; one Duo reconnect worked (master in tmux `hpg-master`).
+- radFinal9: 3/3 COMPLETED, but all three Id–Vd sweeps GAVE UP at Vd 3.75–4.5 V, right at the collapse onset.
+  - The stronger second site (5e18 / 6e18) deepens the low-Vd loss (Id at 1 V 202 / 183 vs 222 mA/mm; gm −19% / −21% vs −17%).
+  - The solver can't follow the collapse step, so the high-Vd level is unknown.
+  - No usable improvement. radFinal8 (47887339) stays the final consolidated model.
+- Goal status: qualitative replication done (Ian's bar). Caveats as in `kb/results/rad-model.md`. Branch not merged (Ian: not yet). No jobs running.
