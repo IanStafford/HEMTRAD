@@ -1653,3 +1653,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - gate-edge exclusion, second-site placement and lumped Rgd are fitting choices;
   - SiN final level shallower than measured.
 - Branch not merged (Ian: not yet).
+
+## 2026-10-27 02:25 — HPG master down; reconnect not approved — WAITING
+- radFinal9 = job 47908735 (3 tasks: SiN second site 5e18 / 6e18, and p6.5e18 + 5e18; deeper SiN final level) was submitted at 02:10. The master dropped at ~02:15.
+- One Duo reconnect attempt via `bin/hpg_reconnect.sh`: the push wasn't approved within 2 min. Per the rules: no retry. Waiting for Ian.
+- radFinal9 keeps running on HPG regardless. To pick up: once Ian reconnects, rsync `results/20261027_radFinal9`, compare with radFinal8 task_4 (SiN two sites), and adopt the closest set into the figures/KB if it's deeper without losing the late onset.
