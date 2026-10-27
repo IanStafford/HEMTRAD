@@ -166,3 +166,4 @@ One parameter set for every device (`sweeps/params_radFinal8.txt`; pre from radF
 - Qfn damping (`stressQfnDamp` 0.02 / 0.005) also stops at 17 V.
 - The Newton log diverges in Qfn in the depleted AlGaN/GaN, a hard solver limit. Both levers stay in, default off (smokes 47861047, 47875456).
 - radFinal9 (47908735): a stronger second site (5e18 / 6e18) deepens the SiN low-Vd loss (gm −19% / −21%), but every Id–Vd sweep gives up at Vd 3.75–4.5 V, right at the collapse step. So the deeper SiN final level couldn't be confirmed, and radFinal8 stays the final set.
+- radFinal10 (47943462): the same cases with Vd_step 0.1 and retryDepth 8 still give up at Vd 4.2 / 3.6 V, so the deeper SiN level stays unresolved and radFinal8 is final.
