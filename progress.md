@@ -1629,3 +1629,13 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - biased SiN: gm −5% / −6% (p7e18 / p8e18).
   - So the deck order of the gm loss is right; the SiN size is smaller than measured.
   - New final set: AlGaN-only under-gate charge 5e17.
+
+## 2026-10-26 22:05 — stress limit confirmed; consolidated radFinal8 submitted
+- Qfn-damp smoke (47875456): DampValue 0.02 and 0.005 both stop at **Vd 17 V** again. With no holes and two Qfn damping levels the stress still ends at Vdg ≈ 27 V, so this is a hard solver limit in the electron equation in the depleted region. It stays as a documented caveat; the damage scale absorbs the field magnitude.
+- **Submitted radFinal8 = job 47887339** (5 tasks), the consolidated final set:
+  - round-3 calibration;
+  - surfCharge −4e11;
+  - under-gate fixed charge 5e17 in the AlGaN only;
+  - field damage 7e18 (y ≥ 0.30);
+  - hotEb 0.5.
+  - Runs: nb HighK/SiN; biased HighK/SiN; SiN with a second discrete site (6e18 + 4e18). Pre comes from radFinal (47693156).
