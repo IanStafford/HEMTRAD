@@ -1666,3 +1666,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - The solver can't follow the collapse step, so the high-Vd level is unknown.
   - No usable improvement. radFinal8 (47887339) stays the final consolidated model.
 - Goal status: qualitative replication done (Ian's bar). Caveats as in `kb/results/rad-model.md`. Branch not merged (Ian: not yet). No jobs running.
+- 08:05 **radFinal10 = job 47943462** (2 tasks): radFinal9 SiN strong second site (5e18 / 6e18), rerun with Vd_step 0.1 and retryDepth 8 (solver-side) to follow the collapse step past 4 V.
