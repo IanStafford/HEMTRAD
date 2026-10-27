@@ -129,3 +129,39 @@ The optional third site `dam3Peak/dam3Ymin/dam3Ymax` (uniform, default off) puts
 - **SiN p6e18 + 4e18:** 0.60 at 1 V, then a *first step* near 5 V (0.53 → 0.44 at the Id–Vd level) and a *second step* near 6.3 V, followed by a slow creep up. The two-step shape, onset region and low-Vd loss now resemble the measured SiN biased curve qualitatively.
 - **SiN p7e18 + 2e18 / 4e18:** steps merge or come earlier.
 - **HighK p7e18 + 4e18:** the same uniform site collapses HighK too (0.63 → 0.39 near 6 V). So the second site is device-specific (a random strike location in that SiN device) and can't be derived from the deck. It's a fitting choice, documented as such. The leakage stepping during irradiation supports event-like damage.
+
+## Consolidated final model (2026-10-27, radFinal8 job 47887339)
+One parameter set for every device (`sweeps/params_radFinal8.txt`; pre from radFinal 47693156):
+- **pre:** polCharge 1e13, phiB 2.94, mobNref 1e18, vsat 1.75e7, mumax 2100.
+- **post (all devices):**
+  - surfCharge −4e11;
+  - fixed acceptor charge 5e17 cm⁻³ in the AlGaN under the gate (`dam2Peak 5e17 dam2M 0 dam2Ymin −0.125 dam2Ymax 0.125 dam2Xmax 0.014`).
+- **post, biased:**
+  - lateral-field E⁴ damage at the stress bias (damPeak 7e18, damEref 5e5, y ≥ 0.30, top 50 nm, acceptors at 0.30 eV);
+  - hot-electron fill-only capture (hotEb 0.5, hotTau 1e-14);
+  - optional second discrete strike site for the SiN device (damPeak 6e18 + `dam3Peak 4e18` at y 1.0–1.6).
+- **Leakage:** a lumped Rgd per device.
+
+**Model results** (vs each deck's pre):
+
+| | ΔVth | Δgm | Id(Vg +1) ratio, Vd 1 → 10 V |
+|---|---|---|---|
+| nb HighK / SiN | +0.21 V | −1% | 0.95 flat |
+| biased HighK | +0.21 V | −2% | 0.93 flat (no collapse) |
+| biased SiN, one site | +0.21 V | −5% | 0.83 → 0.48, single step from ~2 V |
+| biased SiN, two sites | +0.21 V | −17% | 0.60, steps near 5 V and 6.5 V, slow creep up |
+
+**Qualitative match with the measured set:**
+- every irradiated device shifts Vth positive;
+- HPD biased: no collapse and gm essentially kept;
+- SiN biased: a late, two-step collapse with a low-Vd loss and a clear gm loss (largest of all devices);
+- nb: small changes.
+
+**Remaining differences:**
+- the SiN final level is shallower than measured;
+- the lumped leakage, the gate-edge exclusion and the second-site placement are fitting choices.
+
+**Stress limit (confirmed 2026-10-26):** the off-state stress stops at Vd 17 V (Vdg ≈ 27 V).
+- Ian approved `stressNoHoles` (holes removed above `stressNoHolesX`; removing them everywhere breaks the Fe buffer). It runs, but stops at 17 V with identical fields.
+- Qfn damping (`stressQfnDamp` 0.02 / 0.005) also stops at 17 V.
+- The Newton log diverges in Qfn in the depleted AlGaN/GaN, a hard solver limit. Both levers stay in, default off (smokes 47861047, 47875456).
