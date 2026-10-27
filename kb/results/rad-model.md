@@ -167,3 +167,18 @@ One parameter set for every device (`sweeps/params_radFinal8.txt`; pre from radF
 - The Newton log diverges in Qfn in the depleted AlGaN/GaN, a hard solver limit. Both levers stay in, default off (smokes 47861047, 47875456).
 - radFinal9 (47908735): a stronger second site (5e18 / 6e18) deepens the SiN low-Vd loss (gm −19% / −21%), but every Id–Vd sweep gives up at Vd 3.75–4.5 V, right at the collapse step. So the deeper SiN final level couldn't be confirmed, and radFinal8 stays the final set.
 - radFinal10 (47943462): the same cases with Vd_step 0.1 and retryDepth 8 still give up at Vd 4.2 / 3.6 V, so the deeper SiN level stays unresolved and radFinal8 is final.
+
+## Final SiN biased curve (2026-10-27, radFinal11 job 47959281)
+Settings: radFinal8 set with damPeak 6e18 + second site `dam3Peak 4.5e18` (y 1.0–1.6), Id–Vd at `Vd_step 0.1, retryDepth 8`. It runs to 10 V:
+- Id (Vg +1) 212 / 342 / 417 / 452 mA/mm at Vd 1–4 V;
+- **steps near 4.5 V (→ 360) and 5.8 V (→ 255)**;
+- then a slow creep up to 377 at 10 V;
+- gm −18%, Vth +0.20 V.
+
+Qualitatively the measured SiN biased curve: low-Vd loss, two steps, late onset, creep. The final level is close to measured.
+
+Other cases in the run:
+- 6.5e18 + 4e18 and 7e18 + 3e18 also run to 10 V, but end at 472 / 494 with a single step.
+- (radFinal9/10 with 5e18–6e18 sites can't be followed through the step.)
+
+This replaces the radFinal8 two-site SiN curve. All other devices stay at radFinal8.
