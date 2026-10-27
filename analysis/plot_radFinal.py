@@ -1,6 +1,7 @@
 """Consolidated pre/post-irradiation model (sweeps/params_radFinal.txt, job 47693156).
 
-usage: python3 analysis/plot_radFinal.py [run_dir] [--targets t.csv] [--out fig.png] [--damPeak 5e18]
+usage: python3 analysis/plot_radFinal.py [run_dir] [--pre pre_run_dir] [--targets t.csv] [--out fig.png] [--damPeak 5e18|""]
+  e.g. radFinal8: python3 analysis/plot_radFinal.py results/20261026_radFinal8 --pre results/20261025_radFinal --damPeak "" --out figures/radFinal8_model.png
 Three panels:
 - Id-Vd at Vg +1 as post/pre (HighK deck = HPD, SiN deck = SiN);
 - the same for non-biased;
@@ -23,11 +24,13 @@ run = "results/20261025_radFinal"
 tgt = None
 out = "figures/radFinal_model.png"
 dp = "5e18"
-for flag in ("--targets", "--out", "--damPeak"):
+pre_run = None
+for flag in ("--targets", "--out", "--damPeak", "--pre"):
     if flag in args:
         i = args.index(flag); val = args[i + 1]; del args[i:i + 2]
         if flag == "--targets": tgt = val
         elif flag == "--out": out = val
+        elif flag == "--pre": pre_run = val
         else: dp = val
 if args:
     run = args[0]
@@ -37,7 +40,7 @@ COL = {"highk": "#1B4F9C", "sin": "#C2410C"}
 NAME = {"highk": "HPD (HighK deck)", "sin": "SiN"}
 
 M = {}
-for t in glob.glob(f"{run}/task_*"):
+for t in glob.glob(f"{run}/task_*") + (glob.glob(f"{pre_run}/task_*") if pre_run else []):
     p = json.load(open(os.path.join(t, "params.json")))
     d = {}
     for k in ("IdVd", "IdVg"):
@@ -67,7 +70,7 @@ def ratio(post, pre):
 
 for ax, state, title in ((axs[0], "b", "biased (Vg −10 / Vd 28 V)"), (axs[1], "nb", "non-biased")):
     for deck in ("highk", "sin"):
-        lab = f"b_{deck}_p{dp}" if state == "b" else f"nb_{deck}"
+        lab = (f"b_{deck}_p{dp}" if dp else f"b_{deck}") if state == "b" else f"nb_{deck}"
         if lab in M and "IdVd" in M[lab]:
             ax.plot(*ratio(lab, f"pre_{deck}"), color=COL[deck], lw=2, label=f"model {NAME[deck]}")
         mk = f"IdVd_{state}_{'HPD' if deck == 'highk' else 'SiN'}"
@@ -82,8 +85,9 @@ for ax, state, title in ((axs[0], "b", "biased (Vg −10 / Vd 28 V)"), (axs[1], 
     ax.legend(frameon=False, fontsize=8, loc="lower left")
 
 ax = axs[2]
-for lab, ls in (("pre_highk", ":"), ("nb_highk", "--"), (f"b_highk_p{dp}", "-"),
-                ("pre_sin", ":"), ("nb_sin", "--"), (f"b_sin_p{dp}", "-")):
+bl = (lambda d: f"b_{d}_p{dp}") if dp else (lambda d: f"b_{d}")
+for lab, ls in (("pre_highk", ":"), ("nb_highk", "--"), (bl("highk"), "-"),
+                ("pre_sin", ":"), ("nb_sin", "--"), (bl("sin"), "-")):
     if lab in M and "IdVg" in M[lab]:
         d = M[lab]["IdVg"]
         deck = "highk" if "highk" in lab else "sin"
@@ -98,7 +102,7 @@ ax.set_title("Id–Vg (pre dotted, nb dashed, biased solid)", color=INK, fontsiz
 ax.grid(color=GRID, lw=0.8); ax.spines[["top", "right"]].set_visible(False)
 ax.legend(frameon=False, fontsize=6, ncol=2, loc="upper left")
 
-fig.suptitle(f"Pre/post-irradiation model, radFinal (job 47693156), biased damPeak {dp}", color=INK, fontsize=11)
+fig.suptitle(f"Pre/post-irradiation model, {os.path.basename(run)}" + (f", biased damPeak {dp}" if dp else ""), color=INK, fontsize=11)
 fig.tight_layout()
 os.makedirs(os.path.dirname(os.path.abspath(out)), exist_ok=True)
 fig.savefig(out, dpi=150)
