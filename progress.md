@@ -1668,3 +1668,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Goal status: qualitative replication done (Ian's bar). Caveats as in `kb/results/rad-model.md`. Branch not merged (Ian: not yet). No jobs running.
 - 08:05 **radFinal10 = job 47943462** (2 tasks): radFinal9 SiN strong second site (5e18 / 6e18), rerun with Vd_step 0.1 and retryDepth 8 (solver-side) to follow the collapse step past 4 V.
 - 10:50: radFinal10 (47943462) 2/2 COMPLETED, but the Id–Vd still gives up at Vd 4.2 / 3.6 V even with 0.1 V steps and retryDepth 8. A strong second site (≥ 5e18) makes the collapse step itself unresolvable by the solver, so the SiN final level can't be pushed deeper this way. **radFinal8 (47887339) is the final model.** The rad-model goal is closed at the qualitative level Ian accepted; remaining differences and caveats are in `kb/results/rad-model.md` (branch). No jobs running.
+
+## 2026-10-27 14:15 — rad-model: radFinal11 (47959281) — final SiN curve
+- 3/3 COMPLETED, all run to Vd 10 V (0.1 V steps, retryDepth 8).
+- **SiN damPeak 6e18 + second site 4.5e18:** two steps near 4.5 and 5.8 V, creep up to 377 mA/mm at 10 V, gm −18%. That's deeper than radFinal8 (483) and qualitatively the measured curve. Adopted as the final SiN biased curve. Other devices stay at radFinal8.
+- Figures regenerated (untracked `data/rad_y2/compare/`), sent to Ian; KB note updated.
+- Model complete at the qualitative level. Remaining caveats as in the KB note (stress 17 V, fitting choices: gate-edge exclusion, second-site placement, lumped Rgd). No jobs running.
