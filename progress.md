@@ -1674,3 +1674,6 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **SiN damPeak 6e18 + second site 4.5e18:** two steps near 4.5 and 5.8 V, creep up to 377 mA/mm at 10 V, gm −18%. That's deeper than radFinal8 (483) and qualitatively the measured curve. Adopted as the final SiN biased curve. Other devices stay at radFinal8.
 - Figures regenerated (untracked `data/rad_y2/compare/`), sent to Ian; KB note updated.
 - Model complete at the qualitative level. Remaining caveats as in the KB note (stress 17 V, fitting choices: gate-edge exclusion, second-site placement, lumped Rgd). No jobs running.
+
+## 2026-10-27 — rad-model goal closed (Ian: "Close the goal")
+- Final model: radFinal8 (47887339) for pre/nb/HPD, plus radFinal11 (47959281) for the SiN biased curve. Qualitative replication; caveats are in `kb/results/rad-model.md` on `explore/rad-model`. Branch not merged (Ian: not yet). No jobs running.
