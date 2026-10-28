@@ -1679,3 +1679,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Final model: radFinal8 (47887339) for pre/nb/HPD, plus radFinal11 (47959281) for the SiN biased curve. Qualitative replication; caveats are in `kb/results/rad-model.md` on `explore/rad-model`. Branch not merged (Ian: not yet). No jobs running.
 - Dashboard (work log) updated, version 12: day pages Oct 21, Oct 23, Oct 24–27 (rad model), refreshed Overview (tiles: pre fit, SiN-only collapse, Vth shift; open items rad-model stress limit / fitting choices / merge). Model-only figures (`radMech_*`, `radFinal8_model`, `deckVg1_IdVd`); no measured data. `kb/current-status.md` refreshed.
 - Rad-model explainer published: https://claude.ai/artifact/FArVrMfXX8JNvoFRqYWHLu (source `dashboard/rad-model.html`, model-only figures); linked from the work log's Oct 24–27 page and `kb/workflow/dashboard.md`.
+
+## 2026-10-28 — Stress divergence at Vd 17 V: diagnosis started
+- Ian: work on a solution to the stress divergence at Vd 17 V; wants higher voltages.
+- radIV `stressDiag` (default 0): after the ramp stops, one more drain step (+0.25 V). The fields (Qfn, DevPsi, Elec, Econd) and their Newton changes (|ΔQfn|, |ΔPsi|) are written along cuts at several depths and positions to `<tag>_stressDiag.txt`, then restored.
+- **stressDiag1 = job 48125435** (4 tasks, SiN deck, stress only, target Vd 40): Vg_stress −10 / −6 / −14 / −4. This finds where Qfn runs away, and whether the limit follows Vdg (~27 V) or Vd.
