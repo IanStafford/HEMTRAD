@@ -54,6 +54,11 @@ if {![info exists stressQfnDamp]} { set stressQfnDamp 0.1 }
 # stressDiag 1: after the stress ramp stops, try one more drain step and write the
 # fields and their Newton changes along cuts to <tag>_stressDiag.txt (then restore)
 if {![info exists stressDiag]} { set stressDiag 0 }
+# Qfn Abs.Error (V) during the stress drain ramp only (solver tolerance; model default 1e-2).
+# In the fully depleted region under the gate Qfn has no effect on the solution and
+# Newton's updates there wander by 1e-3..4e-2 V, so the 1e-2 tolerance (~1e-5 V
+# effective with updateLimit 1e-3) is never met above Vd ~17 V (job 48125435).
+if {![info exists stressQfnAbs]} { set stressQfnAbs 1.0e-2 }
 # holes are removed only above this depth (um below the AlGaN top); deeper, Qfp is frozen
 # at its rest value 0 (the Fe buffer needs its equilibrium holes). 0 = freeze at 0 everywhere.
 if {![info exists stressNoHolesX]} { set stressNoHolesX 0.1 }
@@ -184,13 +189,13 @@ if {$radState eq "post"} {
         # The off-state solve stops converging near Vdg ~ 27 V (minority quasi-Fermi
         # levels in the depleted AlGaN, job 47311016). Use the highest converged Vd if it
         # is at least Vd_stressMin; the damage law's scale absorbs the field magnitude.
-        foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue $stressQfnDamp }
+        foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue $stressQfnDamp; pdbSetDouble $m Qfn Abs.Error $stressQfnAbs }
         set dS 0.0
         for {set d 1.0} {$d <= $Vd_stress + 1e-9} {set d [expr {$d + 1.0}]} {
             if {![Reach D $dS $d $retryDepth 0]} { break }
             set dS $d
         }
-        foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue 0.1 }
+        foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue 0.1; pdbSetDouble $m Qfn Abs.Error 1.0e-2 }
         if {$dS < $Vd_stressMin} { error "stress drain ramp failed at $dS" }
         if {$stressDiag} {
             sel z=Qfn name=QfnPrev
