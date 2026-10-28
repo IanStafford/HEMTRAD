@@ -1678,3 +1678,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 ## 2026-10-27 — rad-model goal closed (Ian: "Close the goal")
 - Final model: radFinal8 (47887339) for pre/nb/HPD, plus radFinal11 (47959281) for the SiN biased curve. Qualitative replication; caveats are in `kb/results/rad-model.md` on `explore/rad-model`. Branch not merged (Ian: not yet). No jobs running.
 - Dashboard (work log) updated, version 12: day pages Oct 21, Oct 23, Oct 24–27 (rad model), refreshed Overview (tiles: pre fit, SiN-only collapse, Vth shift; open items rad-model stress limit / fitting choices / merge). Model-only figures (`radMech_*`, `radFinal8_model`, `deckVg1_IdVd`); no measured data. `kb/current-status.md` refreshed.
+- Rad-model explainer published: https://claude.ai/artifact/FArVrMfXX8JNvoFRqYWHLu (source `dashboard/rad-model.html`, model-only figures); linked from the work log's Oct 24–27 page and `kb/workflow/dashboard.md`.

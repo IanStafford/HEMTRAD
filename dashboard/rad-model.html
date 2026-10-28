@@ -1,0 +1,282 @@
+<title>HEMT Rad Model</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+/* Layout: a single reading column for the explanation, widening to two columns for figure + text pairs;
+   same lab-notebook family as the work log (Plex, slate-blue accent), with HighK blue / SiN orange as the two deck colours. */
+:root {
+  --bg: #f3f5f7; --surface: #ffffff; --ink: #18212b; --muted: #5b6876; --line: #d9dfe5;
+  --accent: #1f5fae; --accent-soft: #e3edf9; --paper: #ffffff; --gray-soft: #eceff2;
+  --highk: #1b4f9c; --sin: #c2410c; --sin-soft: #fbe6da; --highk-soft: #e1eaf7;
+  --ok: #1d7a4f; --ok-soft: #e1f2e9; --warn: #9a5b00; --warn-soft: #fbefd9; --open: #b23a2b; --open-soft: #fbe5e1;
+  --metal: #8c96a3; --gan: #dfe4ea; --algan: #c6cfd9; --pass: #eef1e4; --twodeg: #1f5fae;
+  --f-display: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161c; --surface: #19212a; --ink: #e6ebf0; --muted: #9aa7b4; --line: #2a3541;
+    --accent: #7fb0ec; --accent-soft: #1d2c3e; --paper: #f4f6f8; --gray-soft: #232d38;
+    --highk: #8db7f0; --sin: #f29a68; --sin-soft: #3a2418; --highk-soft: #1c2b40;
+    --ok: #6fcf9f; --ok-soft: #173326; --warn: #e6b45c; --warn-soft: #3a2c12; --open: #f08c7c; --open-soft: #3d1f1a;
+    --metal: #7d8794; --gan: #2a333e; --algan: #3a4552; --pass: #2f3527; --twodeg: #7fb0ec;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161c; --surface: #19212a; --ink: #e6ebf0; --muted: #9aa7b4; --line: #2a3541;
+  --accent: #7fb0ec; --accent-soft: #1d2c3e; --paper: #f4f6f8; --gray-soft: #232d38;
+  --highk: #8db7f0; --sin: #f29a68; --sin-soft: #3a2418; --highk-soft: #1c2b40;
+  --ok: #6fcf9f; --ok-soft: #173326; --warn: #e6b45c; --warn-soft: #3a2c12; --open: #f08c7c; --open-soft: #3d1f1a;
+  --metal: #7d8794; --gan: #2a333e; --algan: #3a4552; --pass: #2f3527; --twodeg: #7fb0ec;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15.5px; line-height: 1.6; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; display: grid; gap: 44px; }
+header { display: grid; gap: 10px; border-bottom: 1px solid var(--line); padding-bottom: 24px; }
+h1 { font-family: var(--f-display); font-weight: 600; font-size: clamp(28px, 4.4vw, 40px); line-height: 1.12; margin: 0; text-wrap: balance; }
+.lede { margin: 0; max-width: 68ch; font-size: 17px; color: var(--ink); }
+.meta { margin: 0; font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 16px; }
+h2 { font-family: var(--f-display); font-weight: 600; font-size: 24px; line-height: 1.2; margin: 0; text-wrap: balance; }
+h3 { font-size: 15px; font-weight: 600; margin: 0; }
+section { display: grid; gap: 16px; }
+section > p, .prose p { margin: 0; max-width: 68ch; }
+.label { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.num, code { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+code { font-size: .88em; background: var(--gray-soft); padding: 1px 4px; border-radius: 3px; }
+.hk { color: var(--highk); font-weight: 600; }
+.sn { color: var(--sin); font-weight: 600; }
+
+/* schematic */
+.schem { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: grid; gap: 10px; }
+.schem-scroll { overflow-x: auto; }
+.schem svg { display: block; width: 100%; min-width: 620px; height: auto; }
+.schem text { font-family: var(--f-mono); font-size: 11px; fill: var(--muted); }
+.schem text.k { fill: var(--ink); font-weight: 500; }
+.schem text.s { fill: var(--sin); font-weight: 500; }
+.schem text.h { fill: var(--highk); font-weight: 500; }
+.f-gan { fill: var(--gan); } .f-algan { fill: var(--algan); } .f-pass { fill: var(--pass); stroke: var(--line); }
+.f-metal { fill: var(--metal); } .f-dam-s { fill: var(--sin); opacity: .85; } .f-dam-h { fill: var(--highk); opacity: .55; }
+.f-site2 { fill: var(--sin); opacity: .35; stroke: var(--sin); stroke-dasharray: 4 3; }
+.l-2deg { stroke: var(--twodeg); stroke-width: 1.6; stroke-dasharray: 6 4; }
+.l-mark { stroke: var(--muted); stroke-width: 1; }
+.l-field { stroke: var(--sin); stroke-width: 2; fill: none; }
+.l-fieldh { stroke: var(--highk); stroke-width: 2; fill: none; }
+.caption { font-size: 13.5px; color: var(--muted); max-width: 80ch; margin: 0; }
+
+/* steps */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 14px; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.step .n { font-family: var(--f-mono); font-size: 12px; color: var(--accent); }
+.step p { margin: 0; font-size: 14px; color: var(--muted); }
+.step p b { color: var(--ink); font-weight: 600; }
+
+/* figure pairs */
+.pair { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+figure a { display: block; background: var(--paper); padding: 8px; }
+figure img { display: block; width: 100%; height: auto; }
+figcaption { padding: 10px 14px 12px; font-size: 13.5px; color: var(--muted); }
+figcaption b { color: var(--ink); font-weight: 600; display: block; margin-bottom: 2px; }
+.prose { display: grid; gap: 12px; min-width: 0; }
+.prose ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+
+/* tables */
+.tbl { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 500; background: var(--gray-soft); }
+tr:last-child td { border-bottom: 0; }
+td.mono { font-family: var(--f-mono); font-size: 13px; white-space: nowrap; }
+.pill { font-family: var(--f-mono); font-size: 11px; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.part { background: var(--warn-soft); color: var(--warn); }
+.pill.no { background: var(--open-soft); color: var(--open); }
+.pill.fit { background: var(--gray-soft); color: var(--muted); }
+
+.cols2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 18px; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: grid; gap: 10px; min-width: 0; }
+.box ul { margin: 0; padding-left: 18px; display: grid; gap: 7px; font-size: 14.5px; }
+.box li span.j { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+
+@media (max-width: 760px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="label">AlGaN/GaN HEMT · FLOOXS · heavy-ion irradiation</span>
+    <h1>Why biased irradiation collapses the SiN device and not the HPD one</h1>
+    <p class="lede">A pre/post-irradiation model for the Y2 high-LET set (HPD #11 with HfO₂ passivation vs SiN #35, both irradiated at Vg −10 V, Vd 28 V). The stress bias places damage where the field is strongest; the SiN passivation focuses that field into one spot just past the gate, and that spot is what collapses the drain current.</p>
+    <p class="meta"><span>branch explore/rad-model</span><span>driver drivers/radIV.tcl</span><span>final jobs 47887339 · 47959281</span><span>Oct 23–27, 2026</span></p>
+  </header>
+
+  <section aria-labelledby="pic">
+    <h2 id="pic">The mechanism in one picture</h2>
+    <div class="schem">
+      <div class="schem-scroll">
+      <svg viewBox="0 0 800 300" role="img" aria-label="Cross-section of the HEMT from source to drain. The T-gate and field plate sit on the passivation. Under the T-gate overhang, just past the gate foot, the SiN device gets a dense damage spot at the 2DEG; the HighK device gets a smaller, weaker one. A dashed second site further toward the drain marks the hand-placed second strike in the SiN device.">
+        <!-- y (um) -> x px: x = 40 + (y + 1.4) * 150 -->
+        <rect class="f-gan" x="40" y="168" width="720" height="92"/>
+        <rect class="f-algan" x="40" y="152" width="720" height="16"/>
+        <rect class="f-pass" x="40" y="96" width="720" height="56"/>
+        <line class="l-2deg" x1="40" y1="171" x2="760" y2="171"/>
+        <!-- source / drain contacts -->
+        <rect class="f-metal" x="40" y="104" width="22" height="64"/>
+        <rect class="f-metal" x="738" y="104" width="22" height="64"/>
+        <!-- gate foot y -0.125..0.125 : x 231.25..268.75 ; T head to 0.485 : x 333 -->
+        <rect class="f-metal" x="231" y="112" width="38" height="40"/>
+        <rect class="f-metal" x="200" y="96" width="133" height="16"/>
+        <!-- field plate y 0.285..0.725 : x 293..359 -->
+        <rect class="f-metal" x="293" y="60" width="66" height="14"/>
+        <!-- damage, SiN: y 0.35..0.65 peak 0.5 -> x 300..345 -->
+        <ellipse class="f-dam-s" cx="325" cy="166" rx="24" ry="9"/>
+        <!-- damage, HighK: weaker, broader 0.3..0.8 -->
+        <ellipse class="f-dam-h" cx="330" cy="186" rx="34" ry="5"/>
+        <!-- second strike site y 1.0..1.6 : x 400..490 -->
+        <rect class="f-site2" x="400" y="160" width="90" height="16" rx="3"/>
+        <!-- field profiles (schematic) at stress, drawn above the passivation -->
+        <path class="l-field" d="M268 252 C 280 200, 290 222, 300 230 S 318 196, 325 196 S 340 232, 352 246 S 420 254, 520 256"/>
+        <path class="l-fieldh" d="M268 252 C 280 200, 290 222, 300 236 S 320 220, 330 222 S 360 232, 380 244 S 500 250, 720 255"/>
+        <!-- markers -->
+        <line class="l-mark" x1="231" y1="40" x2="231" y2="96"/><line class="l-mark" x1="269" y1="40" x2="269" y2="96"/>
+        <text class="k" x="226" y="34">gate</text>
+        <text class="k" x="293" y="54">field plate</text>
+        <text class="k" x="44" y="92">source</text><text class="k" x="712" y="92">drain</text>
+        <text x="560" y="128">SiN or HfO₂ passivation</text>
+        <text x="560" y="164">AlGaN barrier</text>
+        <text x="560" y="186">2DEG</text>
+        <text x="560" y="214">GaN:Fe buffer</text>
+        <text class="s" x="306" y="146">damage</text>
+        <text class="s" x="404" y="152">2nd strike (SiN, by hand)</text>
+        <text class="s" x="345" y="203">SiN field</text>
+        <text class="h" x="392" y="236">HighK field</text>
+        <text x="44" y="282">lateral field at the stress bias, schematic (same baseline)</text>
+      </svg>
+      </div>
+      <p class="caption">Not to scale vertically. Under stress the field peaks at the gate's drain edge in both devices; there is no electron population there and the model leaves it undamaged (a fitting choice, see Limits). The second peak, under the T-gate overhang near y = 0.5 µm, is twice as high with SiN. Damage scales as field⁴, so that spot gets about ten times more traps in SiN.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="how">
+    <h2 id="how">How a run works</h2>
+    <p>Every device is computed in the same order. Pre-irradiation devices stop after step 1; non-biased devices skip the stress-placed damage.</p>
+    <div class="steps">
+      <div class="step"><span class="n">1 · calibrate</span><h3>Pre-irradiation deck</h3><p>Polarization charge <b>1e13 cm⁻²</b>, Schottky barrier <b>2.94 eV</b>, mobility vsat <b>1.75e7 cm/s</b>, µmax <b>2100</b>. Vth within <b>0.03 V</b>, Id–Vd at Vg +1 within <b>~4%</b>.</p></div>
+      <div class="step"><span class="n">2 · stress</span><h3>Off-state bias</h3><p>Gate to <b>−10 V</b>, then the drain in 1 V steps. The solve converges up to <b>Vd 17 V</b> (target 28 V), and the lateral field there is stored.</p></div>
+      <div class="step"><span class="n">3 · damage</span><h3>Traps from the stress field</h3><p>Acceptor traps at <b>0.30 eV</b> in the top 50 nm, density <b>7e18 · (E/5e5 V/cm)⁴</b> beyond y = 0.30 µm. All devices: fixed charge <b>5e17 cm⁻³</b> in the AlGaN under the gate and <b>−4e11 cm⁻²</b> at the surface.</p></div>
+      <div class="step"><span class="n">4 · measure</span><h3>Hot-electron capture</h3><p>Id–Vg at Vd 0.1 V and Id–Vd at Vg +1 V. Hot electrons fill the traps once they clear a <b>0.5 eV</b> barrier, so the current drops only above a threshold Vd.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="why">
+    <h2 id="why">Why the passivation matters</h2>
+    <div class="pair">
+      <figure><a href="fig/radMech_damage.jpg" target="_blank" rel="noopener"><img src="fig/radMech_damage.jpg" alt="Left: lateral field along the channel at the stress bias for HighK and SiN; SiN has a second peak at y = 0.5 µm about twice the HighK value. Right: resulting damage trap density; SiN peaks near 6e18 at y = 0.5 µm, HighK near 7e17." loading="lazy"></a><figcaption><b>Stress field and the damage it places</b>Model, job 47887339, Vg −10 V / Vd 17 V. Gate shaded, field-plate edge dotted.</figcaption></figure>
+      <div class="prose">
+        <p>The two devices share the same gate, field plate and mesh; only the passivation's permittivity differs (εr 35 for HfO₂, 6.3 for SiN).</p>
+        <ul>
+          <li><span class="hk">HighK</span> couples the T-gate head and field plate strongly to the channel and spreads the drain voltage over several µm toward the drain.</li>
+          <li><span class="sn">SiN</span> couples weakly, so the potential drops in a short stretch under the T-gate overhang: a second field peak at y ≈ 0.5 µm, about <span class="num">5.5e5 V/cm</span> against <span class="num">2.9e5</span>.</li>
+          <li>With a fourth-power damage law that factor of two becomes roughly <span class="num">10×</span> more traps, enough to trap the channel open only in SiN.</li>
+        </ul>
+        <p>Before irradiation the two decks give the same current to within 1%, as the measured pre-irradiation curves do.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="result">
+    <h2 id="result">What the model reproduces</h2>
+    <div class="pair">
+      <figure><a href="fig/radMech_SiN_IdVd.jpg" target="_blank" rel="noopener"><img src="fig/radMech_SiN_IdVd.jpg" alt="Id-Vd at Vg +1 V. HighK: biased curve a few percent below pre, no collapse. SiN: pre curve, one-site curve flattening near 2 V, and the final two-site curve dropping in steps near 4.5 and 5.8 V then creeping up." loading="lazy"></a><figcaption><b>Id–Vd at Vg +1 V, before and after biased irradiation</b>Model only. SiN final curve from job 47959281 (second strike site 4.5e18 at y 1.0–1.6 µm).</figcaption></figure>
+      <div class="prose">
+        <p>In the <span class="sn">SiN</span> device the current follows the pre-irradiation curve with a low-Vd loss until hot electrons reach the damage, then drops in a step near <span class="num">4.5 V</span>. A second, hand-placed strike site further toward the drain adds a second step near <span class="num">5.8 V</span>; after it the current creeps back up, as on the curve tracer.</p>
+        <p>The <span class="hk">HighK</span> device keeps its shape, a few percent below pre-irradiation.</p>
+      </div>
+    </div>
+    <figure><a href="fig/radFinal8_model.jpg" target="_blank" rel="noopener"><img src="fig/radFinal8_model.jpg" alt="Three panels: post over pre current ratios for biased devices (HighK flat at 0.93, SiN dropping from 0.83 to 0.48) and non-biased devices (both 0.95), and Id-Vg near threshold showing a +0.21 V shift for every irradiated device." loading="lazy"></a><figcaption><b>All devices, one parameter set (job 47887339)</b>Post/pre current ratio at Vg +1 for biased and non-biased devices, and Id–Vg near threshold. The SiN curve here is the one-site version.</figcaption></figure>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Observed after irradiation</th><th>Model</th><th>Match</th></tr></thead>
+        <tbody>
+          <tr><td>Threshold shifts positive in every irradiated device</td><td class="mono">+0.21 V, all devices</td><td><span class="pill ok">yes</span></td></tr>
+          <tr><td>HPD biased: no collapse, transconductance kept</td><td class="mono">0.93 flat, gm −2%</td><td><span class="pill ok">yes</span></td></tr>
+          <tr><td>SiN biased: collapse well above the knee, in two steps, then creep</td><td class="mono">steps 4.5 / 5.8 V</td><td><span class="pill part">with 2nd site</span></td></tr>
+          <tr><td>SiN biased loses the most transconductance</td><td class="mono">gm −18% (HighK −2%)</td><td><span class="pill ok">order</span></td></tr>
+          <tr><td>SiN final current level after collapse</td><td class="mono">377 mA/mm at 10 V</td><td><span class="pill part">a bit high</span></td></tr>
+          <tr><td>Non-biased devices change little</td><td class="mono">0.95, gm −1%</td><td><span class="pill ok">yes</span></td></tr>
+          <tr><td>Gate–drain leakage after biased irradiation</td><td class="mono">lumped resistor</td><td><span class="pill fit">not physical</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="ruled">
+    <h2 id="ruled">What was tried and dropped</h2>
+    <div class="cols2">
+      <div class="box">
+        <h3>Did not separate the decks</h3>
+        <ul>
+          <li>Plain trap model at Vg +1: same onset on both decks <span class="j">47062225</span></li>
+          <li>Damage ∝ field or field², and peak-field placement: equal in both <span class="j">47327524 · 47356193</span></li>
+          <li>Fixed charge in the SiN layer from the dielectric field <span class="j">47458257</span></li>
+          <li>Uniform damage at a given position: collapses HighK too <span class="j">47458256 · 47606666</span></li>
+          <li>Electron-weighted damage (n·E, n·E⁴): contact damage dominates, or no effect <span class="j">47628955 · 47725314</span></li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>Changed the shape the wrong way</h3>
+        <ul>
+          <li>Damage at the gate edge: early collapse in both decks <span class="j">47458256</span></li>
+          <li>Access-region n·E damage: more loss in HighK than SiN <span class="j">47662463 · 47752290</span></li>
+          <li>Slower capture (τ 1e-12 s): full SiN collapse from 1 V <span class="j">47773690</span></li>
+          <li>Under-gate charge through the channel: shifts Vth but costs ~7% gm; fixed by keeping it in the AlGaN <span class="j">47852523</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="limits">
+    <h2 id="limits">Limits</h2>
+    <div class="cols2">
+      <div class="box">
+        <h3>Numerical</h3>
+        <ul>
+          <li>The stress solve stops at <b>Vd 17 V</b> (gate–drain 27 V); the electron quasi-Fermi level diverges in the depleted region under the gate. Solving without holes and heavier damping do not help <span class="j">47861047 · 47875456</span>. The damage scale absorbs the weaker field.</li>
+          <li>A stronger second strike site deepens the SiN drop but the Id–Vd sweep cannot get through the step <span class="j">47908735 · 47943462</span>.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>Fitting choices</h3>
+        <ul>
+          <li>No damage closer than 0.30 µm to the gate centre.</li>
+          <li>The second strike site is placed by hand in the SiN device; the same site in HighK would collapse it too, so it stands for where that ion happened to hit.</li>
+          <li>Gate–drain leakage is a lumped resistor per device.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="where">
+    <h2 id="where">Where it lives</h2>
+    <div class="tbl">
+      <table>
+        <tbody>
+          <tr><td>Driver and levers</td><td class="mono">drivers/radIV.tcl</td></tr>
+          <tr><td>Final parameter sets</td><td class="mono">sweeps/params_radFinal8.txt · params_radFinal11.txt</td></tr>
+          <tr><td>Write-up, run history, caveats</td><td class="mono">kb/results/rad-model.md</td></tr>
+          <tr><td>Figures</td><td class="mono">analysis/plot_radMechanism.py · plot_radFinal.py</td></tr>
+          <tr><td>Comparison with the measured curves</td><td class="mono">data/rad_y2/compare/ (workstation only)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Branch <code>explore/rad-model</code>, not merged into main. All curves on this page are model output; the measured data stay on the workstation.</footer>
+</div>

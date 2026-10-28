@@ -6,6 +6,8 @@ tags: [workflow, procedure]
 
 A private claude.ai artifact, **https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd** ("HEMT Collapse Log"): an Overview page plus one page per working day (Done, Needed work, example figures). Source `dashboard/hemt-collapse-log.html`, web figures `dashboard/fig/`, helper `dashboard/webfig.py`. Always edit the repo copy; never start a new artifact.
 
+Separate explainer for the rad model (branch `explore/rad-model`): **https://claude.ai/artifact/FArVrMfXX8JNvoFRqYWHLu** ("HEMT Rad Model"), source `dashboard/rad-model.html`, same `fig/` folder. Model-only figures; no measured numbers on either page.
+
 ## When Ian says "wrap up for the day"
 1. `git pull`. Gather the day's work from `progress.md`, `git log --since=<date>`, [[current-status]] and running jobs (`squeue`).
 2. **Day page** at the top of `<main>`, right after the Overview section and its `<div class="no-js-sep"></div>`, copying the existing structure:
