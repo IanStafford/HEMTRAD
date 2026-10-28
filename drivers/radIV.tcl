@@ -54,10 +54,8 @@ if {![info exists stressQfnDamp]} { set stressQfnDamp 0.1 }
 # stressDiag 1: after the stress ramp stops, try one more drain step and write the
 # fields and their Newton changes along cuts to <tag>_stressDiag.txt (then restore)
 if {![info exists stressDiag]} { set stressDiag 0 }
-# Qfn Abs.Error (V) during the stress drain ramp only (solver tolerance; model default 1e-2).
-# In the fully depleted region under the gate Qfn has no effect on the solution and
-# Newton's updates there wander by 1e-3..4e-2 V, so the 1e-2 tolerance (~1e-5 V
-# effective with updateLimit 1e-3) is never met above Vd ~17 V (job 48125435).
+# NOTE: stressQfnAbs and stressQfnDamp change pdb values mid-run, which FLOOXS ignores
+# (it reads them only when the solver is built); kept for the record, no effect. Use qfnAbs.
 if {![info exists stressQfnAbs]} { set stressQfnAbs 1.0e-2 }
 # holes are removed only above this depth (um below the AlGaN top); deeper, Qfp is frozen
 # at its rest value 0 (the Fe buffer needs its equilibrium holes). 0 = freeze at 0 everywhere.
@@ -122,6 +120,13 @@ foreach m {GaN AlGaN Nitride} { pdbSetDouble $m DevPsi DampValue $dampValue }
 pdbSetDouble GaN Qfn DampValue $dampValue
 pdbSetDouble GaN Qfp DampValue $dampValue
 
+# qfnAbs: Qfn Abs.Error (V) in GaN/AlGaN for the whole run (solver tolerance; model
+# default 1e-2). FLOOXS reads Abs.Error/Rel.Error/DampValue only when it builds the
+# solver (first solve after device init), so it has to be set here. In the fully
+# depleted region under the gate Qfn does not affect the solution and Newton's updates
+# there wander by 1e-3..4e-2 V; with 1e-2 (~1e-5 V effective at updateLimit 1e-3) the
+# off-state stress cannot converge above Vd ~17 V (job 48125435).
+if {[info exists qfnAbs]} { foreach m {GaN AlGaN} { pdbSetDouble $m Qfn Abs.Error $qfnAbs } }
 Initialize
 device init
 
