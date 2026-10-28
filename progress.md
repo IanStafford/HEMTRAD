@@ -1684,3 +1684,7 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Ian: work on a solution to the stress divergence at Vd 17 V; wants higher voltages.
 - radIV `stressDiag` (default 0): after the ramp stops, one more drain step (+0.25 V). The fields (Qfn, DevPsi, Elec, Econd) and their Newton changes (|ΔQfn|, |ΔPsi|) are written along cuts at several depths and positions to `<tag>_stressDiag.txt`, then restored.
 - **stressDiag1 = job 48125435** (4 tasks, SiN deck, stress only, target Vd 40): Vg_stress −10 / −6 / −14 / −4. This finds where Qfn runs away, and whether the limit follows Vdg (~27 V) or Vd.
+- stressDiag1 (48125435) analysed. The stress limit is **Vd 17.0 V for every Vg_stress** (−4 / −6 / −10 / −14), so it does not follow Vdg.
+  - The 17 → 17.25 V step converges directly; the bisection log shows Newton reaching RHS ~1e-2 within 7 iterations and then wandering: scaled Qfn updates 0.1–4 in the fully depleted GaN/AlGaN, never under updateLimit, until a NaN or the iteration cap.
+  - Diagnosis: Qfn floats where n ≈ 0 (it doesn't affect the solution there), and the Qfn Abs.Error of 1e-2 V (≈ 1e-5 V effective) can't be met.
+  - Fix under test (solver tolerance, stress step only): `stressQfnAbs`. **stressAbs1 = job 48141047** (SiN Abs 0.1 / 1.0 to 28 V, SiN 1.0 to 40 V, HighK 1.0 to 28 V).
