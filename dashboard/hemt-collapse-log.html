@@ -120,7 +120,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
   <header class="top">
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">FLOOXS model of an AlGaN/GaN HEMT: what ran each day and what is still open. Id in <span style="white-space:nowrap">mA/mm</span> at Vg = −2 V unless noted; work before Oct 1 used constant mobility and is archived.</p>
-    <p class="meta">Snapshot Oct 17, end of day</p>
+    <p class="meta">Snapshot Oct 27, end of day</p>
   </header>
 
   <div class="layout">
@@ -128,6 +128,9 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
       <div class="sep"></div>
       <div class="era">Field mobility</div>
+      <a href="#oct27" data-page="oct27"><span class="d">Oct 24–27</span><span class="t">rad model</span></a>
+      <a href="#oct23" data-page="oct23"><span class="d">Oct 23</span><span class="t">HighK vs SiN · goal</span></a>
+      <a href="#oct21" data-page="oct21"><span class="d">Oct 21</span><span class="t">capture · export · TRIM</span></a>
       <a href="#oct17" data-page="oct17"><span class="d">Oct 16–17</span><span class="t">lever sweep · fill test</span></a>
       <a href="#oct15" data-page="oct15"><span class="d">Oct 15</span><span class="t">Vg trend · virtual gate</span></a>
       <a href="#oct14" data-page="oct14"><span class="d">Oct 14</span><span class="t">onset view · deck</span></a>
@@ -152,26 +155,30 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <section class="page" id="overview" data-title="Overview">
         <div class="pagehead">
           <h2>Where things stand</h2>
-          <p>The local-field model is the standard again (Oct 16). A one-at-a-time sweep shows trap level, capture barrier and τ set both onset and depth, and the late-onset set sits just above a capture threshold. No single lever gives the measured 0.4–0.5 V with ~1000×; next, a second pass around a baseline nearer the measured onset, and the measured onset at each Vg.</p>
+          <p>A pre/post-irradiation model on branch <code>explore/rad-model</code> reproduces the measured HPD vs SiN set qualitatively: the off-state stress places damage where SiN concentrates the field, so only SiN collapses after biased irradiation. Goal closed Oct 27; next is Ian's call on merging and on the 17 V stress limit.</p>
         </div>
         <div class="tiles">
-          <div class="tile"><span class="k">Calibration</span><span class="v">±2.4%</span><span class="s">vs the measured HfO₂ transfer curve, Vg −2.6 to +1 V at Vds = 10 V.</span></div>
-          <div class="tile"><span class="k">Onset range by lever</span><span class="v">0.4–3.6 V</span><span class="s">Local-field model, one lever at a time around the late set at y = 1.0 µm (baseline 2.3 V). Measured: ~1000× at 0.4–0.5 V.</span></div>
-          <div class="tile"><span class="k">Onset vs Vg</span><span class="v">0.3–0.4 V at all Vg</span><span class="s">Present model. Measured: later at higher Vg. Virtual gate with a converged fill: off from the start at Vg ≤ −1.5, no collapse at −1.</span></div>
+          <div class="tile"><span class="k">Pre-irradiation fit</span><span class="v">±0.03 V · ±4%</span><span class="s">Vth and Id–Vd at Vg +1 to 10 V, rad-model calibration (Oct 23).</span></div>
+          <div class="tile"><span class="k">Biased irradiation</span><span class="v">SiN only</span><span class="s">Model SiN collapses in two steps near 4.5 and 5.8 V; HighK (HPD) stays flat, gm −2%.</span></div>
+          <div class="tile"><span class="k">Vth shift</span><span class="v">+0.21 V</span><span class="s">Every irradiated device in the model, same sign and scale as measured.</span></div>
         </div>
 
         <div class="panel">
           <h3>Open items</h3>
           <ul class="todo">
-            <li><span class="pill open">open</span><span>Fit the local-field model to the measured ~1000× at 0.4–0.5 V. From the late set no single lever gets there (trap level 0.50 eV collapses at 0.4 V but 7e8× deep, from a current already at 37% of trap-free). Next: a second one-at-a-time pass around a baseline nearer the measured onset. <a class="daylink" href="#oct17">Oct 17</a></span></li>
-            <li><span class="pill open">open</span><span>Measured onset is later at higher Vg; the present model is not (0.3–0.4 V at every Vg). The virtual gate got the order only with a fixed 4 fill rounds per point; with the fill converged it is off from the start at Vg ≤ −1.5 and never collapses at −1. Keep or drop the converged fill (Ian's call); needs the measured onset at each Vg. <a class="daylink" href="#oct17">Oct 17</a></span></li>
-            <li><span class="pill open">open</span><span>Mesh in the access region (25–40 nm) is too coarse for narrow traps; needs refinement before TRIM or cascade-shape work. <a class="daylink" href="#sep27">Sep 27</a></span></li>
-            <li><span class="pill open">open</span><span>Calibration only covers saturation (Vds = 10 V). The low-Vd linear region where collapses happen is unvalidated, and gm above +0.5 V is too low (88 vs 160 mS/mm). <a class="daylink" href="#oct01">Oct 1</a></span></li>
-            <li><span class="pill noted">parked</span><span>Thermoelectric term in the energy balance: six fixes tried, none converge (the last two on Oct 13). By Ian's decision the standard model runs without it (<code>etThermo 0</code>, <code>etStats 0</code>), giving drift-diffusion Id. <a class="daylink" href="#oct08">Oct 8</a> · <a class="daylink" href="#oct13">Oct 13</a></span></li>
+            <li><span class="pill open">open</span><span>Rad model: the off-state stress solve stops at Vd 17 V instead of 28 V (electron quasi-Fermi divergence under the gate); no-holes and damping fixes don't help. <a class="daylink" href="#oct27">Oct 27</a></span></li>
+            <li><span class="pill noted">noted</span><span>Rad model fitting choices: no gate-edge damage, hand-placed second SiN strike site, lumped gate–drain leakage. <a class="daylink" href="#oct27">Oct 27</a></span></li>
+            <li><span class="pill noted">noted</span><span>Merge <code>explore/rad-model</code> into main: not yet (Ian). <a class="daylink" href="#oct27">Oct 27</a></span></li>
+            <li><span class="pill open">open</span><span>Pulsed-IV collapse at Vg −2 (~1000× at 0.4–0.5 V): no single trap lever reaches it from the late set. <a class="daylink" href="#oct17">Oct 17</a></span></li>
+            <li><span class="pill noted">parked</span><span>Time-limited capture, waiting for the curve-tracer pulse width and onset vs Vg. <a class="daylink" href="#oct21">Oct 21</a></span></li>
           </ul>
           <details class="older">
-            <summary>Older questions (6)</summary>
+            <summary>Older questions (10)</summary>
             <ul class="todo">
+              <li><span class="pill open">open</span><span>Measured onset is later at higher Vg; the present model is not (0.3–0.4 V at every Vg). Keep or drop the converged fill (Ian's call). <a class="daylink" href="#oct17">Oct 17</a></span></li>
+              <li><span class="pill open">open</span><span>Mesh in the access region (25–40 nm) is too coarse for narrow traps. <a class="daylink" href="#sep27">Sep 27</a></span></li>
+              <li><span class="pill open">open</span><span>Calibration of the HfO₂ deck only covers saturation (Vds = 10 V); the rad-model recalibration covers Id–Vd at Vg +1 on the branch. <a class="daylink" href="#oct01">Oct 1</a></span></li>
+              <li><span class="pill noted">parked</span><span>Thermoelectric term in the energy balance (<code>etThermo 0</code>, <code>etStats 0</code> by Ian's decision). <a class="daylink" href="#oct08">Oct 8</a> · <a class="daylink" href="#oct13">Oct 13</a></span></li>
               <li><span class="pill noted">parked</span><span>Energy-balance fit of trap position and τ (collapses at 0.4–0.7 V with a creeping plateau, but ~1.9 s per Newton iteration). On hold since Oct 16, when the local-field model became the standard again. <a class="daylink" href="#oct13">Oct 13</a></span></li>
               <li><span class="pill open">open</span><span>6 runs still stall at the runaway (all near y = 2.0 µm, 2.8–3.7 V; the Te-ramp step falls below its 0.002 floor at full current). A lower <code>teRampMin</code> is the next thing to try. <a class="daylink" href="#oct02">Oct 2</a></span></li>
               <li><span class="pill open">open</span><span>Insulator (nitride) trap charge has only been tested with static mobility; not yet repeated with the calibrated field mobility. <a class="daylink" href="#oct01">Oct 1</a></span></li>
@@ -181,6 +188,96 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
             </ul>
           </details>
         </div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- OCT 24-27 -->
+      <section class="page" id="oct27" data-title="Oct 24–27">
+        <div class="pagehead">
+          <h2>Oct 24–27 · A pre/post-irradiation model, HPD vs SiN</h2>
+          <p>Goal from Ian (Oct 23): one model that reproduces the measured high-LET irradiation set (HPD #11 vs SiN #35, biased at Vg −10 / Vd 28 V, plus non-biased). Built on branch <code>explore/rad-model</code> with a new driver; qualitative fit accepted by Ian and the goal closed Oct 27.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">branch explore/rad-model</span><span class="chip">final jobs 47887339 · 47959281</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>New driver <code>drivers/radIV.tcl</code>: pre or post state; for post an off-state stress solve, damage traps set from the stress solution, then Id–Vg at Vd 0.1 and Id–Vd at Vg +1 with hot-electron capture. All new levers default off.</li>
+              <li>Pre-irradiation recalibration (3 rounds): Vth within <span class="num">0.03 V</span>, Id–Vd at Vg +1 within <span class="num">~4%</span> up to 10 V; HighK and SiN decks identical before irradiation.</li>
+              <li>Why the decks differ: at the stress bias SiN has a second field peak under the T-gate overhang, <span class="num">2×</span> the HighK value; HighK spreads the field toward the drain. Damage ∝ E⁴ beyond the gate edge lands ~10× denser in SiN, so only SiN collapses.</li>
+              <li>Final model (one parameter set): Vth <span class="num">+0.21 V</span> on every irradiated device (fixed charge in the AlGaN under the gate, gm kept); HPD biased flat, no collapse, gm −2%; SiN biased collapses above the knee in two steps near <span class="num">4.5 and 5.8 V</span> with a slow creep, gm −18% (second step from a hand-placed second strike site).</li>
+              <li>~25 HPG arrays over four days (about 200 tasks). Ruled out along the way: charge in the SiN, uniform damage, electron-density weighting (n·E, n·E⁴), slower capture.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill open">open</span><span>Stress solve stops at Vd 17 V (Vdg ≈ 27 V), not 28 V. Divergence is in the electron quasi-Fermi level in the depleted AlGaN/GaN; the no-holes stress (Ian OK'd) and heavier Qfn damping both stop at 17 V too.</span></li>
+              <li><span class="pill noted">noted</span><span>Fitting choices: no damage at the gate edge (y &lt; 0.30 µm), position of the second SiN strike site, gate–drain leakage as a lumped resistor.</span></li>
+              <li><span class="pill noted">noted</span><span>SiN final level and gm loss somewhat smaller than measured; strong second sites make the collapse step unsolvable (radFinal9/10).</span></li>
+              <li><span class="pill noted">noted</span><span>Branch not merged (Ian: not yet). Overlays with the measured curves stay local (<code>data/rad_y2/compare/</code>, untracked).</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/radMech_damage.jpg" target="_blank" rel="noopener"><img src="fig/radMech_damage.jpg" alt="Lateral stress field and resulting damage trap density along the channel for HighK and SiN" loading="lazy"></a><figcaption><b>Stress field → damage</b>SiN's extra field peak at y ≈ 0.5 µm puts ~10× more damage there than HighK.</figcaption></figure>
+          <figure><a class="img" href="fig/radMech_SiN_IdVd.jpg" target="_blank" rel="noopener"><img src="fig/radMech_SiN_IdVd.jpg" alt="Id-Vd at Vg +1 V before and after biased irradiation for HighK and SiN; SiN collapses in two steps" loading="lazy"></a><figcaption><b>Model Id–Vd at Vg +1</b>HighK stays ~7% lower with no collapse; SiN collapses at 4.5 and 5.8 V with a second strike site.</figcaption></figure>
+          <figure><a class="img" href="fig/radFinal8_model.jpg" target="_blank" rel="noopener"><img src="fig/radFinal8_model.jpg" alt="Post over pre current ratios for biased and non-biased devices and Id-Vg curves near threshold" loading="lazy"></a><figcaption><b>Final model, all devices</b>Non-biased 0.95 flat; Vth +0.21 V in every irradiated device.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#oct23">Oct 23 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- OCT 23 -->
+      <section class="page" id="oct23" data-title="Oct 23">
+        <div class="pagehead">
+          <h2>Oct 23 · HighK vs SiN with the trap model</h2>
+          <p>With the existing trap model, the two passivations collapse at the same Vd at Vg +1; only the recovery differs. That motivated the separate rad model.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">job 47062225</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>deckVg1 (8 tasks, Vg +1, Vd 0–10 V): trap-free Id at 10 V <span class="num">802 / 813 mA/mm</span> (HighK / SiN).</li>
+              <li>Onsets identical on both decks: <span class="num">1.3 / 1.5 / 1.7 V</span> for traps at y 0.3 / 1.0 / 2.4 µm; SiN only recovers 20–60× less above ~4 V.</li>
+              <li>Ian shared the Y2 irradiation summary (HPD #11 vs SiN #35, high LET). TRIM cross-check: displacement damage is ~5 orders below the trap densities needed, so the damage must be bias-assisted and event-like. Lab data kept untracked.</li>
+              <li>Goal set (Ian): a model that reproduces the measured pre and post behaviour, in a separate worktree, HPG jobs allowed.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill resolved">fixed Oct 27</span><span>Trap model can't separate the decks: answered by stress-field-placed damage in the rad model.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/deckVg1_IdVd.jpg" target="_blank" rel="noopener"><img src="fig/deckVg1_IdVd.jpg" alt="Id-Vd at Vg +1 for HighK and SiN with traps at three positions" loading="lazy"></a><figcaption><b>HighK vs SiN, trap model</b>Same onsets on both decks; only the post-collapse recovery differs.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#oct27">← Oct 24–27</a><a href="#oct21">Oct 21 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- OCT 21 -->
+      <section class="page" id="oct21" data-title="Oct 21">
+        <div class="pagehead">
+          <h2>Oct 21 · Softer capture, Python port export, TRIM</h2>
+          <p>A softer virtual-gate capture gives the right Vg order but only a shallow knee; decks exported for the flooxs-pyplot port; TRIM installed.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 46057777 · 47062225</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Softer capture (capF0 1e7): soft knee with creep at Vg −2 and −1.5, Vg ≥ −1 unaffected, but only <span class="num">≤ 1.4×</span> deep.</li>
+              <li>10 GaN deck cases with reference outputs exported to <code>~/flooxs-pyplot/Test/SimpDev/GaNSuite_HEMTRAD_20261021/</code> for the FANGS port (untracked there).</li>
+              <li>SRIM-2013 installed under Wine; <code>bin/trim_run.sh</code> runs TRIM in batch mode (tested, 6 s for the HEMT template).</li>
+              <li>Fixed <code>drivers/pulsedIV.tcl</code>: the gate ramp never reached a positive Vg_meas (f4f091f).</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill noted">parked</span><span>Time-limited (pulse-integrated) capture: waits for the curve-tracer pulse width/period and the measured onset vs Vg.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="pager"><a href="#oct23">← Oct 23</a><a href="#oct17">Oct 16–17 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
@@ -217,7 +314,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
         <div class="figs">
           <figure><a class="img" href="fig/fieldSlide_highk.jpg" target="_blank" rel="noopener"><img src="fig/fieldSlide_highk.jpg" alt="Lateral field along the 2DEG for HighK and SiN at Vd 3, 10 and 20 V" loading="lazy"></a><figcaption><b>HighK vs SiN, field mobility</b>Field-plate peak −52% at 20 V; gate-edge peak unchanged.</figcaption></figure>
         </div>
-        <div class="pager"><a href="#overview">← Overview</a><a href="#oct15">Oct 15 →</a></div>
+        <div class="pager"><a href="#oct21">← Oct 21</a><a href="#oct15">Oct 15 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
