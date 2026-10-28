@@ -1,0 +1,4 @@
+diag_sin_vg-10|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;deviceDeck=rfdevice_SiN.tcl;damPeak=1.0;Vd_stress=40;Vd_stressMin=2;doIdVg=0;doIdVd=0;Vg_stress=-10;stressDiag=1
+lim_sin_vg-6|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;deviceDeck=rfdevice_SiN.tcl;damPeak=1.0;Vd_stress=40;Vd_stressMin=2;doIdVg=0;doIdVd=0;Vg_stress=-6;stressDiag=1
+lim_sin_vg-14|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;deviceDeck=rfdevice_SiN.tcl;damPeak=1.0;Vd_stress=40;Vd_stressMin=2;doIdVg=0;doIdVd=0;Vg_stress=-14;stressDiag=1
+lim_sin_vg-4|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;deviceDeck=rfdevice_SiN.tcl;damPeak=1.0;Vd_stress=40;Vd_stressMin=2;doIdVg=0;doIdVd=0;Vg_stress=-4;stressDiag=1

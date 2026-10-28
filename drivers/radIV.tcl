@@ -51,6 +51,9 @@ if {![info exists Vd_stress]} { set Vd_stress 28.0 }
 if {![info exists stressNoHoles]} { set stressNoHoles 0 }
 # Qfn Newton DampValue during the stress drain ramp only (solver-side; model default 0.1)
 if {![info exists stressQfnDamp]} { set stressQfnDamp 0.1 }
+# stressDiag 1: after the stress ramp stops, try one more drain step and write the
+# fields and their Newton changes along cuts to <tag>_stressDiag.txt (then restore)
+if {![info exists stressDiag]} { set stressDiag 0 }
 # holes are removed only above this depth (um below the AlGaN top); deeper, Qfp is frozen
 # at its rest value 0 (the Fe buffer needs its equilibrium holes). 0 = freeze at 0 everywhere.
 if {![info exists stressNoHolesX]} { set stressNoHolesX 0.1 }
@@ -189,6 +192,32 @@ if {$radState eq "post"} {
         }
         foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue 0.1 }
         if {$dS < $Vd_stressMin} { error "stress drain ramp failed at $dS" }
+        if {$stressDiag} {
+            sel z=Qfn name=QfnPrev
+            sel z=DevPsi name=PsiPrev
+            sel z=Elec name=ElecPrev
+            SaveState
+            contact name=D supply=[expr {$dS + 0.25}]
+            set ok [expr {![catch {device} msg]}]
+            sel z=abs(Qfn-QfnPrev) name=dQfn
+            sel z=abs(DevPsi-PsiPrev) name=dPsi
+            set c [open ${tag}_stressDiag.txt w]
+            puts $c "# stressDiag: converged Vd=$dS, attempt Vd=[expr {$dS + 0.25}] ok=$ok"
+            foreach fld {dQfn dPsi QfnPrev PsiPrev ElecPrev Econd} {
+                sel z=$fld
+                foreach xc {0.001 0.008 0.016 0.03 0.2 1.0 3.0 6.0} {
+                    puts $c "# $fld along y at x = $xc"
+                    if {[catch {puts $c [print1d xv=$xc]}]} { puts $c "{ cut failed }" }
+                }
+                foreach yc {-0.6 0.0 0.2 0.4 0.6 1.0 2.0 3.0} {
+                    puts $c "# $fld along x at y = $yc"
+                    if {[catch {puts $c [print1d yv=$yc]}]} { puts $c "{ cut failed }" }
+                }
+            }
+            close $c
+            RestoreState
+            contact name=D supply=$dS
+        }
         sel z=abs(dot(DevPsi,y*1e-4)) name=Estress
         sel z=sqrt(dot(DevPsi,DevPsi)) name=EstressT
         # n*E at stress, normalised to its peak in the semiconductor (damField ne)
