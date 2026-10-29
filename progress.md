@@ -1697,3 +1697,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - FLOOXS's NaN check (`Values::TestProb`) trips on a non-finite *norm*, so values above ~1e154 also trigger it. f12 itself underflows cleanly.
 - **stressDiag3 = job 48159016** (2 tasks): stress in 0.25 V steps up to the wall, then a diagnostic step of 0.25 / 1.0 V that should fail; dumps the post-failure fields incl. Qfp to locate the blow-up.
 - 2026-10-29: Ian approved a tiny density floor. `model/Continuity.tcl` (branch, CRLF kept) gets the `carFloor` lever (default off): Elec and Hole = statistics + carFloor. **stressFloor1 = job 48161617** (4 tasks, qfnAbs 1, stress in 0.5 V steps): SiN floor 1e-100 / 1e-30 to 28 V, SiN 1e-100 to 40 V, HighK 1e-100 to 28 V. stressDiag3 (48159016) is still running to locate the blow-up.
+- 03:30 stressFloor1 (48161617): carFloor 1e-100 / 1e-30 stops at **17.5 V** like before, so underflow is not the cause.
+- stressDiag3 (48159016) caught a failed step (17.5 → 17.75 V); all dumped fields are ordinary.
+- **Cause found:** trap occupancy f = 1/(1 + g·exp((Et − Qfn)/Vt)) is evaluated in all GaN/AlGaN. In the deep buffer Et ≈ +3 V while Qfn follows the drain to ≈ −17.8 V, so the exponent exceeds 709 above Vd ≈ 17.7 V. exp → inf, and the derivative is inf/inf → "computed a nan or infinite". Independent of Vg, as observed.
+- Fix: `occClamp` lever in `model/Poisson.tcl` (default off) caps the exponent at occClamp (700) via min(a, C). It is exact: e^-700 is 0 in double precision.
+- **stressClamp1 = job 48174580** (4 tasks): SiN clamp ± qfnAbs to 28 V, SiN clamp + qfnAbs to 40 V, HighK clamp + qfnAbs to 28 V.
