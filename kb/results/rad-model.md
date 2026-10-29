@@ -182,3 +182,15 @@ Other cases in the run:
 - (radFinal9/10 with 5e18–6e18 sites can't be followed through the step.)
 
 This replaces the radFinal8 two-site SiN curve. All other devices stay at radFinal8.
+
+## Stress at the real 28 V (2026-10-29, rad28a job 48206375)
+With `occSafe 1` the stress reaches Vd 28 V. pre/nb with occSafe are identical to radFinal/radFinal8 (the rewrite is exact).
+- **Lateral field at 28 V** (x = 0.001 µm):
+  - SiN: 7.5e5 V/cm at y = 0.5, 5.8e5 at 0.6, 3.4e5 at 0.7 (up to the field-plate edge);
+  - HighK: 3.4e5 / 3.5e5 / 3.2e5 at the same y, still 2e5 at y = 1.0;
+  - gate-edge peak 1.04e6 in both.
+- **Damage scale:** the same law needs damPeak ~1.5e18 at 28 V instead of 7e18 at 17 V.
+  - SiN 1.5e18: 0.82 / 0.77 / 0.66 / 0.55 / 0.49 at Vd 1 / 2 / 2.5 / 4 / 10 V;
+  - HighK 1.5e18: 0.93 flat;
+  - 3e18 and 7e18 overdamage SiN (0.08, 0).
+- **Conclusion:** the full stress voltage changes the damage scale but not the picture. The SiN onset stays near 2 V; the 17 V result was not an artefact of the solver limit.
