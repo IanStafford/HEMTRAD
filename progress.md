@@ -1713,3 +1713,21 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - HPG master dropped during the first submit; one Duo reconnect worked, rad28a submitted as 48206375.
 - TCAD group deck (12 slides, model-only figures, measured data described in words only): https://claude.ai/artifact/QhqMqAsA7Jwc7DnUwrkYzi
 - 2026-10-29: Ian asked to recreate the single event from the irradiation current monitoring as a FLOOXS transient, with the EHP injected via quasi-Fermi levels. Plan in `kb/results/see-plan.md` (branch). Open decisions: 2D charge normalisation, SRH term (the model has no recombination), target (prompt only or also the leakage step after it), R35 bias per the slide legend.
+
+## 2026-10-29 afternoon — SEE transient: driver + smoke submitted
+- Ian: "make some good decisions" on the open items; the strike alone is fine for now, both effects would be nice. Decisions:
+  - 2D normalisation lever `seeWeff` = 1 µm (bracket 0.1 later);
+  - SRH lever `srhTau` (default off) used at 1 ns;
+  - each device at its irradiation bias from the slide legend: HPD at Vg −10, SiN at Vg −5 V, Vd 28;
+  - prompt strike first, the post-event leakage step later.
+- `drivers/seeIV.tcl` (branch):
+  - DC at the strike bias (traps off), then charge-neutral EHP injection along a vertical Gaussian track (σ 0.05 µm, x 0–1.4 µm, 4.3e10 pairs/cm, slab width seeWeff);
+  - Qfn/Qfp are reset via Nilsson's F½⁻¹ (< 0.5% vs FLOOXS f12);
+  - transient `device time= t.init= movie=` logging Qfn/Qfp/DevPsi flux of S, D, G, FP, B each step; field cuts at log times.
+- `model/Continuity.tcl`: `srhTau` adds R = np/(τ(n + p)) to both continuity equations.
+- `sweeps/radIV.slurm` takes `DRV` (default radIV).
+- **seeSmoke1 = job 48227316** (4 tasks):
+  - HighK control (no strike);
+  - HighK strike at y = 1.0, without and with SRH;
+  - SiN (Vg −5) strike at y = 0.5.
+- rad28a (48206375) is still running.
