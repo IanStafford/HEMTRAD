@@ -1703,3 +1703,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Fix: `occClamp` lever in `model/Poisson.tcl` (default off) caps the exponent at occClamp (700) via min(a, C). It is exact: e^-700 is 0 in double precision.
 - **stressClamp1 = job 48174580** (4 tasks): SiN clamp ± qfnAbs to 28 V, SiN clamp + qfnAbs to 40 V, HighK clamp + qfnAbs to 28 V.
 - 07:45 stressClamp1 (48174580): the abs()-based exponent cap slows Newton ~10× (Qfp in AlGaN wanders, 7 s linear solves). After 4 h it's only at Vd 3–4 V. Not used. Replaced by `occSafe` (default off): occupancy written as w·exp(−a)/(exp(−a) + g). Exact, no overflow for a > −709 (here a ≥ ~−300), no kink. **stressSafe1 = job 48182110** (same 4 cases). 48174580 is still running and pointless; asked Ian about scancel.
+- Ian OK'd scancel: cancelled 48174580 (slow abs-clamp test).
