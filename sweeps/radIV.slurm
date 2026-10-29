@@ -2,6 +2,7 @@
 # Pre/post-irradiation characterisation sweeps with drivers/radIV.tcl (branch
 # explore/rad-model). One line per task in sweeps/$PARAMS:
 #   label|lever=value;lever=value;...
+# DRV (env, default radIV) picks drivers/$DRV.tcl, e.g. DRV=seeIV.
 # Submit from the worktree root, e.g.
 #   RUN=20261023_radCal1 PARAMS=params_radCal1.txt; mkdir -p results/$RUN
 #   sbatch --array=0-7%8 --export=ALL,RUN=$RUN,PARAMS=$PARAMS \
@@ -48,7 +49,7 @@ JSON="\"label\": \"$LABEL\", \"task_id\": $SLURM_ARRAY_TASK_ID, \"params\": \"$P
         echo "set ${kv%%=*} ${kv#*=}"
         JSON="$JSON, \"${kv%%=*}\": \"${kv#*=}\""
     done
-    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/drivers/radIV.tcl"
+    sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/drivers/${DRV:-radIV}.tcl"
 } > "$DRIVER"
 echo "{ $JSON }" > "$TASK_DIR/params.json"
 

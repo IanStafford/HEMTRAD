@@ -13,13 +13,17 @@ proc ElecDelta {} {
 }
 
 proc ElecContinuity {Mat} {
-    global Vt eTemp etStats etThermo etThermoJ
+    global Vt eTemp etStats etThermo etThermoJ srhTau
 
     pdbSetDouble $Mat Qfn Rel.Error 1.0e-2
     pdbSetDouble $Mat Qfn Abs.Error 1.0e-2
     pdbSetDouble $Mat Qfn DampValue 0.1
 
     set eqn "ddt(Elec) + ([pdbDelayDouble $Mat Elec mob]) * (Elec+1.0e2) * grad(Qfn)"
+    # srhTau (s, default off; Ian OK 2026-10-29 for the single-event transient): SRH
+    # recombination R = n p / (tau (n + p)) with n1 = p1 = ni neglected (ni ~ 1e-10 cm^-3
+    # in GaN), added with the sign of ddt in both continuity equations
+    if {[info exists srhTau]} { append eqn " + Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
     if {$eTemp && $etStats && $etThermo && $etThermoJ} {
         # thermal diffusion (Seebeck) part of the current, consistent with
         # electron statistics at ETemp. Uses Elec without the 1e2 floor: n*Delta
@@ -49,13 +53,14 @@ proc ElecContinuity {Mat} {
 }
 
 proc HoleContinuity {Mat} {
-    global Vt carFloor
+    global Vt carFloor srhTau
 
     pdbSetDouble $Mat Qfp Rel.Error 1.0e-2
     pdbSetDouble $Mat Qfp Abs.Error 1.0e-2
     pdbSetDouble $Mat Qfp DampValue 0.1
 
     set eqn "ddt(Hole) - ([pdbDelayDouble $Mat Hole mob]) * (Hole+1.0e2) * grad(Qfp)"
+    if {[info exists srhTau]} { append eqn " + Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
     pdbSetString $Mat Qfp Equation $eqn
 
     set e "([pdbDelayDouble $Mat Hole Ev])"

@@ -1,0 +1,4 @@
+ctrl_highk|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;occSafe=1;Vd_bias=28;Vg_bias=-10;seeStrike=0;seeTend=1e-10
+hk_y1.0|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;occSafe=1;Vd_bias=28;Vg_bias=-10;seeY0=1.0;seeTend=1e-9
+hk_y1.0_srh|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;occSafe=1;Vd_bias=28;Vg_bias=-10;seeY0=1.0;srhTau=1e-9;seeTend=1e-8
+sin_y0.5|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;occSafe=1;Vd_bias=28;Vg_bias=-5;deviceDeck=rfdevice_SiN.tcl;seeY0=0.5;seeTend=1e-9
