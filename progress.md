@@ -1711,3 +1711,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - pre and nb for both decks with occSafe, to check against radFinal / radFinal8;
   - final model (radFinal8 set) with Vd_stress 28, both decks, damPeak {7e18, 3e18, 1.5e18}. Damage ∝ E⁴ grows with the higher stress field.
 - HPG master dropped during the first submit; one Duo reconnect worked, rad28a submitted as 48206375.
+- TCAD group deck (12 slides, model-only figures, measured data described in words only): https://claude.ai/artifact/QhqMqAsA7Jwc7DnUwrkYzi
