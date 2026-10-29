@@ -1704,3 +1704,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **stressClamp1 = job 48174580** (4 tasks): SiN clamp ± qfnAbs to 28 V, SiN clamp + qfnAbs to 40 V, HighK clamp + qfnAbs to 28 V.
 - 07:45 stressClamp1 (48174580): the abs()-based exponent cap slows Newton ~10× (Qfp in AlGaN wanders, 7 s linear solves). After 4 h it's only at Vd 3–4 V. Not used. Replaced by `occSafe` (default off): occupancy written as w·exp(−a)/(exp(−a) + g). Exact, no overflow for a > −709 (here a ≥ ~−300), no kink. **stressSafe1 = job 48182110** (same 4 cases). 48174580 is still running and pointless; asked Ian about scancel.
 - Ian OK'd scancel: cancelled 48174580 (slow abs-clamp test).
+
+## 2026-10-29 — Stress limit fixed (occSafe); 28 V runs launched
+- **stressSafe1 (48182110):** with `occSafe 1` the stress reaches **Vd 28 V (SiN and HighK) and 40 V (SiN)**, with or without qfnAbs. The 17 V limit was the trap-occupancy exp() overflow; the overflow-safe form fixes it exactly.
+- **rad28a = job ** (10 tasks, launched before 48182110 finished, per Ian):
+  - pre and nb for both decks with occSafe, to check against radFinal / radFinal8;
+  - final model (radFinal8 set) with Vd_stress 28, both decks, damPeak {7e18, 3e18, 1.5e18}. Damage ∝ E⁴ grows with the higher stress field.
