@@ -54,6 +54,8 @@ if {![info exists stressQfnDamp]} { set stressQfnDamp 0.1 }
 # stressDiag 1: after the stress ramp stops, try one more drain step and write the
 # fields and their Newton changes along cuts to <tag>_stressDiag.txt (then restore)
 if {![info exists stressDiag]} { set stressDiag 0 }
+if {![info exists stressStep]} { set stressStep 1.0 }   ;# V, drain step of the stress ramp (bisected on failure)
+if {![info exists stressDiagStep]} { set stressDiagStep 0.25 } ;# V, extra step tried by stressDiag
 # NOTE: stressQfnAbs and stressQfnDamp change pdb values mid-run, which FLOOXS ignores
 # (it reads them only when the solver is built); kept for the record, no effect. Use qfnAbs.
 if {![info exists stressQfnAbs]} { set stressQfnAbs 1.0e-2 }
@@ -196,7 +198,7 @@ if {$radState eq "post"} {
         # is at least Vd_stressMin; the damage law's scale absorbs the field magnitude.
         foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue $stressQfnDamp; pdbSetDouble $m Qfn Abs.Error $stressQfnAbs }
         set dS 0.0
-        for {set d 1.0} {$d <= $Vd_stress + 1e-9} {set d [expr {$d + 1.0}]} {
+        for {set d $stressStep} {$d <= $Vd_stress + 1e-9} {set d [expr {$d + $stressStep}]} {
             if {![Reach D $dS $d $retryDepth 0]} { break }
             set dS $d
         }
@@ -207,13 +209,13 @@ if {$radState eq "post"} {
             sel z=DevPsi name=PsiPrev
             sel z=Elec name=ElecPrev
             SaveState
-            contact name=D supply=[expr {$dS + 0.25}]
+            contact name=D supply=[expr {$dS + $stressDiagStep}]
             set ok [expr {![catch {device} msg]}]
             sel z=abs(Qfn-QfnPrev) name=dQfn
             sel z=abs(DevPsi-PsiPrev) name=dPsi
             set c [open ${tag}_stressDiag.txt w]
-            puts $c "# stressDiag: converged Vd=$dS, attempt Vd=[expr {$dS + 0.25}] ok=$ok"
-            foreach fld {dQfn dPsi QfnPrev PsiPrev ElecPrev Econd Elec Hole Qfn DevPsi} {
+            puts $c "# stressDiag: converged Vd=$dS, attempt Vd=[expr {$dS + $stressDiagStep}] ok=$ok"
+            foreach fld {dQfn dPsi QfnPrev PsiPrev ElecPrev Econd Elec Hole Qfn Qfp DevPsi} {
                 sel z=$fld
                 foreach xc {0.001 0.008 0.016 0.03 0.2 1.0 3.0 6.0} {
                     puts $c "# $fld along y at x = $xc"
