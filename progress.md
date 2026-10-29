@@ -1707,6 +1707,7 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 ## 2026-10-29 — Stress limit fixed (occSafe); 28 V runs launched
 - **stressSafe1 (48182110):** with `occSafe 1` the stress reaches **Vd 28 V (SiN and HighK) and 40 V (SiN)**, with or without qfnAbs. The 17 V limit was the trap-occupancy exp() overflow; the overflow-safe form fixes it exactly.
-- **rad28a = job ** (10 tasks, launched before 48182110 finished, per Ian):
+- **rad28a = job 48206375** (10 tasks, launched before 48182110 finished, per Ian):
   - pre and nb for both decks with occSafe, to check against radFinal / radFinal8;
   - final model (radFinal8 set) with Vd_stress 28, both decks, damPeak {7e18, 3e18, 1.5e18}. Damage ∝ E⁴ grows with the higher stress field.
+- HPG master dropped during the first submit; one Duo reconnect worked, rad28a submitted as 48206375.
