@@ -1731,3 +1731,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - HighK strike at y = 1.0, without and with SRH;
   - SiN (Vg −5) strike at y = 0.5.
 - rad28a (48206375) is still running.
+- 18:30 **rad28a (48206375)** 10/10 COMPLETED (two Id–Vd GAVE UP at 9–10 V).
+  - The occSafe check is exact.
+  - Stress at **28 V** reached in all runs. The damage law needs damPeak 1.5e18 (was 7e18 at 17 V): SiN 0.82 → 0.49 with onset ~2 V, HighK 0.93 flat, the same picture as at 17 V.
+  - The SiN field peak at 28 V widens toward the field-plate edge; HighK spreads to y ≈ 1 µm. KB rad-model updated.
+- seeSmoke1 (48227316) still running (3 h).
