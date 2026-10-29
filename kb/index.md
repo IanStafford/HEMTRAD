@@ -66,6 +66,7 @@ Second brain for the FLOOXS model of **radiation-induced current collapse** in a
 - [[static-era-lessons]] — what the constant-mobility era (Sep 23 – Oct 1) taught
 - [[highk-vs-sin]] — passivation dielectric does not matter at ≤3 V
 - [[rad-model]] — pre/post-irradiation model, HPD vs SiN (branch explore/rad-model; qualitative)
+- [[see-plan]] — plan: single-event transient (ion strike) via quasi-Fermi injection (Oct 29)
 - [[trap-sensitivity]] — one-at-a-time sweep of every trap lever (Oct 17)
 - [[critical-strike]] — strike probability at 1e7 ions/cm²
 - [[flooxs-pyplot-regression]] — GaN regression baselines run on HPG for the solver work
