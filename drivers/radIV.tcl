@@ -213,7 +213,7 @@ if {$radState eq "post"} {
             sel z=abs(DevPsi-PsiPrev) name=dPsi
             set c [open ${tag}_stressDiag.txt w]
             puts $c "# stressDiag: converged Vd=$dS, attempt Vd=[expr {$dS + 0.25}] ok=$ok"
-            foreach fld {dQfn dPsi QfnPrev PsiPrev ElecPrev Econd} {
+            foreach fld {dQfn dPsi QfnPrev PsiPrev ElecPrev Econd Elec Hole Qfn DevPsi} {
                 sel z=$fld
                 foreach xc {0.001 0.008 0.016 0.03 0.2 1.0 3.0 6.0} {
                     puts $c "# $fld along y at x = $xc"
