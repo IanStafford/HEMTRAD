@@ -33,6 +33,18 @@ proc InsTrapCharge {Mat Ntrap sign} {
 # IonAcceptor = Ntrap * f, where f is the electron occupancy of a level Etrap
 # below Econd (Gaussian energy spread Efwhm via 3-point Gauss-Hermite).
 # The Poisson equation subtracts IonAcceptor as negative charge.
+# occExp: exp() of an occupancy exponent. With the occClamp lever (default off) the
+# exponent is capped at occClamp (e.g. 700) via min(a, C) = 0.5*(a + C - |a - C|), so
+# exp() can't overflow to inf where Qfn lies far below the trap level (deep buffer
+# under high drain bias: (Et - Qfn)/Vt > 709 above Vd ~17.7 V gave inf/inf in the
+# derivative, the off-state stress limit; jobs 48125435-48161617). At the cap the
+# occupancy is ~e^-700, i.e. exactly 0 in double precision, so no value changes.
+proc occExp {a} {
+    global occClamp
+    if {[info exists occClamp]} { return "exp(0.5*(($a) + $occClamp - abs(($a) - $occClamp)))" }
+    return "exp( $a )"
+}
+
 proc IonizedAcceptor {Mat Ntrap Etrap Efwhm {g 2.0}} {
     global k q hotEb
 
@@ -49,13 +61,13 @@ proc IonizedAcceptor {Mat Ntrap Etrap Efwhm {g 2.0}} {
 
     # f(E) = 1 / (1 + g*exp((E - Qfn)/Vt)), trap level E = Et
     if {$Efwhm == 0.0} {
-        set occ "(1.0 / (1.0 + $g * exp( ($Et - Qfn) / ($Vt) )))"
+        set occ "(1.0 / (1.0 + $g * [occExp "($Et - Qfn) / ($Vt)"]))"
     } else {
         set esig [expr $Efwhm/2.355]
         set Off  [expr sqrt(3.0)*$esig]
-        set e1 "((1.0/6.0) / (1.0 + $g * exp( ($Et + $Off - Qfn) / ($Vt) )))"
-        set e2 "((2.0/3.0) / (1.0 + $g * exp( ($Et - Qfn) / ($Vt) )))"
-        set e3 "((1.0/6.0) / (1.0 + $g * exp( ($Et - $Off - Qfn) / ($Vt) )))"
+        set e1 "((1.0/6.0) / (1.0 + $g * [occExp "($Et + $Off - Qfn) / ($Vt)"]))"
+        set e2 "((2.0/3.0) / (1.0 + $g * [occExp "($Et - Qfn) / ($Vt)"]))"
+        set e3 "((1.0/6.0) / (1.0 + $g * [occExp "($Et - $Off - Qfn) / ($Vt)"]))"
         set occ "($e1 + $e2 + $e3)"
     }
     # TrapFrozen / FrozenFlag are data fields (read at solve time), so the
