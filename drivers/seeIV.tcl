@@ -48,6 +48,10 @@ foreach m {GaN AlGaN Nitride} { pdbSetDouble $m DevPsi DampValue $dampValue }
 pdbSetDouble GaN Qfn DampValue $dampValue
 pdbSetDouble GaN Qfp DampValue $dampValue
 if {[info exists qfnAbs]} { foreach m {GaN AlGaN} { pdbSetDouble $m Qfn Abs.Error $qfnAbs } }
+# radIV gets these DevPsi tolerances from IonizedAcceptor (trap model on); with traps off
+# they stay at FLOOXS's 1e-6 default and the drain ramp crawls (job 48227316), so set
+# them here as radIV has them (read when the solver is built, i.e. before device init)
+foreach m {GaN AlGaN} { pdbSetDouble $m DevPsi Abs.Error 1.0e-1; pdbSetDouble $m DevPsi Rel.Error 1.0e-1 }
 Initialize
 device init
 
