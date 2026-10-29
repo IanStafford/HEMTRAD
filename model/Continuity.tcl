@@ -33,7 +33,7 @@ proc ElecContinuity {Mat} {
 
     # electron statistics at the electron temperature ETemp (constant 300 K
     # unless the eTemp lever solves it); etStats 0 keeps them at the lattice Temp
-    global etStats k q
+    global etStats k q carFloor
     if {$etStats} {
         set VtE "($k*ETemp/$q)"
         set Nc "([pdbDelayDouble $Mat Elec Nc]) * exp(1.5*log(ETemp/Temp))"
@@ -42,11 +42,14 @@ proc ElecContinuity {Mat} {
         set Nc "([pdbDelayDouble $Mat Elec Nc])"
     }
     set e "$Nc * f12( -(Econd-Qfn) / ($VtE) )"
+    # carFloor (cm^-3, default off): tiny additive floor on the density, a floating-point
+    # guard for fully depleted regions (Ian approved 2026-10-29); 1e-100 is physically zero
+    if {[info exists carFloor]} { set e "($e + $carFloor)" }
     solution add name=Elec solve $Mat const val = "($e)"
 }
 
 proc HoleContinuity {Mat} {
-    global Vt
+    global Vt carFloor
 
     pdbSetDouble $Mat Qfp Rel.Error 1.0e-2
     pdbSetDouble $Mat Qfp Abs.Error 1.0e-2
@@ -59,6 +62,7 @@ proc HoleContinuity {Mat} {
     solution add name=Eval solve $Mat const val = ($e)
 
     set e "([pdbDelayDouble $Mat Hole Nv]) * f12( -(Qfp - Eval) / ($Vt) )"
+    if {[info exists carFloor]} { set e "($e + $carFloor)" }
     solution name=Hole solve $Mat const val = "($e)"
 }
 
