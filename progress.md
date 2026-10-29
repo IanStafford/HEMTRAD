@@ -1736,3 +1736,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - Stress at **28 V** reached in all runs. The damage law needs damPeak 1.5e18 (was 7e18 at 17 V): SiN 0.82 → 0.49 with onset ~2 V, HighK 0.93 flat, the same picture as at 17 V.
   - The SiN field peak at 28 V widens toward the field-plate edge; HighK spreads to y ≈ 1 µm. KB rad-model updated.
 - seeSmoke1 (48227316) still running (3 h).
+- 18:45 seeSmoke1 (48227316) crawls (Vd 3 V after 3 h): with traps off, seeIV ran with FLOOXS's default DevPsi tolerances (1e-6); radIV gets 0.1 from IonizedAcceptor. Fixed in seeIV and resubmitted as **seeSmoke2 = job 48241815**. 48227316 is left running until Ian OKs a scancel.
