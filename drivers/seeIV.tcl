@@ -2,11 +2,17 @@
 # explore/rad-model; plan kb/results/see-plan.md).
 #
 # 1. DC steady state at the strike bias (Vg_bias, then Vd_bias; traps off).
-# 2. Inject a charge-neutral electron-hole plasma along a vertical ion track at y = seeY0
-#    by resetting the quasi-Fermi levels (the solution variables):
+# 2. Strike along a vertical ion track at y = seeY0, two methods (seeMethod):
+#    gen (default): pair generation G = dN(x,y) * exp(-((t-t0)/tau)^2)/(tau sqrt(pi)) in both
+#      continuity equations (seeGenExpr, Continuity.tcl), t0 = 3 tau, tau = seeGenTau; the
+#      transient starts from the converged DC state and the solver builds the plasma.
+#    qf: inject the plasma at t = 0 by resetting the quasi-Fermi levels:
 #      n = n_ss + dN, p = p_ss + dN,  Qfn = Econd + Vt*F12inv(n/Nc), Qfp = Eval - Vt*F12inv(p/Nv)
 #    F12inv is Nilsson's closed form (<0.5% vs FLOOXS f12 for eta -30..25). Equal dN keeps
-#    the charge neutral, so Poisson is consistent at t = 0.
+#    the charge neutral, so Poisson is consistent at t = 0. It does not run: FLOOXS's device
+#    transient is TR-BDF2 (fixed), and the TR stage enforces F_new = -F_old on rows with no
+#    effective time term (carrier-free regions), so from the reset state no first step
+#    converges at any dt (down to 1e-75 s), even for a 1e-4 strike.
 #    dN(x,y) = seePairs/(seeWeff*sqrt(2 pi)*seeSigma) * exp(-(y-y0)^2/(2 sigma^2)) for
 #    seeXmin <= x <= seeXmax in GaN/AlGaN: a 2D slab of the track's charge per unit
 #    depth spread over an effective width seeWeff (the 2D-normalisation lever).
@@ -34,7 +40,9 @@ if {![info exists seePairs]}   { set seePairs 4.3e10 } ;# pairs/cm along the tra
 # um, track starts just below the AlGaN/GaN interface (x 0.015): Qfn/Qfp are continuous
 # there (an interface condition with no time term), and an injection that sets each side
 # from its own Nc/Ec breaks it, so no time step converges. Leaves out the 15 nm AlGaN (~1%).
-if {![info exists seeXmin]}    { set seeXmin 0.0155 }
+if {![info exists seeMethod]}  { set seeMethod gen }
+if {![info exists seeGenTau]}  { set seeGenTau 1.0e-12 } ;# s, Gaussian width of the generation pulse
+if {![info exists seeXmin]}    { set seeXmin [expr {$seeMethod eq "qf" ? 0.0155 : 0.0}] }
 if {![info exists seeXmax]}    { set seeXmax 1.4 }    ;# um, GaN:Fe buffer thickness (SiC below is not in the deck)
 if {![info exists seeTinit]}   { set seeTinit 1.0e-15 }
 if {![info exists seeTend]}    { set seeTend 1.0e-9 }
@@ -54,8 +62,20 @@ if {![info exists tranSign]}  { set tranSign 1 }
 if {![info exists modelDir]} {
     if {[file exists GaN_modelfile_masterD]} { set modelDir . } elseif {[file isdirectory model]} { set modelDir model } else { set modelDir [file join [file dirname [info script]] .. model] }
 }
+if {$seeStrike && $seeMethod eq "gen"} {
+    set seeT0 [expr {3.0 * $seeGenTau}]
+    set seeGenExpr "SeeGenOn*SeeDN*exp(-((time-$seeT0)/$seeGenTau)*((time-$seeT0)/$seeGenTau))/($seeGenTau*1.7724538509)"
+}
 source [file join $modelDir GaN_modelfile_masterD]
 source [file join $modelDir $deviceDeck]
+# track profile (cm^-3, total pairs per unit depth / seeWeff); SeeDN and the generation
+# switch exist before device init (FLOOXS folds fields into the equations there; the switch
+# starts at ~0 with a spatial variation so it is not folded as a constant)
+set sem "(Material(GaN)+Material(AlGaN))"
+set N0 [expr {$seePairs / ($seeWeff * 1.0e-4 * sqrt(2.0 * 3.14159265358979) * $seeSigma * 1.0e-4)}]
+set dN "($N0*exp(-((y-($seeY0))*(y-($seeY0)))/(2.0*$seeSigma*$seeSigma))*(x>=$seeXmin)*(x<=$seeXmax)*$sem)"
+sel z=$dN name=SeeDN
+sel z=1.0e-30*(1.0+x*x) name=SeeGenOn
 foreach m {GaN AlGaN Nitride} { pdbSetDouble $m DevPsi DampValue $dampValue }
 pdbSetDouble GaN Qfn DampValue $dampValue
 pdbSetDouble GaN Qfp DampValue $dampValue
@@ -98,7 +118,7 @@ proc Flux {c s} {
 }
 
 set sf [open ${tag}_summary.txt w]
-puts $sf "deck $deviceDeck Vg $Vg_bias Vd $Vd_bias strike $seeStrike y0 $seeY0 sigma $seeSigma Weff $seeWeff pairs/cm $seePairs x $seeXmin..$seeXmax"
+puts $sf "deck $deviceDeck Vg $Vg_bias Vd $Vd_bias strike $seeStrike method $seeMethod tau $seeGenTau y0 $seeY0 sigma $seeSigma Weff $seeWeff pairs/cm $seePairs x $seeXmin..$seeXmax"
 flush $sf
 
 # 1. DC steady state at the strike bias
@@ -110,15 +130,14 @@ foreach c $contacts { foreach s {Qfn Qfp} { append line " $c.$s=[Flux $c $s]" } 
 puts $sf $line; flush $sf
 
 # 2. inject the plasma
-if {$seeStrike} {
-    set sem "(Material(GaN)+Material(AlGaN))"
+if {$seeStrike && $seeMethod eq "gen"} {
+    sel z=1.0+1.0e-30*x*x name=SeeGenOn
+    puts $sf "generation on: peak dN [format %.4e $N0] /cm3, t0 $seeT0 s, tau $seeGenTau s"
+    flush $sf
+} elseif {$seeStrike} {
     set other "(1.0-$sem)"
     set Nc "(([pdbDelayDouble GaN Elec Nc])*Material(GaN)+([pdbDelayDouble AlGaN Elec Nc])*Material(AlGaN)+$other)"
     set Nv "(([pdbDelayDouble GaN Hole Nv])*Material(GaN)+([pdbDelayDouble AlGaN Hole Nv])*Material(AlGaN)+$other)"
-    set s_cm [expr {$seeSigma * 1.0e-4}]
-    set N0 [expr {$seePairs / ($seeWeff * 1.0e-4 * sqrt(2.0 * 3.14159265358979) * $s_cm)}]
-    set dN "($N0*exp(-((y-($seeY0))*(y-($seeY0)))/(2.0*$seeSigma*$seeSigma))*(x>=$seeXmin)*(x<=$seeXmax)*$sem)"
-    sel z=$dN name=SeeDN
     sel z=Qfn name=QfnSS
     sel z=Qfp name=QfpSS
     sel z=Elec name=ElecSS

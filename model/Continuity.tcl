@@ -21,7 +21,7 @@ proc TimeSign {{bin 0}} {
 }
 
 proc ElecContinuity {Mat} {
-    global Vt eTemp etStats etThermo etThermoJ srhTau
+    global Vt eTemp etStats etThermo etThermoJ srhTau seeGenExpr
 
     pdbSetDouble $Mat Qfn Rel.Error 1.0e-2
     pdbSetDouble $Mat Qfn Abs.Error 1.0e-2
@@ -36,6 +36,9 @@ proc ElecContinuity {Mat} {
     # recombination R = n p / (tau (n + p)) with n1 = p1 = ni neglected (ni ~ 1e-10 cm^-3
     # in GaN), added with the sign of ddt in both continuity equations
     if {[info exists srhTau]} { append eqn " [TimeSign 1] Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
+    # seeGenExpr (cm^-3 s^-1, default off): pair generation G (heavy-ion strike, drivers/seeIV.tcl),
+    # with the sign opposite to recombination
+    if {[info exists seeGenExpr]} { append eqn " [expr {[TimeSign 1] eq "-" ? "+" : "-"}] ($seeGenExpr)" }
     if {$eTemp && $etStats && $etThermo && $etThermoJ} {
         # thermal diffusion (Seebeck) part of the current, consistent with
         # electron statistics at ETemp. Uses Elec without the 1e2 floor: n*Delta
@@ -65,7 +68,7 @@ proc ElecContinuity {Mat} {
 }
 
 proc HoleContinuity {Mat} {
-    global Vt carFloor srhTau
+    global Vt carFloor srhTau seeGenExpr
 
     pdbSetDouble $Mat Qfp Rel.Error 1.0e-2
     pdbSetDouble $Mat Qfp Abs.Error 1.0e-2
@@ -73,6 +76,9 @@ proc HoleContinuity {Mat} {
 
     set eqn "[TimeSign]ddt(Hole) - ([pdbDelayDouble $Mat Hole mob]) * (Hole+1.0e2) * grad(Qfp)"
     if {[info exists srhTau]} { append eqn " [TimeSign 1] Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
+    # seeGenExpr (cm^-3 s^-1, default off): pair generation G (heavy-ion strike, drivers/seeIV.tcl),
+    # with the sign opposite to recombination
+    if {[info exists seeGenExpr]} { append eqn " [expr {[TimeSign 1] eq "-" ? "+" : "-"}] ($seeGenExpr)" }
     pdbSetString $Mat Qfp Equation $eqn
 
     set e "([pdbDelayDouble $Mat Hole Ev])"
