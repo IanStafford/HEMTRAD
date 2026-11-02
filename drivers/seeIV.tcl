@@ -113,20 +113,22 @@ if {$seeStrike} {
     set N0 [expr {$seePairs / ($seeWeff * 1.0e-4 * sqrt(2.0 * 3.14159265358979) * $s_cm)}]
     set dN "($N0*exp(-((y-($seeY0))*(y-($seeY0)))/(2.0*$seeSigma*$seeSigma))*(x>=$seeXmin)*(x<=$seeXmax)*$sem)"
     sel z=$dN name=SeeDN
-    # Nilsson inverse of the normalised F1/2: eta(u) = ln u/(1-u^2) + v/(1+(0.24+1.08 v)^-2), v = (3 sqrt(pi) u/4)^(2/3)
-    proc F12inv {u} {
-        set v "exp((2.0/3.0)*log(1.329340388*($u)))"
-        return "(log($u)/(1.0-($u)*($u)+1.0e-9)+($v)/(1.0+1.0/((0.24+1.08*($v))*(0.24+1.08*($v)))))"
-    }
-    set un "((Elec+SeeDN)/$Nc+1.0e-280)"
-    set up "((Hole+SeeDN)/$Nv+1.0e-280)"
     sel z=Qfn name=QfnSS
     sel z=Qfp name=QfpSS
     sel z=Elec name=ElecSS
     sel z=Hole name=HoleSS
+    # Nilsson inverse of the normalised F1/2: eta(u) = ln u/(1-u^2) + v/(1+(0.24+1.08 v)^-2),
+    # v = (3 sqrt(pi) u/4)^(2/3). Built in stages through data fields: the expression written
+    # out in one sel overflows FLOOXS's parser buffer ("buffer overflow detected", seeSmoke3).
+    sel z=$Nc name=SeeNc
+    sel z=$Nv name=SeeNv
     set Vt "($k*Temp/$q)"
-    sel z=($sem*(Econd+$Vt*[F12inv $un])+$other*QfnSS) name=Qfn
-    sel z=($sem*(Eval-$Vt*[F12inv $up])+$other*QfpSS) name=Qfp
+    foreach {car ss nfld sgn edge sol} {Elec ElecSS SeeNc + Econd Qfn Hole HoleSS SeeNv - Eval Qfp} {
+        sel z=(($car+SeeDN)/$nfld+1.0e-280) name=SeeU
+        sel z=exp((2.0/3.0)*log(1.329340388*SeeU)) name=SeeV
+        sel z=(log(SeeU)/(1.0-SeeU*SeeU+1.0e-9)+SeeV/(1.0+1.0/((0.24+1.08*SeeV)*(0.24+1.08*SeeV)))) name=SeeEta
+        sel z=($sem*($edge${sgn}$Vt*SeeEta)+$other*${sol}SS) name=$sol
+    }
     sel z=Elec-ElecSS name=dElecChk
     sel z=SeeDN name=z
     puts $sf "injected peak dN [lindex [peak GaN] 1] /cm3 (N0 $N0)"
