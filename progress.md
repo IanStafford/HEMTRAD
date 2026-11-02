@@ -1743,3 +1743,14 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - seeSmoke1 (48227316) and seeSmoke2 (48241815) both hit the **12 h TIMEOUT** in the DC drain ramp. Even with matched DevPsi tolerances, traps-off seeIV diverges in Qfn/Qfp above Vd ~7.5–10.5 V.
 - Fix: seeIV now runs radIV's stress numerics: trap model on with an empty trap density (TrapN 1e-30, physically no traps) plus occSafe. That is the setup that reaches 28 V. **seeSmoke3 = job 48965450** (same 4 cases, 24 h limit).
 - Isolation test **seeIso1 = job 48965552** (no strike, DC ramp to 28 V): trap model off/on × surfCharge −4e11. Together with seeSmoke2 task 0 (off, no surfCharge, failed) and seeSmoke3 task 0 (on, no surfCharge) it gives the 2×2: is the convergence from the (empty) trap model or from the surface charge that radIV's stress runs had?
+
+## 2026-11-02 afternoon — SEE transient debugging (local, 0 V)
+- **Isolation result:** the empty trap model (TrapN 1e-30, occSafe) is what lets the off-state DC ramp reach 28 V. Surface charge −4e11 plays no part: trap-on reached 28 V with and without it, while trap-off crawled (3 V after 5.7 h, 48965552_0) or stalled (7.5–10.5 V, seeSmoke2). Ian OK'd scancel: 48965552 and 48965450_0 cancelled.
+- seeSmoke3 strike tasks (48965450_1–3) reached 28 V DC, then segfaulted in the injection `sel`: the one-line F½⁻¹ expression overflows FLOOXS's parser buffer. Fixed by building it in stages.
+- **Continuity sign:** the deck's transport term has the opposite sign to FLOOXS's own decks (`ddt(Elec) − mob·Elec·grad(Qfn)`). This is invisible in DC, but any transient is anti-diffusive: the no-strike control could not take a 1 fs step. Lever `tranSign 1` (default 0) flips ddt and SRH, so DC runs and contact fluxes are unchanged. With it, the control runs to 1 ps in 10 steps. Ian OK'd 2026-11-02.
+- **Quasi-Fermi injection (qf):**
+  - now exact: two Newton steps on FLOOXS f12; net charge 1e8 vs 1e17 with Nilsson alone;
+  - still no first step at any dt (down to 1e-75 s), even for a 1e-4 strike or one 0.1 µm below the AlGaN;
+  - cause: FLOOXS's device transient is TR-BDF2, hard-coded, so this can't be fixed from the deck.
+- **Generation pulse (gen):** lever `seeGenExpr` (Ian OK'd 2026-11-02), seeIV `seeMethod gen`: Gaussian pulse in time, τ 1 ps, same track and pairs/cm, starting from the converged DC state. The first step also fails, with Qfp AlGaN updates of ~800 Vt; min hole density is ~1e-46 there.
+- Next: tests with generation kept out of the AlGaN and at 1e-4 charge, to separate the AlGaN hole rows from nonlinearity.
