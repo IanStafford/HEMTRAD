@@ -1764,3 +1764,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - SiN strike at y 0.5;
   - all at 28 V, 24 h limit.
 - Ian OK'd: **seeGen1 = job 49135298** (4 tasks), submitted 2026-11-02.
+- **2026-11-02 evening — PARKED (Ian signed off).** seeGen1 49135298 at 1 h 47 min: all 4 tasks still on the DC drain ramp, no errors or core files. Drain voltage: control 18 V, hk_y1.0 10 V, hk_y1.0_srh 8.5 V, sin_y0.5 9 V. The strike should start ~2 h later.
+  - **Pick up:** check `results/20261102_seeGen1/task_*` on HPG:
+    1. Did every ramp reach 28 V?
+    2. Is the transient stepping (`*_see.csv` rows, cutbacks)? Locally the full strike was ~13 fs per 15 min.
+    3. If it is too slow for the 24 h limit, rerun with a longer τ or fewer pairs.
+  - Contact flux signs are flipped under tranSign 1.
