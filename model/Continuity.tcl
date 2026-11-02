@@ -12,6 +12,14 @@ proc ElecDelta {} {
     return "(2.5*f32($etac)/f12($etac)-$eta)"
 }
 
+# Sign of the ddt (and recombination) terms in the continuity equations; see tranSign below.
+proc TimeSign {{bin 0}} {
+    global tranSign
+    set flip [expr {[info exists tranSign] && $tranSign}]
+    if {$bin} { return [expr {$flip ? "-" : "+"}] }
+    return [expr {$flip ? "-" : ""}]
+}
+
 proc ElecContinuity {Mat} {
     global Vt eTemp etStats etThermo etThermoJ srhTau
 
@@ -19,11 +27,15 @@ proc ElecContinuity {Mat} {
     pdbSetDouble $Mat Qfn Abs.Error 1.0e-2
     pdbSetDouble $Mat Qfn DampValue 0.1
 
-    set eqn "ddt(Elec) + ([pdbDelayDouble $Mat Elec mob]) * (Elec+1.0e2) * grad(Qfn)"
+    # tranSign (default 0 = old form): FLOOXS reads grad(S) as div(coef*grad S), so the transport
+    # term here has the opposite sign to dn/dt = div(mu n grad Qfn) - R (FLOOXS's own decks write
+    # ddt(Elec) - mob*Elec*grad(Qfn)). Steady state is unaffected; a transient is anti-diffusive.
+    # tranSign 1 flips ddt and the SRH term instead, so contact fluxes and DC runs are unchanged.
+    set eqn "[TimeSign]ddt(Elec) + ([pdbDelayDouble $Mat Elec mob]) * (Elec+1.0e2) * grad(Qfn)"
     # srhTau (s, default off; Ian OK 2026-10-29 for the single-event transient): SRH
     # recombination R = n p / (tau (n + p)) with n1 = p1 = ni neglected (ni ~ 1e-10 cm^-3
     # in GaN), added with the sign of ddt in both continuity equations
-    if {[info exists srhTau]} { append eqn " + Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
+    if {[info exists srhTau]} { append eqn " [TimeSign 1] Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
     if {$eTemp && $etStats && $etThermo && $etThermoJ} {
         # thermal diffusion (Seebeck) part of the current, consistent with
         # electron statistics at ETemp. Uses Elec without the 1e2 floor: n*Delta
@@ -59,8 +71,8 @@ proc HoleContinuity {Mat} {
     pdbSetDouble $Mat Qfp Abs.Error 1.0e-2
     pdbSetDouble $Mat Qfp DampValue 0.1
 
-    set eqn "ddt(Hole) - ([pdbDelayDouble $Mat Hole mob]) * (Hole+1.0e2) * grad(Qfp)"
-    if {[info exists srhTau]} { append eqn " + Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
+    set eqn "[TimeSign]ddt(Hole) - ([pdbDelayDouble $Mat Hole mob]) * (Hole+1.0e2) * grad(Qfp)"
+    if {[info exists srhTau]} { append eqn " [TimeSign 1] Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
     pdbSetString $Mat Qfp Equation $eqn
 
     set e "([pdbDelayDouble $Mat Hole Ev])"

@@ -44,6 +44,9 @@ if {![info exists seeCutTimes]} { set seeCutTimes {1e-13 1e-12 1e-11 1e-10 1e-9 
 if {![info exists trapEn]}    { set trapEn 1 }
 if {![info exists trapShape]} { set trapShape field }
 if {![info exists occSafe]}   { set occSafe 1 }
+# Continuity time terms with the sign that matches the deck's transport term (Continuity.tcl);
+# with the old form even the no-strike control can't take a 1 fs step
+if {![info exists tranSign]}  { set tranSign 1 }
 
 if {![info exists modelDir]} {
     if {[file exists GaN_modelfile_masterD]} { set modelDir . } elseif {[file isdirectory model]} { set modelDir model } else { set modelDir [file join [file dirname [info script]] .. model] }
@@ -127,6 +130,13 @@ if {$seeStrike} {
         sel z=(($car+SeeDN)/$nfld+1.0e-280) name=SeeU
         sel z=exp((2.0/3.0)*log(1.329340388*SeeU)) name=SeeV
         sel z=(log(SeeU)/(1.0-SeeU*SeeU+1.0e-9)+SeeV/(1.0+1.0/((0.24+1.08*SeeV)*(0.24+1.08*SeeV)))) name=SeeEta
+        # Nilsson is good to ~0.4%; on a 3e19 plasma that leaves ~1e17 cm^-3 of net charge
+        # (Poisson kick, first transient step never converged). Two Newton steps on
+        # ln f12(eta) = ln u with FLOOXS's own f12 make n and p exact for the model.
+        for {set it 0} {$it < 2} {incr it} {
+            sel z=((log(f12(SeeEta))-log(SeeU))/((log(f12(SeeEta+0.01))-log(f12(SeeEta-0.01)))/0.02)) name=SeeDEta
+            sel z=(SeeEta-SeeDEta) name=SeeEta
+        }
         sel z=($sem*($edge${sgn}$Vt*SeeEta)+$other*${sol}SS) name=$sol
     }
     sel z=Elec-ElecSS name=dElecChk
@@ -134,8 +144,18 @@ if {$seeStrike} {
     puts $sf "injected peak dN [lindex [peak GaN] 1] /cm3 (N0 $N0)"
     sel z=dElecChk
     puts $sf "check: peak Elec - Elec_ss after reset [lindex [peak GaN] 1] /cm3 (should be ~ peak dN)"
+    sel z=Hole-HoleSS
+    puts $sf "check: peak Hole - Hole_ss after reset [lindex [peak GaN] 1] /cm3 (should be ~ peak dN)"
+    # net charge change, both signs, per semiconductor (0 for a neutral injection)
+    foreach m {GaN AlGaN} {
+        sel z=(Hole-HoleSS)-(Elec-ElecSS)
+        set pk [lindex [peak $m] 1]
+        sel z=(Elec-ElecSS)-(Hole-HoleSS)
+        puts $sf "check: $m max d(p-n) $pk, max d(n-p) [lindex [peak $m] 1] /cm3"
+    }
     flush $sf
 }
+if {[info exists seeInjectOnly] && $seeInjectOnly} { close $sf; puts "SEEIV INJECT-ONLY DONE tag=$tag"; return }
 
 # 3. transient
 set cf [open ${tag}_see.csv w]
