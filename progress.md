@@ -1763,4 +1763,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - HighK strike at y 1.0, without and with SRH 1 ns;
   - SiN strike at y 0.5;
   - all at 28 V, 24 h limit.
-- **Waiting on Ian to OK the sbatch** (the permission check blocked the agent's submit).
+- Ian OK'd: **seeGen1 = job 49135298** (4 tasks), submitted 2026-11-02.
