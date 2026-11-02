@@ -12,12 +12,12 @@ proc ElecDelta {} {
     return "(2.5*f32($etac)/f12($etac)-$eta)"
 }
 
-# Sign of the ddt (and recombination) terms in the continuity equations; see tranSign below.
-proc TimeSign {{bin 0}} {
+# Sign of the transport term in the continuity equations ("+" for the old form when
+# called with "+", flipped with tranSign 1); see tranSign below.
+proc TranSign {old} {
     global tranSign
-    set flip [expr {[info exists tranSign] && $tranSign}]
-    if {$bin} { return [expr {$flip ? "-" : "+"}] }
-    return [expr {$flip ? "-" : ""}]
+    if {[info exists tranSign] && $tranSign} { return [expr {$old eq "+" ? "-" : "+"}] }
+    return $old
 }
 
 proc ElecContinuity {Mat} {
@@ -30,20 +30,23 @@ proc ElecContinuity {Mat} {
     # tranSign (default 0 = old form): FLOOXS reads grad(S) as div(coef*grad S), so the transport
     # term here has the opposite sign to dn/dt = div(mu n grad Qfn) - R (FLOOXS's own decks write
     # ddt(Elec) - mob*Elec*grad(Qfn)). Steady state is unaffected; a transient is anti-diffusive.
-    # tranSign 1 flips ddt and the SRH term instead, so contact fluxes and DC runs are unchanged.
-    set eqn "[TimeSign]ddt(Elec) + ([pdbDelayDouble $Mat Elec mob]) * (Elec+1.0e2) * grad(Qfn)"
+    # tranSign 1 flips the transport (and thermoelectric) term to FLOOXS's form; recombination
+    # keeps the sign of ddt and generation the opposite. DC solutions are unchanged; the
+    # contact fluxes change sign. (A unary minus on ddt, -ddt(Elec), was tried first: the
+    # control ran but any strike failed its first step at every dt.)
+    set eqn "ddt(Elec) [TranSign +] ([pdbDelayDouble $Mat Elec mob]) * (Elec+1.0e2) * grad(Qfn)"
     # srhTau (s, default off; Ian OK 2026-10-29 for the single-event transient): SRH
     # recombination R = n p / (tau (n + p)) with n1 = p1 = ni neglected (ni ~ 1e-10 cm^-3
     # in GaN), added with the sign of ddt in both continuity equations
-    if {[info exists srhTau]} { append eqn " [TimeSign 1] Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
+    if {[info exists srhTau]} { append eqn " + Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
     # seeGenExpr (cm^-3 s^-1, default off): pair generation G (heavy-ion strike, drivers/seeIV.tcl),
     # with the sign opposite to recombination
-    if {[info exists seeGenExpr]} { append eqn " [expr {[TimeSign 1] eq "-" ? "+" : "-"}] ($seeGenExpr)" }
+    if {[info exists seeGenExpr]} { append eqn " - ($seeGenExpr)" }
     if {$eTemp && $etStats && $etThermo && $etThermoJ} {
         # thermal diffusion (Seebeck) part of the current, consistent with
         # electron statistics at ETemp. Uses Elec without the 1e2 floor: n*Delta
         # -> 0 in depletion, where Delta ~ -eta is large
-        append eqn " + ([pdbDelayDouble $Mat Elec mob]) * Elec * 8.617e-5 * [ElecDelta] * grad(ETemp)"
+        append eqn " [TranSign +] ([pdbDelayDouble $Mat Elec mob]) * Elec * 8.617e-5 * [ElecDelta] * grad(ETemp)"
     }
     pdbSetString $Mat Qfn Equation $eqn
 
@@ -74,11 +77,11 @@ proc HoleContinuity {Mat} {
     pdbSetDouble $Mat Qfp Abs.Error 1.0e-2
     pdbSetDouble $Mat Qfp DampValue 0.1
 
-    set eqn "[TimeSign]ddt(Hole) - ([pdbDelayDouble $Mat Hole mob]) * (Hole+1.0e2) * grad(Qfp)"
-    if {[info exists srhTau]} { append eqn " [TimeSign 1] Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
+    set eqn "ddt(Hole) [TranSign -] ([pdbDelayDouble $Mat Hole mob]) * (Hole+1.0e2) * grad(Qfp)"
+    if {[info exists srhTau]} { append eqn " + Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
     # seeGenExpr (cm^-3 s^-1, default off): pair generation G (heavy-ion strike, drivers/seeIV.tcl),
     # with the sign opposite to recombination
-    if {[info exists seeGenExpr]} { append eqn " [expr {[TimeSign 1] eq "-" ? "+" : "-"}] ($seeGenExpr)" }
+    if {[info exists seeGenExpr]} { append eqn " - ($seeGenExpr)" }
     pdbSetString $Mat Qfp Equation $eqn
 
     set e "([pdbDelayDouble $Mat Hole Ev])"
