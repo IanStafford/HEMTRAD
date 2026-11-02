@@ -1737,3 +1737,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - The SiN field peak at 28 V widens toward the field-plate edge; HighK spreads to y ≈ 1 µm. KB rad-model updated.
 - seeSmoke1 (48227316) still running (3 h).
 - 18:45 seeSmoke1 (48227316) crawls (Vd 3 V after 3 h): with traps off, seeIV ran with FLOOXS's default DevPsi tolerances (1e-6); radIV gets 0.1 from IonizedAcceptor. Fixed in seeIV and resubmitted as **seeSmoke2 = job 48241815**. 48227316 is left running until Ian OKs a scancel.
+
+## 2026-11-02 — picked back up; SEE smoke rerun
+- HPG master was down; one Duo reconnect worked.
+- seeSmoke1 (48227316) and seeSmoke2 (48241815) both hit the **12 h TIMEOUT** in the DC drain ramp. Even with matched DevPsi tolerances, traps-off seeIV diverges in Qfn/Qfp above Vd ~7.5–10.5 V.
+- Fix: seeIV now runs radIV's stress numerics: trap model on with an empty trap density (TrapN 1e-30, physically no traps) plus occSafe. That is the setup that reaches 28 V. **seeSmoke3 = job 48965450** (same 4 cases, 24 h limit).
