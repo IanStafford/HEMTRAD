@@ -1742,3 +1742,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - HPG master was down; one Duo reconnect worked.
 - seeSmoke1 (48227316) and seeSmoke2 (48241815) both hit the **12 h TIMEOUT** in the DC drain ramp. Even with matched DevPsi tolerances, traps-off seeIV diverges in Qfn/Qfp above Vd ~7.5–10.5 V.
 - Fix: seeIV now runs radIV's stress numerics: trap model on with an empty trap density (TrapN 1e-30, physically no traps) plus occSafe. That is the setup that reaches 28 V. **seeSmoke3 = job 48965450** (same 4 cases, 24 h limit).
+- Isolation test **seeIso1 = job 48965552** (no strike, DC ramp to 28 V): trap model off/on × surfCharge −4e11. Together with seeSmoke2 task 0 (off, no surfCharge, failed) and seeSmoke3 task 0 (on, no surfCharge) it gives the 2×2: is the convergence from the (empty) trap model or from the surface charge that radIV's stress runs had?
