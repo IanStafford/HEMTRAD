@@ -37,7 +37,13 @@ if {![info exists seeTinit]}   { set seeTinit 1.0e-15 }
 if {![info exists seeTend]}    { set seeTend 1.0e-9 }
 if {![info exists seeUserStep]} { set seeUserStep 0.0 } ;# 0 = no cap on the time step
 if {![info exists seeCutTimes]} { set seeCutTimes {1e-13 1e-12 1e-11 1e-10 1e-9 1e-8 1e-7} }
-set trapEn 0
+# Numerics as in radIV's stress (which reaches Vd 28 V, job 48182110): the trap model is
+# on with an empty trap density (TrapN = 1e-30*(1+x^2), physically no traps) and the
+# overflow-safe occupancy. With trapEn 0 the off-state drain ramp diverges in Qfn/Qfp
+# above Vd ~8-10 V even with matched DevPsi tolerances (job 48241815).
+if {![info exists trapEn]}    { set trapEn 1 }
+if {![info exists trapShape]} { set trapShape field }
+if {![info exists occSafe]}   { set occSafe 1 }
 
 if {![info exists modelDir]} {
     if {[file exists GaN_modelfile_masterD]} { set modelDir . } elseif {[file isdirectory model]} { set modelDir model } else { set modelDir [file join [file dirname [info script]] .. model] }
