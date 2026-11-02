@@ -1754,3 +1754,13 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - cause: FLOOXS's device transient is TR-BDF2, hard-coded, so this can't be fixed from the deck.
 - **Generation pulse (gen):** lever `seeGenExpr` (Ian OK'd 2026-11-02), seeIV `seeMethod gen`: Gaussian pulse in time, τ 1 ps, same track and pairs/cm, starting from the converged DC state. The first step also fails, with Qfp AlGaN updates of ~800 Vt; min hole density is ~1e-46 there.
 - Next: tests with generation kept out of the AlGaN and at 1e-4 charge, to separate the AlGaN hole rows from nonlinearity.
+- **Strike transient runs (local, 0 V).** The `tranSign` unary-minus form `-ddt(Elec)` was the bug: the time term's Jacobian doesn't take the unary minus. tranSign now flips the transport term instead (FLOOXS's own form); R keeps the sign of ddt, G the opposite; contact fluxes change sign. Generation-pulse strike (τ 1 ps) results:
+  - 1e-4 charge: 14 steps to 3.5 ps;
+  - full charge (peak 3.4e19 cm⁻³): 5 steps to 13 fs in 15 min, ~50 Newton iterations per step;
+  - source/drain currents rise smoothly.
+- Ready: **seeGen1** (params_seeGen1.txt, 4 tasks):
+  - HighK control;
+  - HighK strike at y 1.0, without and with SRH 1 ns;
+  - SiN strike at y 0.5;
+  - all at 28 V, 24 h limit.
+- **Waiting on Ian to OK the sbatch** (the permission check blocked the agent's submit).
