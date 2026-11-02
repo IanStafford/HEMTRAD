@@ -31,7 +31,10 @@ if {![info exists seeY0]}      { set seeY0 1.0 }      ;# um, strike position alo
 if {![info exists seeSigma]}   { set seeSigma 0.05 }  ;# um, track radius (Gaussian sigma)
 if {![info exists seeWeff]}    { set seeWeff 1.0 }    ;# um, effective width of the 2D slab
 if {![info exists seePairs]}   { set seePairs 4.3e10 } ;# pairs/cm along the track (Au 2256 MeV, ~41 keV/nm, ~9.5 eV/pair)
-if {![info exists seeXmin]}    { set seeXmin 0.0 }    ;# um, track starts at the AlGaN top
+# um, track starts just below the AlGaN/GaN interface (x 0.015): Qfn/Qfp are continuous
+# there (an interface condition with no time term), and an injection that sets each side
+# from its own Nc/Ec breaks it, so no time step converges. Leaves out the 15 nm AlGaN (~1%).
+if {![info exists seeXmin]}    { set seeXmin 0.0155 }
 if {![info exists seeXmax]}    { set seeXmax 1.4 }    ;# um, GaN:Fe buffer thickness (SiC below is not in the deck)
 if {![info exists seeTinit]}   { set seeTinit 1.0e-15 }
 if {![info exists seeTend]}    { set seeTend 1.0e-9 }
@@ -137,7 +140,11 @@ if {$seeStrike} {
             sel z=((log(f12(SeeEta))-log(SeeU))/((log(f12(SeeEta+0.01))-log(f12(SeeEta-0.01)))/0.02)) name=SeeDEta
             sel z=(SeeEta-SeeDEta) name=SeeEta
         }
-        sel z=($sem*($edge${sgn}$Vt*SeeEta)+$other*${sol}SS) name=$sol
+        # only where the plasma is (SeeDN > 1 cm^-3): elsewhere keep the steady-state Qfn/Qfp,
+        # since the round trip breaks where n or p underflows (p ~ 0 in the AlGaN gave Qfp
+        # ~644 Vt off, and again no time step converged)
+        set inj "($sem*(SeeDN>1.0))"
+        sel z=($inj*($edge${sgn}$Vt*SeeEta)+(1.0-$inj)*${sol}SS) name=$sol
     }
     sel z=Elec-ElecSS name=dElecChk
     sel z=SeeDN name=z
