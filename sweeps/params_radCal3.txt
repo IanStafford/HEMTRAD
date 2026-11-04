@@ -1,0 +1,4 @@
+pre_sin|radState=pre;polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=2.0e7;deviceDeck=rfdevice_SiN.tcl
+p10_vs1.75|radState=pre;polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7
+p10_vs1.75_mu2100|radState=pre;polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100
+p10_vs2.0_mu2100|radState=pre;polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=2.0e7;mobMumax=2100

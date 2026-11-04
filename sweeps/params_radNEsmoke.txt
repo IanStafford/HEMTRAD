@@ -1,0 +1,1 @@
+smoke_ne_sin|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;hotEb=1.0;hotTau=1e-14;damXmax=0.05;damMax=1e20;trapLevel=0.30;damField=ne;damEref=1.0;deviceDeck=rfdevice_SiN.tcl;Vd_stress=4;Vd_stressMin=2;damPeak=1e18;damM=1;doIdVg=0;doIdVd=0

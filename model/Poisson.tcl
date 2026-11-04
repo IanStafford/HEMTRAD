@@ -33,6 +33,20 @@ proc InsTrapCharge {Mat Ntrap sign} {
 # IonAcceptor = Ntrap * f, where f is the electron occupancy of a level Etrap
 # below Econd (Gaussian energy spread Efwhm via 3-point Gauss-Hermite).
 # The Poisson equation subtracts IonAcceptor as negative charge.
+# occTerm w a g = w / (1 + g*exp(a)): one Fermi-occupancy term with exponent a.
+# occSafe 1 (lever, default off) writes it as w*exp(-a)/(exp(-a) + g): mathematically
+# identical, but it tends to 0 instead of evaluating exp(+a) when a is large and
+# positive. Off-state stress above Vd ~17.7 V puts Qfn ~18 V below the trap level in
+# the deep buffer, (Et - Qfn)/Vt > 709, and exp(a) = inf gave inf/inf in the
+# derivative ("computed a nan or infinite", jobs 48125435-48161617). The form only
+# needs a > -709 (Qfn < Et + 18 V), true here. (A min(a,700) cap via abs() was tried
+# first, job 48174580, and slowed Newton ~10x; not used.)
+proc occTerm {w a g} {
+    global occSafe
+    if {[info exists occSafe] && $occSafe} { return "($w * exp(-($a)) / (exp(-($a)) + $g))" }
+    return "($w / (1.0 + $g * exp( $a )))"
+}
+
 proc IonizedAcceptor {Mat Ntrap Etrap Efwhm {g 2.0}} {
     global k q hotEb
 
@@ -49,13 +63,13 @@ proc IonizedAcceptor {Mat Ntrap Etrap Efwhm {g 2.0}} {
 
     # f(E) = 1 / (1 + g*exp((E - Qfn)/Vt)), trap level E = Et
     if {$Efwhm == 0.0} {
-        set occ "(1.0 / (1.0 + $g * exp( ($Et - Qfn) / ($Vt) )))"
+        set occ [occTerm 1.0 "($Et - Qfn) / ($Vt)" $g]
     } else {
         set esig [expr $Efwhm/2.355]
         set Off  [expr sqrt(3.0)*$esig]
-        set e1 "((1.0/6.0) / (1.0 + $g * exp( ($Et + $Off - Qfn) / ($Vt) )))"
-        set e2 "((2.0/3.0) / (1.0 + $g * exp( ($Et - Qfn) / ($Vt) )))"
-        set e3 "((1.0/6.0) / (1.0 + $g * exp( ($Et - $Off - Qfn) / ($Vt) )))"
+        set e1 [occTerm (1.0/6.0) "($Et + $Off - Qfn) / ($Vt)" $g]
+        set e2 [occTerm (2.0/3.0) "($Et - Qfn) / ($Vt)" $g]
+        set e3 [occTerm (1.0/6.0) "($Et - $Off - Qfn) / ($Vt)" $g]
         set occ "($e1 + $e2 + $e3)"
     }
     # TrapFrozen / FrozenFlag are data fields (read at solve time), so the

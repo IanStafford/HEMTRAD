@@ -1,0 +1,2 @@
+iso_trapOff_surf|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;occSafe=1;Vd_bias=28;Vg_bias=-10;seeStrike=0;seeTend=1e-12;trapEn=0;surfCharge=-4.0e11
+iso_trapOn_surf|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;occSafe=1;Vd_bias=28;Vg_bias=-10;seeStrike=0;seeTend=1e-12;trapEn=1;surfCharge=-4.0e11

@@ -1,0 +1,10 @@
+p7_n17|radState=pre
+p8_n17|radState=pre;polCharge=8.0e12;phiB=2.08
+p9_n17|radState=pre;polCharge=9.0e12;phiB=2.51
+p10_n17|radState=pre;polCharge=1.0e13;phiB=2.94
+p7_n18|radState=pre;mobNref=1e18
+p8_n18|radState=pre;polCharge=8.0e12;phiB=2.08;mobNref=1e18
+p9_n18|radState=pre;polCharge=9.0e12;phiB=2.51;mobNref=1e18
+p10_n18|radState=pre;polCharge=1.0e13;phiB=2.94;mobNref=1e18
+smoke_highk|radState=post;damPeak=1e18;damM=2;surfCharge=-5.0e11;Vd_max=6
+smoke_sin|radState=post;damPeak=1e18;damM=2;surfCharge=-5.0e11;Vd_max=6;deviceDeck=rfdevice_SiN.tcl

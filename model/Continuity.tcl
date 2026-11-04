@@ -12,19 +12,41 @@ proc ElecDelta {} {
     return "(2.5*f32($etac)/f12($etac)-$eta)"
 }
 
+# Sign of the transport term in the continuity equations ("+" for the old form when
+# called with "+", flipped with tranSign 1); see tranSign below.
+proc TranSign {old} {
+    global tranSign
+    if {[info exists tranSign] && $tranSign} { return [expr {$old eq "+" ? "-" : "+"}] }
+    return $old
+}
+
 proc ElecContinuity {Mat} {
-    global Vt eTemp etStats etThermo etThermoJ
+    global Vt eTemp etStats etThermo etThermoJ srhTau seeGenExpr
 
     pdbSetDouble $Mat Qfn Rel.Error 1.0e-2
     pdbSetDouble $Mat Qfn Abs.Error 1.0e-2
     pdbSetDouble $Mat Qfn DampValue 0.1
 
-    set eqn "ddt(Elec) + ([pdbDelayDouble $Mat Elec mob]) * (Elec+1.0e2) * grad(Qfn)"
+    # tranSign (default 0 = old form): FLOOXS reads grad(S) as div(coef*grad S), so the transport
+    # term here has the opposite sign to dn/dt = div(mu n grad Qfn) - R (FLOOXS's own decks write
+    # ddt(Elec) - mob*Elec*grad(Qfn)). Steady state is unaffected; a transient is anti-diffusive.
+    # tranSign 1 flips the transport (and thermoelectric) term to FLOOXS's form; recombination
+    # keeps the sign of ddt and generation the opposite. DC solutions are unchanged; the
+    # contact fluxes change sign. (A unary minus on ddt, -ddt(Elec), was tried first: the
+    # control ran but any strike failed its first step at every dt.)
+    set eqn "ddt(Elec) [TranSign +] ([pdbDelayDouble $Mat Elec mob]) * (Elec+1.0e2) * grad(Qfn)"
+    # srhTau (s, default off; Ian OK 2026-10-29 for the single-event transient): SRH
+    # recombination R = n p / (tau (n + p)) with n1 = p1 = ni neglected (ni ~ 1e-10 cm^-3
+    # in GaN), added with the sign of ddt in both continuity equations
+    if {[info exists srhTau]} { append eqn " + Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
+    # seeGenExpr (cm^-3 s^-1, default off): pair generation G (heavy-ion strike, drivers/seeIV.tcl),
+    # with the sign opposite to recombination
+    if {[info exists seeGenExpr]} { append eqn " - ($seeGenExpr)" }
     if {$eTemp && $etStats && $etThermo && $etThermoJ} {
         # thermal diffusion (Seebeck) part of the current, consistent with
         # electron statistics at ETemp. Uses Elec without the 1e2 floor: n*Delta
         # -> 0 in depletion, where Delta ~ -eta is large
-        append eqn " + ([pdbDelayDouble $Mat Elec mob]) * Elec * 8.617e-5 * [ElecDelta] * grad(ETemp)"
+        append eqn " [TranSign +] ([pdbDelayDouble $Mat Elec mob]) * Elec * 8.617e-5 * [ElecDelta] * grad(ETemp)"
     }
     pdbSetString $Mat Qfn Equation $eqn
 
@@ -33,7 +55,7 @@ proc ElecContinuity {Mat} {
 
     # electron statistics at the electron temperature ETemp (constant 300 K
     # unless the eTemp lever solves it); etStats 0 keeps them at the lattice Temp
-    global etStats k q
+    global etStats k q carFloor
     if {$etStats} {
         set VtE "($k*ETemp/$q)"
         set Nc "([pdbDelayDouble $Mat Elec Nc]) * exp(1.5*log(ETemp/Temp))"
@@ -42,23 +64,31 @@ proc ElecContinuity {Mat} {
         set Nc "([pdbDelayDouble $Mat Elec Nc])"
     }
     set e "$Nc * f12( -(Econd-Qfn) / ($VtE) )"
+    # carFloor (cm^-3, default off): tiny additive floor on the density, a floating-point
+    # guard for fully depleted regions (Ian approved 2026-10-29); 1e-100 is physically zero
+    if {[info exists carFloor]} { set e "($e + $carFloor)" }
     solution add name=Elec solve $Mat const val = "($e)"
 }
 
 proc HoleContinuity {Mat} {
-    global Vt
+    global Vt carFloor srhTau seeGenExpr
 
     pdbSetDouble $Mat Qfp Rel.Error 1.0e-2
     pdbSetDouble $Mat Qfp Abs.Error 1.0e-2
     pdbSetDouble $Mat Qfp DampValue 0.1
 
-    set eqn "ddt(Hole) - ([pdbDelayDouble $Mat Hole mob]) * (Hole+1.0e2) * grad(Qfp)"
+    set eqn "ddt(Hole) [TranSign -] ([pdbDelayDouble $Mat Hole mob]) * (Hole+1.0e2) * grad(Qfp)"
+    if {[info exists srhTau]} { append eqn " + Elec*Hole/($srhTau*(Elec+Hole+1.0e-10))" }
+    # seeGenExpr (cm^-3 s^-1, default off): pair generation G (heavy-ion strike, drivers/seeIV.tcl),
+    # with the sign opposite to recombination
+    if {[info exists seeGenExpr]} { append eqn " - ($seeGenExpr)" }
     pdbSetString $Mat Qfp Equation $eqn
 
     set e "([pdbDelayDouble $Mat Hole Ev])"
     solution add name=Eval solve $Mat const val = ($e)
 
     set e "([pdbDelayDouble $Mat Hole Nv]) * f12( -(Qfp - Eval) / ($Vt) )"
+    if {[info exists carFloor]} { set e "($e + $carFloor)" }
     solution name=Hole solve $Mat const val = "($e)"
 }
 

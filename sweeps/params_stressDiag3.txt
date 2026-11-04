@@ -1,0 +1,2 @@
+diag3_sin_d0.25|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;damPeak=1.0;Vd_stressMin=2;doIdVg=0;doIdVd=0;Vg_stress=-10;deviceDeck=rfdevice_SiN.tcl;qfnAbs=1.0;stressDiag=1;Vd_stress=28;stressStep=0.25;stressDiagStep=0.25
+diag3_sin_d1|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;damPeak=1.0;Vd_stressMin=2;doIdVg=0;doIdVd=0;Vg_stress=-10;deviceDeck=rfdevice_SiN.tcl;qfnAbs=1.0;stressDiag=1;Vd_stress=28;stressStep=0.25;stressDiagStep=1.0

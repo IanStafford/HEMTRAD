@@ -1,0 +1,9 @@
+p9_vs1.5|radState=pre;polCharge=9.0e12;phiB=2.51;mobNref=1e18;mobVsat=1.5e7;doIdVg=1
+p9_vs2.0|radState=pre;polCharge=9.0e12;phiB=2.51;mobNref=1e18;mobVsat=2.0e7;doIdVg=1
+p9_vs2.5|radState=pre;polCharge=9.0e12;phiB=2.51;mobNref=1e18;mobVsat=2.5e7;doIdVg=1
+p95_vs1.5|radState=pre;polCharge=9.5e12;phiB=2.72;mobNref=1e18;mobVsat=1.5e7;doIdVg=1
+p95_vs2.0|radState=pre;polCharge=9.5e12;phiB=2.72;mobNref=1e18;mobVsat=2.0e7;doIdVg=1
+p95_vs2.5|radState=pre;polCharge=9.5e12;phiB=2.72;mobNref=1e18;mobVsat=2.5e7;doIdVg=1
+p10_vs1.5|radState=pre;polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.5e7;doIdVg=1
+p10_vs2.0|radState=pre;polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=2.0e7;doIdVg=1
+p10_vs2.5|radState=pre;polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=2.5e7;doIdVg=1

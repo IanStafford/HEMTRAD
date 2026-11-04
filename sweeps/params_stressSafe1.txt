@@ -1,0 +1,4 @@
+sin_safe_qabs_vd28|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;damPeak=1.0;Vd_stressMin=2;doIdVg=0;doIdVd=0;Vg_stress=-10;occSafe=1;deviceDeck=rfdevice_SiN.tcl;qfnAbs=1.0;Vd_stress=28
+sin_safe_vd28|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;damPeak=1.0;Vd_stressMin=2;doIdVg=0;doIdVd=0;Vg_stress=-10;occSafe=1;deviceDeck=rfdevice_SiN.tcl;Vd_stress=28
+sin_safe_qabs_vd40|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;damPeak=1.0;Vd_stressMin=2;doIdVg=0;doIdVd=0;Vg_stress=-10;occSafe=1;deviceDeck=rfdevice_SiN.tcl;qfnAbs=1.0;Vd_stress=40
+highk_safe_qabs_vd28|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;damPeak=1.0;Vd_stressMin=2;doIdVg=0;doIdVd=0;Vg_stress=-10;occSafe=1;qfnAbs=1.0;Vd_stress=28
