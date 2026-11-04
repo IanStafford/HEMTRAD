@@ -41,3 +41,12 @@ Every lever has an `info exists` default, so a driver or array task sets it befo
 | `teProfile` | {} | Vd list for ETemp cut dumps ([[energy-balance]]) |
 
 `drivers/pulsedIV.tcl`'s trap defaults are the model file's (0.68 eV / `hotEb` 0.3 / `hotTau` 1e-13), not [[run-F]]: sweeps always set the levers explicitly. `drivers/calibIdVg.tcl` levers: see [[drivers]].
+
+## Radiation studies (`drivers/radIV.tcl`, 2026-11-04; all default off)
+| Lever | Default | Meaning |
+|---|---|---|
+| `damSites` | {} | Uniform acceptor sites `{ymin ymax xmin xmax N}` (µm, cm⁻³), any number ([[damage-region-map]]) |
+| `stressSkip` | 0 | Skip the stress solve when no damage law uses the stress field |
+| `VgFam` | {} | Extra Id–Vd curves at these Vg, in order, to `<tag>_IdVdG<Vg>.csv` |
+| `mobDamFac`, `mobDamYmin/Ymax/Xmax` | unset | Low-field mobility factor in a window, GaN (`model/GaN.tcl`) |
+| `polWinFac`, `polWinYmin/Ymax` | unset | Interface polarization charge factor in a y window |

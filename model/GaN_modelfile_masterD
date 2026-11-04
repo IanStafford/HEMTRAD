@@ -82,7 +82,12 @@ if {$eTemp} {
 # Is the interface charge constant everwhere all the time?
 #Add interface charge
 if {![info exists polCharge]} { set polCharge 7.0e12 } ;# net AlGaN/GaN interface (polarization) charge, cm^-2
-pdbSetString AlGaN_GaN DevPsi Equation "$polCharge"
+# polWinFac (2026-11-04): interface charge factor in polWinYmin..polWinYmax (um). Unset = uniform.
+if {[info exists polWinFac]} {
+    pdbSetString AlGaN_GaN DevPsi Equation "$polCharge*(1.0-(1.0-$polWinFac)*(y>=$polWinYmin)*(y<=$polWinYmax))"
+} else {
+    pdbSetString AlGaN_GaN DevPsi Equation "$polCharge"
+}
 # Optional net fixed charge at the AlGaN/SiN surface (cm^-2): surface donors in
 # excess of the AlGaN surface polarization charge (passivation-induced). Unset = none.
 if {[info exists surfCharge]} { pdbSetString AlGaN_Nitride DevPsi Equation "$surfCharge" }

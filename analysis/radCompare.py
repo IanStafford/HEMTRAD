@@ -5,7 +5,8 @@ usage: python3 analysis/radCompare.py <run_or_task_dir>... [--targets t.csv] [--
   targets.csv: digitized measured curves (curve,x,y; kept outside git, default
   ~/HEMTRAD/data/rad_y2/targets.csv).
 Per task: Vth (linear extrapolation at max gm, Vd 0.1), gm max (mS/mm), Id at
-Vg -2.6/-2.0/-1.4 (Vd 0.1), Id-Vd at Vg +1 at 1/2/4/6/10 V, Ioff at the lowest Vg.
+Vg -2.6/-2.0/-1.4 (Vd 0.1), Id-Vd at Vg +1 at 1/2/4/6/10 V, Ron, the largest Id-Vd step,
+Ioff at the lowest Vg.
 --ref LABEL also prints each task's ratios to that task (post/pre).
 """
 import csv
@@ -15,6 +16,8 @@ import os
 import sys
 
 import numpy as np
+
+from radMetrics import ron_step, vth_gm
 
 args = [a for a in sys.argv[1:]]
 plot = None
@@ -41,14 +44,6 @@ def load_targets(path):
     return {k: np.array(v) for k, v in t.items()}
 
 
-def vth_gm(vg, idd):
-    o = np.argsort(vg)
-    vg, idd = vg[o], idd[o]
-    gm = np.gradient(idd, vg)
-    k = int(np.argmax(gm))
-    return vg[k] - idd[k] / gm[k], gm[k]
-
-
 def metrics(t):
     m = {}
     f = glob.glob(os.path.join(t, "*_IdVg.csv"))
@@ -66,6 +61,7 @@ def metrics(t):
         d = np.loadtxt(f[0], delimiter=",", ndmin=2)
         for v in VD_PTS:
             m[f"Id{v:g}"] = float(np.interp(v, d[:, 0], d[:, 2])) if d[-1, 0] >= v - 1e-6 else np.nan
+        m["Ron"], m["drop"], m["dropVd"] = ron_step(d)
         m["lastVd"] = float(d[-1, 0])
         m["_IdVd"] = d
     return m
@@ -83,7 +79,7 @@ for t in tasks:
     p = json.load(open(os.path.join(t, "params.json")))
     res.append((p["label"], p, metrics(t)))
 
-cols = ["Vth", "gm"] + [f"Ig{v}" for v in VG_PTS] + [f"Id{v:g}" for v in VD_PTS] + ["Ioff", "lastVd"]
+cols = ["Vth", "gm"] + [f"Ig{v}" for v in VG_PTS] + [f"Id{v:g}" for v in VD_PTS] + ["Ron", "drop", "dropVd", "Ioff", "lastVd"]
 print(f"{'label':<18}" + "".join(f"{c:>10}" for c in cols))
 if T:
     meas = {"Vth": -2.97, "gm": 53.5, "Ioff": 5.4e-6}
@@ -101,7 +97,7 @@ if ref:
     for lab, p, m in res:
         print(f"{lab:<18}" + "".join(
             f"{(m.get(c, np.nan) - r.get(c, np.nan)) if c == 'Vth' else m.get(c, np.nan) / r.get(c, np.nan):>10.3g}"
-            for c in cols if c != "lastVd"))
+            for c in cols if c not in ("lastVd", "drop", "dropVd")))
 
 if plot:
     import matplotlib.pyplot as plt

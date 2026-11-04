@@ -1,9 +1,9 @@
 #!/bin/bash
-# Pre/post-irradiation characterisation sweeps with drivers/radIV.tcl (branch
-# explore/rad-model). One line per task in sweeps/$PARAMS:
+# Pre/post-irradiation characterisation sweeps with drivers/radIV.tcl.
+# One line per task in sweeps/$PARAMS:
 #   label|lever=value;lever=value;...
 # DRV (env, default radIV) picks drivers/$DRV.tcl, e.g. DRV=seeIV.
-# Submit from the worktree root, e.g.
+# Submit from the repo root, e.g.
 #   RUN=20261023_radCal1 PARAMS=params_radCal1.txt; mkdir -p results/$RUN
 #   sbatch --array=0-7%8 --export=ALL,RUN=$RUN,PARAMS=$PARAMS \
 #          --output=results/$RUN/slurm_%A_%a.out --error=results/$RUN/slurm_%A_%a.err sweeps/radIV.slurm
@@ -17,7 +17,7 @@
 
 set -euo pipefail
 
-REPO=/home/ianstafford/blue/ee1/ianstafford/HEMTRAD-wt/rad-model
+REPO=${REPO:-/home/ianstafford/blue/ee1/ianstafford/HEMTRAD}   # override (--export) to run from an HPG worktree
 RUN_DIR=$REPO/results/$RUN
 TASK_DIR=$RUN_DIR/task_${SLURM_ARRAY_TASK_ID}
 

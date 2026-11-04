@@ -97,6 +97,20 @@ if {![info exists dam2Field]} { set dam2Field "" }   ;# "" = same field/Eref as 
 if {![info exists dam3Peak]}  { set dam3Peak 0.0 }
 if {![info exists dam3Ymin]}  { set dam3Ymin 1.0 }
 if {![info exists dam3Ymax]}  { set dam3Ymax 1.6 }
+# damSites (2026-11-04): any number of uniform acceptor sites, each {ymin ymax xmin xmax N}
+# (um, um, um below the AlGaN top, um, cm^-3), summed into TrapN. {} = none (old behaviour).
+if {![info exists damSites]}  { set damSites {} }
+# stressSkip 1: no stress solve, for damage that doesn't use the stress field (damSites,
+# surfCharge, a uniform dam2/dam3 site). The stress fields are then ~0. 0 = old behaviour.
+if {![info exists stressSkip]} { set stressSkip 0 }
+# VgFam: extra Id-Vd curves, one per Vg in the list, in that order (like the measured
+# family; fill-only traps keep their state between curves), to <tag>_IdVdG<Vg>.csv. {} = none.
+if {![info exists VgFam]}     { set VgFam {} }
+# low-field mobility factor in a window (with mobDamFac set, GaN.tcl multiplies by the
+# data field MobDam). Unset = old behaviour.
+if {![info exists mobDamYmin]} { set mobDamYmin -1.0e3 }
+if {![info exists mobDamYmax]} { set mobDamYmax 1.0e3 }
+if {![info exists mobDamXmax]} { set mobDamXmax 0.05 }
 if {![info exists dam2Eref]}  { set dam2Eref "" }
 if {![info exists dam2Xmax]}  { set dam2Xmax "" }    ;# depth of the second site (um); "" = damXmax
 if {![info exists Rgd]}       { set Rgd 0.0 }
@@ -109,7 +123,7 @@ if {![info exists hotTau]}    { set hotTau 1.0e-14 }
 if {![info exists fillIters]} { set fillIters 4 }
 if {![info exists fillRelax]} { set fillRelax 0.5 }
 
-set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || $damInsPeak > 0.0 || $dam2Peak > 0.0 || $dam3Peak > 0.0 || [llength $damList] > 0)}]
+set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || $damInsPeak > 0.0 || $dam2Peak > 0.0 || $dam3Peak > 0.0 || [llength $damList] > 0 || [llength $damSites] > 0)}]
 set trapEn $useTraps
 set trapShape field
 
@@ -118,6 +132,9 @@ if {![info exists modelDir]} {
 }
 source [file join $modelDir GaN_modelfile_masterD]
 source [file join $modelDir $deviceDeck]
+if {[info exists mobDamFac]} {
+    sel z=1.0-(1.0-$mobDamFac)*(x>=0.0)*(x<=$mobDamXmax)*(y>=$mobDamYmin)*(y<=$mobDamYmax)+1.0e-30*(1.0+x*x) name=MobDam
+}
 foreach m {GaN AlGaN Nitride} { pdbSetDouble $m DevPsi DampValue $dampValue }
 pdbSetDouble GaN Qfn DampValue $dampValue
 pdbSetDouble GaN Qfp DampValue $dampValue
@@ -184,7 +201,11 @@ set sf [open ${tag}_summary.txt w]
 #---------------- irradiation (post) ----------------
 if {$radState eq "post"} {
     if {[info exists surfCharge]} { puts $sf "surfCharge $surfCharge" }
-    if {$useTraps} {
+    if {$useTraps && $stressSkip} {
+        if {$damPeak > 0.0 || ($damInsPeak > 0.0 && $damInsM != 0.0) || ($dam2Peak > 0.0 && $dam2M != 0.0) || [llength $damList] > 0} { error "stressSkip with a damage law that needs the stress field" }
+        foreach f {Estress EstressT EstressNE ElecStress} { sel z=1.0e-30*(1.0+x*x) name=$f }
+        puts $sf "stress skipped"
+    } elseif {$useTraps} {
         if {$stressNoHoles} {
             solution name=Qfp nosolve
             sel z=50.0*(x<$stressNoHolesX)+1.0e-12*(1.0+x*x) name=Qfp
@@ -258,7 +279,7 @@ flush $sf
 proc DamageIn {tg} {
     global damPeak damM damEref damMax damXmax damYmin damYmax sf
     global damInsPeak damInsM damInsEref damInsXmin damField damInsField
-    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref dam2Xmax damNexp damNref dam3Peak dam3Ymin dam3Ymax
+    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref dam2Xmax damNexp damNref dam3Peak dam3Ymin dam3Ymax damSites
     ThawTraps
     set fld [expr {$damField eq "tot" ? "EstressT" : ($damField eq "ne" ? "EstressNE" : "Estress")}]
     set n "($damPeak*exp($damM*log($fld/$damEref+1.0e-30)))"
@@ -279,6 +300,16 @@ proc DamageIn {tg} {
         set fi [expr {$damInsField eq "lat" ? "Estress" : "EstressT"}]
         set ni "($damInsPeak*exp($damInsM*log($fi/$damInsEref+1.0e-30)))"
         set n "$n+(0.5*($ni+$damMax-abs($ni-$damMax)))*(x<0.0)*(x>=$damInsXmin)*(y>=$damYmin)*(y<=$damYmax)"
+    }
+    if {[llength $damSites] > 0} {
+        # summed through a data field, one site at a time: FLOOXS's parser has a fixed buffer
+        sel z=0.0*x name=SiteSum
+        foreach site $damSites {
+            lassign $site y0 y1 x0 x1 ns
+            sel z=SiteSum+$ns*(x>=$x0)*(x<=$x1)*(y>=$y0)*(y<=$y1) name=SiteSum
+            puts $sf "$tg site y=$y0..$y1 x=$x0..$x1 N=$ns"
+        }
+        set n "$n+SiteSum"
     }
     foreach s {0.0 0.01 0.03 0.1 0.3 0.6 1.0} {
         sel z=$s*($n)+1.0e-30*(1.0+x*x) name=TrapN
@@ -307,8 +338,32 @@ proc DamageIn {tg} {
     return 1
 }
 
+# One Id-Vd curve at gate voltage vg, from rest and back, to file fn.
+proc IdVdCurve {tg vg fn} {
+    global Vd_max Vd_step retryDepth useTraps te
+    if {![Ramp G 0.0 $vg 0.1]} { return 0 }
+    if {$useTraps} { CaptureTraps }
+    set f [open $fn w]
+    puts $f "0.0, [IdDev], [IdExt 0.0 $vg], 300.0"
+    set dPrev 0.0
+    set n [expr {int(round($Vd_max / $Vd_step))}]
+    for {set i 1} {$i <= $n} {incr i} {
+        set d [expr {$i * $Vd_step}]
+        if {![Reach D $dPrev $d $retryDepth 1]} { puts "IDVD GAVE UP at Vd=$d"; break }
+        set dPrev $d
+        puts $f "$d, [IdDev], [IdExt $d $vg], $te"
+        flush $f
+        puts "IDVD $tg Vg=$vg Vd=$d Id=[IdDev] peakTe=$te"
+    }
+    close $f
+    # back to rest for the next curve or damage setting
+    if {![Ramp D $dPrev 0.0 0.5]} { return 0 }
+    if {![Ramp G $vg 0.0 0.1]} { return 0 }
+    return 1
+}
+
 proc Measure {tg} {
-    global doIdVg doIdVd Vd_lin Vg_hi Vg_lo Vg_step Vg_out Vd_max Vd_step retryDepth useTraps te
+    global doIdVg doIdVd Vd_lin Vg_hi Vg_lo Vg_step Vg_out VgFam useTraps retryDepth
     if {$doIdVg} {
         if {![Ramp D 0.0 $Vd_lin 0.05]} { return 0 }
         if {![Ramp G 0.0 $Vg_hi 0.1]} { return 0 }
@@ -330,24 +385,10 @@ proc Measure {tg} {
         if {![Ramp D $Vd_lin 0.0 0.05]} { return 0 }
     }
     if {$doIdVd} {
-        if {![Ramp G 0.0 $Vg_out 0.1]} { return 0 }
-        if {$useTraps} { CaptureTraps }
-        set f [open ${tg}_IdVd.csv w]
-        puts $f "0.0, [IdDev], [IdExt 0.0 $Vg_out], 300.0"
-        set dPrev 0.0
-        set n [expr {int(round($Vd_max / $Vd_step))}]
-        for {set i 1} {$i <= $n} {incr i} {
-            set d [expr {$i * $Vd_step}]
-            if {![Reach D $dPrev $d $retryDepth 1]} { puts "IDVD GAVE UP at Vd=$d"; break }
-            set dPrev $d
-            puts $f "$d, [IdDev], [IdExt $d $Vg_out], $te"
-            flush $f
-            puts "IDVD $tg Vd=$d Id=[IdDev] peakTe=$te"
-        }
-        close $f
-        # back to rest for the next damage setting
-        if {![Ramp D $dPrev 0.0 0.5]} { return 0 }
-        if {![Ramp G $Vg_out 0.0 0.1]} { return 0 }
+        if {![IdVdCurve $tg $Vg_out ${tg}_IdVd.csv]} { return 0 }
+    }
+    foreach vg $VgFam {
+        if {![IdVdCurve $tg $vg ${tg}_IdVdG$vg.csv]} { return 0 }
     }
     return 1
 }

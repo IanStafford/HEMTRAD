@@ -59,6 +59,8 @@ mater add name=GaN
 
         #Heller high field: mu = mulow / (1 + (mulow E / vsat)^beta)^(1/beta), E along the channel (V/cm)
         set mulow "([pdbGetDouble GaN Elec lowfldmob])"
+        # mobDamFac (drivers/radIV.tcl): low-field mobility factor in a window, data field MobDam
+        if {[info exists mobDamFac]} { set mulow "(MobDam*$mulow)" }
         set E "(abs(dot(DevPsi,y*1e-4))+1)"
         if {[info exists mobVsat]} { set vs "($mobVsat)" } else { set vs "(3.3e7-(3.0e6*$Tn))" }
         set b "(0.85*exp(log($Tn)*(0.4)))"
