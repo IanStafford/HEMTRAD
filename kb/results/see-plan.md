@@ -55,3 +55,11 @@ Goal (Ian, 2026-10-29): recreate in FLOOXS the single event seen in the Y2 curre
 - **SRH recombination term** (physics change).
 - **Target:** the prompt transient only, or also the lasting leakage step after it?
 - **R35 bias:** confirm the gate bias from the slide legend. If it differs from −10 V, rerun the SiN rad-model stress at that bias.
+
+## First results: seeGen1 (job 49135298, 2026-11-04)
+Generation-pulse strike (`seeMethod gen`, τ 1 ps, `tranSign 1`, W_eff 1 µm, 6.9e-13 C/µm deposited), Vd 28 V. Currents below are magnitudes; drain current flows in, source and bottom-hole current flow out.
+- HighK, y 1.0, Vg −10: Id ~2.3 mA/µm, still near that plateau at 1 ns. Drain charge by 1 ns is 2.25e-12 C/µm, 3.3× deposited. Holes at the bottom contact are 54% of deposited.
+- SiN, y 0.5, Vg −5: Id ~2.0 mA/µm, drain charge 2.9× deposited.
+- SRH 1 ns: tracks the no-SRH run until a bad step at 0.70 ns, then stalls until the 24 h limit. Discard the last row.
+- Control without a strike stays ≤ ~5e-13 A/µm.
+- The output misses displacement current, so the columns only balance on the plateau. The mechanism behind the plateau isn't identified yet.
