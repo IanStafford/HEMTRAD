@@ -1,0 +1,2 @@
+hk_y1.0_10ns|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;occSafe=1;Vd_bias=28;seeTend=1e-8;seeCutTimes={1e-12 1e-11 1e-10 1e-9 2e-9 3e-9 5e-9 1e-8};Vg_bias=-10;seeY0=1.0
+sin_y0.5_10ns|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;occSafe=1;Vd_bias=28;seeTend=1e-8;seeCutTimes={1e-12 1e-11 1e-10 1e-9 2e-9 3e-9 5e-9 1e-8};Vg_bias=-5;deviceDeck=rfdevice_SiN.tcl;seeY0=0.5
