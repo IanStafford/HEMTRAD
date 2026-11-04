@@ -1786,3 +1786,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - Reading: the plasma collapses the buffer and gate barrier together, and the channel stays on while the hole reservoir drains. This is an inference from two depth cuts. It predicts Id falling over a few ns; untested (run ended at 1 ns).
   - Snapshot rerun not needed. Slide comparison done in chat (measured values not logged): the model has no lasting step (no damage term) and its gate column doesn't respond, so neither slide feature is reproduced yet. Total current depends on the width assumption.
   - Next, waiting on Ian: OK for a 10 ns run (HighK, SiN) to test the decay.
+- Ian OK'd: **seeGen2 = job 49511531** (2 tasks, `params_seeGen2.txt`, results/20261104_seeGen2), submitted 2026-11-04. HighK y 1.0 Vg −10 and SiN y 0.5 Vg −5, Vd 28, no SRH, to 10 ns, 36 h limit, extra cuts at 1, 2, 3, 5, 10 ns. Tests whether Id decays as the hole reservoir drains (~0.9 ns estimate).
