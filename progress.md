@@ -1770,3 +1770,11 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
     2. Is the transient stepping (`*_see.csv` rows, cutbacks)? Locally the full strike was ~13 fs per 15 min.
     3. If it is too slow for the 24 h limit, rerun with a longer τ or fewer pairs.
   - Contact flux signs are flipped under tranSign 1.
+- **2026-11-04 — seeGen1 49135298 finished: the strike transient works at 28 V.** Currents are in A/µm; deposited charge is 6.9e-13 C/µm (4.3e10 pairs/cm).
+  - **hk_y1.0 (HighK, no SRH):** completed to 1 ns in 22.7 h, 1118 rows. Drain ~2.3 mA/µm, source ~1.9, bottom-contact holes ~0.35, and still near that plateau at 1 ns (Id peak 2.37 at 0.72 ns, 2.29 at 1 ns). Collected by 1 ns: drain 2.25e-12 C/µm = 3.3× deposited; holes at bottom 3.7e-13 C/µm = 54% of deposited.
+  - **sin_y0.5 (SiN, y 0.5):** completed to 1 ns in 15.2 h. Same shape, Id ~2.0 mA/µm, drain charge 1.96e-12 C/µm = 2.9× deposited.
+  - **hk_y1.0_srh (SRH 1 ns):** TIMEOUT at 24 h. It tracks hk_y1.0 (Id 2.16 mA/µm at 0.66 ns, falling slowly), then one bad accepted step at 0.70 ns (S 2.15 A/µm, a jump of 1000×) and 444k cutbacks with no progress. Discard that last row.
+  - **ctrl_highk (no strike):** completed to 0.1 ns, currents ≤ ~5e-13 A/µm, about 1e10 below the strike.
+  - Checks: at the plateau S + D − B closes to ~1e-6 A/µm (0.03%). Net electrons out = holes out (3.7e-13 C/µm). No >3% Id jumps after 100 ps in any strike run except the SRH bad step. Early on (ps) the columns don't balance, by up to ~0.3 mA/µm at 6 ps: contact DevPsi columns stay ~1e-16 and gate/FP DevPsi columns are constant at their DC value, so displacement current isn't captured in the output.
+  - Unexplained: the current doesn't decay within 1 ns; mechanism not yet identified (candidate: retained holes lowering the barrier). Not yet compared with the slide.
+  - Next: Ian's call on longer window / SRH rerun / position scan.
