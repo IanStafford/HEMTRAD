@@ -62,4 +62,6 @@ Generation-pulse strike (`seeMethod gen`, τ 1 ps, `tranSign 1`, W_eff 1 µm, 6.
 - SiN, y 0.5, Vg −5: Id ~2.0 mA/µm, drain charge 2.9× deposited.
 - SRH 1 ns: tracks the no-SRH run until a bad step at 0.70 ns, then stalls until the 24 h limit. Discard the last row.
 - Control without a strike stays ≤ ~5e-13 A/µm.
-- The output misses displacement current, so the columns only balance on the plateau. The mechanism behind the plateau isn't identified yet.
+- The output misses displacement current, so the columns only balance on the plateau.
+- Mechanism (inferred from cuts at x 0.016 and 0.5 µm, HighK at 1 ns vs control): gate barrier gone (DevPsi 3.94 → 2.84, level with the source; Elec ~1e-27 → 1.1e19); buffer flooded (x 0.5 DevPsi 6.37 → 2.94, n ≈ p ≈ 1e18); peak lateral field moves from the gate edge (7e5 V/cm) to near the drain (1.4e6 V/cm at y 3.19). About 3.2e-13 C/µm of holes remain, ~0.9 ns at the 0.35 mA/µm bottom-contact current, so Id should fall over a few ns. Not yet tested.
+- Not reproduced yet: the lasting leakage step (no damage term) and the gate current (gate column stays at its DC value).
