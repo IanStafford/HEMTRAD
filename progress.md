@@ -1814,3 +1814,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **2026-11-04 — FANGS first HPG run archived** (`archive/fangs-hpg-first-run/`; Ian). The HPG checkout, env and runs stay in place. Back to rad modeling.
 - **2026-11-04 — `explore/rad-model` merged into main (Ian).** Clean merge. The new model levers default off; the HPG worktree stays in place for seeGen2 (49511531). No FLOOXS regression was run after the merge.
 - **2026-11-04 — Rad study started (Ian's plan: Vth causes, damage-region maps, Ron).** R33 data stored untracked. New default-off levers in `radIV.tcl`/`GaN.tcl`/masterD: `damSites`, `stressSkip`, `VgFam`, `mobDamFac`, `polWinFac`; local smoke test ran all of them. Literature review in `kb/results/rad-literature.md`: no source at our fluence, so all levers stay phenomenological. Next: regression check radChk, then radVth (64 tasks) and radMap1 (58). HPG cap about 100 CPUs (Ian).
+
+## 2026-11-04 (afternoon): regression check radChk running (job 49552956)
+
+- **Run:** `sweeps/params_radChk.txt` (6 tasks, driver radIV at e8342ee): `pre_{highk,sin}`, `nb_*_skip` (dam2 law + stressSkip), `nb_*_sites` (same damage through damSites).
+- **So far, partial:** `pre_highk` done in 21 min. `pre_*` IdVg and IdVd are byte-identical to radFinal. `nb_*` IdVd matches radFinal8 on every point except the Vd = 0 row (1e-94, noise). `nb_*` IdVg differs only below Vg about -3 V, by at most 8e-9 mA/mm. `_skip` and `_sites` give the same IdVg in both decks.
+- **Time:** stressSkip reaches Vd 9.75 V (HighK) and 8.75 V (SiN) in about 25 min, the same last points as radFinal8, then keeps retrying the next step. Over 50 min spent on that so far, which sets the cost of the maps.
+- **Next:** when all 6 end, check every log, then submit radVth (64) and radMap1 (58) at <= 100 CPUs. seeGen2 (49511531) still running: HighK t = 3.2e-13 s, SiN t = 1.3e-12 s after 5.7 h.
