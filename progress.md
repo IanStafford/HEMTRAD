@@ -1778,3 +1778,11 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - Checks: at the plateau S + D − B closes to ~1e-6 A/µm (0.03%). Net electrons out = holes out (3.7e-13 C/µm). No >3% Id jumps after 100 ps in any strike run except the SRH bad step. Early on (ps) the columns don't balance, by up to ~0.3 mA/µm at 6 ps: contact DevPsi columns stay ~1e-16 and gate/FP DevPsi columns are constant at their DC value, so displacement current isn't captured in the output.
   - Unexplained: the current doesn't decay within 1 ns; mechanism not yet identified (candidate: retained holes lowering the barrier). Not yet compared with the slide.
   - Next: Ian's call on longer window / SRH rerun / position scan.
+- **2026-11-04 — seeGen1 mechanism, from the saved field cuts (`*_cuts_k.txt`, no rerun needed).** At 1 ns vs the no-strike control (HighK, y 1.0):
+  - gate barrier gone: DevPsi at x 0.016 under the gate 3.94 → 2.84, level with the source; Elec there ~1e-27 → 1.1e19 cm⁻³;
+  - buffer flooded: x 0.5 DevPsi 6.37 → 2.94, n ≈ p ≈ 8e17–1e18 cm⁻³ over y −1…1.5;
+  - field moved: peak |dPsi/dy| 7e5 V/cm at the gate edge → 1.4e6 V/cm near the drain (y 3.19). SiN is similar (1.3e6).
+  - hole budget: 3.2e-13 C/µm of the deposited holes are left, ~0.9 ns at the 0.35 mA/µm leaving through the bottom contact. Depth-integral estimate from the one x 0.5 cut, assuming ~1 µm depth: ~4e-13 C/µm, the same order.
+  - Reading: the plasma collapses the buffer and gate barrier together, and the channel stays on while the hole reservoir drains. This is an inference from two depth cuts. It predicts Id falling over a few ns; untested (run ended at 1 ns).
+  - Snapshot rerun not needed. Slide comparison done in chat (measured values not logged): the model has no lasting step (no damage term) and its gate column doesn't respond, so neither slide feature is reproduced yet. Total current depends on the width assumption.
+  - Next, waiting on Ian: OK for a 10 ns run (HighK, SiN) to test the decay.
