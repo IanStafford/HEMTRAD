@@ -6,7 +6,7 @@ import random
 
 BASE = ("polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;"
         "hotEb=0.5;hotTau=1e-14;damXmax=0.05;damMax=1e20;trapLevel=0.30;damField=lat;damEref=5.0e5;damM=4;damYmin=0.30;"
-        "retryDepth=8")
+        "retryDepth=8;noRampBack=1")
 SKIP = "stressSkip=1"
 DECKS = (("hk", ""), ("sin", "deviceDeck=rfdevice_SiN.tcl"))
 YSRC, YDRN = -1.25, 3.41   # mesh edges
@@ -16,11 +16,11 @@ def sites(*s):
     return "damSites={" + " ".join("{" + " ".join(f"{v:g}" for v in q) + "}" for q in s) + "}"
 
 
-def write(name, cases):
+def write(name, cases, common=""):
     with open(f"sweeps/params_{name}.txt", "w") as f:
         for lab, lev in cases:
             for d, dl in DECKS:
-                extra = ";".join(x for x in (BASE, dl, lev) if x)
+                extra = ";".join(x for x in (BASE, common, dl, lev) if x)
                 f.write(f"{d}_{lab}|{extra}\n")
     print(name, 2 * len(cases))
 
@@ -55,7 +55,8 @@ cases += [(f"chGate{n:g}", sitecase((*G, 0.015, 0.05, n))) for n in (1e17, 5e17,
 cases += [(f"chAll{n:g}", sitecase((*A, 0.015, 0.05, n))) for n in (1e17, 5e17, 2e18)]
 cases += [(f"buf{n:g}", sitecase((*A, 0.1, 1.4, n))) for n in (1e16, 1e17, 5e17)]
 cases += [(f"ins{n:g}", f"{SKIP};insTrapSign=-1;damInsPeak={n:g};damInsM=0;damInsXmin=-0.05") for n in (1e17, 5e17, 1e18)]
-write("radVth", cases)
+# Vth, gm, Ron and low-field current only, so stop before the high-Vd retries (about 1 h per task)
+write("radVth", cases, "Vd_max=5.0")
 
 # ---- Phase 3a: one site, position map (width 0.3 um, top 50 nm)
 Y = [(-1.05, -0.75), (-0.75, -0.45), (-0.45, -0.15), (-0.15, 0.15)] + [(0.15 + 0.3 * i, 0.45 + 0.3 * i) for i in range(10)]

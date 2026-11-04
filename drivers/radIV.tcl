@@ -105,6 +105,7 @@ if {![info exists damSites]}  { set damSites {} }
 if {![info exists stressSkip]} { set stressSkip 0 }
 # VgFam: extra Id-Vd curves, one per Vg in the list, in that order (like the measured
 # family; fill-only traps keep their state between curves), to <tag>_IdVdG<Vg>.csv. {} = none.
+if {![info exists noRampBack]} { set noRampBack 0 }    ;# 1: stop after the last curve, no ramp back to rest (nothing is measured after it)
 if {![info exists VgFam]}     { set VgFam {} }
 # low-field mobility factor in a window (with mobDamFac set, GaN.tcl multiplies by the
 # data field MobDam). Unset = old behaviour.
@@ -356,6 +357,7 @@ proc IdVdCurve {tg vg fn} {
         puts "IDVD $tg Vg=$vg Vd=$d Id=[IdDev] peakTe=$te"
     }
     close $f
+    if {$::noRampBack && [llength $::VgFam] == 0 && [llength $::damList] == 0} { return 1 }
     # back to rest for the next curve or damage setting
     if {![Ramp D $dPrev 0.0 0.5]} { return 0 }
     if {![Ramp G $vg 0.0 0.1]} { return 0 }
