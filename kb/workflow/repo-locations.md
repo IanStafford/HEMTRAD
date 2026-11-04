@@ -39,6 +39,7 @@ Before 2026-10-12 everything sat flat in the root; `progress.md` and old commits
 | flooxs-pyplot (workstation) | `~/flooxs-pyplot` (private `IanStafford/flooxs-pyplot`; matplotlib plot windows, regression suite; `Test/SimpDev/GaNSuite` = GaN starter decks) |
 | GaN regression results | `~/flooxs-pyplot/Test/Regression/hpg_results/20261008/` and `20261015-fangs*` (FANGS HPG campaign, runs 1-3; not committed) |
 | FANGS HPG campaign scripts | `archive/fangs-hpg-tests/` (finished 2026-10-15; HPG folder `fangs-hpg-20261015` deleted) |
+| FANGS first HPG run inputs | `archive/fangs-hpg-first-run/` (finished 2026-11-04, at FANGS 6570d19) |
 | HPG SSH key / config | workstation `~/.ssh/id_ed25519_hpg` (no passphrase), `~/.ssh/config` hosts `hpg`, `hpg-login7`, `hpg-tmux` ([[hpg-workflow]]) |
 | HPG persistent tmux | session `hemtrad` on `login7` |
 | Exploratory worktrees | workstation `~/HEMTRAD-wt/{field-capture,gate-injection}` (branches `explore/*`), HPG `/home/ianstafford/blue/ee1/ianstafford/HEMTRAD-wt/` (created with `git worktree add`; pull only) ([[vg-dependence]]) |
