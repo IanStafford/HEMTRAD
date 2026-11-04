@@ -1821,3 +1821,11 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **So far, partial:** `pre_highk` done in 21 min. `pre_*` IdVg and IdVd are byte-identical to radFinal. `nb_*` IdVd matches radFinal8 on every point except the Vd = 0 row (1e-94, noise). `nb_*` IdVg differs only below Vg about -3 V, by at most 8e-9 mA/mm. `_skip` and `_sites` give the same IdVg in both decks.
 - **Time:** stressSkip reaches Vd 9.75 V (HighK) and 8.75 V (SiN) in about 25 min, the same last points as radFinal8, then keeps retrying the next step. Over 50 min spent on that so far, which sets the cost of the maps.
 - **Next:** when all 6 end, check every log, then submit radVth (64) and radMap1 (58) at <= 100 CPUs. seeGen2 (49511531) still running: HighK t = 3.2e-13 s, SiN t = 1.3e-12 s after 5.7 h.
+
+## 2026-11-04 (late afternoon): radChk passed; radVth and radMap1 submitted
+
+- **radChk (49552956) finished, all 6 COMPLETED, no crashes.** `pre_*` CSVs byte-identical to radFinal. `nb_*_skip` and `nb_*_sites` give radFinal8's Vth (-2.784 V), gm (67.06 HighK, 67.39 SiN) and last Vd (9.75, 8.75 V). IdVd differs only in the Vd = 0 row (1e-94). IdVg differs only below Vg about -3 V, by at most 8e-9 mA/mm. `IDVD GAVE UP` at 10 V (HighK) and 9 V (SiN) on the nb cases, the same stopping points as radFinal8.
+- **Timing:** no-stress nb tasks took 1.5-1.8 h against 3.5-3.8 h with stress. About 25 min of that is the measurement; the rest is retries at the failing step and the ramp back. `pre_sin` took 82 min, 65 of them after its last measured point.
+- **Changes to save CPU (9619606), no physics:** new default-off lever `noRampBack` (stop after the last curve; smoke-tested locally). radVth runs to `Vd_max=5` because it's scored on Vth, gm, Ron and low-field current. High-Vd behaviour of any Vth candidate would need a separate run.
+- **Submitted:** radVth **49570570** (64 tasks, %40) and radMap1 **49570571** (58 tasks, Vd to 10 V). Max 100 CPUs with seeGen2. Group queue held only my 2 seeGen2 tasks at submission.
+- **Next:** check every log, then `analysis/radMap.py` on both; write the ranked Vth table and pick positions for the depth, width and multi-strike studies.
