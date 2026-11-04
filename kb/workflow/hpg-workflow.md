@@ -19,6 +19,8 @@ The binding rules (ask before sbatch/scancel, connection-failure procedure) are 
 - `ssh hpg-tmux` — attach (or create) the tmux session `hemtrad` (`RemoteCommand bash -lc "module load tmux && tmux new -A -s hemtrad"`, tmux 3.5 is a module; `screen` is in `/usr/bin`).
 Non-interactive use: `ssh -o BatchMode=yes hpg-login7 'bash -lc "module load tmux; tmux send-keys -t hemtrad \"<cmd>\" Enter"'`, read back with `tmux capture-pane -p -t hemtrad`. The session survives the master dropping (verified: created, then reattached from a separate connection). Use it for long `rsync`s, builds, `srun --pty` interactive jobs (they keep running while detached), HPG-side watchers; **never `flooxs` on the login node**. A login-node reboot (maintenance) kills the session; `sbatch` jobs are unaffected. Ian can attach from his laptop with the same alias if his config has it (`ssh hpg`, then `ssh login7`, `module load tmux`, `tmux attach -t hemtrad`).
 
+**Paths:** `/home/ianstafford/blue/ee1/ianstafford` (HEMTRAD, FLOOXS, sweep results) is in the 40 GB NFS home; `/blue/ee1/ianstafford` (FANGS) is the real `/blue`. They are separate directories ([[repo-locations]]).
+
 **Commands:** always a login shell with a quoted heredoc:
 ```bash
 ssh hpg bash -l <<'REMOTE'

@@ -21,6 +21,8 @@ Before 2026-10-12 everything sat flat in the root; `progress.md` and old commits
 
 ## Machines and checkouts
 
+**Two different places on HPG** (checked 2026-11-04): `/home/ianstafford/blue/ee1/ianstafford` is an ordinary folder in the home directory (NFS, 40 GB quota, 12 GB used), not a link to `/blue`. `/blue/ee1/ianstafford` is the real `/blue` storage. HEMTRAD, its worktrees, every sweep's `results/` and stock FLOOXS are on the home path; FANGS is on `/blue`. Writing `/blue/ee1/...` for a HEMTRAD path, or the reverse, points at nothing.
+
 | What | Path |
 |---|---|
 | HEMTRAD working copy (agent edits here) | workstation `/home/staffian/HEMTRAD` |
@@ -29,8 +31,8 @@ Before 2026-10-12 everything sat flat in the root; `progress.md` and old commits
 | GitHub | `IanStafford/HEMTRAD` (`main`; `static-mobility` frozen) |
 | Obsidian vault | `~/notes/HEMTRAD-vault` — symlinks only: `CLAUDE.md`, `progress.md`, `RESULTS.md`, and `kb/` (this knowledge base). Never copy repo files in; `.obsidian/` stays out of the repo |
 | Sweep results (not in git) | `results/` on both machines; static era in `results/archive_static_mobility/` |
-| Stock FLOOXS on HPG | `/home/ianstafford/blue/ee1/ianstafford/flooxs` (`release/flooxs`) — HEMTRAD jobs use it; don't modify |
-| flooxs-pyplot on HPG | none: the old checkout `/home/ianstafford/blue/ee1/ianstafford/flooxs-pyplot` (da619c4c) was deleted 2026-10-15 (Ian), with the Oct 8 bundle and `gan_regress_results/`; nothing from flooxs-pyplot is left on HPG. Copy a new one as a git bundle if needed |
+| Stock FLOOXS on HPG | `/home/ianstafford/blue/ee1/ianstafford/flooxs` (home, `release/flooxs`) — HEMTRAD jobs use it; don't modify |
+| flooxs-pyplot (FANGS) on HPG | `/blue/ee1/ianstafford/flooxs-pyplot` with `build-hpg`, env `/blue/ee1/ianstafford/conda/envs/fangs`, runs in `/blue/ee1/ianstafford/runs`. Copied as a git bundle (HPG has no GitHub access) since 2026-11-04. The bundle's ref is remote-tracking, so `git clone` alone gives an empty repo: fetch `+refs/remotes/origin/main-gucs79:refs/remotes/origin/main-gucs79` from it. Older checkout (da619c4c) deleted 2026-10-15 |
 | FLOOXS source (workstation) | `~/flooxs/src` |
 | Crash-fix build | `~/flooxs-crashfix` (branch `crash-fix`), patch `flooxs-crashfix.patch` |
 | SRIM / TRIM (workstation) | `~/.wine-srim/drive_c/SRIM` (Wine prefix `~/.wine-srim`), package in `~/opt/srim-2013/`; run with `bin/trim_run.sh` ([[trim]]) |

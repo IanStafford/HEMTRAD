@@ -14,7 +14,7 @@ FLOOXS (Tcl) TCAD model of an AlGaN/GaN HEMT (HighK/HfO2-passivated, T-gate + fi
 - **HiPerGator (HPG) is reached only through `ssh hpg`**, a multiplexed master connection. Since 2026-10-13 it authenticates with the workstation key `~/.ssh/id_ed25519_hpg` (no password) **plus one Duo push that Ian approves on his phone**. You can trigger the push (`bin/hpg_reconnect.sh`), but only Ian can approve it.
 - **The repo exists in three places**, synced through GitHub (`IanStafford/HEMTRAD`, branch `main`):
   - Workstation `/home/staffian/HEMTRAD`: your working copy. Edit here.
-  - HPG `/home/ianstafford/blue/ee1/ianstafford/HEMTRAD`: only `git pull` there. Never edit files on HPG.
+  - HPG `/home/ianstafford/blue/ee1/ianstafford/HEMTRAD`: only `git pull` there. Never edit files on HPG. Despite its name this path is in the 40 GB NFS home, not on `/blue` (`/blue/ee1/ianstafford` is a different directory, `kb/workflow/repo-locations.md`).
   - Ian's laptop: a read-only clone (pull only, never pushes). Anything Ian should see must be committed and pushed from the workstation.
 - **Obsidian vault** `~/notes/HEMTRAD-vault` (outside the repo): symlinks only — `CLAUDE.md`, `progress.md`, `archive/static_mobility/RESULTS.md` and the `kb/` folder. Never copy or move repo files into it; never open the repo itself as a vault (`.obsidian/` is gitignored as a safety net). To add something, `ln -s` it there.
 - **Where things run:** short checks (a few points, syntax, debugging a deck) locally; sweeps, more than ~3 driver runs or anything long → SLURM on HPG. When Ian says to run everything on HPG for the day, don't run FLOOXS locally.
