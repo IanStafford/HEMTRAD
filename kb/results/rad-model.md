@@ -194,3 +194,31 @@ With `occSafe 1` the stress reaches Vd 28 V. pre/nb with occSafe are identical t
   - HighK 1.5e18: 0.93 flat;
   - 3e18 and 7e18 overdamage SiN (0.08, 0).
 - **Conclusion:** the full stress voltage changes the damage scale but not the picture. The SiN onset stays near 2 V; the 17 V result was not an artefact of the solver limit.
+
+## Ways to make the Vth shift (2026-11-04, radVth job 49570570, radVth2 job 49606876)
+
+Each row is one mechanism, no stress solve, ratios against the undamaged reference. HighK and SiN agree to within about 0.001 V, so one column serves both. Numbers are model results, and none of these says the mechanism is what happens in the device.
+
+| Mechanism | Setting | ΔVth (V) | gm ratio | Ron ratio | Id(1 V) ratio |
+|---|---|---|---|---|---|
+| Schottky barrier | `phiB` +0.2 eV | +0.20 | 1.00 | 1.01 | 0.99 |
+| Polarization under the gate | −5% | +0.22 | 1.01 | 1.01 | 0.99 |
+| AlGaN acceptors under the gate (current model) | 5e17 | +0.17 | 1.00 | 1.00 | 0.995 |
+| Channel acceptors under the gate | 5e17 | +0.27 | 0.87 | 1.02 | 0.98 |
+| Polarization, whole device | −5% | +0.22 | 0.985 | 1.06 | 0.94 |
+| AlGaN acceptors, whole device | 5e17 | +0.17 | 0.98 | 1.07 | 0.93 |
+| Surface charge | −1.2e12 cm⁻² | +0.17 | 0.96 | 1.15 | 0.87 |
+| Channel acceptors, whole device | 5e17 | +0.26 | 0.78 | 1.35 | 0.74 |
+| Dielectric charge near the gate (y −0.35 to 0.40) | 1e18 | +0.03 | 0.97 | 1.04 | 0.96 |
+| Dielectric charge, y ≥ 0.30 | 1e18 | −0.015 | 0.80 | 2.0–2.1 | 0.46–0.49 |
+| Buffer acceptors, level 0.30, 1.0 or 1.7 eV | up to 5e17 | 0 (see below) | 1.00 | 1.00 | 1.00 |
+
+- **Vth alone can't separate these.** Ron and gm can: gate-local routes leave Ron within 2%, whole-device routes raise it, and channel-depth routes cost gm.
+- **One lever for two effects?** A whole-device route gives the Vth shift and a small Ron rise together, which the current model does with two levers (`dam2Peak`, `surfCharge`). Not yet tested against measured data.
+- **Dielectric charge isn't a Vth route.** At the gate it reaches only +0.03 V at 1e18, because there's no dielectric under the gate foot.
+- **The buffer rows don't test back-gating.** The model's buffer is undoped and holds no electrons to fill these levels: at 1.7 eV, IonAcceptor is about 4e-9 cm⁻³ out of 5e17 (local check). That implies a Fermi level about 3.25 eV below Ec there. A level of 3.3 eV does fill, 58–100% at 1e16 (local check), and radVth3 (job 49614033) runs that at 1e15–1e17.
+- **Reduced polarization needs care on SiN.** `sin_polAll9.7e12`, `sin_polAll9e12` and `sin_polGate0.9` ran hours longer than the rest, retrying in Id–Vd with Qfp not converging. Their Id–Vg is fine.
+
+Reachable size is a separate question: [[rad-literature]] finds no Vth data near 1e7 cm⁻². Candidate high-Vd behaviour isn't covered, since these runs stop at 5 V to save CPU.
+
+Related: [[damage-region-map]], [[ron-increase]].

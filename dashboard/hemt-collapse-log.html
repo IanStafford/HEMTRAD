@@ -120,7 +120,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
   <header class="top">
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">FLOOXS model of an AlGaN/GaN HEMT: what ran each day and what is still open. Id in <span style="white-space:nowrap">mA/mm</span> at Vg = −2 V unless noted; work before Oct 1 used constant mobility and is archived.</p>
-    <p class="meta">Snapshot Oct 27, end of day</p>
+    <p class="meta">Snapshot Nov 4, end of day</p>
   </header>
 
   <div class="layout">
@@ -128,6 +128,8 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
       <div class="sep"></div>
       <div class="era">Field mobility</div>
+      <a href="#nov04" data-page="nov04"><span class="d">Nov 4</span><span class="t">damage map · merge</span></a>
+      <a href="#nov02" data-page="nov02"><span class="d">Oct 28–Nov 2</span><span class="t">28 V · strike</span></a>
       <a href="#oct27" data-page="oct27"><span class="d">Oct 24–27</span><span class="t">rad model</span></a>
       <a href="#oct23" data-page="oct23"><span class="d">Oct 23</span><span class="t">HighK vs SiN · goal</span></a>
       <a href="#oct21" data-page="oct21"><span class="d">Oct 21</span><span class="t">capture · export · TRIM</span></a>
@@ -155,39 +157,107 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <section class="page" id="overview" data-title="Overview">
         <div class="pagehead">
           <h2>Where things stand</h2>
-          <p>A pre/post-irradiation model on branch <code>explore/rad-model</code> reproduces the measured HPD vs SiN set qualitatively: the off-state stress places damage where SiN concentrates the field, so only SiN collapses after biased irradiation. Goal closed Oct 27; next is Ian's call on merging and on the 17 V stress limit.</p>
+          <p>The rad model is merged into main, and a new damage map shows Vth moves only for damage under the gate while Ron rises about equally anywhere; one dense section gives abrupt steps onto a rising line, the shape R33 shows. Next, a mesh check decides whether those steps are real, then the multi-strike study runs.</p>
         </div>
         <div class="tiles">
-          <div class="tile"><span class="k">Pre-irradiation fit</span><span class="v">±0.03 V · ±4%</span><span class="s">Vth and Id–Vd at Vg +1 to 10 V, rad-model calibration (Oct 23).</span></div>
-          <div class="tile"><span class="k">Biased irradiation</span><span class="v">SiN only</span><span class="s">Model SiN collapses in two steps near 4.5 and 5.8 V; HighK (HPD) stays flat, gm −2%.</span></div>
-          <div class="tile"><span class="k">Vth shift</span><span class="v">+0.21 V</span><span class="s">Every irradiated device in the model, same sign and scale as measured.</span></div>
+          <div class="tile"><span class="k">Vth, one damaged section</span><span class="v">Gate only</span><span class="s">+0.78 V at 1e18 cm⁻³ under the gate; under 0.01 V anywhere else.</span></div>
+          <div class="tile"><span class="k">Ron, one damaged section</span><span class="v">+6–7% · +23–32%</span><span class="s">At 1e18 and 4e18 cm⁻³, nearly the same at any position.</span></div>
+          <div class="tile"><span class="k">Abrupt steps</span><span class="v">4e18 only</span><span class="s">None at 1e18; up to two per curve at 4e18. Not yet checked against the mesh.</span></div>
         </div>
 
         <div class="panel">
           <h3>Open items</h3>
           <ul class="todo">
-            <li><span class="pill open">open</span><span>Rad model: the off-state stress solve stops at Vd 17 V instead of 28 V (electron quasi-Fermi divergence under the gate); no-holes and damping fixes don't help. <a class="daylink" href="#oct27">Oct 27</a></span></li>
-            <li><span class="pill noted">noted</span><span>Rad model fitting choices: no gate-edge damage, hand-placed second SiN strike site, lumped gate–drain leakage. <a class="daylink" href="#oct27">Oct 27</a></span></li>
-            <li><span class="pill noted">noted</span><span>Merge <code>explore/rad-model</code> into main: not yet (Ian). <a class="daylink" href="#oct27">Oct 27</a></span></li>
-            <li><span class="pill open">open</span><span>Pulsed-IV collapse at Vg −2 (~1000× at 0.4–0.5 V): no single trap lever reaches it from the late set. <a class="daylink" href="#oct17">Oct 17</a></span></li>
-            <li><span class="pill noted">parked</span><span>Time-limited capture, waiting for the curve-tracer pulse width and onset vs Vg. <a class="daylink" href="#oct21">Oct 21</a></span></li>
+            <li><span class="pill progress">in progress</span><span>Are the steps real? Mesh check at 10 and 5 nm decides whether the depth, width and multi-strike studies run. <a class="daylink" href="#nov04">Nov 4</a></span></li>
+            <li><span class="pill progress">in progress</span><span>Does the current after a step stop depending on Vg, as in R33? SiN Vg family running. <a class="daylink" href="#nov04">Nov 4</a></span></li>
+            <li><span class="pill progress">in progress</span><span>Cause of the biased Ron rise: access-region acceptors, mobility loss, dielectric charge, field-weighted damage. <a class="daylink" href="#nov04">Nov 4</a></span></li>
+            <li><span class="pill open">open</span><span>Cause of the Vth shift: several routes give +0.2 V in the model, but the literature has nothing at 1e7 cm⁻², and it would take about as many charges per ion as a track has atoms. <a class="daylink" href="#nov04">Nov 4</a></span></li>
+            <li><span class="pill progress">in progress</span><span>Does the strike current decay? The 10 ns run (seeGen2) is still early in the strike. <a class="daylink" href="#nov04">Nov 4</a></span></li>
+            <li><span class="pill open">open</span><span>R33 questions for Ian: the pre-curve width, whether the steps or the shared line could be instrument effects, and whether a control device exists. <a class="daylink" href="#nov04">Nov 4</a></span></li>
           </ul>
           <details class="older">
-            <summary>Older questions (10)</summary>
+            <summary>Older questions (11)</summary>
             <ul class="todo">
+              <li><span class="pill noted">noted</span><span>Rad model fitting choices: no gate-edge damage, hand-placed second SiN strike site, lumped gate–drain leakage. <a class="daylink" href="#oct27">Oct 27</a></span></li>
+              <li><span class="pill open">open</span><span>Pulsed-IV collapse at Vg −2 (~1000× at 0.4–0.5 V): no single trap lever reaches it from the late set. <a class="daylink" href="#oct17">Oct 17</a></span></li>
+              <li><span class="pill noted">parked</span><span>Time-limited capture, waiting for the curve-tracer pulse width and onset vs Vg. <a class="daylink" href="#oct21">Oct 21</a></span></li>
               <li><span class="pill open">open</span><span>Measured onset is later at higher Vg; the present model is not (0.3–0.4 V at every Vg). Keep or drop the converged fill (Ian's call). <a class="daylink" href="#oct17">Oct 17</a></span></li>
-              <li><span class="pill open">open</span><span>Mesh in the access region (25–40 nm) is too coarse for narrow traps. <a class="daylink" href="#sep27">Sep 27</a></span></li>
-              <li><span class="pill open">open</span><span>Calibration of the HfO₂ deck only covers saturation (Vds = 10 V); the rad-model recalibration covers Id–Vd at Vg +1 on the branch. <a class="daylink" href="#oct01">Oct 1</a></span></li>
+              <li><span class="pill open">open</span><span>Calibration of the HfO₂ deck only covers saturation (Vds = 10 V); the rad-model recalibration covers Id–Vd at Vg +1. <a class="daylink" href="#oct01">Oct 1</a></span></li>
               <li><span class="pill noted">parked</span><span>Thermoelectric term in the energy balance (<code>etThermo 0</code>, <code>etStats 0</code> by Ian's decision). <a class="daylink" href="#oct08">Oct 8</a> · <a class="daylink" href="#oct13">Oct 13</a></span></li>
               <li><span class="pill noted">parked</span><span>Energy-balance fit of trap position and τ (collapses at 0.4–0.7 V with a creeping plateau, but ~1.9 s per Newton iteration). On hold since Oct 16, when the local-field model became the standard again. <a class="daylink" href="#oct13">Oct 13</a></span></li>
               <li><span class="pill open">open</span><span>6 runs still stall at the runaway (all near y = 2.0 µm, 2.8–3.7 V; the Te-ramp step falls below its 0.002 floor at full current). A lower <code>teRampMin</code> is the next thing to try. <a class="daylink" href="#oct02">Oct 2</a></span></li>
-              <li><span class="pill open">open</span><span>Insulator (nitride) trap charge has only been tested with static mobility; not yet repeated with the calibrated field mobility. <a class="daylink" href="#oct01">Oct 1</a></span></li>
               <li><span class="pill open">open</span><span>How much of the passivation's trap density is filled. Filled, neutral and positive insulator charge give three different answers. <a class="daylink" href="#oct01">Oct 1</a></span></li>
               <li><span class="pill open">open</span><span>2D vs 3D: a real cascade damages only a ~0.16 µm patch of the 200 µm gate width. Whether that can trigger a device-level collapse needs a 3D run. <a class="daylink" href="#sep28">Sep 28</a></span></li>
               <li><span class="pill open">open</span><span>Is a trap blob ~2 µm into the access region physically plausible for this radiation damage? It gave the best <code>radPlot1</code> match. <a class="daylink" href="#sep25">Sep 25</a></span></li>
             </ul>
           </details>
         </div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- NOV 4 -->
+      <section class="page" id="nov04" data-title="Nov 4">
+        <div class="pagehead">
+          <h2>Nov 4 · What damage does where: the first map</h2>
+          <p>The rad model is merged into main and reproduces its earlier runs. New studies place damage by hand to learn what each region does: Vth responds only under the gate, Ron about equally anywhere, and one dense section gives abrupt steps. A mesh check on those steps is still running.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 49552956 · 49570570 · 49570571 · 49606872 · 49606874–49606877 · 49614033 · 49511531</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li><code>explore/rad-model</code> merged into main. Regression (radChk, 6 tasks): pre curves byte-identical; non-biased curves through the new <code>damSites</code> and <code>stressSkip</code> levers match radFinal8's Vth of <span class="num">−2.784 V</span> and last Vd.</li>
+              <li>Position map (radMap1, 58 tasks, no crashes): one section 0.3 µm wide at 14 positions, 1e18 and 4e18 cm⁻³, both decks. Vth moves only under the gate, <span class="num">+0.78 / +1.96 V</span>, and by under 0.01 V elsewhere. Ron rises <span class="num">+6–7% / +23–32%</span> at any position.</li>
+              <li>Steps appear only at 4e18, where the section can hold about twice the 2DEG's charge: abrupt drops onto a rising line, two per curve near the drain edge, with nothing placed by hand. High-Vd current suffers most on the source side, <span class="num">0.24</span> of the reference at 10 V against 0.55 mid-drift.</li>
+              <li>Vth routes (radVth, radVth2): <span class="num">+0.17 to +0.22 V</span> from Schottky barrier +0.2 eV, polarization −5% (gate or whole device), AlGaN acceptors 5e17 (gate or whole device) or surface charge −1.2e12. Gate-local routes keep Ron within 1%; whole-device routes add 6–15%. Dielectric charge at the gate reaches only <span class="num">+0.03 V</span>. The literature review found nothing at our fluence.</li>
+              <li>Dielectric charge away from the gate raises Ron up to <span class="num">2.0–2.1×</span> with no Vth shift: a candidate for the biased Ron rise.</li>
+              <li>Strike transient (seeGen1) works at 28 V: drain about <span class="num">2 mA/µm</span>, 3× the deposited charge, no decay by 1 ns. Separately, the FANGS first HPG run finished and is archived.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill progress">in progress</span><span>Mesh check (radMesh, 11 tasks): do the steps survive 10 and 5 nm spacing? Depth, width and multi-strike wait on it. A hint so far: a 0.1 µm site with the same charge falls from 144 to 35 mA/mm at 1 V on the standard mesh, the case most exposed to it.</span></li>
+              <li><span class="pill progress">in progress</span><span>SiN Vg family (radFam, 7 tasks): does the current after a step stop depending on Vg?</span></li>
+              <li><span class="pill progress">in progress</span><span>Ron candidates with Ron(Vg) (radRon, 46 tasks) and low-exponent field damage (radStress, 8 tasks).</span></li>
+              <li><span class="pill progress">in progress</span><span>Back-gating (radVth3, 6 tasks). The first two buffer runs tested nothing: traps in the undoped buffer stayed empty even at 1.7 eV (about 1e-26 charged, checked locally). A 3.3 eV level does fill.</span></li>
+              <li><span class="pill progress">in progress</span><span>Strike decay to 10 ns (seeGen2): HighK at about 1 ps, SiN at 2.7 ps after 10 h. Rough finish: SiN early tomorrow, HighK early afternoon.</span></li>
+              <li><span class="pill open">open</span><span>For Ian: R33 pre-curve width; whether the steps or the shared line could be instrument effects; whether a control device exists; whether to cancel the one stuck Vth task (below).</span></li>
+              <li><span class="pill noted">noted</span><span>One Vth task (<code>sin_polAll9e+12</code>) has been retrying at Vd 2.5 V for over 4 h. Its Vth is saved; it holds 1 CPU and is left running until Ian decides.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/radMap1.jpg" target="_blank" rel="noopener"><img src="fig/radMap1.jpg" alt="Six panels against site position for HighK and SiN at two densities: Vth change, gm ratio, Ron ratio, Id at 4 V and 10 V ratios, and the Vd of the largest step" loading="lazy"></a><figcaption><b>Effect vs site position</b>Vth responds only under the gate (grey band); Ron is nearly flat with position, and its small wiggle is probably mesh aliasing.</figcaption></figure>
+          <figure><a class="img" href="fig/radMap1_curves.jpg" target="_blank" rel="noopener"><img src="fig/radMap1_curves.jpg" alt="Id-Vd at Vg +1 for HighK and SiN: reference, and one damaged section at seven positions at 1e18 and 4e18; the 4e18 curves drop abruptly onto rising lines" loading="lazy"></a><figcaption><b>Id–Vd at Vg +1, one section</b>At 4e18 the current drops abruptly onto a rising line, twice at y = 3 µm. At 1e18 there are no steps. Decks nearly match without a stress solve.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#nov02">Oct 28–Nov 2 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- OCT 28 - NOV 2 -->
+      <section class="page" id="nov02" data-title="Oct 28–Nov 2">
+        <div class="pagehead">
+          <h2>Oct 28–Nov 2 · The 17 V limit fixed, a strike transient that runs</h2>
+          <p>The stress solve's 17 V limit turned out to be a floating-point overflow, and fixing it left the HPD vs SiN picture unchanged at the real 28 V. Then a FLOOXS transient of the ion strike, which needed a generation pulse rather than injected quasi-Fermi levels.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 48182110 · 48206375 · 48965552 · 49135298</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Cause of the limit: the trap occupancy's exponent passes 709 above Vd ≈ <span class="num">17.7 V</span>, at any Vg, because Qfn follows the drain in the deep buffer. Rewriting it without the overflow (<code>occSafe</code>) reaches <span class="num">28 V</span> on both decks and 40 V on SiN.</li>
+              <li>At 28 V (rad28a) the same damage law needs damPeak <span class="num">1.5e18</span>, not 7e18. SiN still collapses (0.82 → 0.49, onset near 2 V) and HighK stays flat at 0.93: the same picture as at 17 V.</li>
+              <li>New driver <code>drivers/seeIV.tcl</code> for the ion strike. Injecting carriers through the quasi-Fermi levels never took a first step, whatever the time step, so the strike is a Gaussian generation pulse (τ 1 ps) along the track.</li>
+              <li>Two fixes it needed: the deck's transport term had the opposite sign to FLOOXS's own decks, invisible in DC but anti-diffusive in a transient (<code>tranSign</code>); and only the empty trap model lets the off-state DC ramp reach 28 V, while surface charge plays no part (isolation test).</li>
+              <li>seeGen1 submitted Nov 2 (control, HighK with and without SRH, SiN, all at 28 V). Results on <a class="daylink" href="#nov04">Nov 4</a>.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill noted">noted</span><span>The final parameter set still uses the 17 V stress with damPeak 7e18; a 28 V set exists but hasn't replaced it.</span></li>
+              <li><span class="pill noted">noted</span><span>The post-event leakage step is not modelled yet; the strike comes first.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="pager"><a href="#nov04">← Nov 4</a><a href="#oct27">Oct 24–27 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
@@ -210,10 +280,10 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           </div>
           <div class="panel"><h3>Needed work</h3>
             <ul class="todo">
-              <li><span class="pill open">open</span><span>Stress solve stops at Vd 17 V (Vdg ≈ 27 V), not 28 V. Divergence is in the electron quasi-Fermi level in the depleted AlGaN/GaN; the no-holes stress (Ian OK'd) and heavier Qfn damping both stop at 17 V too.</span></li>
+              <li><span class="pill resolved">fixed Oct 29</span><span>Stress solve stops at Vd 17 V (Vdg ≈ 27 V), not 28 V. Divergence is in the electron quasi-Fermi level in the depleted AlGaN/GaN; the no-holes stress (Ian OK'd) and heavier Qfn damping both stop at 17 V too.</span></li>
               <li><span class="pill noted">noted</span><span>Fitting choices: no damage at the gate edge (y &lt; 0.30 µm), position of the second SiN strike site, gate–drain leakage as a lumped resistor.</span></li>
               <li><span class="pill noted">noted</span><span>SiN final level and gm loss somewhat smaller than measured; strong second sites make the collapse step unsolvable (radFinal9/10).</span></li>
-              <li><span class="pill noted">noted</span><span>Branch not merged (Ian: not yet). Overlays with the measured curves stay local (<code>data/rad_y2/compare/</code>, untracked).</span></li>
+              <li><span class="pill resolved">fixed Nov 4</span><span>Branch not merged (Ian: not yet). Overlays with the measured curves stay local (<code>data/rad_y2/compare/</code>, untracked).</span></li>
             </ul>
           </div>
         </div>
@@ -222,7 +292,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           <figure><a class="img" href="fig/radMech_SiN_IdVd.jpg" target="_blank" rel="noopener"><img src="fig/radMech_SiN_IdVd.jpg" alt="Id-Vd at Vg +1 V before and after biased irradiation for HighK and SiN; SiN collapses in two steps" loading="lazy"></a><figcaption><b>Model Id–Vd at Vg +1</b>HighK stays ~7% lower with no collapse; SiN collapses at 4.5 and 5.8 V with a second strike site.</figcaption></figure>
           <figure><a class="img" href="fig/radFinal8_model.jpg" target="_blank" rel="noopener"><img src="fig/radFinal8_model.jpg" alt="Post over pre current ratios for biased and non-biased devices and Id-Vg curves near threshold" loading="lazy"></a><figcaption><b>Final model, all devices</b>Non-biased 0.95 flat; Vth +0.21 V in every irradiated device.</figcaption></figure>
         </div>
-        <div class="pager"><a href="#overview">← Overview</a><a href="#oct23">Oct 23 →</a></div>
+        <div class="pager"><a href="#nov02">← Oct 28–Nov 2</a><a href="#oct23">Oct 23 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 

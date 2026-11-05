@@ -47,6 +47,8 @@ Every lever has an `info exists` default, so a driver or array task sets it befo
 |---|---|---|
 | `damSites` | {} | Uniform acceptor sites `{ymin ymax xmin xmax N}` (µm, cm⁻³), any number ([[damage-region-map]]) |
 | `stressSkip` | 0 | Skip the stress solve when no damage law uses the stress field |
+| `noRampBack` | 0 | Stop after the last curve, with no ramp back to rest. Ignored when `VgFam` or `damList` is set |
+| `meshY` (`rfdevice*.tcl`) | unset | Local mesh refinement, `{y spacing y spacing ...}` in µm. Lines needn't be in order |
 | `VgFam` | {} | Extra Id–Vd curves at these Vg, in order, to `<tag>_IdVdG<Vg>.csv` |
 | `mobDamFac`, `mobDamYmin/Ymax/Xmax` | unset | Low-field mobility factor in a window, GaN (`model/GaN.tcl`) |
 | `polWinFac`, `polWinYmin/Ymax` | unset | Interface polarization charge factor in a y window |

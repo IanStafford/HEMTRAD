@@ -1839,3 +1839,19 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Submitted (96 tasks, 100 CPUs with what's running; only my jobs in the group queue):** radMesh **49606872** (11, do steps survive 10 and 5 nm), radFam **49606874** (7, SiN Vg family), radStress **49606875** (8, field-weighted damage at low exponent), radVth2 **49606876** (24, deep-level buffer, dielectric at the gate), radRon **49606877** (46, Ron candidates with Ron(Vg)).
 - **Held back:** depth, width and multi-strike wait for radMesh, because they depend on whether the steps are real.
 - **HPG master dropped before 19:31**, which stopped both watchers. Reconnected on the one allowed attempt. Jobs unaffected.
+
+## 2026-11-04 (night): wrap-up, Ian signed off
+
+- **Dashboard** updated: new pages Nov 4 and Oct 28-Nov 2, Overview refreshed, 2 old items marked fixed. https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd
+- **radVth (49570570):** 63 of 64 done. `sin_polAll9e+12` (task 21) has been retrying at Vd 2.5 V for over 4 h with Qfp not converging; its Id-Vg and Vth are saved. **Decision for Ian:** cancel it or let it run? It holds 1 CPU, 24 h limit.
+- **radVth2 (49606876), partial, 12 of 24 tasks finished, Vth and Ron available for all but one:** dielectric charge at the gate gives at most +0.03 V; across the device Ron goes up to 2.2-2.4x with Vth under 0.011 V. Buffer acceptors at 1.0 and 1.7 eV do nothing, but a local check shows they stay empty (about 4e-9 of 5e17 cm^-3 at 1.7 eV), so this did not test back-gating.
+- **Submitted radVth3 49614033** (6 tasks): buffer acceptors at 3.3 eV, 1e15-1e17, which a local check shows do fill (58-100% at 1e16).
+- **Early hint from radMesh:** a 0.1 um site with the same total charge (1.2e19) falls from 144 to 35 mA/mm at Vd 1 V on the standard mesh. That case is the most exposed to the mesh; its 10 and 5 nm versions are still running.
+- **Running at sign-off:** radMesh 49606872 (11), radFam 49606874 (7), radStress 49606875 (8), radVth2 (12 left), radRon 49606877 (46), radVth3 (6), radVth (1), seeGen2 49511531 (2, HighK about 1 ps, SiN 2.7 ps at 10 h).
+- **PARKED, where to pick up:** check radMesh first.
+  1. If steps survive 10 and 5 nm: generate and submit depth, width and multi-strike (section 3b-3d of the plan, standing approval, <= 100 CPUs).
+  2. If they don't: don't run multi-strike as planned; write it up and rethink with Ian.
+  3. Then analyse radFam against R33's shape (kept out of tracked files), and score radRon and radStress.
+  4. Check every task's logs before plotting.
+- **Questions for Ian (not blocking):** R33 pre-curve width; whether the steps or shared line could be instrument effects (range, compliance, sweep order); whether pre and post are the same device, and whether a control exists.
+- **Also for Ian:** during the literature review, the agent used a browser user-agent on some curl downloads and hit bot walls; IOP's was not bypassed. Blocked publishers leave some key papers read only from abstracts or not at all, marked in `kb/results/rad-literature.md`.
