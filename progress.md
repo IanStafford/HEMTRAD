@@ -1880,3 +1880,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **radFine 49735196:** 17 of 19 done, no crashes; 2 family tasks still running. Dense sites limit current by density (3-10 V mean 558, 346, 229 mA/mm at 4e18, 6e18, 8e18 for 0.3 um; 595, 374, 254, 121 for 0.1 um up to 1.2e19), independent of Vg with fresh curves. The drop at 1 V shrinks with mesh (to 12, 36, 96 mA/mm at 10, 5, 2.5 nm); the level holds (121, 128).
 - **radMulti 49735488:** 53 of 61 done; 8 out of memory at 4 GB (mostly 4-5 sites), not rerun: low-Vd data exists for 5 of them and high Vd isn't converged. Vd/Id at 0.25 V: 2.25, 3.46, 4.56, 5.62, 6.68, 7.73 Ohm-mm for 0-5 sites, within about 1% across location and deck. The current limit doesn't fall with more sites. It finished before radFine was read, so the cancel rule wasn't used.
 - **Trap memory:** with traps kept from earlier curves, a rising Vg-independent line survives 5 nm. Fill-only capture has no emission, so this overstates memory. Testable: repeat a sweep on a device, or change the Vg order.
+
+## 2026-11-05 afternoon: partial width done, emission test submitted (Ian)
+
+- **Partial width (`analysis/radPartialWidth.py`, no solver):** one 0.16 um track is 0.08% of 200 um; all 93 tracks 7.5%. All tracks change the current by 3-7% and resistance by at most +8% even if each column is fully blocked. An abrupt step therefore can't be one track switching; measured step sizes are far larger (numbers in the local note).
+- **Emission, Ian's OK:** new levers `emitFrac` (`model/Poisson.tcl`) and `emitRest` (`drivers/radIV.tcl`), default off (06f08b4). Smoke-tested locally. This is a crude stand-in with no time constant, a fraction per step, not a physical emission rate.
+- **radEmit 49834170** (21 tasks, SiN, 5 nm in the site, 6 GB): emitFrac 0.01-1 at 3 sites; emitRest 0.5, 0.9, 0.99 with a Vg family at 2 sites. Any step that appears gets a mesh check before it counts.
+- Local smoke test went to the repo root because the scratch folder had gone; those files are removed, nothing committed.

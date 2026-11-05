@@ -100,8 +100,24 @@ With curves run in the order Vg +1, then −2 upward, traps stay filled, because
 - **No separate step per strike can be claimed.** The dips at higher Vd are the same kind as those that shrink with the mesh.
 - **Caveat:** each site spans the whole device width and is far denser than TRIM gives at 1e7 cm⁻². This shows how sections combine, not what a real fluence does.
 
+## Partial width (2026-11-05, no solver)
+
+`analysis/radPartialWidth.py`: Id_total = f·Id_damaged + (1−f)·Id_undamaged, with parallel columns and no current spreading between them. At 1e7 cm⁻² about 93 ions land on the 200 µm device, and one 0.16 µm track covers 0.08% of the width, so 7.5% if every track has its own column.
+
+| Columns damaged | 0.3 µm, 4e18: resistance, Id(10 V) | 0.1 µm, 1.2e19: resistance, Id(10 V) |
+|---|---|---|
+| 0.08% (one track) | 1.000, 1.000 | 1.000, 0.999 |
+| 7.4% (all tracks) | 1.016, 0.967 | 1.027, 0.931 |
+| 20% | 1.045, 0.910 | 1.075, 0.815 |
+| 50% | 1.121, 0.775 | 1.212, 0.537 |
+| 100% | 1.274, 0.550 | 1.538, 0.074 |
+
+- **Isolated tracks can't move the device much.** One track changes the current by at most about 0.1%, and all tracks by 3–7%. Even a column that passes nothing gives only +8% resistance at 7.5%.
+- **So an abrupt step can't be one track switching.** A step's size is the fraction of the width that switches. The measured steps are many times what one track's column could give, and larger than all the tracks together, which needs damage or switching that spreads across a large part of the width, or a measurement effect.
+- **Limits:** this leaves out current spreading, which would shrink the effect further, and lateral spread of damage under bias, which would enlarge it. 0.16 µm is the estimate from [[critical-strike]].
+
 ## Open
 
-Trap emission, which limits how far the memory result can be pushed; partial-width damage; what actually produces abrupt steps in the measured curves, since the 2D sites here don't.
+Trap emission (radEmit, job 49834170), which limits how far the memory result can be pushed; what actually produces abrupt steps in the measured curves, since neither the 2D sites nor isolated tracks do.
 
 Related: [[rad-model]], [[ron-increase]], [[rad-literature]], [[critical-strike]], [[mesh]], [[hot-electron-capture]].

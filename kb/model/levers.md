@@ -47,6 +47,8 @@ Every lever has an `info exists` default, so a driver or array task sets it befo
 |---|---|---|
 | `damSites` | {} | Uniform acceptor sites `{ymin ymax xmin xmax N}` (µm, cm⁻³), any number ([[damage-region-map]]) |
 | `stressSkip` | 0 | Skip the stress solve when no damage law uses the stress field |
+| `emitFrac` (`Poisson.tcl`) | unset | Crude emission: fraction of the charge released before each capture. Live occupancy still sets the floor. 1 = no memory |
+| `emitRest` | 0 | Fraction of the captured charge released at rest before each Id–Vd curve |
 | `noRampBack` | 0 | Stop after the last curve, with no ramp back to rest. Ignored when `VgFam` or `damList` is set |
 | `meshY` (`rfdevice*.tcl`) | unset | Local mesh refinement, `{y spacing y spacing ...}` in µm. Lines needn't be in order |
 | `VgFam` | {} | Extra Id–Vd curves at these Vg, in order, to `<tag>_IdVdG<Vg>.csv` |

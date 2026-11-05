@@ -29,6 +29,7 @@ Model numbers. Ron is the 0–0.5 V slope. radRon job 49606877 (46 tasks, no cra
 - **Dielectric charge, access acceptors and mobility loss are all viable, and can't be told apart by Ron(Vg) alone.** gm gives some leverage, at a given Ron dielectric and acceptor cases cost less gm than whole-channel mobility loss.
 - **Against R33's trend (qualitative):** the gap between biased and non-biased Ron grows as Vg falls. A constant series term alone doesn't do that; a series term plus some extra Vth shift or source-side damage would. This is two different devices with no same-device pre curve, so it's a lead, not a result.
 - **Low-exponent field damage doesn't reach it** (radStress, job 49606875): Ron rises at most 9% (E¹, peak 2e18), with no steps and almost the same loss on both decks. So it doesn't explain the larger low-field loss seen on HPD either.
+- **Isolated tracks don't reach it** ([[damage-region-map]], partial width): all 93 tracks give at most +8% resistance, even if each blocks its column. A larger rise needs damage across much more of the width, which fits field-driven damage or charge under bias better than isolated tracks.
 - Contact resistance is still to do as post-processing.
 
 ## What's needed from the measurements
