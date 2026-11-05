@@ -120,7 +120,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
   <header class="top">
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">FLOOXS model of an AlGaN/GaN HEMT: what ran each day and what is still open. Id in <span style="white-space:nowrap">mA/mm</span> at Vg = −2 V unless noted; work before Oct 1 used constant mobility and is archived.</p>
-    <p class="meta">Snapshot Nov 5, morning</p>
+    <p class="meta">Snapshot Nov 5, afternoon</p>
   </header>
 
   <div class="layout">
@@ -158,21 +158,20 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <section class="page" id="overview" data-title="Overview">
         <div class="pagehead">
           <h2>Where things stand</h2>
-          <p>Damage moves Vth only under the gate and raises Ron about equally anywhere, but the abrupt steps reported Nov 4 were mesh artifacts; a narrower, denser site does collapse near 1 V. Next, a fine-mesh batch finds the real threshold, and then Ian decides how to run multi-strike.</p>
+          <p>On a fine mesh, damage gives Vth shifts under the gate, additive series resistance and a gate-independent current limit, but no abrupt steps; the final SiN curve's two steps vanish too. Next is Ian's decision on the final model, and finding what produces the measured steps.</p>
         </div>
         <div class="tiles">
           <div class="tile"><span class="k">Vth, one damaged section</span><span class="v">Gate only</span><span class="s">+0.78 V at 1e18 cm⁻³ under the gate; under 0.01 V anywhere else.</span></div>
-          <div class="tile"><span class="k">Ron, one damaged section</span><span class="v">+6–7% · +23–32%</span><span class="s">At 1e18 and 4e18 cm⁻³, nearly the same at any position.</span></div>
-          <div class="tile"><span class="k">Steps at 0.3 µm, 4e18</span><span class="v">Mesh artifact</span><span class="s">Under 8 mA/mm at 10 and 5 nm. A 0.1 µm site at 1.2e19 does collapse near 1 V.</span></div>
+          <div class="tile"><span class="k">Resistance per strike</span><span class="v">+1.1 Ω·mm</span><span class="s">0.1 µm site at 1.2e19. Adds up to 5 sites, whatever the location.</span></div>
+          <div class="tile"><span class="k">Steps on a fine mesh</span><span class="v">None</span><span class="s">Final SiN curve at 10 nm rises smoothly to 473 mA/mm. Current limit stays, set by density.</span></div>
         </div>
 
         <div class="panel">
           <h3>Open items</h3>
           <ul class="todo">
-            <li><span class="pill progress">in progress</span><span>Where does a real collapse start, and is it converged after it? Density and width at 5 nm (radFine). <a class="daylink" href="#nov05">Nov 5</a></span></li>
-            <li><span class="pill progress">in progress</span><span>Is the final SiN two-step curve also a mesh effect? Same curve at 10 nm. <a class="daylink" href="#nov05">Nov 5</a></span></li>
-            <li><span class="pill progress">in progress</span><span>Filled sites gave a nearly Vg-independent rising line on the standard mesh. Repeat at 5 nm, with and without trap memory. <a class="daylink" href="#nov05">Nov 5</a></span></li>
-            <li><span class="pill open">open</span><span>Depth and multi-strike: on hold for Ian's decision, since every site now needs a fine mesh. <a class="daylink" href="#nov05">Nov 5</a></span></li>
+            <li><span class="pill open">open</span><span>Final model: its two SiN steps are mesh artifacts. Ian to decide what to do with the final set. <a class="daylink" href="#nov05">Nov 5</a></span></li>
+            <li><span class="pill open">open</span><span>What makes abrupt steps in real devices? Sharp 2D sites don't. Partial-width damage and trap emission are untested. <a class="daylink" href="#nov05">Nov 5</a></span></li>
+            <li><span class="pill open">open</span><span>Cause of the biased Ron rise: dielectric charge, access acceptors and mobility loss all fit so far. <a class="daylink" href="#nov05">Nov 5</a></span></li>
             <li><span class="pill open">open</span><span>Cause of the Vth shift: several routes give +0.2 V in the model, but the literature has nothing at 1e7 cm⁻². <a class="daylink" href="#nov04">Nov 4</a></span></li>
             <li><span class="pill noted">noted</span><span>Waiting on a comprehensive measured set: same-device pre and post, width, Vth, Vg order. <a class="daylink" href="#nov05">Nov 5</a></span></li>
           </ul>
@@ -199,15 +198,17 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <!-- NOV 5 -->
       <section class="page" id="nov05" data-title="Nov 5">
         <div class="pagehead">
-          <h2>Nov 5 · The steps were the mesh</h2>
-          <p>The mesh check overturned yesterday's headline: a 0.3 µm section at 4e18 has no real steps. Vth, Ron and gm hold up. A narrower, denser site does collapse, and the Ron candidates have narrowed.</p>
-          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 49606872 · 49606874–49606877 · 49614033 · 49511531 · 49735196</span></div>
+          <h2>Nov 5 · The steps were the mesh, including the final model's</h2>
+          <p>Fine meshes overturned yesterday's headline and the final SiN curve's two steps. What holds up: Vth under the gate, series resistance that adds per strike, and a current limit set by density that doesn't depend on Vg.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 49606872 · 49606874–49606877 · 49614033 · 49511531 · 49735196 · 49735488</span></div>
         </div>
         <div class="cols">
           <div class="panel"><h3>Done</h3>
             <ul class="done">
               <li>Mesh check (radMesh, 11 tasks): steps of 84–157 mA/mm on the standard mesh shrink to <span class="num">under 8 mA/mm</span> at 10 and 5 nm. Current saturates near <span class="num">560 mA/mm</span> (0.55) at all three positions, so the source-side result is withdrawn too. The two fine meshes agree.</li>
-              <li>A 0.1 µm site with the same total charge (1.2e19) collapses near <span class="num">1 V</span> on all three meshes, so density matters. After the collapse it isn't converged: 0.1, 26 and 76 mA/mm at 10 V.</li>
+              <li>Final SiN curve at 10 nm: <span class="num">no steps</span>, a smooth rise to 473 mA/mm at 10 V, against steps at 4.5 and 5.8 V on the standard mesh. Below the steps the two agree within 1%, so the low-Vd loss stands.</li>
+              <li>A dense site is a current limit set by density: <span class="num">558, 346, 229 mA/mm</span> at 4e18, 6e18, 8e18, with little effect from width. With fresh curves it doesn't depend on Vg, even from −2 to +1 V at 1.2e19. The apparent drop at 1 V shrinks with the mesh.</li>
+              <li>Multi-strike (53 of 61 tasks): each site adds about <span class="num">+1.1 Ω·mm</span>, up to 5, within 1% across location and deck. The current limit doesn't fall with more sites, and no separate step per strike can be claimed.</li>
               <li>Ron (radRon, 46 tasks): dielectric charge, access acceptors and mobility loss all raise Ron with no Vth shift. Drain-side damage adds a nearly constant series term; a Vth shift of +0.21 V adds <span class="num">0.12 Ω·mm at Vg +1 and 1.21 at −2</span>.</li>
               <li>Low-exponent field damage (radStress) reaches at most <span class="num">+9%</span> Ron with no steps. Back-gating with buffer traps that fill (radVth3) gives <span class="num">+0.108 V</span> at about 1e13 cm⁻², far more charge than surface charge needs.</li>
               <li>Strike decay (seeGen2): the drain current peaks near <span class="num">0.7 ns</span> (2.37 and 2.02 mA/µm) and has fallen 12% and 6% by about 1.35 ns. Both runs then took a bad step and stopped advancing, so they were cancelled with no 10 ns result.</li>
@@ -215,16 +216,16 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           </div>
           <div class="panel"><h3>Needed work</h3>
             <ul class="todo">
-              <li><span class="pill progress">in progress</span><span>radFine (19 tasks): collapse threshold in density and width at 5 nm, a 2.5 nm convergence check, positions.</span></li>
-              <li><span class="pill progress">in progress</span><span>Final SiN curve at 10 nm: its two steps partly rest on a uniform site on the same coarse cells, so they're unverified until this returns.</span></li>
-              <li><span class="pill progress">in progress</span><span>Vg family (provisional, standard mesh): with traps kept filled from earlier curves, sites give a nearly Vg-independent rising line. Repeating at 5 nm, with and without trap memory.</span></li>
-              <li><span class="pill open">open</span><span>Depth and multi-strike are on hold: Ian to decide scope and mesh.</span></li>
+              <li><span class="pill open">open</span><span>Final model: it no longer reproduces the measured steps. Ian to decide. The rad-model explainer and the Oct 29 group deck still show them.</span></li>
+              <li><span class="pill noted">noted</span><span>Trap memory: with traps kept from earlier curves, a rising Vg-independent line survives 5 nm, but low Vd is dead, and the model has no emission. Testable by repeating a sweep on a device or changing the Vg order.</span></li>
+              <li><span class="pill noted">noted</span><span>8 of 61 multi-strike tasks ran out of memory at 4 GB; not rerun, since high Vd isn't converged there anyway. Sites span the full width at densities far above TRIM, so this shows how sections combine, not a real fluence.</span></li>
               <li><span class="pill noted">noted</span><span>R33 came with no context. Width unknown; same-device pre and post exist but aren't in hand, so pre-referenced numbers aren't usable quantitatively.</span></li>
             </ul>
           </div>
         </div>
         <div class="figs wide">
-          <figure><a class="img" href="fig/radMesh_curves.jpg" target="_blank" rel="noopener"><img src="fig/radMesh_curves.jpg" alt="Id-Vd for three damaged sites on the standard mesh, 10 nm and 5 nm: the 0.3 micron sites lose their steps on the fine meshes, the 0.1 micron site still collapses near 1 V but its later current differs by mesh" loading="lazy"></a><figcaption><b>Mesh check</b>Left and middle: the steps vanish at 10 and 5 nm, which agree. Right: the narrow, dense site still collapses near 1 V, but its current after that depends on the mesh.</figcaption></figure>
+          <figure><a class="img" href="fig/radMesh_curves.jpg" target="_blank" rel="noopener"><img src="fig/radMesh_curves.jpg" alt="Id-Vd for three damaged sites on the standard mesh, 10 nm and 5 nm: the 0.3 micron sites lose their steps on the fine meshes, the 0.1 micron site still collapses near 1 V but its later current differs by mesh" loading="lazy"></a><figcaption><b>Mesh check</b>Left and middle: the steps vanish at 10 and 5 nm, which agree. Right: the narrow, dense site's drop near 1 V also shrinks with the mesh.</figcaption></figure>
+          <figure><a class="img" href="fig/radFine.jpg" target="_blank" rel="noopener"><img src="fig/radFine.jpg" alt="Four panels: final SiN curve with steps on the standard mesh and smooth at 10 nm; Id-Vd levels by density; fresh curves at three Vg on one line; resistance rising linearly with number of strikes" loading="lazy"></a><figcaption><b>What a fine mesh shows</b>Final curve loses its steps; density sets the current limit; the limit doesn't depend on Vg; resistance adds per strike.</figcaption></figure>
         </div>
         <div class="pager"><a href="#overview">← Overview</a><a href="#nov04">Nov 4 →</a></div>
       </section>
@@ -315,6 +316,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           </div>
           <div class="panel"><h3>Needed work</h3>
             <ul class="todo">
+              <li><span class="pill open">corrected Nov 5</span><span>The two SiN steps on this page are mesh artifacts: at 10 nm the curve rises smoothly. <a class="daylink" href="#nov05">Nov 5</a></span></li>
               <li><span class="pill resolved">fixed Oct 29</span><span>Stress solve stops at Vd 17 V (Vdg ≈ 27 V), not 28 V. Divergence is in the electron quasi-Fermi level in the depleted AlGaN/GaN; the no-holes stress (Ian OK'd) and heavier Qfn damping both stop at 17 V too.</span></li>
               <li><span class="pill noted">noted</span><span>Fitting choices: no damage at the gate edge (y &lt; 0.30 µm), position of the second SiN strike site, gate–drain leakage as a lumped resistor.</span></li>
               <li><span class="pill noted">noted</span><span>SiN final level and gm loss somewhat smaller than measured; strong second sites make the collapse step unsolvable (radFinal9/10).</span></li>

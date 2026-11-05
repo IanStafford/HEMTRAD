@@ -1873,3 +1873,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Sites 0.1 um wide, 1.2e19, top 50 nm, 5 nm mesh in every site, Vd to 10 V, no site under the gate. Sets: 2 to 5 sites moving toward the drain and toward the gate, 3 fixed-seed random sets, on both decks; singles at 13 positions for the superposition check. Order within a set doesn't matter because damage is static.
 - **Cancel rule:** if radFine shows this site's collapse isn't converged, or the 5 nm results don't hold at 2.5 nm, cancel 49735488.
 - 1.2e19 over 50 nm is far above anything TRIM gives at 1e7 cm^-2. This tests how strikes combine, not what a real fluence does.
+
+## 2026-11-05 afternoon: radFine and radMulti analysed; final SiN curve loses its steps
+
+- **Final SiN curve at 10 nm (radFine `sin_final_m10`, radFinal11 set): no steps.** Smooth rise to 473 mA/mm at 10 V, against steps at 4.5 and 5.8 V and 377 on the standard mesh. Within 1% below the steps. **Decision for Ian:** what to do with the final model. Set unchanged. The rad-model explainer and the TCAD group deck (Oct 29) still show the two steps.
+- **radFine 49735196:** 17 of 19 done, no crashes; 2 family tasks still running. Dense sites limit current by density (3-10 V mean 558, 346, 229 mA/mm at 4e18, 6e18, 8e18 for 0.3 um; 595, 374, 254, 121 for 0.1 um up to 1.2e19), independent of Vg with fresh curves. The drop at 1 V shrinks with mesh (to 12, 36, 96 mA/mm at 10, 5, 2.5 nm); the level holds (121, 128).
+- **radMulti 49735488:** 53 of 61 done; 8 out of memory at 4 GB (mostly 4-5 sites), not rerun: low-Vd data exists for 5 of them and high Vd isn't converged. Vd/Id at 0.25 V: 2.25, 3.46, 4.56, 5.62, 6.68, 7.73 Ohm-mm for 0-5 sites, within about 1% across location and deck. The current limit doesn't fall with more sites. It finished before radFine was read, so the cancel rule wasn't used.
+- **Trap memory:** with traps kept from earlier curves, a rising Vg-independent line survives 5 nm. Fill-only capture has no emission, so this overstates memory. Testable: repeat a sweep on a device, or change the Vg order.
