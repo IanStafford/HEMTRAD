@@ -134,3 +134,9 @@ write("radRon", cases, "Vd_max=1.0;VgFam={-2 -1 0}")
 # ---- Phase 4: damage that follows the irradiation field at a low exponent, with the stress solve
 cases = [(f"f{m}_p{p:g}", f"damM={m};damPeak={p:g}") for m in (1, 2) for p in (5e17, 2e18)]
 write("radStress", cases)
+
+# ---- Vth, third pass: charged buffer acceptors (back-gating)
+# The model's buffer is undoped, with no electrons to fill a level at 1.0 or 1.7 eV (about 1e-26
+# of the traps are charged, checked locally). A level 3.3 eV below Ec is filled there.
+cases = [(f"buf{n:g}_L3.3", sitecase((*A, 0.1, 1.4, n)) + ";trapLevel=3.3") for n in (1e15, 1e16, 1e17)]
+write("radVth3", cases, "Vd_max=5.0")
