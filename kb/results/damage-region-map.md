@@ -118,7 +118,7 @@ With curves run in the order Vg +1, then −2 upward, traps stay filled, because
 
 ## Trap emission (radEmit, job 49834170, 2026-11-05)
 
-Crude levers, with no time constant: `emitFrac` releases a fraction of the excess charge per capture. SiN, 5 nm in the site, Id–Vd at Vg +1 V. 15 tasks, no crashes; 12 stopped before 10 V or nearly so.
+Crude levers, with no time constant: `emitFrac` releases a fraction of the excess charge per capture. SiN, 5 nm in the site, Id–Vd at Vg +1 V. 15 tasks, no crashes; 11 stopped before 10 V.
 
 | Site | Fill-only, 10 V | With `emitFrac` 0.01 to 1 |
 |---|---|---|
