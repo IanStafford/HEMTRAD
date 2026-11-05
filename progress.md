@@ -1866,3 +1866,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Ian on R33:** the width is unknown; the Excel came with no context; same-device pre and post exist but he doesn't have them; no comprehensive dataset yet. So pre-referenced R33 numbers are not usable quantitatively.
 - **Submitted radFine 49735196** (19 tasks, under plan approval): density and width threshold at 5 nm, 2.5 nm convergence, positions, Vg family at 5 nm with and without trap memory, trap-free ref curves through an empty trap model, final SiN curve (radFinal11 set) at 10 nm.
 - **On hold, Ian to decide:** depth and multi-strike, and on which mesh. Every site needs a fine mesh, about 1.5x the time.
+
+## 2026-11-05: radMulti submitted alongside radFine (Ian)
+
+- **radMulti 49735488** (61 tasks, %75, 80 CPUs with radFine). Ian: run it alongside radFine, and cancel it if radFine is negative.
+- Sites 0.1 um wide, 1.2e19, top 50 nm, 5 nm mesh in every site, Vd to 10 V, no site under the gate. Sets: 2 to 5 sites moving toward the drain and toward the gate, 3 fixed-seed random sets, on both decks; singles at 13 positions for the superposition check. Order within a set doesn't matter because damage is static.
+- **Cancel rule:** if radFine shows this site's collapse isn't converged, or the 5 nm results don't hold at 2.5 nm, cancel 49735488.
+- 1.2e19 over 50 nm is far above anything TRIM gives at 1e7 cm^-2. This tests how strikes combine, not what a real fluence does.
