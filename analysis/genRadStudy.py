@@ -175,3 +175,29 @@ FINAL = ("polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;r
          "dam2Xmax=0.014;dam3Peak=@S;Vd_step=0.1;retryDepth=8;meshY={0.3 0.01 1.6 0.01}")
 cases.append(("sin", "final_m10", FINAL.replace("@P", "6e18").replace("@S", "4.5e18")))
 writex("radFine", cases)
+
+# ---- Phase 3d: multiple strikes. 0.1 um sites at 1.2e19 (the one site known to collapse on a fine
+# mesh), 5 nm in every site. Damage is static, so only the set matters, not the order. No site under
+# the gate. Singles give the superposition check; radFine has HighK y 3.0, 1.5 and -0.9.
+POOL = [-0.9, -0.6, -0.3, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, 3.0]
+def multi(ys, n=1.2e19, w=0.1):
+    ss = [site(y, w, n) for y in ys]
+    lines = " ".join(f"{a:g} 0.005 {b:g} 0.005" for a, b, *_ in ss)
+    return sitecase(*ss) + ";meshY={" + lines + "}"
+cases = []
+for y in POOL:
+    for d in ("hk", "sin"):
+        if d == "hk" and y in (-0.9, 1.5, 3.0):
+            continue
+        cases.append((d, f"ms_s_y{y:g}", multi([y])))
+DRN = [0.6, 1.2, 1.8, 2.4, 3.0]
+GATE = DRN[::-1]
+sets = [(f"drn_k{k}", DRN[:k]) for k in range(2, 6)] + [(f"gat_k{k}", GATE[:k]) for k in range(2, 5)]
+for seed in (1, 2, 3):
+    order = random.Random(seed).sample(POOL, 5)
+    print("seed", seed, order)
+    sets += [(f"r{seed}_k{k}", sorted(order[:k])) for k in range(2, 6)]
+for lab, ys in sets:
+    for d in ("hk", "sin"):
+        cases.append((d, f"ms_{lab}", multi(ys)))
+writex("radMulti", cases)
