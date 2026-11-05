@@ -211,14 +211,17 @@ Each row is one mechanism, no stress solve, ratios against the undamaged referen
 | Channel acceptors, whole device | 5e17 | +0.26 | 0.78 | 1.35 | 0.74 |
 | Dielectric charge near the gate (y −0.35 to 0.40) | 1e18 | +0.03 | 0.97 | 1.04 | 0.96 |
 | Dielectric charge, y ≥ 0.30 | 1e18 | −0.015 | 0.80 | 2.0–2.1 | 0.46–0.49 |
-| Buffer acceptors, level 0.30, 1.0 or 1.7 eV | up to 5e17 | 0 (see below) | 1.00 | 1.00 | 1.00 |
+| Buffer acceptors that fill (level 3.3 eV) | 1e16 / 1e17 | +0.017 / +0.108 | 1.00 / 0.98 | 1.00 / 1.03 | 0.995 / 0.965 |
+| Buffer acceptors that stay empty (0.30, 1.0, 1.7 eV) | up to 5e17 | 0, not a test | 1.00 | 1.00 | 1.00 |
 
 - **Vth alone can't separate these.** Ron and gm can: gate-local routes leave Ron within 2%, whole-device routes raise it, and channel-depth routes cost gm.
 - **One lever for two effects?** A whole-device route gives the Vth shift and a small Ron rise together, which the current model does with two levers (`dam2Peak`, `surfCharge`). Not yet tested against measured data.
 - **Dielectric charge isn't a Vth route.** At the gate it reaches only +0.03 V at 1e18, because there's no dielectric under the gate foot.
-- **The buffer rows don't test back-gating.** The model's buffer is undoped and holds no electrons to fill these levels: at 1.7 eV, IonAcceptor is about 4e-9 cm⁻³ out of 5e17 (local check). That implies a Fermi level about 3.25 eV below Ec there. A level of 3.3 eV does fill, 58–100% at 1e16 (local check), and radVth3 (job 49614033) runs that at 1e15–1e17.
+- **Back-gating works but takes a lot of charge.** The model's buffer is undoped and holds no electrons to fill levels at 0.30–1.7 eV: at 1.7 eV, IonAcceptor is about 4e-9 cm⁻³ out of 5e17 (local check). A level of 3.3 eV does fill, 58–100% at 1e16 (local check). With it (radVth3, job 49614033), +0.108 V takes 1e17 cm⁻³ over 1.3 µm, a sheet of about 1e13 cm⁻², roughly ten times what surface charge needs for a similar shift.
 - **Reduced polarization needs care on SiN.** `sin_polAll9.7e12`, `sin_polAll9e12` and `sin_polGate0.9` ran hours longer than the rest, retrying in Id–Vd with Qfp not converging. Their Id–Vg is fine.
 
 Reachable size is a separate question: [[rad-literature]] finds no Vth data near 1e7 cm⁻². Candidate high-Vd behaviour isn't covered, since these runs stop at 5 V to save CPU.
 
 Related: [[damage-region-map]], [[ron-increase]].
+
+**Caveat added 2026-11-05:** the two steps of the final SiN curve above (radFinal11) come partly from `dam3` on 25–50 nm cells. A 0.3 µm uniform site on those cells gave mesh-artifact steps ([[damage-region-map]]). The same curve at 10 nm is running (radFine, job 49735196). Until it's back, treat those two steps as unverified.

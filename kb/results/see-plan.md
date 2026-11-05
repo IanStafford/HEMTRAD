@@ -65,3 +65,16 @@ Generation-pulse strike (`seeMethod gen`, τ 1 ps, `tranSign 1`, W_eff 1 µm, 6.
 - The output misses displacement current, so the columns only balance on the plateau.
 - Mechanism (inferred from cuts at x 0.016 and 0.5 µm, HighK at 1 ns vs control): gate barrier gone (DevPsi 3.94 → 2.84, level with the source; Elec ~1e-27 → 1.1e19); buffer flooded (x 0.5 DevPsi 6.37 → 2.94, n ≈ p ≈ 1e18); peak lateral field moves from the gate edge (7e5 V/cm) to near the drain (1.4e6 V/cm at y 3.19). About 3.2e-13 C/µm of holes remain, ~0.9 ns at the 0.35 mA/µm bottom-contact current, so Id should fall over a few ns. Not yet tested.
 - Not reproduced yet: the lasting leakage step (no damage term) and the gate current (gate column stays at its DC value).
+
+## seeGen2 (2026-11-05, job 49511531): decay has started, run stopped at about 1.3 ns
+
+Same strikes as seeGen1, aimed at 10 ns. Both tasks accepted one bad step (HighK at 1.39 ns, SiN at 1.47 ns: currents about 1000× higher, sign flipped on SiN), and the time step then fell to nothing with no progress for 3 and 7 h. Cancelled with Ian's permission at 22.9 h; the bad last row is excluded.
+
+| | Peak drain current | Peak at | At the end | Charge through the drain |
+|---|---|---|---|---|
+| HighK, y 1.0 | 2.37 mA/µm | 0.72 ns | 2.08 mA/µm at 1.32 ns | 2.96e-12 C/µm |
+| SiN, y 0.5 | 2.02 mA/µm | 0.65 ns | 1.89 mA/µm at 1.38 ns | 2.70e-12 C/µm |
+
+- **The current does turn over**, peaking near 0.7 ns. If the fall from 0.8 ns continued as an exponential, the time constant would be about 3.5 ns (HighK) and 7.6 ns (SiN), so it would take over 10 ns to end. That's an extrapolation from a short stretch.
+- **Charge through the drain is already 4× the deposited 6.9e-13 C/µm.**
+- The bad steps came at dt of 6e-11 to 9e-11 s. A rerun would need a maximum time step, and would cost well over a day per task.

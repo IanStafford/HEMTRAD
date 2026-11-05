@@ -120,7 +120,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
   <header class="top">
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">FLOOXS model of an AlGaN/GaN HEMT: what ran each day and what is still open. Id in <span style="white-space:nowrap">mA/mm</span> at Vg = −2 V unless noted; work before Oct 1 used constant mobility and is archived.</p>
-    <p class="meta">Snapshot Nov 4, end of day</p>
+    <p class="meta">Snapshot Nov 5, morning</p>
   </header>
 
   <div class="layout">
@@ -128,6 +128,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
       <div class="sep"></div>
       <div class="era">Field mobility</div>
+      <a href="#nov05" data-page="nov05"><span class="d">Nov 5</span><span class="t">mesh check · Ron</span></a>
       <a href="#nov04" data-page="nov04"><span class="d">Nov 4</span><span class="t">damage map · merge</span></a>
       <a href="#nov02" data-page="nov02"><span class="d">Oct 28–Nov 2</span><span class="t">28 V · strike</span></a>
       <a href="#oct27" data-page="oct27"><span class="d">Oct 24–27</span><span class="t">rad model</span></a>
@@ -157,23 +158,23 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <section class="page" id="overview" data-title="Overview">
         <div class="pagehead">
           <h2>Where things stand</h2>
-          <p>The rad model is merged into main, and a new damage map shows Vth moves only for damage under the gate while Ron rises about equally anywhere; one dense section gives abrupt steps onto a rising line, the shape R33 shows. Next, a mesh check decides whether those steps are real, then the multi-strike study runs.</p>
+          <p>Damage moves Vth only under the gate and raises Ron about equally anywhere, but the abrupt steps reported Nov 4 were mesh artifacts; a narrower, denser site does collapse near 1 V. Next, a fine-mesh batch finds the real threshold, and then Ian decides how to run multi-strike.</p>
         </div>
         <div class="tiles">
           <div class="tile"><span class="k">Vth, one damaged section</span><span class="v">Gate only</span><span class="s">+0.78 V at 1e18 cm⁻³ under the gate; under 0.01 V anywhere else.</span></div>
           <div class="tile"><span class="k">Ron, one damaged section</span><span class="v">+6–7% · +23–32%</span><span class="s">At 1e18 and 4e18 cm⁻³, nearly the same at any position.</span></div>
-          <div class="tile"><span class="k">Abrupt steps</span><span class="v">4e18 only</span><span class="s">None at 1e18; up to two per curve at 4e18. Not yet checked against the mesh.</span></div>
+          <div class="tile"><span class="k">Steps at 0.3 µm, 4e18</span><span class="v">Mesh artifact</span><span class="s">Under 8 mA/mm at 10 and 5 nm. A 0.1 µm site at 1.2e19 does collapse near 1 V.</span></div>
         </div>
 
         <div class="panel">
           <h3>Open items</h3>
           <ul class="todo">
-            <li><span class="pill progress">in progress</span><span>Are the steps real? Mesh check at 10 and 5 nm decides whether the depth, width and multi-strike studies run. <a class="daylink" href="#nov04">Nov 4</a></span></li>
-            <li><span class="pill progress">in progress</span><span>Does the current after a step stop depending on Vg, as in R33? SiN Vg family running. <a class="daylink" href="#nov04">Nov 4</a></span></li>
-            <li><span class="pill progress">in progress</span><span>Cause of the biased Ron rise: access-region acceptors, mobility loss, dielectric charge, field-weighted damage. <a class="daylink" href="#nov04">Nov 4</a></span></li>
-            <li><span class="pill open">open</span><span>Cause of the Vth shift: several routes give +0.2 V in the model, but the literature has nothing at 1e7 cm⁻², and it would take about as many charges per ion as a track has atoms. <a class="daylink" href="#nov04">Nov 4</a></span></li>
-            <li><span class="pill progress">in progress</span><span>Does the strike current decay? The 10 ns run (seeGen2) is still early in the strike. <a class="daylink" href="#nov04">Nov 4</a></span></li>
-            <li><span class="pill open">open</span><span>R33 questions for Ian: the pre-curve width, whether the steps or the shared line could be instrument effects, and whether a control device exists. <a class="daylink" href="#nov04">Nov 4</a></span></li>
+            <li><span class="pill progress">in progress</span><span>Where does a real collapse start, and is it converged after it? Density and width at 5 nm (radFine). <a class="daylink" href="#nov05">Nov 5</a></span></li>
+            <li><span class="pill progress">in progress</span><span>Is the final SiN two-step curve also a mesh effect? Same curve at 10 nm. <a class="daylink" href="#nov05">Nov 5</a></span></li>
+            <li><span class="pill progress">in progress</span><span>Filled sites gave a nearly Vg-independent rising line on the standard mesh. Repeat at 5 nm, with and without trap memory. <a class="daylink" href="#nov05">Nov 5</a></span></li>
+            <li><span class="pill open">open</span><span>Depth and multi-strike: on hold for Ian's decision, since every site now needs a fine mesh. <a class="daylink" href="#nov05">Nov 5</a></span></li>
+            <li><span class="pill open">open</span><span>Cause of the Vth shift: several routes give +0.2 V in the model, but the literature has nothing at 1e7 cm⁻². <a class="daylink" href="#nov04">Nov 4</a></span></li>
+            <li><span class="pill noted">noted</span><span>Waiting on a comprehensive measured set: same-device pre and post, width, Vth, Vg order. <a class="daylink" href="#nov05">Nov 5</a></span></li>
           </ul>
           <details class="older">
             <summary>Older questions (11)</summary>
@@ -195,11 +196,45 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       </section>
       <div class="no-js-sep"></div>
 
+      <!-- NOV 5 -->
+      <section class="page" id="nov05" data-title="Nov 5">
+        <div class="pagehead">
+          <h2>Nov 5 · The steps were the mesh</h2>
+          <p>The mesh check overturned yesterday's headline: a 0.3 µm section at 4e18 has no real steps. Vth, Ron and gm hold up. A narrower, denser site does collapse, and the Ron candidates have narrowed.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 49606872 · 49606874–49606877 · 49614033 · 49511531 · 49735196</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Mesh check (radMesh, 11 tasks): steps of 84–157 mA/mm on the standard mesh shrink to <span class="num">under 8 mA/mm</span> at 10 and 5 nm. Current saturates near <span class="num">560 mA/mm</span> (0.55) at all three positions, so the source-side result is withdrawn too. The two fine meshes agree.</li>
+              <li>A 0.1 µm site with the same total charge (1.2e19) collapses near <span class="num">1 V</span> on all three meshes, so density matters. After the collapse it isn't converged: 0.1, 26 and 76 mA/mm at 10 V.</li>
+              <li>Ron (radRon, 46 tasks): dielectric charge, access acceptors and mobility loss all raise Ron with no Vth shift. Drain-side damage adds a nearly constant series term; a Vth shift of +0.21 V adds <span class="num">0.12 Ω·mm at Vg +1 and 1.21 at −2</span>.</li>
+              <li>Low-exponent field damage (radStress) reaches at most <span class="num">+9%</span> Ron with no steps. Back-gating with buffer traps that fill (radVth3) gives <span class="num">+0.108 V</span> at about 1e13 cm⁻², far more charge than surface charge needs.</li>
+              <li>Strike decay (seeGen2): the drain current peaks near <span class="num">0.7 ns</span> (2.37 and 2.02 mA/µm) and has fallen 12% and 6% by about 1.35 ns. Both runs then took a bad step and stopped advancing, so they were cancelled with no 10 ns result.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill progress">in progress</span><span>radFine (19 tasks): collapse threshold in density and width at 5 nm, a 2.5 nm convergence check, positions.</span></li>
+              <li><span class="pill progress">in progress</span><span>Final SiN curve at 10 nm: its two steps partly rest on a uniform site on the same coarse cells, so they're unverified until this returns.</span></li>
+              <li><span class="pill progress">in progress</span><span>Vg family (provisional, standard mesh): with traps kept filled from earlier curves, sites give a nearly Vg-independent rising line. Repeating at 5 nm, with and without trap memory.</span></li>
+              <li><span class="pill open">open</span><span>Depth and multi-strike are on hold: Ian to decide scope and mesh.</span></li>
+              <li><span class="pill noted">noted</span><span>R33 came with no context. Width unknown; same-device pre and post exist but aren't in hand, so pre-referenced numbers aren't usable quantitatively.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs wide">
+          <figure><a class="img" href="fig/radMesh_curves.jpg" target="_blank" rel="noopener"><img src="fig/radMesh_curves.jpg" alt="Id-Vd for three damaged sites on the standard mesh, 10 nm and 5 nm: the 0.3 micron sites lose their steps on the fine meshes, the 0.1 micron site still collapses near 1 V but its later current differs by mesh" loading="lazy"></a><figcaption><b>Mesh check</b>Left and middle: the steps vanish at 10 and 5 nm, which agree. Right: the narrow, dense site still collapses near 1 V, but its current after that depends on the mesh.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#nov04">Nov 4 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
       <!-- NOV 4 -->
       <section class="page" id="nov04" data-title="Nov 4">
         <div class="pagehead">
-          <h2>Nov 4 · What damage does where: the first map</h2>
-          <p>The rad model is merged into main and reproduces its earlier runs. New studies place damage by hand to learn what each region does: Vth responds only under the gate, Ron about equally anywhere, and one dense section gives abrupt steps. A mesh check on those steps is still running.</p>
+          <h2>Nov 4 · What damage does where: the first map (steps corrected Nov 5)</h2>
+          <p>The rad model is merged into main and reproduces its earlier runs. New studies place damage by hand to learn what each region does: Vth responds only under the gate, Ron about equally anywhere, and one dense section appeared to give abrupt steps, which the Nov 5 mesh check showed were artifacts.</p>
           <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 49552956 · 49570570 · 49570571 · 49606872 · 49606874–49606877 · 49614033 · 49511531</span></div>
         </div>
         <div class="cols">
@@ -207,7 +242,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
             <ul class="done">
               <li><code>explore/rad-model</code> merged into main. Regression (radChk, 6 tasks): pre curves byte-identical; non-biased curves through the new <code>damSites</code> and <code>stressSkip</code> levers match radFinal8's Vth of <span class="num">−2.784 V</span> and last Vd.</li>
               <li>Position map (radMap1, 58 tasks, no crashes): one section 0.3 µm wide at 14 positions, 1e18 and 4e18 cm⁻³, both decks. Vth moves only under the gate, <span class="num">+0.78 / +1.96 V</span>, and by under 0.01 V elsewhere. Ron rises <span class="num">+6–7% / +23–32%</span> at any position.</li>
-              <li>Steps appear only at 4e18, where the section can hold about twice the 2DEG's charge: abrupt drops onto a rising line, two per curve near the drain edge, with nothing placed by hand. High-Vd current suffers most on the source side, <span class="num">0.24</span> of the reference at 10 V against 0.55 mid-drift.</li>
+              <li><b>Corrected Nov 5:</b> this run showed abrupt steps at 4e18 and the worst high-Vd loss on the source side. Both were mesh artifacts: on a fine mesh there are no real steps, and Id at 10 V is 0.55 at all three positions checked.</li>
               <li>Vth routes (radVth, radVth2): <span class="num">+0.17 to +0.22 V</span> from Schottky barrier +0.2 eV, polarization −5% (gate or whole device), AlGaN acceptors 5e17 (gate or whole device) or surface charge −1.2e12. Gate-local routes keep Ron within 1%; whole-device routes add 6–15%. Dielectric charge at the gate reaches only <span class="num">+0.03 V</span>. The literature review found nothing at our fluence.</li>
               <li>Dielectric charge away from the gate raises Ron up to <span class="num">2.0–2.1×</span> with no Vth shift: a candidate for the biased Ron rise.</li>
               <li>Strike transient (seeGen1) works at 28 V: drain about <span class="num">2 mA/µm</span>, 3× the deposited charge, no decay by 1 ns. Separately, the FANGS first HPG run finished and is archived.</li>
@@ -215,21 +250,21 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           </div>
           <div class="panel"><h3>Needed work</h3>
             <ul class="todo">
-              <li><span class="pill progress">in progress</span><span>Mesh check (radMesh, 11 tasks): do the steps survive 10 and 5 nm spacing? Depth, width and multi-strike wait on it. A hint so far: a 0.1 µm site with the same charge falls from 144 to 35 mA/mm at 1 V on the standard mesh, the case most exposed to it.</span></li>
-              <li><span class="pill progress">in progress</span><span>SiN Vg family (radFam, 7 tasks): does the current after a step stop depending on Vg?</span></li>
-              <li><span class="pill progress">in progress</span><span>Ron candidates with Ron(Vg) (radRon, 46 tasks) and low-exponent field damage (radStress, 8 tasks).</span></li>
-              <li><span class="pill progress">in progress</span><span>Back-gating (radVth3, 6 tasks). The first two buffer runs tested nothing: traps in the undoped buffer stayed empty even at 1.7 eV (about 1e-26 charged, checked locally). A 3.3 eV level does fill.</span></li>
-              <li><span class="pill progress">in progress</span><span>Strike decay to 10 ns (seeGen2): HighK at about 1 ps, SiN at 2.7 ps after 10 h. Rough finish: SiN early tomorrow, HighK early afternoon.</span></li>
-              <li><span class="pill open">open</span><span>For Ian: R33 pre-curve width; whether the steps or the shared line could be instrument effects; whether a control device exists; whether to cancel the one stuck Vth task (below).</span></li>
-              <li><span class="pill noted">noted</span><span>One Vth task (<code>sin_polAll9e+12</code>) has been retrying at Vd 2.5 V for over 4 h. Its Vth is saved; it holds 1 CPU and is left running until Ian decides.</span></li>
+              <li><span class="pill resolved">fixed Nov 5</span><span>Mesh check: the steps did not survive. See Nov 5.</span></li>
+              <li><span class="pill resolved">fixed Nov 5</span><span>SiN Vg family (radFam, 7 tasks): does the current after a step stop depending on Vg?</span></li>
+              <li><span class="pill resolved">fixed Nov 5</span><span>Ron candidates with Ron(Vg) (radRon, 46 tasks) and low-exponent field damage (radStress, 8 tasks).</span></li>
+              <li><span class="pill resolved">fixed Nov 5</span><span>Back-gating (radVth3, 6 tasks). The first two buffer runs tested nothing: traps in the undoped buffer stayed empty even at 1.7 eV (about 1e-26 charged, checked locally). A 3.3 eV level does fill.</span></li>
+              <li><span class="pill noted">stopped</span><span>Strike decay to 10 ns (seeGen2): cancelled Nov 5 after a bad step near 1.4 ns.</span></li>
+              <li><span class="pill resolved">fixed Nov 5</span><span>Questions for Ian on R33: answered as far as he can (see Nov 5).</span></li>
+              <li><span class="pill resolved">fixed Nov 5</span><span>One Vth task (<code>sin_polAll9e+12</code>) retried at Vd 2.5 V for over 4 h, then finished by itself.</span></li>
             </ul>
           </div>
         </div>
         <div class="figs">
-          <figure><a class="img" href="fig/radMap1.jpg" target="_blank" rel="noopener"><img src="fig/radMap1.jpg" alt="Six panels against site position for HighK and SiN at two densities: Vth change, gm ratio, Ron ratio, Id at 4 V and 10 V ratios, and the Vd of the largest step" loading="lazy"></a><figcaption><b>Effect vs site position</b>Vth responds only under the gate (grey band); Ron is nearly flat with position, and its small wiggle is probably mesh aliasing.</figcaption></figure>
-          <figure><a class="img" href="fig/radMap1_curves.jpg" target="_blank" rel="noopener"><img src="fig/radMap1_curves.jpg" alt="Id-Vd at Vg +1 for HighK and SiN: reference, and one damaged section at seven positions at 1e18 and 4e18; the 4e18 curves drop abruptly onto rising lines" loading="lazy"></a><figcaption><b>Id–Vd at Vg +1, one section</b>At 4e18 the current drops abruptly onto a rising line, twice at y = 3 µm. At 1e18 there are no steps. Decks nearly match without a stress solve.</figcaption></figure>
+          <figure><a class="img" href="fig/radMap1.jpg" target="_blank" rel="noopener"><img src="fig/radMap1.jpg" alt="Six panels against site position for HighK and SiN at two densities: Vth change, gm ratio, Ron ratio, Id at 4 V and 10 V ratios, and the Vd of the largest step" loading="lazy"></a><figcaption><b>Effect vs site position</b>Vth responds only under the gate (grey band); Ron is nearly flat with position. The Id and step panels are standard-mesh artifacts (see Nov 5).</figcaption></figure>
+          <figure><a class="img" href="fig/radMap1_curves.jpg" target="_blank" rel="noopener"><img src="fig/radMap1_curves.jpg" alt="Id-Vd at Vg +1 for HighK and SiN: reference, and one damaged section at seven positions at 1e18 and 4e18; the 4e18 curves drop abruptly onto rising lines" loading="lazy"></a><figcaption><b>Id–Vd at Vg +1, one section (standard mesh)</b>The steps at 4e18 are mesh artifacts; on a fine mesh these curves saturate smoothly (see Nov 5).</figcaption></figure>
         </div>
-        <div class="pager"><a href="#overview">← Overview</a><a href="#nov02">Oct 28–Nov 2 →</a></div>
+        <div class="pager"><a href="#nov05">← Nov 5</a><a href="#nov02">Oct 28–Nov 2 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 

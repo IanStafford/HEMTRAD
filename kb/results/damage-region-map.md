@@ -5,7 +5,31 @@ date: 2026-11-04
 ---
 # Damage-region map
 
-Empirical map of what a damaged section does, by position, on both decks. **Interim:** the steps below are not yet checked for mesh sensitivity (radMesh, job 49606872). Depth, width and multi-strike studies come after that.
+Empirical map of what a damaged section does, by position, on both decks. **Corrected 2026-11-05: the steps and the position dependence at high Vd in radMap1 were mesh artifacts** (radMesh, job 49606872). Vth, Ron and gm stand. Density and width thresholds on a fine mesh are running (radFine, job 49735196). The multi-strike study is on hold until Ian decides how to proceed.
+
+## Mesh check (radMesh, job 49606872, 11 tasks, no crashes)
+
+Figure: `figures/rad/radMesh_curves.png`. HighK, Vg +1 V, Id in mA/mm.
+
+| Site | Mesh in the site | Largest step | Id at 4 V | Id at 10 V |
+|---|---|---|---|---|
+| 0.3 µm, 4e18, y 3.0 | standard (about 50 nm) | 100 at 4 V | 399 | 369 |
+| | 10 nm | 3.8 | 540 | 562 |
+| | 5 nm | 3.7 | 542 | 562 |
+| 0.3 µm, 4e18, y −0.9 | standard | 157 at 4.5 V | 552 | 250 |
+| | 10 nm | 7.8 | 555 | 526 |
+| | 5 nm | none | 556 | 558 |
+| 0.3 µm, 4e18, y 1.5 | standard | 84 at 3.75 V | 437 | 565 |
+| | 5 nm | 4.1 | 547 | 566 |
+| 0.1 µm, 1.2e19, y 1.5 | standard | 110 at 1 V | 0.1 | 0.1 |
+| | 10 nm | 126 at 1 V | 3.0 | 26 |
+| | 5 nm | 103 at 1 V | 124 | 76 |
+
+- **At 0.3 µm and 4e18 there is no real step.** At 10 and 5 nm the curve saturates smoothly near 560 mA/mm, 0.55 of the undamaged current, the same at all three positions. The two meshes agree.
+- **Halving the Vd step doesn't remove the coarse-mesh steps** (0.1 V, same mesh), which is why this needed a mesh test.
+- **Likely mechanism (not shown directly):** a sharp-edged site on 25–50 nm cells fills about one cell at a time, so each cell flips as a step.
+- **The 0.1 µm site with the same total charge does collapse, near 1 V on all three meshes.** So density matters, not just total charge. What happens after the collapse isn't converged: Id at 10 V goes 0.1, 26, 76 mA/mm. Nothing after the collapse can be quoted yet.
+- **Untested elsewhere:** the final SiN two-step curve (radFinal11) relies on `dam3` at y 1.0–1.6 on the same coarse cells, so its steps may have the same problem. Earlier position maps used Gaussians, and the Sep 27 check there found onset shifts of about 0.1 V. radFine includes the final curve at 10 nm.
 
 ## Setup
 
@@ -13,28 +37,34 @@ radMap1 (job 49570571, 58 tasks, all finished, no crashes; 3 stopped before 10 V
 
 Figures: `figures/rad/radMap1.png`, `figures/rad/radMap1_curves.png`. Table: `results/20261104_radMap1/map.csv` (not committed; rebuild with `analysis/radMap.py`).
 
-## What each region does
+## What holds up from radMap1
 
-| Site | ΔVth (V) | gm ratio | Ron ratio | Id(10 V) ratio | Steps at 4e18 |
-|---|---|---|---|---|---|
-| Under the gate (y 0), 1e18 / 4e18 | +0.78 / +1.96 | 0.78 / 0.59 | 1.07 / 1.32 | 0.76 / 0.39 | none |
-| Gate edge, source side (y −0.3), 1e18 / 4e18 | 0 / −0.005 | 0.96 / 0.80 | 1.07 / 1.28 | 0.88 / 0.44 | one, about 67 mA/mm at 3.5 V |
-| Source access (y −0.9), 1e18 / 4e18 | −0.002 / −0.006 | 0.97 / 0.90 | 1.06 / 1.25 | 0.91 / 0.24 | one, 157–220 mA/mm at 4.5–5 V |
-| Gate edge, drain side (y 0.3), 1e18 / 4e18 | 0 / −0.003 | 0.97 / 0.89 | 1.06 / 1.28 | 0.94 / 0.50 | none |
-| Mid drift (y 1.5), 1e18 / 4e18 | −0.002 / −0.005 | 0.98 / 0.93 | 1.06 / 1.25 | 1.00 / 0.55 | one, about 84 mA/mm at 3.75 V |
-| Drain edge (y 3.0), 1e18 / 4e18 | −0.002 / −0.005 | 0.98 / 0.92 | 1.07 / 1.27 | 1.00 / 0.32–0.36 | two, at 4 V and 7.5–8 V |
+Standard-mesh numbers; the fine-mesh runs confirm them at the three positions checked (Ron 1.27–1.28 and gm 0.88–0.92 at 4e18).
 
-## Findings so far
+| Site | ΔVth (V) | gm ratio | Ron ratio |
+|---|---|---|---|
+| Under the gate (y 0), 1e18 / 4e18 | +0.78 / +1.96 | 0.78 / 0.59 | 1.07 / 1.32 |
+| Gate edge, source side (y −0.3), 1e18 / 4e18 | 0 / −0.005 | 0.96 / 0.80 | 1.07 / 1.28 |
+| Source access (y −0.9), 1e18 / 4e18 | −0.002 / −0.006 | 0.97 / 0.90 | 1.06 / 1.25 |
+| Gate edge, drain side (y 0.3), 1e18 / 4e18 | 0 / −0.003 | 0.97 / 0.89 | 1.06 / 1.28 |
+| Mid drift (y 1.5), 1e18 / 4e18 | −0.002 / −0.005 | 0.98 / 0.93 | 1.06 / 1.25 |
+| Drain edge (y 3.0), 1e18 / 4e18 | −0.002 / −0.005 | 0.98 / 0.92 | 1.07 / 1.27 |
 
-- **Vth is set only under the gate.** A site that doesn't overlap the gate foot moves Vth by at most 0.007 V, at any density tested.
-- **Ron barely depends on position.** It's 1.06–1.07 at 1e18 and 1.23–1.32 at 4e18 everywhere, as expected for a series section. The wiggle with y is probably mesh aliasing: a 0.3 µm window catches a varying number of 25–50 nm cells, and refining the source-side site moved Id at 0.5 V by 2.6%.
-- **There's a threshold between 1e18 and 4e18 cm⁻³.** Over 50 nm that's 5e12 to 2e13 cm⁻², bracketing the 2DEG (polCharge 1e13). Only the higher density gives steps or a large loss at high Vd.
-- **One site can give abrupt steps onto a rising line, sometimes two per curve.** Nothing placed these by hand; a uniform site and hot-electron fill-only capture produce them. Steps depend on position, and none appear when the site sits at the gate or just past its drain edge.
-- **The source side is the most damaging place for high-Vd current** at 4e18 (ratio 0.24 at y −0.9, against 0.55 mid-drift). Two source-side HighK/SiN cases at y −0.6 stopped before 10 V, so that point is missing.
-- **The decks barely differ here.** HighK and SiN agree closely below about 7 V; the step at y 2.7 is the largest difference (3.75 V against 7.25 V). Without a stress solve, the deck's main route to the damage is gone, so this says nothing about how irradiation would place damage in each deck.
+- **Vth is set only under the gate.** A site that doesn't overlap the gate foot moves Vth by at most 0.007 V.
+- **Ron barely depends on position.** The wiggle with y was mesh aliasing: it mostly goes away on the fine mesh.
+- **Current at high Vd no longer distinguishes positions** at 0.3 µm and 4e18: 0.54–0.55 at 10 V on the fine mesh. The earlier claim that the source side is worst, and the Id(4 V) and Id(10 V) panels of `figures/rad/radMap1.png`, are withdrawn.
+- **The decks barely differ here.** Without a stress solve the deck's main route to the damage is gone, so this says nothing about how irradiation would place damage in each deck.
+
+## Vg family (radFam, job 49606874): standard mesh, so provisional
+
+SiN, curves run in the order Vg +1, then −2 up to +0.5, with traps kept filled from curve to curve, because capture is fill-only. Six of 7 tasks finished; the trap-free reference stalled at Vg −0.5 and was cancelled.
+
+- **Filled sites give a nearly Vg-independent rising line.** At y 3.0 and 4e18, the curves for Vg −1.5 to +0.5 agree within about 10% from 5 to 10 V (7.6 to 325 mA/mm), with almost no current below 4 V.
+- **This depends on trap memory and on the coarse mesh.** The first curve doesn't show this line. radFine repeats it on 5 nm, and takes fresh curves with no memory. Until then, this is a lead only.
+- **A question this raises for the measured data:** the order of the Vg curves matters if traps persist.
 
 ## Open
 
-Mesh dependence of the steps, the current after a step against Vg (radFam, job 49606874), depth, width, and multiple sites.
+Collapse threshold in density and width, convergence after a collapse, the Vg family on the fine mesh (all radFine); whether to run depth and multi-strike, and on what mesh.
 
 Related: [[rad-model]], [[ron-increase]], [[rad-literature]], [[critical-strike]], [[mesh]], [[hot-electron-capture]].

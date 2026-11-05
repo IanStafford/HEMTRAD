@@ -1855,3 +1855,14 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   4. Check every task's logs before plotting.
 - **Questions for Ian (not blocking):** R33 pre-curve width; whether the steps or shared line could be instrument effects (range, compliance, sweep order); whether pre and post are the same device, and whether a control exists.
 - **Also for Ian:** during the literature review, the agent used a browser user-agent on some curl downloads and hit bot walls; IOP's was not bypassed. Blocked publishers leave some key papers read only from abstracts or not at all, marked in `kb/results/rad-literature.md`.
+
+## 2026-11-05: mesh check overturns the steps; overnight runs analysed
+
+- **Correction: the steps reported Nov 4 were mesh artifacts.** radMesh 49606872 (11 tasks, no crashes): a 0.3 um, 4e18 site has steps of 84-157 mA/mm on the standard mesh and under 8 at 10 and 5 nm; Id at 10 V converges to about 560 mA/mm (0.55) at all three positions. The "source side is worst" claim is withdrawn. Vth, Ron and gm stand. Dashboard and notes corrected.
+- **0.1 um, 1.2e19 site (same total charge):** collapses near 1 V on all three meshes; after that it isn't converged (Id at 10 V 0.1, 26, 76 mA/mm).
+- **radFam 49606874 (standard mesh, provisional):** with traps kept filled from earlier curves, sites give a nearly Vg-independent rising line (y 3.0: within about 10% from 5 to 10 V for Vg -1.5 to +0.5). Needs the fine-mesh repeat. Task 0 (trap-free ref) stuck at Vg -0.5, cancelled after 12.9 h with Ian's permission.
+- **radRon 49606877, radStress 49606875, radVth2 49606876, radVth3 49614033, radVth 49570570: all finished, no crashes.** Ron: `kb/results/ron-increase.md`. Field damage at low exponent reaches at most +9%. Back-gating +0.108 V at 1e17. `sin_polAll9e+12` finished by itself, no cancel needed.
+- **seeGen2 49511531 cancelled with Ian's permission** (22.9 h): both tasks took a bad step at about 1.4 ns and stopped advancing. Current peaks near 0.7 ns (2.37, 2.02 mA/um), and falls to 2.08, 1.89 by about 1.35 ns. No 10 ns result. `kb/results/see-plan.md`.
+- **Ian on R33:** the width is unknown; the Excel came with no context; same-device pre and post exist but he doesn't have them; no comprehensive dataset yet. So pre-referenced R33 numbers are not usable quantitatively.
+- **Submitted radFine 49735196** (19 tasks, under plan approval): density and width threshold at 5 nm, 2.5 nm convergence, positions, Vg family at 5 nm with and without trap memory, trap-free ref curves through an empty trap model, final SiN curve (radFinal11 set) at 10 nm.
+- **On hold, Ian to decide:** depth and multi-strike, and on which mesh. Every site needs a fine mesh, about 1.5x the time.
