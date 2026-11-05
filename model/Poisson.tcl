@@ -99,8 +99,15 @@ proc ThawTraps {} {
 
 # Record the present trapped charge as captured: from now on the traps can fill
 # further but not empty (no emission) until ThawTraps.
+# emitFrac (lever, default off): on each call, that fraction of the charge above the live
+# occupancy is released first, a crude emission per step. 1 = no memory, live occupancy.
 proc CaptureTraps {} {
-    sel z=IonAcceptor name=TrapFrozen
+    global emitFrac
+    if {[info exists emitFrac] && $emitFrac > 0.0} {
+        sel z=(1.0-$emitFrac)*IonAcceptor+1.0e-30*(1.0+x*x) name=TrapFrozen
+    } else {
+        sel z=IonAcceptor name=TrapFrozen
+    }
 }
 
 # Local-field electron temperature, Te = T + (2/3) tau v(E) E / (k/q), with

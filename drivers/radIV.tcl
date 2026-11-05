@@ -105,6 +105,7 @@ if {![info exists damSites]}  { set damSites {} }
 if {![info exists stressSkip]} { set stressSkip 0 }
 # VgFam: extra Id-Vd curves, one per Vg in the list, in that order (like the measured
 # family; fill-only traps keep their state between curves), to <tag>_IdVdG<Vg>.csv. {} = none.
+if {![info exists emitRest]} { set emitRest 0.0 }  ;# fraction of the captured charge released at rest before each Id-Vd curve
 if {![info exists noRampBack]} { set noRampBack 0 }    ;# 1: stop after the last curve, no ramp back to rest (nothing is measured after it)
 if {![info exists VgFam]}     { set VgFam {} }
 # low-field mobility factor in a window (with mobDamFac set, GaN.tcl multiplies by the
@@ -341,7 +342,12 @@ proc DamageIn {tg} {
 
 # One Id-Vd curve at gate voltage vg, from rest and back, to file fn.
 proc IdVdCurve {tg vg fn} {
-    global Vd_max Vd_step retryDepth useTraps te
+    global Vd_max Vd_step retryDepth useTraps te emitRest
+    if {$useTraps && $emitRest > 0.0} {
+        sel z=(1.0-$emitRest)*TrapFrozen+1.0e-30*(1.0+x*x) name=TrapFrozen
+        SaveState
+        if {[catch {device}]} { RestoreState; puts "emitRest solve failed"; return 0 }
+    }
     if {![Ramp G 0.0 $vg 0.1]} { return 0 }
     if {$useTraps} { CaptureTraps }
     set f [open $fn w]

@@ -201,3 +201,16 @@ for lab, ys in sets:
     for d in ("hk", "sin"):
         cases.append((d, f"ms_{lab}", multi(ys)))
 writex("radMulti", cases)
+
+# ---- trap emission (Ian, 2026-11-05): fill-only and fully fresh are the two extremes tried so far.
+# emitFrac: some of the excess charge leaks per capture call. emitRest: some leaks at rest between
+# curves, which could leave low Vd normal and then refill onto a line. SiN, 5 nm in the site.
+ESITES = (("A", 3.0, 0.3, 4e18), ("B", 1.5, 0.3, 8e18), ("C", 1.5, 0.1, 1.2e19))
+cases = []
+for lab, y, w, n in ESITES:
+    for f in (0.01, 0.03, 0.1, 0.3, 1.0):
+        cases.append(("sin", f"site{lab}_ef{f:g}", sc(y, w, n) + f";emitFrac={f:g};doIdVg=0"))
+for lab, y, w, n in ESITES[:2]:
+    for r in (0.5, 0.9, 0.99):
+        cases.append(("sin", f"site{lab}_er{r:g}", sc(y, w, n) + f";emitRest={r:g};doIdVg=0;VgFam={{-1.5 -1 -0.5 0 0.5}}"))
+writex("radEmit", cases)
