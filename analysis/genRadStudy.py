@@ -140,3 +140,38 @@ write("radStress", cases)
 # of the traps are charged, checked locally). A level 3.3 eV below Ec is filled there.
 cases = [(f"buf{n:g}_L3.3", sitecase((*A, 0.1, 1.4, n)) + ";trapLevel=3.3") for n in (1e15, 1e16, 1e17)]
 write("radVth3", cases, "Vd_max=5.0")
+
+# ---- after radMesh: the 0.3 um / 4e18 steps went away at 10 and 5 nm, the 0.1 um site kept a collapse.
+# Always 5 nm here unless labelled. Where does a real collapse start, is it converged, and does the
+# line after it depend on Vg? Fresh curves use Vg_out (no trap memory); VgFam keeps the traps
+# filled by the earlier curves.
+M05 = lambda a, b, sp=0.005: fine(a, b, sp)
+def site(yc, w, n):
+    return (yc - w / 2, yc + w / 2, 0.0, 0.05, n)
+def sc(yc, w, n, sp=0.005):
+    s = site(yc, w, n)
+    return sitecase(s) + ";" + fine(s[0], s[1], sp)
+cases = []
+for n in (6e18, 8e18, 1.2e19):
+    cases.append(("hk", f"y1.5_w0.3_n{n:g}", sc(1.5, 0.3, n)))
+for n in (4e18, 6e18, 8e18):
+    cases.append(("hk", f"y1.5_w0.1_n{n:g}", sc(1.5, 0.1, n)))
+cases.append(("hk", "y1.5_w0.1_n1.2e19_m025", sc(1.5, 0.1, 1.2e19, 0.0025)))
+cases.append(("hk", "y3.0_w0.1_n1.2e19", sc(3.0, 0.1, 1.2e19)))
+cases.append(("hk", "y-0.9_w0.1_n1.2e19", sc(-0.9, 0.1, 1.2e19)))
+FAMV = "VgFam={-2 -1.5 -1 -0.5 0 0.5}"
+cases.append(("sin", "fam_y3.0_w0.3_n4e18", sc(3.0, 0.3, 4e18) + ";" + FAMV))
+cases.append(("sin", "fam_y1.5_w0.1_n1.2e19", sc(1.5, 0.1, 1.2e19) + ";" + FAMV))
+for vg in (-2, -1, 0):
+    cases.append(("sin", f"fresh_y1.5_w0.1_n1.2e19_G{vg}", sc(1.5, 0.1, 1.2e19) + f";doIdVg=0;Vg_out={vg}"))
+# trap-free family curves that radFam's ref could not finish: an empty trap density gets through
+# the same off-state solves. G-1 checks it against the plain ref.
+for vg in (-1, -0.5, 0, 0.5):
+    cases.append(("sin", f"ref_G{vg}", f"{SKIP};damSites={{{{-1.25 3.41 0 0.05 1}}}};doIdVg=0;Vg_out={vg}"))
+# is the final SiN curve's two-step collapse also a mesh effect? radFinal11 set, 10 nm from 0.3 to 1.6 um
+FINAL = ("polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;hotEb=1.0;"
+         "hotTau=1e-14;damXmax=0.05;damMax=1e20;trapLevel=0.30;damField=lat;damEref=5.0e5;damM=4;damYmin=0.30;"
+         "deviceDeck=rfdevice_SiN.tcl;damPeak=@P;hotEb=0.5;dam2Field=lat;dam2M=0;dam2Ymin=-0.125;dam2Ymax=0.125;dam2Peak=5e17;"
+         "dam2Xmax=0.014;dam3Peak=@S;Vd_step=0.1;retryDepth=8;meshY={0.3 0.01 1.6 0.01}")
+cases.append(("sin", "final_m10", FINAL.replace("@P", "6e18").replace("@S", "4.5e18")))
+writex("radFine", cases)
