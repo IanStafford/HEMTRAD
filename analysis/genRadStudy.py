@@ -64,3 +64,73 @@ cases = [("ref", "")]
 for n in (1e18, 4e18):
     cases += [(f"y{(a + b) / 2:.2f}_n{n:g}", sitecase((a, b, 0.0, 0.05, n))) for a, b in Y]
 write("radMap1", cases)
+
+
+# ---- explicit deck lists for the follow-up studies
+def writex(name, cases, common=""):
+    """cases: (deck, label, levers); deck is 'hk' or 'sin'."""
+    dl = dict(DECKS)
+    with open(f"sweeps/params_{name}.txt", "w") as f:
+        for d, lab, lev in cases:
+            extra = ";".join(x for x in (BASE, common, dl[d], lev) if x)
+            f.write(f"{d}_{lab}|{extra}\n")
+    print(name, len(cases))
+
+
+def fine(y0, y1, sp):
+    return f"meshY={{{y0:g} {sp:g} {y1:g} {sp:g}}}"
+
+
+# ---- do the steps survive a finer mesh? same sites as radMap1, 10 and 5 nm across the site
+MS = {"y3.00": (2.85, 3.15), "y1.50": (1.35, 1.65), "y-0.90": (-1.05, -0.75)}
+cases = []
+for lab, (a, b) in MS.items():
+    for sp, sl in ((0.01, "m10"), (0.005, "m05")):
+        cases.append(("hk", f"{lab}_{sl}", sitecase((a, b, 0.0, 0.05, 4e18)) + ";" + fine(a, b, sp)))
+a, b = MS["y3.00"]
+cases.append(("sin", "y3.00_m05", sitecase((a, b, 0.0, 0.05, 4e18)) + ";" + fine(a, b, 0.005)))
+cases.append(("hk", "y3.00_step0.1", sitecase((a, b, 0.0, 0.05, 4e18)) + ";Vd_step=0.1"))
+# a 0.1 um site with the same total charge, the width most exposed to the mesh
+n01 = (1.45, 1.55, 0.0, 0.05, 1.2e19)
+cases.append(("hk", "w0.1", sitecase(n01)))
+for sp, sl in ((0.01, "m10"), (0.005, "m05")):
+    cases.append(("hk", f"w0.1_{sl}", sitecase(n01) + ";" + fine(1.45, 1.55, sp)))
+writex("radMesh", cases)
+
+# ---- Vg family on SiN (R33 is SiN): is the current after a step independent of Vg?
+S4 = lambda a, b: (a, b, 0.0, 0.05, 4e18)
+cases = [("sin", "ref", ""),
+         ("sin", "y-0.90", sitecase(S4(-1.05, -0.75))),
+         ("sin", "y1.50", sitecase(S4(1.35, 1.65))),
+         ("sin", "y3.00", sitecase(S4(2.85, 3.15))),
+         ("sin", "3sites", sitecase(S4(1.05, 1.35), S4(1.95, 2.25), S4(2.85, 3.15))),
+         ("sin", "ins1e18", f"{SKIP};insTrapSign=-1;damInsPeak=1e18;damInsM=0;damInsXmin=-0.05"),
+         ("sin", "nb", f"surfCharge=-4.0e11;{SKIP};{sites((-0.125, 0.125, 0.0, 0.014, 5e17))}")]
+writex("radFam", cases, "VgFam={-2 -1.5 -1 -0.5 0 0.5}")
+
+# ---- Vth, second pass: the first buffer and dielectric cases could not act
+# A level 0.30 eV below Ec stays empty in the buffer, so those traps carry no charge: repeat
+# with deep levels. The first ins cases inherited damYmin = 0.30: repeat with charge at the gate.
+cases = []
+for lev in (1.0, 1.7):
+    cases += [(f"buf{n:g}_L{lev:g}", sitecase((*A, 0.1, 1.4, n)) + f";trapLevel={lev:g}") for n in (1e16, 1e17, 5e17)]
+INS = "insTrapSign=-1;damInsM=0;damInsXmin=-0.05"
+cases += [(f"insAll{n:g}", f"{SKIP};{INS};damInsPeak={n:g};damYmin=-1.3") for n in (1e17, 5e17, 1e18)]
+cases += [(f"insGate{n:g}", f"{SKIP};{INS};damInsPeak={n:g};damYmin=-0.35;damYmax=0.40") for n in (1e17, 5e17, 1e18)]
+write("radVth2", cases, "Vd_max=5.0")
+
+# ---- Phase 4: Ron candidates with Ron(Vg), low Vd only
+GD = (0.125, 3.285)
+SD = (YSRC, -0.125)
+cases = [("ref", ""), ("nb", f"surfCharge=-4.0e11;{SKIP};{sites((-0.125, 0.125, 0.0, 0.014, 5e17))}")]
+for lab, (a, b) in (("GD", GD), ("SD", SD), ("All", A)):
+    cases += [(f"mob{lab}{m:g}", f"mobDamFac={m:g};mobDamYmin={a:g};mobDamYmax={b:g}") for m in (0.8, 0.5, 0.3)]
+for lab, w in (("GD", GD), ("SD", SD)):
+    cases += [(f"ch{lab}{n:g}", sitecase((*w, 0.015, 0.05, n))) for n in (1e17, 5e17, 2e18)]
+cases += [(f"algGD{n:g}", sitecase((*GD, 0.0, 0.014, n))) for n in (5e17, 1e18, 5e18)]
+cases += [(f"insGD{n:g}", f"{SKIP};{INS};damInsPeak={n:g}") for n in (1e17, 5e17, 1e18)]
+write("radRon", cases, "Vd_max=1.0;VgFam={-2 -1 0}")
+
+# ---- Phase 4: damage that follows the irradiation field at a low exponent, with the stress solve
+cases = [(f"f{m}_p{p:g}", f"damM={m};damPeak={p:g}") for m in (1, 2) for p in (5e17, 2e18)]
+write("radStress", cases)

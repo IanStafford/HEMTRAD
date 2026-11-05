@@ -54,6 +54,8 @@ proc HEMT_Struct { } {
     line y loc=[expr $Gtr+$FP2] spac=0.02 tag=rightFP
     line y loc=[expr $Gtr+$DrainGate] spac=0.05 
     line y loc=[expr $Gtr+$DrainGate+0.125] spac=0.05 tag=right
+    # optional local refinement, {y spacing y spacing ...} in um (default none)
+    if {[info exists ::meshY]} { foreach {yl sl} $::meshY { line y loc=$yl spac=$sl } }
 
     #work layers top down, left to right
     region Metal xlo=topFP xhi=bottomFP ylo=leftFP yhi=rightFP
