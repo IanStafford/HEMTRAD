@@ -344,6 +344,8 @@ proc DamageIn {tg} {
 proc IdVdCurve {tg vg fn} {
     global Vd_max Vd_step retryDepth useTraps te emitRest
     if {$useTraps && $emitRest > 0.0} {
+        # cold electrons at rest: a stale hot TeTrap would refill the traps at the next capture
+        ResetTe
         sel z=(1.0-$emitRest)*TrapFrozen+1.0e-30*(1.0+x*x) name=TrapFrozen
         SaveState
         if {[catch {device}]} { RestoreState; puts "emitRest solve failed"; return 0 }

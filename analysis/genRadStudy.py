@@ -214,3 +214,10 @@ for lab, y, w, n in ESITES[:2]:
     for r in (0.5, 0.9, 0.99):
         cases.append(("sin", f"site{lab}_er{r:g}", sc(y, w, n) + f";emitRest={r:g};doIdVg=0;VgFam={{-1.5 -1 -0.5 0 0.5}}"))
 writex("radEmit", cases)
+
+# ---- emitRest again, with TeTrap reset at rest. 1e-9 = charge kept, electrons cold: the memory case.
+cases = []
+for lab, y, w, n in ESITES[:2]:
+    for r in (1e-9, 0.5, 0.9, 0.99):
+        cases.append(("sin", f"site{lab}_er{r:g}", sc(y, w, n) + f";emitRest={r:g};doIdVg=0;VgFam={{-1.5 -0.5 0.5}}"))
+writex("radEmit2", cases)

@@ -116,6 +116,20 @@ With curves run in the order Vg +1, then −2 upward, traps stay filled, because
 - **So an abrupt step can't be one track switching.** A step's size is the fraction of the width that switches. The measured steps are many times what one track's column could give, and larger than all the tracks together, which needs damage or switching that spreads across a large part of the width, or a measurement effect.
 - **Limits:** this leaves out current spreading, which would shrink the effect further, and lateral spread of damage under bias, which would enlarge it. 0.16 µm is the estimate from [[critical-strike]].
 
+## Trap emission (radEmit, job 49834170, 2026-11-05)
+
+Crude levers, with no time constant: `emitFrac` releases a fraction of the excess charge per capture. SiN, 5 nm in the site, Id–Vd at Vg +1 V. 15 tasks, no crashes; 12 stopped before 10 V or nearly so.
+
+| Site | Fill-only, 10 V | With `emitFrac` 0.01 to 1 |
+|---|---|---|
+| y 3.0, 0.3 µm, 4e18 | smooth, 557 | same to about 7 V (574 at 7 V for 0.3 and 1), wiggles of 15–26 at 0.01–0.03, solver stops at 7.5–8 V for 0.1 and above |
+| y 1.5, 0.3 µm, 8e18 | about 240 | same limit near 243, solver stops at 2.25–3.75 V |
+| y 1.5, 0.1 µm, 1.2e19 | about 130 | level 120–150, with single-point spikes to 12–38 that recover at the next point |
+
+- **No clean step onto a lower line.** The current limit doesn't move with emission. The spikes recover at once, so they look numerical.
+- **Removing memory makes the solver stop sooner**, so what lies past those points is unknown. A last drop of about 45 mA/mm just before stopping at site A hasn't been followed.
+- **`emitRest` had a bug:** it left TeTrap hot from the previous curve, which refilled the traps at the next capture. Those 6 tasks were cancelled. Fixed; rerun as radEmit2 (8 tasks).
+
 ## Open
 
 Trap emission (radEmit, job 49834170), which limits how far the memory result can be pushed; what actually produces abrupt steps in the measured curves, since neither the 2D sites nor isolated tracks do.

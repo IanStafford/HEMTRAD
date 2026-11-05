@@ -1887,3 +1887,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Emission, Ian's OK:** new levers `emitFrac` (`model/Poisson.tcl`) and `emitRest` (`drivers/radIV.tcl`), default off (06f08b4). Smoke-tested locally. This is a crude stand-in with no time constant, a fraction per step, not a physical emission rate.
 - **radEmit 49834170** (21 tasks, SiN, 5 nm in the site, 6 GB): emitFrac 0.01-1 at 3 sites; emitRest 0.5, 0.9, 0.99 with a Vg family at 2 sites. Any step that appears gets a mesh check before it counts.
 - Local smoke test went to the repo root because the scratch folder had gone; those files are removed, nothing committed.
+
+## 2026-11-05 evening: emitFrac analysed, emitRest bug fixed and rerun
+
+- **radEmit 49834170, emitFrac (15 tasks, no crashes, 12 stopped early):** no clean step onto a lower line; the current limit doesn't move (about 550-570, 243, 130 mA/mm at the 3 sites). Spikes at site C recover at the next point. Solver stops earlier as memory goes.
+- **emitRest bug (mine):** TeTrap stayed hot from the previous curve and refilled the traps at the next capture. The 6 tasks were cancelled with Ian's standing permission at 2.8 h. Their one striking curve (site B, 251 to 74 mA/mm at 5.75 V, then rising) came from that state and doesn't count.
+- **Trap memory caveat:** the earlier family runs (radFam, radFine) also had a stale TeTrap at the start of each curve. Their filled traps were mostly captured at high Vd anyway, but radEmit2's 1e-9 case retests this with cold electrons.
+- **radEmit2 submitted:** fix adds `ResetTe` in `emitRest`; 8 tasks, sites A and B, emitRest 1e-9, 0.5, 0.9, 0.99, Vg -1.5, -0.5, +0.5 after +1. Expect several hours.
