@@ -178,6 +178,17 @@ Figure: `figures/rad/gauss_mesh.png`. σ 40 nm at the surface, hotEb 1.0, Vd ste
 - **The Oct 29 slide's "only the recovery differs":** at 5 nm SiN recovers higher above 6 V (about 180 against 115–123 at 10 V), the reverse of the standard-mesh result.
 - **Not yet settled:** shape or barrier (these use hotEb 1.0, the uniform sites 0.5), 2.5 nm convergence, onset against Vg. All in radGauss2.
 
+## Converged collapse, and what it needs (radGauss2 job 50148046, radChk2 job 50128862, radEmit3 job 50128200)
+
+All three finished with no crashes. Id in mA/mm, Vg +1 unless stated.
+
+- **The Gaussian collapse is converged.** At 2.5 nm, 0.30 eV drops near 1.2 V to 36 at 2 V and recovers to about 160 by 5 V, matching 5 nm. 0.55 eV drops at 0.3–0.4 V to 0 at 0.5 V, then creeps to 42 at 10 V, again matching 5 nm.
+- **The capture barrier decides it.** The same Gaussian at hotEb 0.5 (the final model's value) loses only 25 mA/mm at 1.8 V, with no collapse. A wider Gaussian (σ 0.1 µm, more charge) at hotEb 1.0 collapses at 1.4 V to about 0 and stays below 4 by 10 V.
+- **Onset barely moves with Vg** (SiN, 0.30 eV): 1.4 V at Vg −1.5, 1.3 V at −0.5 and 0, 1.2–1.3 V at +1. The level after recovery is the same at every Vg, 178–180 at 10 V. That shared, gate-independent level resembles R33. R33's onset moves later at higher Vg; this one doesn't.
+- **The deck contrast survives a fine mesh** (biased, 10 nm over y 0.3–2.0): HighK 952 at 10 V, no collapse (standard mesh 953); SiN one site 503 (standard 500). The difference comes from where the stress field puts damage, not from the mesh.
+- **Site B's drops (8e18, hotEb 0.5) persist at 2.5 nm:** 38–102 mA/mm at 5–9.75 V depending on Vg, and they recover within a volt or two. Real, or at least not removed by refinement, but they're dips rather than drops onto a lower line.
+- **Partial release at rest (5 nm):** site A at 10–30% released starts low and rises smoothly to the limit, with no drop. Site B at 10–20% is blocked to 3–4 V, then rises. Site B at 30% and Vg +0.5 drops from 251 to 79 at 7.5 V and then rises (92, 103): the closest thing to R33's shape so far, but one curve, and at a density where dips are common.
+
 ## Open
 
 Release between 0 and 50% and the 2.5 nm check (radEmit3); what actually produces abrupt steps in the measured curves, since neither the 2D sites nor isolated tracks do.

@@ -1913,3 +1913,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **radGauss 50128863** (8 tasks, no crashes): correction to "no steps survive a fine mesh". Gaussian traps at hotEb 1.0 still drop abruptly at 5 nm: 157 to 10 mA/mm near 1.3 V at 0.30 eV, recovering by 5 V; 17 to 0.06 mA/mm at 0.3-0.4 V at 0.55 eV, then creeping. Onset no longer depends on position. Recovery at 0.30 eV differs a lot from the standard mesh, and the deck order reverses.
 - **radGauss2 50148046** (7 tasks): 2.5 nm at both levels, hotEb 0.5, sigma 0.1, SiN at Vg -1.5, -0.5, 0.
 - radChk2 (HighK no collapse to 8.25 V so far at 10 nm) and radEmit3 still running. radEmit3 so far: site B's drops persist at 2.5 nm.
+
+## 2026-11-07 evening: radGauss2, radChk2, radEmit3 analysed
+
+- **radGauss2 50148046:** Gaussian collapse converged at 2.5 nm (both levels). hotEb 0.5 gives no collapse; hotEb 1.0 does. Onset 1.2-1.4 V at Vg -1.5 to +1, flat with Vg (R33 moves later at higher Vg). Post-collapse level the same at every Vg.
+- **radChk2 50128862:** biased HighK 952 and SiN one-site 503 mA/mm at 10 V at 10 nm, matching the standard mesh. Deck contrast is not a mesh effect.
+- **radEmit3 50128200:** site B dips persist at 2.5 nm; partial release gives smooth rising curves, with one R33-like curve (site B, 30%, Vg +0.5).
+- **Decision for Ian:** the final model uses hotEb 0.5, which can't collapse on a fine mesh. Test the final set at hotEb 1.0 on 10 nm (2-4 tasks)? Changing the final model needs his OK.
