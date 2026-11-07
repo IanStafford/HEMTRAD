@@ -1906,3 +1906,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **radChk2 50128862** (2 tasks): biased HighK and SiN one-site at 10 nm over y 0.3-2.0. **radGauss 50128863** (8 tasks, pulsedIV): the Oct 29 slide's Gaussian set at 5 nm on both decks; Gaussian at 0.55 eV on standard and 5 nm. **radMap2 50128864** (56 tasks): radMap1's 14 windows at 5 nm, 4e18 and 8e18, both decks, including under the gate.
 - First placement figure from existing data: `figures/rad/placement_w0.1.png` (`analysis/radPlacementFig.py`). Level about 120-135 mA/mm on the drain side, 64-117 on the source side; Vd/Id at 0.25 V is 3.44-3.52 everywhere.
 - Correction: "no steps survive a fine mesh" was only tested for sharp-edged sites at 0.30 eV. An older check found a Gaussian at 0.55 eV still collapses on 4 nm; radGauss retests it.
+
+## 2026-11-07 afternoon: radMap2 and radGauss analysed; Gaussian traps collapse on a fine mesh
+
+- **radMap2 50128864** (56 tasks, no crashes, 2 stopped before 10 V): 4e18 is clean, with three zones and no real steps; 8e18 has drain-side drops at about 7-8.5 V that aren't settled.
+- **radGauss 50128863** (8 tasks, no crashes): correction to "no steps survive a fine mesh". Gaussian traps at hotEb 1.0 still drop abruptly at 5 nm: 157 to 10 mA/mm near 1.3 V at 0.30 eV, recovering by 5 V; 17 to 0.06 mA/mm at 0.3-0.4 V at 0.55 eV, then creeping. Onset no longer depends on position. Recovery at 0.30 eV differs a lot from the standard mesh, and the deck order reverses.
+- **radGauss2 50148046** (7 tasks): 2.5 nm at both levels, hotEb 0.5, sigma 0.1, SiN at Vg -1.5, -0.5, 0.
+- radChk2 (HighK no collapse to 8.25 V so far at 10 nm) and radEmit3 still running. radEmit3 so far: site B's drops persist at 2.5 nm.
