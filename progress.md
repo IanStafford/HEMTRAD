@@ -1894,3 +1894,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **emitRest bug (mine):** TeTrap stayed hot from the previous curve and refilled the traps at the next capture. The 6 tasks were cancelled with Ian's standing permission at 2.8 h. Their one striking curve (site B, 251 to 74 mA/mm at 5.75 V, then rising) came from that state and doesn't count.
 - **Trap memory caveat:** the earlier family runs (radFam, radFine) also had a stale TeTrap at the start of each curve. Their filled traps were mostly captured at high Vd anyway, but radEmit2's 1e-9 case retests this with cold electrons.
 - **radEmit2 submitted:** fix adds `ResetTe` in `emitRest`; 8 tasks, sites A and B, emitRest 1e-9, 0.5, 0.9, 0.99, Vg -1.5, -0.5, +0.5 after +1. Expect several hours.
+
+## 2026-11-07: radEmit2 analysed; radEmit3 submitted
+
+- **radEmit2 49853997** (8 tasks, no crashes, all to 10 V): with cold electrons at rest, the rising Vg-independent line survives with memory kept. Site A is near normal once 50% is released. Site B at 90% has normal low Vd, then drops of 24-52 mA/mm per point near 5.5 V that recover by 10 V, at about the same Vd for all Vg. Not counted until the mesh check. Details: `kb/results/damage-region-map.md`.
+- **radEmit3 50128200** (8 tasks, 8 GB): site B at 90% and 99% on 2.5 nm; sites A and B released 10, 20, 30%.
+- **Still waiting on Ian:** final model wording, and whether to update the explainer and the Oct 29 group deck. Dashboard not updated since the fine-mesh results.
