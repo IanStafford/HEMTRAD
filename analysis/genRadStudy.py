@@ -231,3 +231,31 @@ for lab, y, w, n in ESITES[:2]:
     for r in (0.1, 0.2, 0.3):
         cases.append(("sin", f"site{lab}_er{r:g}", sc(y, w, n) + f";emitRest={r:g};{FAM3}"))
 writex("radEmit3", cases)
+
+# ---- 2026-11-07: fine-mesh check of what the Oct 29 slides rest on (Ian). Biased curves at 10 nm;
+# the fixed Gaussian trap set of job 47062225 at 5 nm through pulsedIV; Gaussians at 0.55 eV.
+FB = ("polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;hotEb=0.5;"
+      "hotTau=1e-14;damXmax=0.05;damMax=1e20;trapLevel=0.30;damField=lat;damEref=5.0e5;damM=4;damYmin=0.30;damPeak=7e18;"
+      "dam2Field=lat;dam2M=0;dam2Ymin=-0.125;dam2Ymax=0.125;dam2Peak=5e17;dam2Xmax=0.014;noRampBack=1;meshY={0.3 0.01 2.0 0.01}")
+with open("sweeps/params_radChk2.txt", "w") as f:
+    f.write(f"hk_b_m10|{FB}\n")
+    f.write(f"sin_b_m10|{FB};deviceDeck=rfdevice_SiN.tcl\n")
+print("radChk2 2")
+PI = ("trapEn=1;trapSigma=0.04;trapMeanX=0.0;trapWidth=0.1;hotEb=1.0;hotTau=1e-14;hotMu=600;hotVsat=1.9e7;fillIters=4;"
+      "fillRelax=0.5;eTemp=0;Vg_meas=1.0;Vd_max=10.0;Vd_step=0.1;dampValue=0.05;mobModel=field")
+def gcase(lab, deck, y, peak, lev, sp):
+    m = f";meshY={{{y - 0.16:g} {sp:g} {y + 0.16:g} {sp:g}}}" if sp else ""
+    return f"{lab}|{PI};deviceDeck={deck};trapMeanY={y:g};trapPeak={peak:g};trapLevel={lev:g};ivCSV=pulsedIV_{lab}.csv{m}\n"
+with open("sweeps/params_radGauss.txt", "w") as f:
+    for y in (1.0, 2.4):
+        f.write(gcase(f"hk_y{y:g}_L0.3_m05", "rfdevice.tcl", y, 5e18, 0.30, 0.005))
+        f.write(gcase(f"sin_y{y:g}_L0.3_m05", "rfdevice_SiN.tcl", y, 5e18, 0.30, 0.005))
+        f.write(gcase(f"hk_y{y:g}_L0.55", "rfdevice.tcl", y, 4e18, 0.55, 0))
+        f.write(gcase(f"hk_y{y:g}_L0.55_m05", "rfdevice.tcl", y, 4e18, 0.55, 0.005))
+print("radGauss 8")
+# ---- refined position map: radMap1's 14 windows at 5 nm, including under the gate
+cases = []
+for n in (4e18, 8e18):
+    for a, b in Y:
+        cases.append((f"y{(a + b) / 2:.2f}_n{n:g}", sitecase((a, b, 0.0, 0.05, n)) + ";" + fine(a, b, 0.005)))
+write("radMap2", cases)
