@@ -128,10 +128,28 @@ Crude levers, with no time constant: `emitFrac` releases a fraction of the exces
 
 - **No clean step onto a lower line.** The current limit doesn't move with emission. The spikes recover at once, so they look numerical.
 - **Removing memory makes the solver stop sooner**, so what lies past those points is unknown. A last drop of about 45 mA/mm just before stopping at site A hasn't been followed.
-- **`emitRest` had a bug:** it left TeTrap hot from the previous curve, which refilled the traps at the next capture. Those 6 tasks were cancelled. Fixed; rerun as radEmit2 (8 tasks).
+- **`emitRest` had a bug:** it left TeTrap hot from the previous curve, which refilled the traps at the next capture. Those 6 tasks were cancelled and rerun with the fix.
+
+### Release at rest (radEmit2, job 49853997, 8 tasks, no crashes)
+
+SiN, 5 nm in the site, all reached 10 V. Curves run in the order Vg +1, −1.5, −0.5, +0.5, with electrons cold at rest. Id in mA/mm.
+
+| Site, released | Vd 0.25 V (Vg +0.5) | Vd 4 V | Vd 10 V | Shape |
+|---|---|---|---|---|
+| A (y 3.0, 0.3 µm, 4e18), none | 0.0 | 285 | 554 | rising line, same for all Vg until the gate limits it |
+| A, 50% | 83 | 527 | 560 | near normal |
+| A, 90%, 99% | 86 | 539–541 | 558–560 | normal |
+| B (y 1.5, 0.3 µm, 8e18), none | 0.0 | 0 | 152 | blocked to about 6.5 V, then a shared rising line |
+| B, 50% | 18 | 242 | 250 | low Vd depressed, smooth rise to the limit |
+| B, 90% | 66 | 236 | 250 | normal low Vd, at limit by 2 V, drop near 5.5 V, recovers by 10 V |
+| B, 99% | 66 | 247 | 242 | normal low Vd, shallower drops near 7–8 V |
+
+- **Trap memory holds with cold electrons:** the rising, Vg-independent line is not from the stale TeTrap.
+- **Low Vd switches between dead and normal somewhere under 50% released.** Between the two extremes is untested (radEmit3).
+- **Site B's drops (24–52 mA/mm per point) don't count yet.** They come at about the same Vd for every Vg, return to the same limit rather than settling on a lower line, and look like the wiggles already seen at this density. A 2.5 nm check is running. Measured onset moves with Vg; these don't.
 
 ## Open
 
-Trap emission (radEmit, job 49834170), which limits how far the memory result can be pushed; what actually produces abrupt steps in the measured curves, since neither the 2D sites nor isolated tracks do.
+Release between 0 and 50% and the 2.5 nm check (radEmit3); what actually produces abrupt steps in the measured curves, since neither the 2D sites nor isolated tracks do.
 
 Related: [[rad-model]], [[ron-increase]], [[rad-literature]], [[critical-strike]], [[mesh]], [[hot-electron-capture]].

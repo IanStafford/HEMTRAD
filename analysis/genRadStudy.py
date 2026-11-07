@@ -221,3 +221,13 @@ for lab, y, w, n in ESITES[:2]:
     for r in (1e-9, 0.5, 0.9, 0.99):
         cases.append(("sin", f"site{lab}_er{r:g}", sc(y, w, n) + f";emitRest={r:g};doIdVg=0;VgFam={{-1.5 -0.5 0.5}}"))
 writex("radEmit2", cases)
+
+# ---- after radEmit2: do site B's drops at emitRest 0.9 survive 2.5 nm, and what happens between
+# full memory and 50% released, where low Vd goes from dead to normal?
+FAM3 = "doIdVg=0;VgFam={-1.5 -0.5 0.5}"
+cases = [("sin", "siteB_er0.9_m025", sc(1.5, 0.3, 8e18, 0.0025) + f";emitRest=0.9;{FAM3}"),
+         ("sin", "siteB_er0.99_m025", sc(1.5, 0.3, 8e18, 0.0025) + f";emitRest=0.99;{FAM3}")]
+for lab, y, w, n in ESITES[:2]:
+    for r in (0.1, 0.2, 0.3):
+        cases.append(("sin", f"site{lab}_er{r:g}", sc(y, w, n) + f";emitRest={r:g};{FAM3}"))
+writex("radEmit3", cases)

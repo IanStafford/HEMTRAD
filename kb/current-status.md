@@ -1,9 +1,9 @@
 ---
 title: Current status
 tags: [status]
-updated: 2026-11-05
+updated: 2026-11-07
 ---
-# Current status (as of 2026-11-05)
+# Current status (as of 2026-11-07)
 
 **Repo:** reorganised 2026-10-12 into `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/` ([[repo-locations]]); FLOOXS internals in [[flooxs-overview]].
 
