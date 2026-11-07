@@ -148,6 +148,36 @@ SiN, 5 nm in the site, all reached 10 V. Curves run in the order Vg +1, −1.5, 
 - **Low Vd switches between dead and normal somewhere under 50% released.** Between the two extremes is untested (radEmit3).
 - **Site B's drops (24–52 mA/mm per point) don't count yet.** They come at about the same Vd for every Vg, return to the same limit rather than settling on a lower line, and look like the wiggles already seen at this density. A 2.5 nm check is running. Measured onset moves with Vg; these don't.
 
+## Refined position map (radMap2, job 50128864, 56 tasks, no crashes, 2 stopped before 10 V)
+
+Figures: `figures/rad/placement_4e18.png`, `figures/rad/placement_8e18.png`. One 0.3 µm site, 5 nm, hotEb 0.5, Vg +1 V. The 4e18 map is clean; the 8e18 map isn't settled.
+
+| Site | 4e18: ΔVth, gm, Ron, Id(10 V) | 8e18: ΔVth, gm, Ron, Id(4 V) |
+|---|---|---|
+| Under the gate | +1.96, 0.59, 1.32, 0.38 | +2.74, 0.50, 2.00, 0.20 |
+| y −0.3 | 0, 0.78, 1.28, 0.50 | +0.03, 0.22, 1.80, 0.25 |
+| y 0.3 | 0, 0.89, 1.29, 0.50 | −0.02, 0.64, 1.84, 0.26 |
+| Elsewhere | 0, 0.86–0.92, 1.27–1.29, 0.53–0.55 | −0.01, 0.72–0.86, 1.75–1.81, 0.24–0.28 |
+
+- **Three zones at 4e18:** under the gate, its two neighbours, and everywhere else. Steps are 16 mA/mm or less, and the decks agree.
+- **At 8e18, drain-side curves drop by 30–120 mA/mm at about 7–8.5 V, and the source side doesn't.** Size and Vd differ between decks and positions. At y 1.5 a drop near 9.5 V stayed about the same at 2.5 nm (60 against 65 mA/mm, radEmit3), so these may not all be numerical. Unresolved.
+
+## Gaussian traps do collapse on a fine mesh (radGauss, job 50128863, 2026-11-07)
+
+Figure: `figures/rad/gauss_mesh.png`. σ 40 nm at the surface, hotEb 1.0, Vd step 0.1 V, Vg +1 V. This corrects the claim above that no abrupt behaviour survives a fine mesh; that was only tested on uniform sites at hotEb 0.5.
+
+| Set | Standard mesh | 5 nm |
+|---|---|---|
+| 0.30 eV, 5e18, y 1.0 | 154 to about 0.05 mA/mm at 1.5 V, stays down | 157 to 10 mA/mm over 1.2–1.3 V, back to about 150 by 5 V |
+| 0.30 eV, 5e18, y 2.4 | 158 to about 0 at 1.7 V, stays down | same drop at 1.2 V, same recovery |
+| 0.55 eV, 4e18, y 1.0 and 2.4 | 26 to 0.05 at 0.4–0.5 V | 17 to 0.06 at 0.3–0.4 V, then creeps up (41–51 at 10 V) |
+
+- **The collapse itself survives; its depth and recovery don't.** About 15× at 0.30 eV and about 300× at 0.55 eV, then a recovery.
+- **The onset no longer depends on position**, at least between these two sites (1.2–1.3 V, not 1.5 and 1.7 V).
+- **The 0.55 eV shape resembles the original collapse target:** sharp drop at low Vd, then creep. That target is at Vg −2; this is Vg +1.
+- **The Oct 29 slide's "only the recovery differs":** at 5 nm SiN recovers higher above 6 V (about 180 against 115–123 at 10 V), the reverse of the standard-mesh result.
+- **Not yet settled:** shape or barrier (these use hotEb 1.0, the uniform sites 0.5), 2.5 nm convergence, onset against Vg. All in radGauss2.
+
 ## Open
 
 Release between 0 and 50% and the 2.5 nm check (radEmit3); what actually produces abrupt steps in the measured curves, since neither the 2D sites nor isolated tracks do.

@@ -259,3 +259,19 @@ for n in (4e18, 8e18):
     for a, b in Y:
         cases.append((f"y{(a + b) / 2:.2f}_n{n:g}", sitecase((a, b, 0.0, 0.05, n)) + ";" + fine(a, b, 0.005)))
 write("radMap2", cases)
+
+# ---- after radGauss: Gaussian traps at hotEb 1.0 collapse abruptly at 5 nm, unlike the uniform sites at
+# hotEb 0.5. Is it converged, is it the shape or the barrier, and does the onset move with Vg?
+def g2(lab, deck, y, lev, sp, extra="", half=0.16, peak=None):
+    m = f";meshY={{{y - half:g} {sp:g} {y + half:g} {sp:g}}}"
+    pk = peak if peak else (5e18 if lev == 0.30 else 4e18)
+    return f"{lab}|{PI};deviceDeck={deck};trapMeanY={y:g};trapPeak={pk:g};trapLevel={lev:g};ivCSV=pulsedIV_{lab}.csv{m}{extra}\n"
+H, N = "rfdevice.tcl", "rfdevice_SiN.tcl"
+with open("sweeps/params_radGauss2.txt", "w") as f:
+    f.write(g2("hk_L0.3_m025", H, 1.0, 0.30, 0.0025))
+    f.write(g2("hk_L0.55_m025", H, 1.0, 0.55, 0.0025))
+    f.write(g2("hk_L0.3_eb0.5", H, 1.0, 0.30, 0.005, ";hotEb=0.5"))
+    f.write(g2("hk_L0.3_s0.1", H, 1.0, 0.30, 0.005, ";trapSigma=0.1", half=0.35))
+    for vg in (-1.5, -0.5, 0):
+        f.write(g2(f"sin_L0.3_G{vg:g}", N, 1.0, 0.30, 0.005, f";Vg_meas={vg:g}"))
+print("radGauss2 7")
