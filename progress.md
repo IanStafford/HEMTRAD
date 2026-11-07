@@ -1900,3 +1900,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **radEmit2 49853997** (8 tasks, no crashes, all to 10 V): with cold electrons at rest, the rising Vg-independent line survives with memory kept. Site A is near normal once 50% is released. Site B at 90% has normal low Vd, then drops of 24-52 mA/mm per point near 5.5 V that recover by 10 V, at about the same Vd for all Vg. Not counted until the mesh check. Details: `kb/results/damage-region-map.md`.
 - **radEmit3 50128200** (8 tasks, 8 GB): site B at 90% and 99% on 2.5 nm; sites A and B released 10, 20, 30%.
 - **Still waiting on Ian:** final model wording, and whether to update the explainer and the Oct 29 group deck. Dashboard not updated since the fine-mesh results.
+
+## 2026-11-07: fine-mesh checks and refined position map submitted (Ian)
+
+- **radChk2 50128862** (2 tasks): biased HighK and SiN one-site at 10 nm over y 0.3-2.0. **radGauss 50128863** (8 tasks, pulsedIV): the Oct 29 slide's Gaussian set at 5 nm on both decks; Gaussian at 0.55 eV on standard and 5 nm. **radMap2 50128864** (56 tasks): radMap1's 14 windows at 5 nm, 4e18 and 8e18, both decks, including under the gate.
+- First placement figure from existing data: `figures/rad/placement_w0.1.png` (`analysis/radPlacementFig.py`). Level about 120-135 mA/mm on the drain side, 64-117 on the source side; Vd/Id at 0.25 V is 3.44-3.52 everywhere.
+- Correction: "no steps survive a fine mesh" was only tested for sharp-edged sites at 0.30 eV. An older check found a Gaussian at 0.55 eV still collapses on 4 nm; radGauss retests it.
