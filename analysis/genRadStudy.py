@@ -275,3 +275,15 @@ with open("sweeps/params_radGauss2.txt", "w") as f:
     for vg in (-1.5, -0.5, 0):
         f.write(g2(f"sin_L0.3_G{vg:g}", N, 1.0, 0.30, 0.005, f";Vg_meas={vg:g}"))
 print("radGauss2 7")
+
+# ---- 2026-11-09 (Ian OK, test only): the final parameter set with the capture barrier at 1.0 eV
+# instead of 0.5, 10 nm over y 0.3-2.0. A Gaussian collapses on a fine mesh at 1.0 but not at 0.5.
+EB = ";Vd_step=0.1;retryDepth=8"
+with open("sweeps/params_radEB1.txt", "w") as f:
+    f.write(f"hk_b_eb1|{FB};hotEb=1.0{EB}\n")
+    f.write(f"sin_b_eb1|{FB};deviceDeck=rfdevice_SiN.tcl;hotEb=1.0{EB}\n")
+    f.write(f"sin_b_eb0.75|{FB};deviceDeck=rfdevice_SiN.tcl;hotEb=0.75{EB}\n")
+    f.write(f"sin_final_eb1|{FINAL.replace('@P', '6e18').replace('@S', '4.5e18').replace('meshY={0.3 0.01 1.6 0.01}', 'meshY={0.3 0.01 2.0 0.01}')};noRampBack=1;hotEb=1.0\n")
+    for d, dl in (("highk", ""), ("sin", ";deviceDeck=rfdevice_SiN.tcl")):
+        f.write(f"nb_{d}_eb1|{NB}{dl};{SKIP};{DAM2};noRampBack=1;hotEb=1.0{EB}\n")
+print("radEB1 6")
