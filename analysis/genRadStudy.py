@@ -287,3 +287,9 @@ with open("sweeps/params_radEB1.txt", "w") as f:
     for d, dl in (("highk", ""), ("sin", ";deviceDeck=rfdevice_SiN.tcl")):
         f.write(f"nb_{d}_eb1|{NB}{dl};{SKIP};{DAM2};noRampBack=1;hotEb=1.0{EB}\n")
 print("radEB1 6")
+
+# ---- radEB1 showed SiN drops at hotEb 1.0 on 10 nm; check them at 5 nm before they count
+with open("sweeps/params_radEB2.txt", "w") as f:
+    f.write(f"sin_b_eb1_m05|{FB};deviceDeck=rfdevice_SiN.tcl;hotEb=1.0{EB};meshY={{0.3 0.005 2.0 0.005}}\n")
+    f.write(f"sin_final_eb1_m05|{FINAL.replace('@P', '6e18').replace('@S', '4.5e18').replace('meshY={0.3 0.01 1.6 0.01}', 'meshY={0.3 0.005 2.0 0.005}')};noRampBack=1;hotEb=1.0\n")
+print("radEB2 2")

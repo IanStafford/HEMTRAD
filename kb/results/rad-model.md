@@ -225,3 +225,20 @@ Reachable size is a separate question: [[rad-literature]] finds no Vth data near
 Related: [[damage-region-map]], [[ron-increase]].
 
 **Correction 2026-11-05 (radFine, job 49735196): the two steps of the final SiN curve above are mesh artifacts.** With 10 nm from y 0.3 to 1.6 µm, the same parameter set gives 118 / 211 / 340 / 451 mA/mm at Vd 0.5 / 1 / 2 / 4 V, then a smooth rise to 473 at 10 V, with no step larger than 1 mA/mm. The standard mesh gave steps near 4.5 and 5.8 V and 377 at 10 V. Below the steps, the two meshes agree within 1%, so the low-Vd loss, the Vth shift and the SiN vs HighK difference stand; the late collapse does not. The model doesn't currently reproduce the measured steps. The final set is unchanged pending Ian's decision. Not yet rechecked on a fine mesh: radFinal8's other curves and the 28 V set. See [[damage-region-map]].
+
+## Capture barrier 1.0 eV in the final set (radEB1, job 50411481, 2026-11-09, test only)
+
+10 nm from y 0.3 to 2.0 µm, Vd step 0.1 V, otherwise the final set. 6 tasks, no crashes. Figure `figures/rad/hotEb_final.png`. Id in mA/mm at Vg +1 V.
+
+| Device | hotEb 0.5 (final) | hotEb 1.0 |
+|---|---|---|
+| HighK biased | smooth, 952 at 10 V | identical, 951 |
+| SiN biased, one site | 455 at 2 V, smooth, 503 at 10 V | 373 at 1.5 V, falls to 255 at 2 V, recovers to about 387, dips again near 7 V, 370 at 10 V |
+| SiN biased, one site, hotEb 0.75 | | small drop near 1.8 V (400 to 351), 448 at 10 V |
+| SiN final, two sites | smooth, 473 at 10 V | drops near 3.4 V (388 to 322) and 6.6 V (393 to 299), recovers to 376 at 10 V |
+| Non-biased, both decks | no collapse | no collapse, same curves |
+
+- Vth and gm are unchanged by the barrier (SiN two sites gm 55.8 against 68.0 pre, −18%, as before).
+- At hotEb 1.0 the model again collapses SiN and not HighK, on a fine mesh, with two drops when there are two sites. The drops recover partly between and after, unlike the measured slow creep.
+- Not counted yet: a 5 nm check of both SiN cases is running (radEB2). The final model stays at 0.5 unless Ian decides otherwise.
+
