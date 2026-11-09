@@ -1920,3 +1920,7 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **radChk2 50128862:** biased HighK 952 and SiN one-site 503 mA/mm at 10 V at 10 nm, matching the standard mesh. Deck contrast is not a mesh effect.
 - **radEmit3 50128200:** site B dips persist at 2.5 nm; partial release gives smooth rising curves, with one R33-like curve (site B, 30%, Vg +0.5).
 - **Decision for Ian:** the final model uses hotEb 0.5, which can't collapse on a fine mesh. Test the final set at hotEb 1.0 on 10 nm (2-4 tasks)? Changing the final model needs his OK.
+
+## 2026-11-09: radEB1 submitted (Ian OK, test only)
+
+- **radEB1 50411481** (6 tasks): final set at hotEb 1.0 (and SiN at 0.75), 10 nm over y 0.3-2.0, Vd step 0.1: biased HighK, biased SiN one site, final SiN two sites, non-biased both decks. Final model unchanged unless Ian decides otherwise.
