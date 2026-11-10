@@ -1929,3 +1929,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 - **radEB1 50411481** (6 tasks, no crashes): at hotEb 1.0 on 10 nm, HighK biased and non-biased devices are unchanged; SiN one site drops near 1.5-2 V (373 to 255 mA/mm) and recovers; SiN two sites drops near 3.4 and 6.6 V and recovers to 376 at 10 V. hotEb 0.75 gives a small drop. Vth, gm unchanged.
 - **radEB2 50470082** (2 tasks): both SiN cases at 5 nm. **Decision for Ian afterwards:** whether the final model moves to hotEb 1.0.
+
+## 2026-11-09 evening: radEB2 analysed
+
+- **radEB2 50470082** (2 tasks, no crashes, 6.1-6.5 h, 2.8 GB): at 5 nm the SiN one-site collapse at hotEb 1.0 matches 10 nm (374 to 256 mA/mm at 1.6-1.7 V): converged. The two-site drops shrink to 28 and 22 mA/mm with wiggles: not converged.
+- **Decision for Ian:** move the final model to hotEb 1.0 for a real SiN-only collapse (one step), or keep 0.5.

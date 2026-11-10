@@ -240,5 +240,6 @@ Related: [[damage-region-map]], [[ron-increase]].
 
 - Vth and gm are unchanged by the barrier (SiN two sites gm 55.8 against 68.0 pre, −18%, as before).
 - At hotEb 1.0 the model again collapses SiN and not HighK, on a fine mesh, with two drops when there are two sites. The drops recover partly between and after, unlike the measured slow creep.
-- Not counted yet: a 5 nm check of both SiN cases is running (radEB2). The final model stays at 0.5 unless Ian decides otherwise.
+- **5 nm check (radEB2, job 50470082, 2 tasks, no crashes):** the one-site collapse is converged: 374 to 256 mA/mm at 1.6–1.7 V, then the same recovery, within 2 mA/mm of 10 nm everywhere. The two-site drops are not: at 5 nm they shrink to 28 mA/mm at 3.4 V and 22 at 4.9 V, with smaller wiggles, ending at 395. The second site (dam3, 4.5e18 at y 1.0–1.6) is still mesh-sensitive.
+- So hotEb 1.0 gives one real, SiN-only collapse from the field-placed damage. A converged second step isn't there yet. The final model stays at 0.5 unless Ian decides otherwise.
 
