@@ -293,3 +293,14 @@ with open("sweeps/params_radEB2.txt", "w") as f:
     f.write(f"sin_b_eb1_m05|{FB};deviceDeck=rfdevice_SiN.tcl;hotEb=1.0{EB};meshY={{0.3 0.005 2.0 0.005}}\n")
     f.write(f"sin_final_eb1_m05|{FINAL.replace('@P', '6e18').replace('@S', '4.5e18').replace('meshY={0.3 0.01 1.6 0.01}', 'meshY={0.3 0.005 2.0 0.005}')};noRampBack=1;hotEb=1.0\n")
 print("radEB2 2")
+
+# ---- final rad model from 2026-11-11 (Ian): hotEb 1.0, 10 nm over y 0.3-2.0, one damage law for all devices,
+# no hand-placed second site. Same inputs as radChk (pre) and radEB1 (nb, b), so those runs are its results.
+with open("sweeps/params_radFinal12.txt", "w") as f:
+    for line in open("sweeps/params_radChk.txt"):
+        if line.startswith("pre_"):
+            f.write(line)
+    for line in open("sweeps/params_radEB1.txt"):
+        if line.split("|")[0] in ("hk_b_eb1", "sin_b_eb1", "nb_highk_eb1", "nb_sin_eb1"):
+            f.write(line)
+print("radFinal12 6")

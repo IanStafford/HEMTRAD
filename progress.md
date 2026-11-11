@@ -1934,3 +1934,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 - **radEB2 50470082** (2 tasks, no crashes, 6.1-6.5 h, 2.8 GB): at 5 nm the SiN one-site collapse at hotEb 1.0 matches 10 nm (374 to 256 mA/mm at 1.6-1.7 V): converged. The two-site drops shrink to 28 and 22 mA/mm with wiggles: not converged.
 - **Decision for Ian:** move the final model to hotEb 1.0 for a real SiN-only collapse (one step), or keep 0.5.
+
+## 2026-11-11: final rad model moved to hotEb 1.0 (Ian)
+
+- **Final set:** radFinal8 levers with hotEb 1.0, meshY {0.3 0.01 2.0 0.01}, Vd step 0.1, no dam3 second site: `sweeps/params_radFinal12.txt`. No rerun: radChk (pre) and radEB1 (nb, biased) already ran these exact inputs; radEB2 confirms SiN at 5 nm.
+- **Explainer** (https://claude.ai/artifact/FArVrMfXX8JNvoFRqYWHLu) and **Oct 29 group deck** (https://claude.ai/artifact/QhqMqAsA7Jwc7DnUwrkYzi) updated: one SiN collapse, no hand-placed second site, fine-mesh trap-set slide.

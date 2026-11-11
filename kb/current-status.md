@@ -1,15 +1,15 @@
 ---
 title: Current status
 tags: [status]
-updated: 2026-11-07
+updated: 2026-11-11
 ---
-# Current status (as of 2026-11-07)
+# Current status (as of 2026-11-11)
 
 **Repo:** reorganised 2026-10-12 into `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/` ([[repo-locations]]); FLOOXS internals in [[flooxs-overview]].
 
 **Model:** calibrated field mobility ([[calibration]]), local-field hot-electron capture ([[hot-electron-capture]]), Te-ramp stall rescue ([[te-ramp]]). **Since 2026-10-16 (Ian) the local-field model (`eTemp 0`, the model-file default) is the standard again, to save computation time.** The standard electron energy balance (`eTemp 1`, `etStats 0`, `etThermo 0`; standard Oct 13–16) is kept as an option: it collapses at the measured voltage but costs ~1.9 s per Newton iteration ([[energy-balance]]).
 
-**Now (Nov 5):** on a fine mesh, sharp-edged damage gives a current limit, not steps. The final SiN curve's two steps vanish at 10 nm, so the model no longer reproduces the measured steps; Ian decides what to do with the final set. Measured data is incomplete: R33 came with no context, and same-device pre and post exist but aren't in hand. Details: [[damage-region-map]], [[ron-increase]], [[rad-model]], [[rad-literature]].
+**Now (Nov 11):** final rad model updated (Ian): capture barrier 1.0 eV and a 10 nm mesh, no hand-placed second site. SiN biased collapses once, by about a third near 1.7 V, converged at 5 nm; HighK and non-biased devices don't. The two measured SiN steps are not reproduced. Measured data still incomplete. Details: [[rad-model]], [[damage-region-map]], [[ron-increase]].
 
 **Key results**
 - **Damage by region (radMap1 job 49570571, radMesh job 49606872, radFine job 49735196, radMulti job 49735488):** Vth moves only under the gate (+0.78 V at 1e18, +1.96 V at 4e18). Each section adds series resistance, about the same anywhere (0.1 µm at 1.2e19: about +1.1 Ω·mm per site, additive up to 5). Current saturates at a level set by density (558, 346, 229 mA/mm at 4e18, 6e18, 8e18), independent of Vg. No steps survive a fine mesh ([[damage-region-map]]).

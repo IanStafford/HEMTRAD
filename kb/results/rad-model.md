@@ -6,6 +6,12 @@ source: branch explore/rad-model, drivers/radIV.tcl, sweeps/params_rad*.txt
 ---
 # Pre/post-irradiation model (branch `explore/rad-model`)
 
+> **Final model as of 2026-11-11 (Ian):** the radFinal8 parameter set with the hot-electron capture barrier at **1.0 eV** (was 0.5), a **10 nm** mesh from y 0.3 to 2.0 µm (`meshY`), Vd step 0.1 V, and **no hand-placed second SiN site**. Parameters `sweeps/params_radFinal12.txt`; results are radChk 49552956 (pre), radEB1 50411481 (nb, biased) and radEB2 50470082 (5 nm check). Figure `figures/rad/radFinalEB_IdVd.png`.
+> - Vth +0.21 V on every irradiated device. Non-biased: 0.93–0.95 of pre, gm −1%.
+> - HighK biased: 342 / 951 mA/mm at 1 / 10 V (0.93 / 0.92 of pre), no collapse, gm −2%.
+> - SiN biased: 306 at 1 V (0.83), 374 → 255 mA/mm at 1.6–1.8 V, partial recovery to about 390 at 6 V, a dip near 7–8 V, 370 at 10 V (0.36). gm −6%.
+> - Not reproduced: the measured second step, the current staying down after the drop, and onset moving later at higher Vg. The sections below are the history, and their steps (radFinal8, radFinal11) are mesh artifacts.
+
 Goal (2026-10-23): one model that reproduces, **qualitatively** (Ian, 2026-10-25), the measured pre- and post-irradiation behaviour of the HPD (#11) and SiN (#35) devices, irradiated non-biased and biased (Vg −10 / Vd 28 V) with high-LET heavy ions. The measured data are kept untracked (`data/rad_y2/`, `kb/results/measured-rad-y2.md` on the workstation only), so this note gives model numbers and qualitative comparisons only.
 
 ## Driver and tools

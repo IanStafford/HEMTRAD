@@ -114,14 +114,14 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <span class="label">AlGaN/GaN HEMT · FLOOXS · heavy-ion irradiation</span>
     <h1>Why biased irradiation collapses the SiN device and not the HPD one</h1>
     <p class="lede">A pre/post-irradiation model for the Y2 high-LET set (HPD #11 with HfO₂ passivation vs SiN #35, both irradiated at Vg −10 V, Vd 28 V). The stress bias places damage where the field is strongest; the SiN passivation focuses that field into one spot just past the gate, and that spot is what collapses the drain current.</p>
-    <p class="meta"><span>branch explore/rad-model</span><span>driver drivers/radIV.tcl</span><span>final jobs 47887339 · 47959281</span><span>Oct 23–27, 2026</span></p>
+    <p class="meta"><span>main</span><span>driver drivers/radIV.tcl</span><span>final jobs 50411481 · 50470082</span><span>Oct 23 – Nov 11, 2026</span></p>
   </header>
 
   <section aria-labelledby="pic">
     <h2 id="pic">The mechanism in one picture</h2>
     <div class="schem">
       <div class="schem-scroll">
-      <svg viewBox="0 0 800 300" role="img" aria-label="Cross-section of the HEMT from source to drain. The T-gate and field plate sit on the passivation. Under the T-gate overhang, just past the gate foot, the SiN device gets a dense damage spot at the 2DEG; the HighK device gets a smaller, weaker one. A dashed second site further toward the drain marks the hand-placed second strike in the SiN device.">
+      <svg viewBox="0 0 800 300" role="img" aria-label="Cross-section of the HEMT from source to drain. The T-gate and field plate sit on the passivation. Under the T-gate overhang, just past the gate foot, the SiN device gets a dense damage spot at the 2DEG; the HighK device gets a smaller, weaker one.">
         <!-- y (um) -> x px: x = 40 + (y + 1.4) * 150 -->
         <rect class="f-gan" x="40" y="168" width="720" height="92"/>
         <rect class="f-algan" x="40" y="152" width="720" height="16"/>
@@ -139,8 +139,6 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
         <ellipse class="f-dam-s" cx="325" cy="166" rx="24" ry="9"/>
         <!-- damage, HighK: weaker, broader 0.3..0.8 -->
         <ellipse class="f-dam-h" cx="330" cy="186" rx="34" ry="5"/>
-        <!-- second strike site y 1.0..1.6 : x 400..490 -->
-        <rect class="f-site2" x="400" y="160" width="90" height="16" rx="3"/>
         <!-- field profiles (schematic) at stress, drawn above the passivation -->
         <path class="l-field" d="M268 252 C 280 200, 290 222, 300 230 S 318 196, 325 196 S 340 232, 352 246 S 420 254, 520 256"/>
         <path class="l-fieldh" d="M268 252 C 280 200, 290 222, 300 236 S 320 220, 330 222 S 360 232, 380 244 S 500 250, 720 255"/>
@@ -154,7 +152,6 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
         <text x="560" y="186">2DEG</text>
         <text x="560" y="214">GaN:Fe buffer</text>
         <text class="s" x="306" y="146">damage</text>
-        <text class="s" x="404" y="152">2nd strike (SiN, by hand)</text>
         <text class="s" x="345" y="203">SiN field</text>
         <text class="h" x="392" y="236">HighK field</text>
         <text x="44" y="282">lateral field at the stress bias, schematic (same baseline)</text>
@@ -169,9 +166,9 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
     <p>Every device is computed in the same order. Pre-irradiation devices stop after step 1; non-biased devices skip the stress-placed damage.</p>
     <div class="steps">
       <div class="step"><span class="n">1 · calibrate</span><h3>Pre-irradiation deck</h3><p>Polarization charge <b>1e13 cm⁻²</b>, Schottky barrier <b>2.94 eV</b>, mobility vsat <b>1.75e7 cm/s</b>, µmax <b>2100</b>. Vth within <b>0.03 V</b>, Id–Vd at Vg +1 within <b>~4%</b>.</p></div>
-      <div class="step"><span class="n">2 · stress</span><h3>Off-state bias</h3><p>Gate to <b>−10 V</b>, then the drain in 1 V steps. The solve converges up to <b>Vd 17 V</b> (target 28 V), and the lateral field there is stored.</p></div>
-      <div class="step"><span class="n">3 · damage</span><h3>Traps from the stress field</h3><p>Acceptor traps at <b>0.30 eV</b> in the top 50 nm, density <b>7e18 · (E/5e5 V/cm)⁴</b> beyond y = 0.30 µm. All devices: fixed charge <b>5e17 cm⁻³</b> in the AlGaN under the gate and <b>−4e11 cm⁻²</b> at the surface.</p></div>
-      <div class="step"><span class="n">4 · measure</span><h3>Hot-electron capture</h3><p>Id–Vg at Vd 0.1 V and Id–Vd at Vg +1 V. Hot electrons fill the traps once they clear a <b>0.5 eV</b> barrier, so the current drops only above a threshold Vd.</p></div>
+      <div class="step"><span class="n">2 · stress</span><h3>Off-state bias</h3><p>Gate to <b>−10 V</b>, then the drain to <b>Vd 17 V</b>, and the lateral field there is stored. The full 28 V now solves too; it changes the damage scale, not the picture.</p></div>
+      <div class="step"><span class="n">3 · damage</span><h3>Traps from the stress field</h3><p>Acceptor traps at <b>0.30 eV</b> in the top 50 nm, density <b>7e18 · (E/5e5 V/cm)⁴</b> beyond y = 0.30 µm, on a <b>10 nm</b> mesh from y 0.3 to 2.0 µm. All devices: fixed charge <b>5e17 cm⁻³</b> in the AlGaN under the gate and <b>−4e11 cm⁻²</b> at the surface.</p></div>
+      <div class="step"><span class="n">4 · measure</span><h3>Hot-electron capture</h3><p>Id–Vg at Vd 0.1 V and Id–Vd at Vg +1 V. Hot electrons fill the traps once they clear a <b>1.0 eV</b> barrier, so the current drops only above a threshold Vd. At 0.5 eV there is no collapse on a fine mesh.</p></div>
     </div>
   </section>
 
@@ -194,22 +191,22 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   <section aria-labelledby="result">
     <h2 id="result">What the model reproduces</h2>
     <div class="pair">
-      <figure><a href="fig/radMech_SiN_IdVd.jpg" target="_blank" rel="noopener"><img src="fig/radMech_SiN_IdVd.jpg" alt="Id-Vd at Vg +1 V. HighK: biased curve a few percent below pre, no collapse. SiN: pre curve, one-site curve flattening near 2 V, and the final two-site curve dropping in steps near 4.5 and 5.8 V then creeping up." loading="lazy"></a><figcaption><b>Id–Vd at Vg +1 V, before and after biased irradiation</b>Model only. SiN final curve from job 47959281 (second strike site 4.5e18 at y 1.0–1.6 µm).</figcaption></figure>
+      <figure><a href="fig/radFinalEB_IdVd.jpg" target="_blank" rel="noopener"><img src="fig/radFinalEB_IdVd.jpg" alt="Id-Vd at Vg +1 V for HighK and SiN: pre-irradiation, non-biased and biased. HighK biased stays a few percent below pre with no collapse. SiN biased drops from about 374 to 255 mA/mm near 1.7 V, recovers to about 390 by 6 V, dips again near 7 to 8 V and ends near 370." loading="lazy"></a><figcaption><b>Id–Vd at Vg +1 V, before and after irradiation</b>Model only, jobs 50411481 and 50470082. A 5 nm mesh gives the same SiN curve within 2 mA/mm.</figcaption></figure>
       <div class="prose">
-        <p>In the <span class="sn">SiN</span> device the current follows the pre-irradiation curve with a low-Vd loss until hot electrons reach the damage, then drops in a step near <span class="num">4.5 V</span>. A second, hand-placed strike site further toward the drain adds a second step near <span class="num">5.8 V</span>; after it the current creeps back up, as on the curve tracer.</p>
-        <p>The <span class="hk">HighK</span> device keeps its shape, a few percent below pre-irradiation.</p>
+        <p>In the <span class="sn">SiN</span> device the current follows the pre-irradiation curve with a low-Vd loss until hot electrons reach the damage, then drops by about a third near <span class="num">1.7 V</span>, from 374 to 255 mA/mm. It recovers partly with Vd and ends near <span class="num">370 mA/mm</span> at 10 V, about a third of pre-irradiation.</p>
+        <p>The <span class="hk">HighK</span> device keeps its shape, a few percent below pre-irradiation. Non-biased devices of both kinds lose 5–7%.</p>
+        <p>Earlier versions showed two SiN steps near 4.5 and 5.8 V, with a second strike site placed by hand. Those steps came from the 25–50 nm mesh and are gone on a fine one.</p>
       </div>
     </div>
-    <figure><a href="fig/radFinal8_model.jpg" target="_blank" rel="noopener"><img src="fig/radFinal8_model.jpg" alt="Three panels: post over pre current ratios for biased devices (HighK flat at 0.93, SiN dropping from 0.83 to 0.48) and non-biased devices (both 0.95), and Id-Vg near threshold showing a +0.21 V shift for every irradiated device." loading="lazy"></a><figcaption><b>All devices, one parameter set (job 47887339)</b>Post/pre current ratio at Vg +1 for biased and non-biased devices, and Id–Vg near threshold. The SiN curve here is the one-site version.</figcaption></figure>
     <div class="tbl">
       <table>
         <thead><tr><th>Observed after irradiation</th><th>Model</th><th>Match</th></tr></thead>
         <tbody>
           <tr><td>Threshold shifts positive in every irradiated device</td><td class="mono">+0.21 V, all devices</td><td><span class="pill ok">yes</span></td></tr>
           <tr><td>HPD biased: no collapse, transconductance kept</td><td class="mono">0.93 flat, gm −2%</td><td><span class="pill ok">yes</span></td></tr>
-          <tr><td>SiN biased: collapse well above the knee, in two steps, then creep</td><td class="mono">steps 4.5 / 5.8 V</td><td><span class="pill part">with 2nd site</span></td></tr>
-          <tr><td>SiN biased loses the most transconductance</td><td class="mono">gm −18% (HighK −2%)</td><td><span class="pill ok">order</span></td></tr>
-          <tr><td>SiN final current level after collapse</td><td class="mono">377 mA/mm at 10 V</td><td><span class="pill part">a bit high</span></td></tr>
+          <tr><td>SiN biased: collapse above the knee, in two steps, then creep</td><td class="mono">one drop near 1.7 V, partial recovery</td><td><span class="pill part">one step</span></td></tr>
+          <tr><td>SiN biased loses the most transconductance</td><td class="mono">gm −6% (HighK −2%)</td><td><span class="pill ok">order</span></td></tr>
+          <tr><td>SiN final current level after collapse</td><td class="mono">370 mA/mm at 10 V</td><td><span class="pill part">a bit high</span></td></tr>
           <tr><td>Non-biased devices change little</td><td class="mono">0.95, gm −1%</td><td><span class="pill ok">yes</span></td></tr>
           <tr><td>Gate–drain leakage after biased irradiation</td><td class="mono">lumped resistor</td><td><span class="pill fit">not physical</span></td></tr>
         </tbody>
@@ -237,6 +234,8 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
           <li>Access-region n·E damage: more loss in HighK than SiN <span class="j">47662463 · 47752290</span></li>
           <li>Slower capture (τ 1e-12 s): full SiN collapse from 1 V <span class="j">47773690</span></li>
           <li>Under-gate charge through the channel: shifts Vth but costs ~7% gm; fixed by keeping it in the AlGaN <span class="j">47852523</span></li>
+          <li>Capture barrier 0.5 eV: no collapse at all on a fine mesh; the earlier steps were the mesh <span class="j">49735196 · 50411481</span></li>
+          <li>A hand-placed second strike site: its step shrinks on a 5 nm mesh, so it isn't used <span class="j">50470082</span></li>
         </ul>
       </div>
     </div>
@@ -248,15 +247,16 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
       <div class="box">
         <h3>Numerical</h3>
         <ul>
-          <li>The stress solve stops at <b>Vd 17 V</b> (gate–drain 27 V); the electron quasi-Fermi level diverges in the depleted region under the gate. Solving without holes and heavier damping do not help <span class="j">47861047 · 47875456</span>. The damage scale absorbs the weaker field.</li>
-          <li>A stronger second strike site deepens the SiN drop but the Id–Vd sweep cannot get through the step <span class="j">47908735 · 47943462</span>.</li>
+          <li>The damage is placed at a stress of <b>Vd 17 V</b>, not 28 V. The old 17 V limit was an overflow in the trap occupancy, now fixed; at 28 V the same picture needs a smaller damage scale <span class="j">48182110 · 48206375</span>.</li>
+          <li>Sharp-edged damage on 25–50 nm cells gives steps that vanish on a finer mesh. The final runs use 10 nm from y 0.3 to 2.0 µm, and 5 nm agrees within 2 mA/mm <span class="j">49606872 · 50470082</span>.</li>
         </ul>
       </div>
       <div class="box">
         <h3>Fitting choices</h3>
         <ul>
           <li>No damage closer than 0.30 µm to the gate centre.</li>
-          <li>The second strike site is placed by hand in the SiN device; the same site in HighK would collapse it too, so it stands for where that ion happened to hit.</li>
+          <li>Capture barrier <b>1.0 eV</b>, chosen because 0.5 eV gives no collapse on a fine mesh.</li>
+          <li>Not reproduced: the measured second step, the SiN current staying down after the drop, and a collapse onset that moves later at higher Vg.</li>
           <li>Gate–drain leakage is a lumped resistor per device.</li>
         </ul>
       </div>
@@ -269,14 +269,14 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
       <table>
         <tbody>
           <tr><td>Driver and levers</td><td class="mono">drivers/radIV.tcl</td></tr>
-          <tr><td>Final parameter sets</td><td class="mono">sweeps/params_radFinal8.txt · params_radFinal11.txt</td></tr>
+          <tr><td>Final parameter set</td><td class="mono">sweeps/params_radFinal12.txt</td></tr>
           <tr><td>Write-up, run history, caveats</td><td class="mono">kb/results/rad-model.md</td></tr>
-          <tr><td>Figures</td><td class="mono">analysis/plot_radMechanism.py · plot_radFinal.py</td></tr>
+          <tr><td>Figures</td><td class="mono">analysis/plot_radMechanism.py · plot_radFinalEB.py</td></tr>
           <tr><td>Comparison with the measured curves</td><td class="mono">data/rad_y2/compare/ (workstation only)</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <footer>Branch <code>explore/rad-model</code>, not merged into main. All curves on this page are model output; the measured data stay on the workstation.</footer>
+  <footer>On <code>main</code> since Nov 4; final set updated Nov 11 (capture barrier 1.0 eV, fine mesh). All curves on this page are model output; the measured data stay on the workstation.</footer>
 </div>
