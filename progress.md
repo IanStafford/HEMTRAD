@@ -1946,3 +1946,5 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **radExp1, NOT SUBMITTED** (11 tasks, hotEb 1.0, 10 nm + 5 nm around Gaussians): SiN damPeak 4.5e18 / 3e18 / 2e18 (later onset?); trapLevel 0.40 / 0.50 both decks (stay down?); Gaussian second strike sigma 40 nm, SiN at y 1.5 (5e18, 3e18) and y 2.4 (5e18), HighK y 1.5 (5e18) (second step?).
 
 - **HPG master dropped before the radExp1 submit; one reconnect tried, Duo push not approved within 2 min. WAITING for Ian.** Pick up: reconnect, then submit `sweeps/params_radExp1.txt` (8 GB, %11) as RUN=20261111_radExp1.
+
+- **radExp1 submitted: job 50831893** (after Ian approved the reconnect).
