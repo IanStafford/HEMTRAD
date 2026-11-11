@@ -1939,3 +1939,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 - **Final set:** radFinal8 levers with hotEb 1.0, meshY {0.3 0.01 2.0 0.01}, Vd step 0.1, no dam3 second site: `sweeps/params_radFinal12.txt`. No rerun: radChk (pre) and radEB1 (nb, biased) already ran these exact inputs; radEB2 confirms SiN at 5 nm.
 - **Explainer** (https://claude.ai/artifact/FArVrMfXX8JNvoFRqYWHLu) and **Oct 29 group deck** (https://claude.ai/artifact/QhqMqAsA7Jwc7DnUwrkYzi) updated: one SiN collapse, no hand-placed second site, fine-mesh trap-set slide.
+
+## 2026-11-11: exploring from the new final set
+
+- New lever `damGauss` (radIV, default off, smoke-tested: peak 5e18, 3.03e18 at 1 sigma).
+- **radExp1 ** (11 tasks, hotEb 1.0, 10 nm + 5 nm around Gaussians): SiN damPeak 4.5e18 / 3e18 / 2e18 (later onset?); trapLevel 0.40 / 0.50 both decks (stay down?); Gaussian second strike sigma 40 nm, SiN at y 1.5 (5e18, 3e18) and y 2.4 (5e18), HighK y 1.5 (5e18) (second step?).
