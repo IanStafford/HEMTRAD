@@ -1948,3 +1948,5 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **HPG master dropped before the radExp1 submit; one reconnect tried, Duo push not approved within 2 min. WAITING for Ian.** Pick up: reconnect, then submit `sweeps/params_radExp1.txt` (8 GB, %11) as RUN=20261111_radExp1.
 
 - **radExp1 submitted: job 50831893** (after Ian approved the reconnect).
+
+- radExp1 tasks 4 and 6 (SiN trapLevel 0.40, 0.50) FAILED: trap-occupancy overflow ramping down from the 17 V stress (RAMP GAVE UP D at 16.0). Rerun with occSafe=1 as **radExp1b 50847918**.
