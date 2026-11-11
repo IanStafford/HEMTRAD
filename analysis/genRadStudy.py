@@ -320,3 +320,10 @@ with open("sweeps/params_radExp1.txt", "w") as f:
     for d, dl, y, n in (("sin", SINd, 1.5, 5e18), ("sin", SINd, 1.5, 3e18), ("sin", SINd, 2.4, 5e18), ("hk", "", 1.5, 5e18)):
         f.write(f"{d}_g{y:g}_n{n:g}|{FE}{dl};damGauss={{{{{y:g} 0.0 0.04 {n:g}}}}}{gm(y)}\n")
 print("radExp1 11")
+
+# ---- radExp1's SiN deep-level tasks overflowed in the trap occupancy ramping down from the stress
+# (the Oct 29 exp() overflow, reached sooner with a deeper level). occSafe is the exact overflow-free form.
+with open("sweeps/params_radExp1b.txt", "w") as f:
+    for lev in (0.40, 0.50):
+        f.write(f"sin_L{lev:g}_os|{FE}{SINd};trapLevel={lev:g};occSafe=1\n")
+print("radExp1b 2")
