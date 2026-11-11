@@ -99,6 +99,7 @@ if {![info exists dam3Ymin]}  { set dam3Ymin 1.0 }
 if {![info exists dam3Ymax]}  { set dam3Ymax 1.6 }
 # damSites (2026-11-04): any number of uniform acceptor sites, each {ymin ymax xmin xmax N}
 # (um, um, um below the AlGaN top, um, cm^-3), summed into TrapN. {} = none (old behaviour).
+if {![info exists damGauss]} { set damGauss {} }   ;# {y x sigma N} list: Gaussian acceptor sites (um, cm^-3), semiconductor only
 if {![info exists damSites]}  { set damSites {} }
 # stressSkip 1: no stress solve, for damage that doesn't use the stress field (damSites,
 # surfCharge, a uniform dam2/dam3 site). The stress fields are then ~0. 0 = old behaviour.
@@ -125,7 +126,7 @@ if {![info exists hotTau]}    { set hotTau 1.0e-14 }
 if {![info exists fillIters]} { set fillIters 4 }
 if {![info exists fillRelax]} { set fillRelax 0.5 }
 
-set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || $damInsPeak > 0.0 || $dam2Peak > 0.0 || $dam3Peak > 0.0 || [llength $damList] > 0 || [llength $damSites] > 0)}]
+set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || $damInsPeak > 0.0 || $dam2Peak > 0.0 || $dam3Peak > 0.0 || [llength $damList] > 0 || [llength $damSites] > 0 || [llength $damGauss] > 0)}]
 set trapEn $useTraps
 set trapShape field
 
@@ -281,7 +282,7 @@ flush $sf
 proc DamageIn {tg} {
     global damPeak damM damEref damMax damXmax damYmin damYmax sf
     global damInsPeak damInsM damInsEref damInsXmin damField damInsField
-    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref dam2Xmax damNexp damNref dam3Peak dam3Ymin dam3Ymax damSites
+    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref dam2Xmax damNexp damNref dam3Peak dam3Ymin dam3Ymax damSites damGauss
     ThawTraps
     set fld [expr {$damField eq "tot" ? "EstressT" : ($damField eq "ne" ? "EstressNE" : "Estress")}]
     set n "($damPeak*exp($damM*log($fld/$damEref+1.0e-30)))"
@@ -312,6 +313,15 @@ proc DamageIn {tg} {
             puts $sf "$tg site y=$y0..$y1 x=$x0..$x1 N=$ns"
         }
         set n "$n+SiteSum"
+    }
+    if {[llength $damGauss] > 0} {
+        sel z=0.0*x name=GaussSum
+        foreach g $damGauss {
+            lassign $g y0 x0 sg ng
+            sel z=GaussSum+$ng*exp(-((y-$y0)*(y-$y0)+(x-$x0)*(x-$x0))/(2.0*$sg*$sg))*(x>=0.0) name=GaussSum
+            puts $sf "$tg gauss y=$y0 x=$x0 sigma=$sg N=$ng"
+        }
+        set n "$n+GaussSum"
     }
     foreach s {0.0 0.01 0.03 0.1 0.3 0.6 1.0} {
         sel z=$s*($n)+1.0e-30*(1.0+x*x) name=TrapN

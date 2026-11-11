@@ -304,3 +304,19 @@ with open("sweeps/params_radFinal12.txt", "w") as f:
         if line.split("|")[0] in ("hk_b_eb1", "sin_b_eb1", "nb_highk_eb1", "nb_sin_eb1"):
             f.write(line)
 print("radFinal12 6")
+
+# ---- 2026-11-11 exploration from the new final set (hotEb 1.0): onset too early, no converged second
+# step, current recovers after the drop. Damage scale, trap level, and a smooth (Gaussian) second strike.
+FE = f"{FB};hotEb=1.0;Vd_step=0.1;retryDepth=8"
+SINd = ";deviceDeck=rfdevice_SiN.tcl"
+def gm(y):
+    return f";meshY={{0.3 0.01 2.6 0.01 {y - 0.16:g} 0.005 {y + 0.16:g} 0.005}}"
+with open("sweeps/params_radExp1.txt", "w") as f:
+    for p in (4.5e18, 3e18, 2e18):
+        f.write(f"sin_p{p:g}|{FE}{SINd};damPeak={p:g}\n")
+    for lev in (0.40, 0.50):
+        f.write(f"hk_L{lev:g}|{FE};trapLevel={lev:g}\n")
+        f.write(f"sin_L{lev:g}|{FE}{SINd};trapLevel={lev:g}\n")
+    for d, dl, y, n in (("sin", SINd, 1.5, 5e18), ("sin", SINd, 1.5, 3e18), ("sin", SINd, 2.4, 5e18), ("hk", "", 1.5, 5e18)):
+        f.write(f"{d}_g{y:g}_n{n:g}|{FE}{dl};damGauss={{{{{y:g} 0.0 0.04 {n:g}}}}}{gm(y)}\n")
+print("radExp1 11")
