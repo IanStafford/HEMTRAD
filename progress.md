@@ -1952,3 +1952,6 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - radExp1 tasks 4 and 6 (SiN trapLevel 0.40, 0.50) FAILED: trap-occupancy overflow ramping down from the 17 V stress (RAMP GAVE UP D at 16.0). Rerun with occSafe=1 as **radExp1b 50847918**.
 
 - **2026-11-11 15:00, radExp1 partial (5 of 11 done, no crashes):** SiN damPeak 4.5e18 / 3e18 / 2e18 give no collapse (663 / 847 / 940 mA/mm at 10 V), so a lower scale removes the collapse rather than delaying it; the threshold lies between 4.5e18 and 7e18. HighK at trapLevel 0.40 / 0.50: no collapse (941 / 936). Gaussian second-strike tasks and the SiN deep-level reruns (radExp1b) still running.
+
+- **radExp1b 50847918 cancelled** (Ian standing permission) at 4.5 h: with occSafe the stress went past 17 V toward the 28 V target, so its damage would not match the final model. Final set and reruns now pin Vd_stress=17.0. Resubmitted as **radExp1c 50892179** (RUN 20261111_radExp1c).
+- radExp1 Gaussian tasks are still in the stress solve after 6.5 h (Vd 7-16 V, 45-83 retries); 24 h limit.
