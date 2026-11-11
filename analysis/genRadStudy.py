@@ -301,7 +301,11 @@ with open("sweeps/params_radFinal12.txt", "w") as f:
         if line.startswith("pre_"):
             f.write(line)
     for line in open("sweeps/params_radEB1.txt"):
-        if line.split("|")[0] in ("hk_b_eb1", "sin_b_eb1", "nb_highk_eb1", "nb_sin_eb1"):
+        lab = line.split("|")[0]
+        if lab in ("hk_b_eb1", "sin_b_eb1"):
+            # the stress stopped at 17 V in these runs (old occupancy overflow); say so explicitly
+            f.write(line.rstrip("\n") + ";Vd_stress=17.0\n")
+        elif lab in ("nb_highk_eb1", "nb_sin_eb1"):
             f.write(line)
 print("radFinal12 6")
 
@@ -325,5 +329,5 @@ print("radExp1 11")
 # (the Oct 29 exp() overflow, reached sooner with a deeper level). occSafe is the exact overflow-free form.
 with open("sweeps/params_radExp1b.txt", "w") as f:
     for lev in (0.40, 0.50):
-        f.write(f"sin_L{lev:g}_os|{FE}{SINd};trapLevel={lev:g};occSafe=1\n")
+        f.write(f"sin_L{lev:g}_os|{FE}{SINd};trapLevel={lev:g};occSafe=1;Vd_stress=17.0\n")
 print("radExp1b 2")
