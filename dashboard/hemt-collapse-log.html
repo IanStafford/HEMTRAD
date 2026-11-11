@@ -120,7 +120,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
   <header class="top">
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">FLOOXS model of an AlGaN/GaN HEMT: what ran each day and what is still open. Id in <span style="white-space:nowrap">mA/mm</span> at Vg = −2 V unless noted; work before Oct 1 used constant mobility and is archived.</p>
-    <p class="meta">Snapshot Nov 5, afternoon</p>
+    <p class="meta">Snapshot Nov 11</p>
   </header>
 
   <div class="layout">
@@ -128,6 +128,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
       <div class="sep"></div>
       <div class="era">Field mobility</div>
+      <a href="#nov11" data-page="nov11"><span class="d">Nov 7–11</span><span class="t">real collapse · final</span></a>
       <a href="#nov05" data-page="nov05"><span class="d">Nov 5</span><span class="t">mesh check · Ron</span></a>
       <a href="#nov04" data-page="nov04"><span class="d">Nov 4</span><span class="t">damage map · merge</span></a>
       <a href="#nov02" data-page="nov02"><span class="d">Oct 28–Nov 2</span><span class="t">28 V · strike</span></a>
@@ -158,21 +159,21 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <section class="page" id="overview" data-title="Overview">
         <div class="pagehead">
           <h2>Where things stand</h2>
-          <p>On a fine mesh, damage gives Vth shifts under the gate, additive series resistance and a gate-independent current limit, but no abrupt steps; the final SiN curve's two steps vanish too. Next is Ian's decision on the final model, and finding what produces the measured steps.</p>
+          <p>The final rad model now uses a 1.0 eV capture barrier on a fine mesh: SiN collapses once, by about a third near 1.7 V, and HighK doesn't, with the result unchanged at 5 nm. Next is finding what gives the second SiN step, the current staying down, and an onset that moves with Vg.</p>
         </div>
         <div class="tiles">
-          <div class="tile"><span class="k">Vth, one damaged section</span><span class="v">Gate only</span><span class="s">+0.78 V at 1e18 cm⁻³ under the gate; under 0.01 V anywhere else.</span></div>
-          <div class="tile"><span class="k">Resistance per strike</span><span class="v">+1.1 Ω·mm</span><span class="s">0.1 µm site at 1.2e19. Adds up to 5 sites, whatever the location.</span></div>
-          <div class="tile"><span class="k">Steps on a fine mesh</span><span class="v">None</span><span class="s">Final SiN curve at 10 nm rises smoothly to 473 mA/mm. Current limit stays, set by density.</span></div>
+          <div class="tile"><span class="k">Final model, SiN biased</span><span class="v">−32% at 1.7 V</span><span class="s">374 → 255 mA/mm, partial recovery, 370 at 10 V. Same at 5 nm.</span></div>
+          <div class="tile"><span class="k">Final model, HighK biased</span><span class="v">No collapse</span><span class="s">0.92 of pre at every Vd, gm −2%.</span></div>
+          <div class="tile"><span class="k">Vth shift</span><span class="v">+0.21 V</span><span class="s">Every irradiated device; only damage under the gate moves it.</span></div>
         </div>
 
         <div class="panel">
           <h3>Open items</h3>
           <ul class="todo">
-            <li><span class="pill open">open</span><span>Final model: its two SiN steps are mesh artifacts. Ian to decide what to do with the final set. <a class="daylink" href="#nov05">Nov 5</a></span></li>
-            <li><span class="pill open">open</span><span>What makes abrupt steps in real devices? Sharp 2D sites don't. Partial-width damage and trap emission are untested. <a class="daylink" href="#nov05">Nov 5</a></span></li>
+            <li><span class="pill progress">in progress</span><span>Second SiN step: a smooth (Gaussian) second strike, which does converge, instead of the hand-placed uniform one. <a class="daylink" href="#nov11">Nov 11</a></span></li>
+            <li><span class="pill progress">in progress</span><span>SiN current recovers after the drop; measured stays down. Deeper trap levels collapsed and stayed down on a fine mesh. <a class="daylink" href="#nov11">Nov 11</a></span></li>
+            <li><span class="pill open">open</span><span>Onset should move later at higher Vg (R33); the model's is flat, 1.2–1.4 V from Vg −1.5 to +1. <a class="daylink" href="#nov11">Nov 11</a></span></li>
             <li><span class="pill open">open</span><span>Cause of the biased Ron rise: dielectric charge, access acceptors and mobility loss all fit so far. <a class="daylink" href="#nov05">Nov 5</a></span></li>
-            <li><span class="pill open">open</span><span>Cause of the Vth shift: several routes give +0.2 V in the model, but the literature has nothing at 1e7 cm⁻². <a class="daylink" href="#nov04">Nov 4</a></span></li>
             <li><span class="pill noted">noted</span><span>Waiting on a comprehensive measured set: same-device pre and post, width, Vth, Vg order. <a class="daylink" href="#nov05">Nov 5</a></span></li>
           </ul>
           <details class="older">
@@ -192,6 +193,41 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
             </ul>
           </details>
         </div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- NOV 7-11 -->
+      <section class="page" id="nov11" data-title="Nov 7–11">
+        <div class="pagehead">
+          <h2>Nov 7–11 · A real collapse, and a new final model</h2>
+          <p>A smooth trap with a 1.0 eV capture barrier collapses on any mesh; at 0.5 eV, the old final value, nothing collapses. The final model moved to 1.0 eV and a fine mesh, and the explainer and the Oct 29 deck were revised.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 50128200 · 50128862–50128864 · 50148046 · 50411481 · 50470082</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Refined position map (56 tasks, 5 nm): at 4e18 three zones, under the gate (Vth <span class="num">+1.96 V</span>, Id 0.38 at 10 V), its neighbours (0.50) and everywhere else (0.53–0.55), with no real steps.</li>
+              <li>Gaussian traps at a 1.0 eV barrier collapse on 5 and 2.5 nm alike: <span class="num">157 → 10 mA/mm</span> near 1.2 V at 0.30 eV, then a recovery; <span class="num">about 300×</span> at 0.3–0.4 V at 0.55 eV, then a creep. The same trap at 0.5 eV loses only 25 mA/mm.</li>
+              <li>The collapse onset barely moves with Vg (1.4 V at −1.5, 1.2–1.3 V up to +1), and the level after recovery is the same at every Vg.</li>
+              <li>Final parameter set at 1.0 eV on 10 nm: SiN biased drops <span class="num">374 → 255 mA/mm</span> near 1.7 V, HighK and non-biased devices don't change; 5 nm agrees within 2 mA/mm. The hand-placed second site's step doesn't converge and was dropped.</li>
+              <li>Emission levers (crude, default off): partial release between curves gives smooth rising curves; trap memory gives a Vg-independent rising line.</li>
+              <li>Final model updated (Ian, Nov 11); rad-model explainer and three slides of the Oct 29 deck revised.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill progress">in progress</span><span>Second SiN step from a smooth second strike, and a deeper trap level so the current stays down.</span></li>
+              <li><span class="pill open">open</span><span>Onset later at higher Vg, as measured; nothing in the model does that yet.</span></li>
+              <li><span class="pill noted">noted</span><span>8e18 sites show 30–120 mA/mm dips at 5–9 V that survive 2.5 nm but recover; not used.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/hotEb_final.jpg" target="_blank" rel="noopener"><img src="fig/hotEb_final.jpg" alt="Final parameter set at capture barrier 0.5, 0.75 and 1.0 eV on a 10 nm mesh, with 5 nm dotted: HighK unchanged; SiN one site drops near 1.7 V at 1.0 eV; SiN two sites drops twice at 10 nm but much less at 5 nm" loading="lazy"></a><figcaption><b>Capture barrier in the final set</b>At 1.0 eV SiN drops by a third near 1.7 V, unchanged at 5 nm; the second site's step shrinks at 5 nm.</figcaption></figure>
+          <figure><a class="img" href="fig/gauss_mesh.jpg" target="_blank" rel="noopener"><img src="fig/gauss_mesh.jpg" alt="Gaussian traps on the standard and 5 nm meshes, log scale: the collapse survives on 5 nm but the long stay near zero does not" loading="lazy"></a><figcaption><b>Gaussian traps, coarse vs fine mesh</b>The drop is real; its depth and recovery were the mesh.</figcaption></figure>
+          <figure><a class="img" href="fig/placement_4e18.jpg" target="_blank" rel="noopener"><img src="fig/placement_4e18.jpg" alt="Id-Vd for one 0.3 micron site at 4e18 at 14 positions on a 5 nm mesh, with the current level and Vd over Id against position" loading="lazy"></a><figcaption><b>Strike placement, 5 nm</b>Only the gate and its neighbours stand out; Vd/Id at 0.25 V barely moves.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#nov05">Nov 5 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
@@ -216,7 +252,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           </div>
           <div class="panel"><h3>Needed work</h3>
             <ul class="todo">
-              <li><span class="pill open">open</span><span>Final model: it no longer reproduces the measured steps. Ian to decide. The rad-model explainer and the Oct 29 group deck still show them.</span></li>
+              <li><span class="pill resolved">fixed Nov 11</span><span>Final model: it no longer reproduces the measured steps. Ian to decide. The rad-model explainer and the Oct 29 group deck still show them.</span></li>
               <li><span class="pill noted">noted</span><span>Trap memory: with traps kept from earlier curves, a rising Vg-independent line survives 5 nm, but low Vd is dead, and the model has no emission. Testable by repeating a sweep on a device or changing the Vg order.</span></li>
               <li><span class="pill noted">noted</span><span>8 of 61 multi-strike tasks ran out of memory at 4 GB; not rerun, since high Vd isn't converged there anyway. Sites span the full width at densities far above TRIM, so this shows how sections combine, not a real fluence.</span></li>
               <li><span class="pill noted">noted</span><span>R33 came with no context. Width unknown; same-device pre and post exist but aren't in hand, so pre-referenced numbers aren't usable quantitatively.</span></li>
@@ -227,7 +263,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           <figure><a class="img" href="fig/radMesh_curves.jpg" target="_blank" rel="noopener"><img src="fig/radMesh_curves.jpg" alt="Id-Vd for three damaged sites on the standard mesh, 10 nm and 5 nm: the 0.3 micron sites lose their steps on the fine meshes, the 0.1 micron site still collapses near 1 V but its later current differs by mesh" loading="lazy"></a><figcaption><b>Mesh check</b>Left and middle: the steps vanish at 10 and 5 nm, which agree. Right: the narrow, dense site's drop near 1 V also shrinks with the mesh.</figcaption></figure>
           <figure><a class="img" href="fig/radFine.jpg" target="_blank" rel="noopener"><img src="fig/radFine.jpg" alt="Four panels: final SiN curve with steps on the standard mesh and smooth at 10 nm; Id-Vd levels by density; fresh curves at three Vg on one line; resistance rising linearly with number of strikes" loading="lazy"></a><figcaption><b>What a fine mesh shows</b>Final curve loses its steps; density sets the current limit; the limit doesn't depend on Vg; resistance adds per strike.</figcaption></figure>
         </div>
-        <div class="pager"><a href="#overview">← Overview</a><a href="#nov04">Nov 4 →</a></div>
+        <div class="pager"><a href="#nov11">← Nov 7–11</a><a href="#nov04">Nov 4 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
