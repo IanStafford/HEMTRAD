@@ -249,3 +249,20 @@ Related: [[damage-region-map]], [[ron-increase]].
 - **5 nm check (radEB2, job 50470082, 2 tasks, no crashes):** the one-site collapse is converged: 374 to 256 mA/mm at 1.6–1.7 V, then the same recovery, within 2 mA/mm of 10 nm everywhere. The two-site drops are not: at 5 nm they shrink to 28 mA/mm at 3.4 V and 22 at 4.9 V, with smaller wiggles, ending at 395. The second site (dam3, 4.5e18 at y 1.0–1.6) is still mesh-sensitive.
 - So hotEb 1.0 gives one real, SiN-only collapse from the field-placed damage. A converged second step isn't there yet. The final model stays at 0.5 unless Ian decides otherwise.
 
+## Exploring from the final set (radExp1 50831893, radExp1c 50892179, 2026-11-11/12)
+
+Figure `figures/rad/radExp1.png`. SiN biased unless stated, Vg +1 V, Id in mA/mm, hotEb 1.0, 10 nm mesh.
+
+| Change | Result |
+|---|---|
+| Damage scale 4.5e18 / 3e18 / 2e18 (final 7e18) | no collapse: 663 / 847 / 940 at 10 V. Lowering the scale removes the collapse rather than delaying it |
+| Trap level 0.40 eV (occSafe, 17 V) | drop at 1.3–1.4 V (290 to 225), rises to 348 at 6 V, 334 at 10 V; Vth +0.25 V, gm 63.0 |
+| Trap level 0.50 eV (occSafe, 17 V) | drop at 0.9–1.0 V (149 to 99), slow rise to 183 at 4 V and 239 at 10 V; Vth +0.26 V, gm 61.2 |
+| HighK at 0.40 / 0.50 eV | no collapse, 941 / 936 at 10 V; Vth +0.26 V |
+| HighK with a Gaussian strike (y 1.5, 5e18) | no step, but a hard limit near 480–560 mA/mm (563 at 10 V, 0.55 of pre) |
+
+- **A deeper level makes SiN stay down and creep, as measured, but moves the onset earlier** (0.9 V at 0.50 eV), the wrong way; measured SiN collapses near 4.5 V. It also adds about 0.05 V to the Vth shift on both decks.
+- **A smooth strike in HighK costs it about 45% at high Vd.** The measured HPD stays flat, so a strike like that didn't land in it, or its damage was weaker.
+- **The SiN Gaussian tasks didn't finish:** two timed out in the stress solve at 12.5–15.5 V (over 200 retries), one overflowed at 17 V. None had occSafe. Rerun in radExp2 with occSafe and the stress pinned at 17 V.
+- **Running (radExp2):** SiN Gaussian second strikes again; damage scale 5e18–6e18 (does the onset move later near threshold?); level 0.40–0.50 eV with a smaller scale (later onset that still stays down?).
+

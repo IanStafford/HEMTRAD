@@ -331,3 +331,15 @@ with open("sweeps/params_radExp1b.txt", "w") as f:
     for lev in (0.40, 0.50):
         f.write(f"sin_L{lev:g}_os|{FE}{SINd};trapLevel={lev:g};occSafe=1;Vd_stress=17.0\n")
 print("radExp1b 2")
+
+# ---- after radExp1/1c (2026-11-12). From here every stressed run uses occSafe with the stress pinned at 17 V
+# (occSafe is exact; without it the Gaussian SiN stresses stalled or overflowed near 17 V).
+FO = f"{FE};occSafe=1;Vd_stress=17.0"
+with open("sweeps/params_radExp2.txt", "w") as f:
+    for y, n in ((1.5, 5e18), (1.5, 3e18), (2.4, 5e18)):
+        f.write(f"sin_g{y:g}_n{n:g}|{FO}{SINd};damGauss={{{{{y:g} 0.0 0.04 {n:g}}}}}{gm(y)}\n")
+    for p in (5e18, 5.5e18, 6e18):
+        f.write(f"sin_p{p:g}|{FO}{SINd};damPeak={p:g}\n")
+    for lev, p in ((0.5, 3e18), (0.5, 5e18), (0.4, 5e18)):
+        f.write(f"sin_L{lev:g}_p{p:g}|{FO}{SINd};trapLevel={lev:g};damPeak={p:g}\n")
+print("radExp2 9")
