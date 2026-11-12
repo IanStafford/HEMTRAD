@@ -361,3 +361,12 @@ with open("sweeps/params_radExp3.txt", "w") as f:
     for d, dl in (("highk", ""), ("sin", SINd)):
         f.write(f"nb_{d}_ron|{NB}{dl};{SKIP};{DAM2};hotEb=1.0{RV}\n")
 print("radExp3 12")
+
+# ---- 2026-11-12 (Ian): final model at higher drain voltage, Id-Vd to 28 V at Vg +1 and 0. occSafe keeps the
+# occupancy from overflowing above ~17.7 V during the measurement too (exact form, same results below that).
+HV = ";Vd_max=28.0;Vd_step=0.2;VgFam={0};noRampBack=0;occSafe=1"
+with open("sweeps/params_radHV.txt", "w") as f:
+    for line in open("sweeps/params_radFinal12.txt"):
+        lab, lev = line.rstrip("\n").split("|", 1)
+        f.write(f"{lab}_hv|{lev}{HV}\n")
+print("radHV 6")
