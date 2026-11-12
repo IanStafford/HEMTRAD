@@ -1975,3 +1975,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Then: rerun the final set, the high-Vd figures and the second-strike scan at 28 V. Jobs already running at 17 V (radExp2, radExp3 except its 28 V tasks, radHV biased, radStrike2) are left to finish as a 17 V comparison.
 
 - **2026-11-12: 3D plan** (Ian): FLOOXS source survey and a phased plan in `kb/model/3d-plan.md`. Nothing run yet.
+
+## 2026-11-12: 3D slice, Phase A done and Phase C build test submitted
+
+- **TRIM (local, Au 2256 MeV, full cascades, 200 ions, model-deck stacks; 22 s each):** `data/trim/{HighK,SiN}_track.json` via `analysis/trimTrack.py` (totals within 3% of VACANCY.txt). Top 50 nm of GaN: 0.21-0.27 vacancies per nm per ion, median radius 1.5-2 nm, about 1e17-2e18 cm^-3 on axis; most ions leave none in the AlGaN. Nuclear displacements alone are below the collapse threshold, so the electronic track core (Se ~41 keV/nm in GaN) carries the damage.
+- New: `model/rfdevice3d.tcl` (plain extrusion, levers passMat, W3d, zSpac0/1, bot3d, yCoarse, init3d, meshZ); driver levers deviceDim, damTube, trackFieldM (default off); `analysis/genRad3d.py`.
+- **rad3dBuild 51045898** (6 tasks, 32 GB): pre-irradiation 3D builds, W 0.5 um, 3/5/11 z lines, bricks without gas, with gas, tets; SiN deck.
