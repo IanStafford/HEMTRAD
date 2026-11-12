@@ -55,3 +55,17 @@ rows = [("hk_nz5_bcgs", f"{B};zSpac0=0.125;zSpac1=0.125;mathDev3d={{row ilu bcgs
         ("hk2d_coarse", f"{VAL};bot2d=1.5;yCoarse=2"),
         ("sin2d_coarse", f"{VAL};deviceDeck=rfdevice_SiN.tcl;bot2d=1.5;yCoarse=2")]
 write("rad3dSolve", rows)
+
+# ---- first tracks (2026-11-12): one TRIM track at the SiN overhang (y 0.5 um) on slices 0.25 / 0.5 / 1 um wide.
+# Core sigma 30 nm (resolvable with 20 nm z spacing at the wall; nm-scale cores come later with the mesh study),
+# core density 5e15 * Se(eV/A) * eta, about 2e19 cm^-3 in GaN at eta 1; TRIM vacancies spread to 20 nm.
+# Post state, no stress solve, hotEb 1.0 as the final model. BiCGSTAB (UMFPACK fails above ~50k points).
+POST = ("polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;hotEb=1.0;hotTau=1e-14;"
+        "damXmax=0.05;damMax=1e20;trapLevel=0.30;damField=lat;damEref=5.0e5;damM=4;damYmin=0.30;retryDepth=8;"
+        "stressSkip=1;noRampBack=1;doIdVg=0;Vd_max=6.0;Vd_step=0.25")
+T3 = f"{D3};bot3d=1.5;yCoarse=2;passMat=Nitride;zSpac0=0.02;mathDev3d={{row ilu bcgs scale}}"
+rows = [("umf_nz5_128g", f"{B};zSpac0=0.125;zSpac1=0.125")]
+for w in (0.25, 0.5, 1.0):
+    tb = tubes("SiN", 0.5, 0.0, 1.0, 0.03, 5e15, sigma_vac_floor=0.02)
+    rows.append((f"sin_trk_W{w:g}", f"{POST};{T3};W3d={w:g};zSpac1={min(0.1, w / 4):g};{tb}"))
+write("rad3dTrack1", rows)
