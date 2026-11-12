@@ -1988,3 +1988,5 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 ## 2026-11-12 afternoon: 3D validation passes (workstation recovered from a memory shortage; no data lost)
 
 - **rad3dSolve 51052220:** pre-irradiation 3D slice (3 z lines) vs 2D at the same coarsening: Id-Vd within 0.15%, Vth within 1.5 mV, gm +0.8%, both decks. Coarsening vs standard 2D: +1.6% at 1 V, +0.4% at 10 V. ILU+BiCGSTAB at 5 z lines matches within 0.05%, about 15 min per Vd point; GMRES wrong. 11 z lines still running. Details `kb/model/3d-plan.md`.
+
+- **rad3dTrack1 51061333 51061334** (UMFPACK 5 z lines at 128 GB; first SiN TRIM track at y 0.5 um on slices W 0.25/0.5/1 um, core sigma 30 nm, ~2e19 cm^-3 in GaN, BiCGSTAB, Vd to 6 V, 48 h limit).
