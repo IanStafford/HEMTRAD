@@ -1955,3 +1955,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 - **radExp1b 50847918 cancelled** (Ian standing permission) at 4.5 h: with occSafe the stress went past 17 V toward the 28 V target, so its damage would not match the final model. Final set and reruns now pin Vd_stress=17.0. Resubmitted as **radExp1c 50892179** (RUN 20261111_radExp1c).
 - radExp1 Gaussian tasks are still in the stress solve after 6.5 h (Vd 7-16 V, 45-83 retries); 24 h limit.
+
+## 2026-11-12: radExp1 and radExp1c analysed; radExp2 submitted
+
+- Deeper level (SiN, 17 V, occSafe): 0.40 eV drop at 1.3 V, 334 at 10 V; 0.50 eV drop at 0.9 V to 99, creeps to 239 at 10 V. Stays down like measured, but earlier onset. Vth +0.25-0.26 V on both decks (my Nov 11 note that it was 0.05 V less positive was backwards).
+- HighK with a Gaussian strike: smooth limit at 0.55 of pre. SiN Gaussian tasks: 2 TIMEOUT, 1 FAILED (overflow), all without occSafe.
+- **radExp2 51020993** (9 tasks, occSafe, Vd_stress 17): SiN Gaussian strikes again; damPeak 5e18/5.5e18/6e18; level 0.4-0.5 with damPeak 3e18-5e18. Details in `kb/results/rad-model.md`.
