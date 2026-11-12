@@ -1967,3 +1967,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **radHV 51027334** (6 tasks, Ian): final model (pre, nb, biased, both decks) Id-Vd to 28 V in 0.2 V steps at Vg +1 and 0, occSafe on, for high-Vd figures.
 
 - **radStrike2 51027921** (8 tasks, Ian: how does second-strike position set the second dip): final SiN set + Gaussian strike (sigma 40 nm, 3e18) at y 0.8 / 1.2 / 2.0 / 2.4 / 2.8 / 3.1 um (y 1.5 is in radExp2); and the final set with field damage cut off past y 1.0 and 0.7 um. The one-site final already dips 393 at 6.3 V to 333 at 7.7 V (5 nm).
+
+## 2026-11-12: final model moves to a 28 V stress (Ian)
+
+- Decision (Ian): stress at the real 28 V instead of 17 V. Damage scale to be refitted at hotEb 1.0 on the fine mesh.
+- **rad28fit 51040272** (6 tasks): SiN damPeak 1e18 / 2e18 / 3e18 / 4e18, HighK 1.5e18 / 4e18; with radExp3 (SiN 1.5e18, 2.5e18; HighK 2.5e18).
+- Then: rerun the final set, the high-Vd figures and the second-strike scan at 28 V. Jobs already running at 17 V (radExp2, radExp3 except its 28 V tasks, radHV biased, radStrike2) are left to finish as a 17 V comparison.
