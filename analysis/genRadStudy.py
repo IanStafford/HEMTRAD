@@ -384,3 +384,13 @@ with open("sweeps/params_radStrike2.txt", "w") as f:
     for ym in (1.0, 0.7):
         f.write(f"sin_cut{ym:g}|{FO}{SINd};damYmax={ym:g}\n")
 print("radStrike2 8")
+
+# ---- 2026-11-12 (Ian): the final model moves to a 28 V stress. Refit the damage scale at 28 V on the final set
+# (hotEb 1.0, occSafe, 10 nm over y 0.3-2.6). radExp3 already has SiN 1.5e18 / 2.5e18 and HighK 2.5e18.
+F28 = f"{FE};occSafe=1;Vd_stress=28.0;meshY={{0.3 0.01 2.6 0.01}}"
+with open("sweeps/params_rad28fit.txt", "w") as f:
+    for p in (1e18, 2e18, 3e18, 4e18):
+        f.write(f"sin_s28_p{p:g}|{F28}{SINd};damPeak={p:g}\n")
+    for p in (1.5e18, 4e18):
+        f.write(f"hk_s28_p{p:g}|{F28};damPeak={p:g}\n")
+print("rad28fit 6")
