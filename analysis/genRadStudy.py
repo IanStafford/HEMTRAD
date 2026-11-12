@@ -343,3 +343,21 @@ with open("sweeps/params_radExp2.txt", "w") as f:
     for lev, p in ((0.5, 3e18), (0.5, 5e18), (0.4, 5e18)):
         f.write(f"sin_L{lev:g}_p{p:g}|{FO}{SINd};trapLevel={lev:g};damPeak={p:g}\n")
 print("radExp2 9")
+
+# ---- 2026-11-12 (Ian: more tests aimed at the measured data), from the final set with occSafe and 17 V
+# (a) later onset: cooler hot electrons (hotTau); (b) stress at the real 28 V, where the field widens and may
+# place damage in two regions; (c) onset against Vg for the final SiN curve, fresh curves; (d) Ron(Vg) at low Vd,
+# biased against non-biased, both decks.
+with open("sweeps/params_radExp3.txt", "w") as f:
+    for tau in (5e-15, 7e-15):
+        f.write(f"sin_tau{tau:g}|{FO}{SINd};hotTau={tau:g}\n")
+    for d, dl, p in (("sin", SINd, 1.5e18), ("sin", SINd, 2.5e18), ("hk", "", 2.5e18)):
+        f.write(f"{d}_s28_p{p:g}|{FO}{dl};Vd_stress=28.0;damPeak={p:g};meshY={{0.3 0.01 2.6 0.01}}\n")
+    for vg in (-1, 0, 0.5):
+        f.write(f"sin_G{vg:g}|{FO}{SINd};doIdVg=0;Vg_out={vg:g}\n")
+    RV = ";Vd_max=1.0;VgFam={-2 -1 0};noRampBack=0"
+    f.write(f"hk_b_ron|{FO}{RV}\n")
+    f.write(f"sin_b_ron|{FO}{SINd}{RV}\n")
+    for d, dl in (("highk", ""), ("sin", SINd)):
+        f.write(f"nb_{d}_ron|{NB}{dl};{SKIP};{DAM2};hotEb=1.0{RV}\n")
+print("radExp3 12")
