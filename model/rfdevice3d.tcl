@@ -21,7 +21,8 @@ if {![info exists yCoarse]} { set yCoarse 1.0 }
 if {![info exists init3d]}  { set init3d "quad nogas" }
 
 pdbSetDouble Math iterLimit 300
-math device dim=3 col umf none scale
+if {![info exists mathDev3d]} { set mathDev3d "col umf none scale" }   ;# 3D device solver; UMFPACK fails above ~50k points
+eval math device dim=3 $mathDev3d
 
 mater add name=Metal
 mater add name=Nitride

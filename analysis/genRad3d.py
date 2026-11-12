@@ -42,3 +42,16 @@ rows = [("hk_nz3", f"{B};zSpac0=0.25;zSpac1=0.25"),
         ("hk_nz5_tet", f"{B};zSpac0=0.125;zSpac1=0.125;init3d={{}}"),
         ("sin_nz5", f"{B};zSpac0=0.125;zSpac1=0.125;passMat=Nitride")]
 write("rad3dBuild", rows)
+
+# ---- Phase C/D (2026-11-12): UMFPACK fails at 5+ z lines (about 85k points); try the iterative solvers.
+# Validate the 3-line deck against the 2D decks with the same coarsening (bot 1.5 um, y spacing x2).
+VAL = f"{PRE};doIdVg=1;Vd_max=10.0;Vd_step=0.25;noRampBack=1"
+C3 = f"{D3};bot3d=1.5;yCoarse=2;W3d=0.5"
+rows = [("hk_nz5_bcgs", f"{B};zSpac0=0.125;zSpac1=0.125;mathDev3d={{row ilu bcgs scale}}"),
+        ("hk_nz5_gmres", f"{B};zSpac0=0.125;zSpac1=0.125;mathDev3d={{col ilu gmres scale}}"),
+        ("hk_nz11_bcgs", f"{B};zSpac0=0.05;zSpac1=0.05;mathDev3d={{row ilu bcgs scale}}"),
+        ("hk3d_nz3_val", f"{VAL};{C3};zSpac0=0.25;zSpac1=0.25"),
+        ("sin3d_nz3_val", f"{VAL};{C3};zSpac0=0.25;zSpac1=0.25;passMat=Nitride"),
+        ("hk2d_coarse", f"{VAL};bot2d=1.5;yCoarse=2"),
+        ("sin2d_coarse", f"{VAL};deviceDeck=rfdevice_SiN.tcl;bot2d=1.5;yCoarse=2")]
+write("rad3dSolve", rows)

@@ -34,6 +34,9 @@ proc HEMT_Struct { } {
     set Gtr [expr {$Mid_Point + ($Gate_Length/2.0)}]
   
     set bot 7.5
+    # coarsening levers for 3D comparisons (2026-11-12), default = old mesh: buffer depth and y spacing factor
+    if {[info exists ::bot2d]} { set bot $::bot2d }
+    set c [expr {[info exists ::yCoarse] ? $::yCoarse : 1.0}]
     line x loc=-1.0 spac=0.05 tag=toptop
     line x loc=[expr 0.0-$SiN_Thick-$HPD_Thick-$FP_Thick] spac=0.05 tag=topFP
     line x loc=[expr 0.0-$Gate_Thick-$HPD_Thick] spac=0.05 tag=bottomFP
@@ -43,16 +46,16 @@ proc HEMT_Struct { } {
     line x loc=0.0 spac=0.001 tag=AlGaNTop
     line x loc=$Al_Thick spac=0.001 tag=AlGaNBottom
     line x loc=0.1 spac=0.01
-    line x loc=7.5 spac=0.25 tag=BBottom
+    line x loc=$bot spac=0.25 tag=BBottom
 
-    line y loc=[expr $Gtl-$SourceGate-0.125] spac=0.05 tag=left
+    line y loc=[expr $Gtl-$SourceGate-0.125] spac=[expr 0.05*$c] tag=left
     line y loc=[expr $Gtl-$SourceT] spac=0.03 tag=SourceT
     line y loc=[expr $Gtl] spac=0.01 tag=GateL
     line y loc=[expr $Gtr] spac=0.005 tag=GateR
     line y loc=[expr $Gtr+$FP_Offset] spac=0.01 tag=leftFP
     line y loc=[expr $Gtr+$DrainT] spac=0.01 tag=DrainT
     line y loc=[expr $Gtr+$FP2] spac=0.02 tag=rightFP
-    line y loc=[expr $Gtr+$DrainGate] spac=0.05 
+    line y loc=[expr $Gtr+$DrainGate] spac=[expr 0.05*$c] 
     line y loc=[expr $Gtr+$DrainGate+0.125] spac=0.05 tag=right
     # optional local refinement, {y spacing y spacing ...} in um (default none)
     if {[info exists ::meshY]} { foreach {yl sl} $::meshY { line y loc=$yl spac=$sl } }
