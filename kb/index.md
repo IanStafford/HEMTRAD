@@ -69,6 +69,7 @@ Second brain for the FLOOXS model of **radiation-induced current collapse** in a
 - [[rad-literature]] — literature on Vth, Ron and steps in irradiated HEMTs; nothing at our fluence (Nov 4)
 - [[damage-region-map]] — what damage in each device region does, one to five sites (Nov 2026)
 - [[ron-increase]] — Ron rise after biased irradiation: candidates and simulations (Nov 2026)
+- [[3d-plan]] — plan for a 3D slice of the gate width: FLOOXS support, phases, risks (Nov 12)
 - [[see-plan]] — plan: single-event transient (ion strike) via quasi-Fermi injection (Oct 29)
 - [[trap-sensitivity]] — one-at-a-time sweep of every trap lever (Oct 17)
 - [[critical-strike]] — strike probability at 1e7 ions/cm²

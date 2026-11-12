@@ -1973,3 +1973,5 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Decision (Ian): stress at the real 28 V instead of 17 V. Damage scale to be refitted at hotEb 1.0 on the fine mesh.
 - **rad28fit 51040272** (6 tasks): SiN damPeak 1e18 / 2e18 / 3e18 / 4e18, HighK 1.5e18 / 4e18; with radExp3 (SiN 1.5e18, 2.5e18; HighK 2.5e18).
 - Then: rerun the final set, the high-Vd figures and the second-strike scan at 28 V. Jobs already running at 17 V (radExp2, radExp3 except its 28 V tasks, radHV biased, radStrike2) are left to finish as a 17 V comparison.
+
+- **2026-11-12: 3D plan** (Ian): FLOOXS source survey and a phased plan in `kb/model/3d-plan.md`. Nothing run yet.
