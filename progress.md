@@ -1961,3 +1961,5 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Deeper level (SiN, 17 V, occSafe): 0.40 eV drop at 1.3 V, 334 at 10 V; 0.50 eV drop at 0.9 V to 99, creeps to 239 at 10 V. Stays down like measured, but earlier onset. Vth +0.25-0.26 V on both decks (my Nov 11 note that it was 0.05 V less positive was backwards).
 - HighK with a Gaussian strike: smooth limit at 0.55 of pre. SiN Gaussian tasks: 2 TIMEOUT, 1 FAILED (overflow), all without occSafe.
 - **radExp2 51020993** (9 tasks, occSafe, Vd_stress 17): SiN Gaussian strikes again; damPeak 5e18/5.5e18/6e18; level 0.4-0.5 with damPeak 3e18-5e18. Details in `kb/results/rad-model.md`.
+
+- **radExp3 51021670** (12 tasks, Ian: more tests aimed at the measured data): SiN hotTau 5e-15 / 7e-15; stress at 28 V (SiN damPeak 1.5e18, 2.5e18; HighK 2.5e18); final SiN at Vg -1 / 0 / +0.5; Ron(Vg) at Vd <= 1 V for biased and non-biased, both decks.
