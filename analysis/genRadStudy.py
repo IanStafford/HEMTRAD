@@ -370,3 +370,17 @@ with open("sweeps/params_radHV.txt", "w") as f:
         lab, lev = line.rstrip("\n").split("|", 1)
         f.write(f"{lab}_hv|{lev}{HV}\n")
 print("radHV 6")
+
+# ---- 2026-11-12 (Ian): how does the second strike's position set the Vd of the second dip? The one-site final
+# curve already dips (393 at 6.3 V to 333 at 7.7 V, 5 nm). Smooth second strike (sigma 40 nm, 3e18) along the
+# drift region on the final SiN set, plus the final set with its field-placed damage cut off past y 1.0 and 0.7 um
+# to find where the existing dip comes from.
+def gm2(y):
+    top = max(2.6, y + 0.2)
+    return f";meshY={{0.3 0.01 {top:g} 0.01 {y - 0.16:g} 0.005 {y + 0.16:g} 0.005}}"
+with open("sweeps/params_radStrike2.txt", "w") as f:
+    for y in (0.8, 1.2, 2.0, 2.4, 2.8, 3.1):
+        f.write(f"sin_s2_y{y:g}|{FO}{SINd};damGauss={{{{{y:g} 0.0 0.04 3e18}}}}{gm2(y)}\n")
+    for ym in (1.0, 0.7):
+        f.write(f"sin_cut{ym:g}|{FO}{SINd};damYmax={ym:g}\n")
+print("radStrike2 8")
