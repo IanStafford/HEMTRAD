@@ -109,5 +109,7 @@ Related: [[critical-strike]], [[damage-region-map]], [[mesh]], [[flooxs-overview
 **Solver:**
 - ILU+BiCGSTAB (`mathDev3d={row ilu bcgs scale}`) at 5 z lines gives the UMFPACK 3-line answer within 0.05% (373.55 against 373.60 mA/mm at 1 V). It's slower, about 15 min per Vd point against about 1 min.
 - ILU+GMRES gives nonsense (3080 mA/mm at 0.75 V) and is not used.
-- 11 z lines with BiCGSTAB is still running.
+- 11 z lines (187k points) with BiCGSTAB: 373.60 mA/mm at 1 V, identical to 3 lines; 4 points in 2h25, 4.4 GB.
+- UMFPACK at 5 z lines fails with "ERROR: out of memory" at 4.4 GB even with 128 GB allocated (job 51061333): the 32-bit index limit of the `di` interface, not RAM. Above about 50k points BiCGSTAB is the solver.
+- First tracks (rad3dTrack1 51061334, SiN, core sigma 30 nm): about 1-1.5 h per Vd point; results pending.
 

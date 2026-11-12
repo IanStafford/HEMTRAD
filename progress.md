@@ -1990,3 +1990,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **rad3dSolve 51052220:** pre-irradiation 3D slice (3 z lines) vs 2D at the same coarsening: Id-Vd within 0.15%, Vth within 1.5 mV, gm +0.8%, both decks. Coarsening vs standard 2D: +1.6% at 1 V, +0.4% at 10 V. ILU+BiCGSTAB at 5 z lines matches within 0.05%, about 15 min per Vd point; GMRES wrong. 11 z lines still running. Details `kb/model/3d-plan.md`.
 
 - **rad3dTrack1 51061333 51061334** (UMFPACK 5 z lines at 128 GB; first SiN TRIM track at y 0.5 um on slices W 0.25/0.5/1 um, core sigma 30 nm, ~2e19 cm^-3 in GaN, BiCGSTAB, Vd to 6 V, 48 h limit).
+
+## 2026-11-12 evening: 3D solver results; 2D sweeps still in their stress ramps
+
+- **rad3dSolve 51052220 done:** 11 z lines (187k points) with ILU+BiCGSTAB gives 373.60 mA/mm at 1 V, same as 3 lines (373.60) and 5 lines (373.55). 2h25 for 4 points, 4.4 GB. GMRES gave up at 1 V.
+- **UMFPACK test 51061333 (128 GB):** fails again at 5 z lines, "UMFPACK ... ERROR: out of memory" at 4.4 GB RSS with 128 GB allocated. This is the 32-bit (di) index limit, not RAM, so more memory doesn't help; above ~50k points BiCGSTAB is the only option.
+- **rad3dTrack1 51061334:** W 0.25 and 0.5 at Vd 0.5 V after 3.5 h (206.3 and 209.1 mA/mm); W 1 still on its first point. Roughly 1-1.5 h per Vd point, so the 6 V sweeps need most of the 48 h.
+- **2D sweeps still running, all in their stress ramps** (6-8.5 h in): rad28fit 12.5-22 V of 28; radStrike2 9-16.5 V; radExp2 Gaussian tasks 10-15 V; radExp3 28 V tasks 9-26 V. radHV: 4 of 6 done (to 28 V), pre tasks at their last curve. Risk: the 28 V ramps may not finish within 24 h; check at ~16 h.
