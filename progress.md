@@ -1963,3 +1963,5 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **radExp2 51020993** (9 tasks, occSafe, Vd_stress 17): SiN Gaussian strikes again; damPeak 5e18/5.5e18/6e18; level 0.4-0.5 with damPeak 3e18-5e18. Details in `kb/results/rad-model.md`.
 
 - **radExp3 51021670** (12 tasks, Ian: more tests aimed at the measured data): SiN hotTau 5e-15 / 7e-15; stress at 28 V (SiN damPeak 1.5e18, 2.5e18; HighK 2.5e18); final SiN at Vg -1 / 0 / +0.5; Ron(Vg) at Vd <= 1 V for biased and non-biased, both decks.
+
+- **radHV 51027334** (6 tasks, Ian): final model (pre, nb, biased, both decks) Id-Vd to 28 V in 0.2 V steps at Vg +1 and 0, occSafe on, for high-Vd figures.
