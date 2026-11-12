@@ -1965,3 +1965,5 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **radExp3 51021670** (12 tasks, Ian: more tests aimed at the measured data): SiN hotTau 5e-15 / 7e-15; stress at 28 V (SiN damPeak 1.5e18, 2.5e18; HighK 2.5e18); final SiN at Vg -1 / 0 / +0.5; Ron(Vg) at Vd <= 1 V for biased and non-biased, both decks.
 
 - **radHV 51027334** (6 tasks, Ian): final model (pre, nb, biased, both decks) Id-Vd to 28 V in 0.2 V steps at Vg +1 and 0, occSafe on, for high-Vd figures.
+
+- **radStrike2 51027921** (8 tasks, Ian: how does second-strike position set the second dip): final SiN set + Gaussian strike (sigma 40 nm, 3e18) at y 0.8 / 1.2 / 2.0 / 2.4 / 2.8 / 3.1 um (y 1.5 is in radExp2); and the final set with field damage cut off past y 1.0 and 0.7 um. The one-site final already dips 393 at 6.3 V to 333 at 7.7 V (5 nm).
