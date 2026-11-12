@@ -81,3 +81,33 @@ By symmetry that's a periodic row of tracks spaced 2W apart along the width. The
 - **If the interface panics:** move the material boundary where three meet, or simplify the T-gate/field-plate geometry for the 3D deck only.
 
 Related: [[critical-strike]], [[damage-region-map]], [[mesh]], [[flooxs-overview]], [[flooxs-solver]].
+
+## Results so far (2026-11-12)
+
+**TRIM, model-deck stacks** (Au 2256 MeV, full cascades, 200 ions, local, 22 s each; `analysis/trimTrack.py`, `data/trim/*_track.json`):
+- Totals agree with TRIM's own vacancy counts within 3%.
+- Top 50 nm of GaN: 0.21–0.27 vacancies per nm per ion, median radius 1.5–2 nm, on-axis density about 1e17–2e18 cm⁻³.
+- Most ions leave no vacancy in the 15 nm AlGaN.
+- Nuclear displacements alone are below the collapse threshold, so the electronic track core (Se about 41 keV/nm in GaN) carries the damage.
+
+**Build** (rad3dBuild, job 51045898):
+- Bricks without the gas region (`init quad nogas`) build the full multi-material deck with no MakeInterfaces failure.
+- Tetrahedra fail (TetGen error code 2).
+- 3 z lines over 0.5 µm: 51k points, 1.9 GB, about 1 min per Vd point.
+- UMFPACK fails ("numeric factorization") at 5 z lines (85k points) and 11 (187k), at about 4.4 GB, so not memory.
+
+**Validation** (rad3dSolve, job 51052220): pre-irradiation 3D at 3 z lines against 2D at the same coarsening (buffer 1.5 µm, y spacing ×2).
+
+| Deck | Id–Vd max difference | Vth 3D / 2D | gm 3D / 2D |
+|---|---|---|---|
+| HighK | 0.15% | −2.9979 / −2.9964 V | 68.67 / 68.14 |
+| SiN | 0.14% | −2.9976 / −2.9961 V | 69.05 / 68.51 |
+
+- The coarsening itself adds +1.6% at 1 V and +0.4% at 10 V against the standard 2D mesh, a little over the 1% target at low Vd. It's the same for 2D and 3D, so comparisons on one mesh are clean.
+- The polarization interface works in 3D.
+
+**Solver:**
+- ILU+BiCGSTAB (`mathDev3d={row ilu bcgs scale}`) at 5 z lines gives the UMFPACK 3-line answer within 0.05% (373.55 against 373.60 mA/mm at 1 V). It's slower, about 15 min per Vd point against about 1 min.
+- ILU+GMRES gives nonsense (3080 mA/mm at 0.75 V) and is not used.
+- 11 z lines with BiCGSTAB is still running.
+

@@ -1984,3 +1984,7 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 - **rad3dBuild 51045898 results:** bricks without gas build with no MakeInterfaces failure. 3 z lines (51k points, 1.9 GB): Id 373.6 mA/mm at Vd 1 V vs 368.2 in standard 2D. 5 and 11 z lines (85k, 187k points): "Error in UMFPACK numeric factorization" at about 4.4 GB, not a memory limit. Tets: TetGen error code 2.
 - **rad3dSolve 51052220** (7 tasks): ILU+BiCGSTAB and ILU+GMRES at 5 and 11 z lines; full pre-irradiation validation of the 3-line 3D deck on both decks against 2D decks with the same coarsening (new default-off levers bot2d, yCoarse in rfdevice*.tcl).
+
+## 2026-11-12 afternoon: 3D validation passes (workstation recovered from a memory shortage; no data lost)
+
+- **rad3dSolve 51052220:** pre-irradiation 3D slice (3 z lines) vs 2D at the same coarsening: Id-Vd within 0.15%, Vth within 1.5 mV, gm +0.8%, both decks. Coarsening vs standard 2D: +1.6% at 1 V, +0.4% at 10 V. ILU+BiCGSTAB at 5 z lines matches within 0.05%, about 15 min per Vd point; GMRES wrong. 11 z lines still running. Details `kb/model/3d-plan.md`.
