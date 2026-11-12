@@ -1,0 +1,98 @@
+{
+ "deck": "HighK",
+ "ion": "Au 2256 MeV",
+ "ions": 200,
+ "source": "results/trim_HighK",
+ "layers": [
+  {
+   "layer": "HfO2",
+   "depth_nm": [
+    0.0,
+    250.0
+   ],
+   "vac_per_nm": 0.475,
+   "vac_per_nm_sd_between_ions": 2.1552,
+   "sigma_nm": 13.678,
+   "r50_nm": 7.619,
+   "r90_nm": 30.263,
+   "peak_cm3": 4.041e+17,
+   "Se_eV_per_A": 5137.0,
+   "n_vac": 23749
+  },
+  {
+   "layer": "Si3N4",
+   "depth_nm": [
+    250.0,
+    300.0
+   ],
+   "vac_per_nm": 0.564,
+   "vac_per_nm_sd_between_ions": 4.0036,
+   "sigma_nm": 19.609,
+   "r50_nm": 21.893,
+   "r90_nm": 41.067,
+   "peak_cm3": 2.334e+17,
+   "Se_eV_per_A": 2796.9,
+   "n_vac": 5640
+  },
+  {
+   "layer": "AlGaN",
+   "depth_nm": [
+    300.0,
+    315.0
+   ],
+   "vac_per_nm": 0.3433,
+   "vac_per_nm_sd_between_ions": 2.6351,
+   "sigma_nm": 92.294,
+   "r50_nm": 87.51,
+   "r90_nm": 219.349,
+   "peak_cm3": 6415000000000000.0,
+   "Se_eV_per_A": 3767.6,
+   "n_vac": 1030
+  },
+  {
+   "layer": "GaN_top50nm",
+   "depth_nm": [
+    315.0,
+    365.0
+   ],
+   "vac_per_nm": 0.2663,
+   "vac_per_nm_sd_between_ions": 1.0244,
+   "sigma_nm": 61.56,
+   "r50_nm": 2.09,
+   "r90_nm": 227.661,
+   "peak_cm3": 1.118e+16,
+   "Se_eV_per_A": 4069.3,
+   "n_vac": 2663
+  },
+  {
+   "layer": "GaN_50-500nm",
+   "depth_nm": [
+    365.0,
+    815.0
+   ],
+   "vac_per_nm": 0.2632,
+   "vac_per_nm_sd_between_ions": 0.3327,
+   "sigma_nm": 28.271,
+   "r50_nm": 2.132,
+   "r90_nm": 15.777,
+   "peak_cm3": 5.24e+16,
+   "Se_eV_per_A": 4073.0,
+   "n_vac": 23684
+  },
+  {
+   "layer": "GaN_0.5-2um",
+   "depth_nm": [
+    815.0,
+    2315.0
+   ],
+   "vac_per_nm": 0.3548,
+   "vac_per_nm_sd_between_ions": 0.5749,
+   "sigma_nm": 56.522,
+   "r50_nm": 4.437,
+   "r90_nm": 127.427,
+   "peak_cm3": 1.767e+16,
+   "Se_eV_per_A": 4087.8,
+   "n_vac": 106430
+  }
+ ]
+}

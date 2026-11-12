@@ -35,7 +35,7 @@ LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/sweeps/$PARAMS")
 LABEL=${LINE%%|*}
 PAIRS=${LINE#*|}
 
-for f in GaN_modelfile_masterD GaN.tcl AlGaN.tcl Insulator.tcl Metal.tcl Continuity.tcl Poisson.tcl rfdevice.tcl rfdevice_SiN.tcl; do
+for f in GaN_modelfile_masterD GaN.tcl AlGaN.tcl Insulator.tcl Metal.tcl Continuity.tcl Poisson.tcl rfdevice.tcl rfdevice_SiN.tcl rfdevice3d.tcl; do
     cp "$REPO/model/$f" "$TASK_DIR/$f"
 done
 
