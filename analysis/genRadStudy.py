@@ -394,3 +394,20 @@ with open("sweeps/params_rad28fit.txt", "w") as f:
     for p in (1.5e18, 4e18):
         f.write(f"hk_s28_p{p:g}|{F28};damPeak={p:g}\n")
 print("rad28fit 6")
+
+# ---- 2026-11-13 (Ian): slides comparing 1, 2 and 3 ion strikes in SiN and HighK. Final set (17 V stress,
+# hotEb 1.0, occSafe), biased, plus N Gaussian strikes (sigma 40 nm, 3e18, at the AlGaN top) at y 0.8, 1.6, 2.4 um,
+# added in that order. N = 0 is rerun on the same mesh (10 nm over y 0.3-2.6, 5 nm within 0.16 um of each strike).
+SY = (0.8, 1.6, 2.4)
+def gmN(ys):
+    s = "0.3 0.01 2.6 0.01"
+    for y in ys:
+        s += f" {y - 0.16:g} 0.005 {y + 0.16:g} 0.005"
+    return f";meshY={{{s}}}"
+with open("sweeps/params_radStrikeN.txt", "w") as f:
+    for deck, dk in (("sin", SINd), ("hk", "")):
+        for n in range(4):
+            ys = SY[:n]
+            g = (";damGauss={" + " ".join(f"{{{y:g} 0.0 0.04 3e18}}" for y in ys) + "}") if ys else ""
+            f.write(f"{deck}_N{n}|{FO}{dk}{g}{gmN(ys)}\n")
+print("radStrikeN 8")
