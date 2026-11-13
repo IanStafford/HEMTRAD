@@ -1999,3 +1999,11 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **2D sweeps still running, all in their stress ramps** (6-8.5 h in): rad28fit 12.5-22 V of 28; radStrike2 9-16.5 V; radExp2 Gaussian tasks 10-15 V; radExp3 28 V tasks 9-26 V. radHV: 4 of 6 done (to 28 V), pre tasks at their last curve. Risk: the 28 V ramps may not finish within 24 h; check at ~16 h.
 - **HPG master connection dropped** (evening, 2026-11-12); the job watcher stopped. Jobs on HPG are unaffected. No reconnect attempted yet: waiting for Ian to be ready to approve the Duo push before the ~16 h check on rad28fit.
 - **2026-11-12 ~23:50:** reconnected by hand (`ssh -fN hpg` from the app's Terminal panel; `bin/hpg_reconnect.sh` fails inside the desktop app because snap tmux can't start under NoNewPrivs). At 23:57, 20 of my tasks still running. The master dropped again before 00:38. Not retrying; waiting for Ian (best fix: run the session from a regular terminal, or install tmux from apt).
+
+## 2026-11-13 00:50: job status after reconnect
+
+- **Done:** radHV (6/6, figures to 28 V); radExp3 (12/12); radExp2 7 of 9; radStrike2 6 of 8; rad28fit 3 of 6 (SiN p1e18: 625.7 mA/mm at 10 V; HighK p1.5e18 956.0, p4e18 942.9).
+- **Failed:** radStrike2 task 5 (second strike at y 3.1 um, nearest the drain): the 17 V stress ramp gave up at Vd 7 V ("RAMP GAVE UP D at 7.0").
+- **Still running:** radExp2 tasks 0-1 (23 h of 24 h; task 0 at 8.6 V of its last curve, task 1 has no curve yet, so it will time out); radStrike2 y 1.2 (at 7.8 V); rad28fit SiN p2/3/4e18 (20.5 h, no curve yet, likely to time out at 24 h); rad3dTrack1 W 0.25/0.5/1 at 0.75/3.75/1.25 V (18 h of 48 h).
+- The hfport jobs (51096601, 51100607-11, 51171952-55, 51173648-9) belong to the HEMTRAD-FANGS session, not this one.
+- Next: analyse the finished sets (HV figures, strike position against second-dip Vd, 28 V refit).
