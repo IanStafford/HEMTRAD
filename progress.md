@@ -2012,3 +2012,11 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 - Ian asked for slides comparing 1, 2 and 3 ion strikes in SiN and HighK. Decisions (Ian): strikes on top of the final model; 17 V stress; a new short deck.
 - **radStrikeN 51174895** (8 tasks, 48 h limit): final set (biased, hotEb 1.0, occSafe, 17 V) plus 0/1/2/3 Gaussian strikes (sigma 40 nm, 3e18 cm^-3, AlGaN top) at y 0.8, then 1.6, then 2.4 um; both decks. N = 0 rerun on the same mesh (10 nm over y 0.3-2.6, 5 nm around each strike). Expect 15-25 h.
+
+## 2026-11-13 midday: dashboard updated (Nov 12-13 page)
+
+- Synced radHV, radExp2, radExp3, rad28fit, rad3dTrack1 (partial). Figures `figures/rad/radHV_28V.png`, `figures/rad/radStrike2_pos.png` (`analysis/plot_nov12.py`).
+- radHV: HighK biased 959 mA/mm at 28 V (0.93 of pre); SiN biased (Vg +1) 457 -> 370 near 2.2 V, second dip 528 -> 460 near 9.5-12 V, 621 at 28 V; at Vg 0 ~0 until 5 V, 600 at 28 V.
+- radStrike2: second strike at y 1.2-2.8 leaves the curve within a few mA/mm of the no-strike case; at 0.8 it is ~30 mA/mm higher. Field damage cut at y 0.7 or 1.0 changes nothing. The y 3.1 task failed in the stress ramp at 7 V.
+- radExp2/3: no route stays down (scale 5/5.5/6e18: 706/661/594 at 10 V; tau 5e-15/7e-15: 586/555; Gaussian second strikes ~490; level 0.4-0.5 eV recovers). 28 V: SiN 1e18 626, 1.5e18 392 (drop 63 at 1.8 V), 2.5e18 ~0; HighK 2.5e18/4e18 952/943, no collapse. rad28fit SiN 2/3/4e18 hit the 24 h limit.
+- **Open:** every occSafe run (17 V pinned) reports peakN(GaN) 5.0e18 against 5.9e18 in radEB1 for the same stress field, and a weaker SiN collapse (~500 vs 370 mA/mm at 10 V). Needs a look before the strike-count numbers are compared with the Nov 11 final.

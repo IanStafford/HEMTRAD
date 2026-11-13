@@ -37,3 +37,5 @@ updated: 2026-11-11
 - Is a trap blob ~2 µm into the access region physically plausible? ([[static-era-lessons]])
 
 Update this note when a result changes the picture.
+
+- **Nov 12-13 (dashboard page Nov 12-13):** final model checked to Vd 28 V (radHV: HighK 0.93 of pre throughout; SiN biased dips near 2 and 9.5 V, 621 mA/mm at 28 V; at Vg 0 SiN is off until 5 V). Second-strike position barely changes SiN (radStrike2). 28 V stress refit: SiN scale between 1e18 and 2.5e18 (1.5e18 gives 392 at 10 V); HighK no collapse up to 4e18. Open: occSafe runs place ~15% less peak damage (5.0e18 vs 5.9e18) than the Nov 11 radEB1 run, so the SiN collapse is weaker (457 -> 370 at 2.2 V, ~500 at 10 V vs 370). 0-3 strike runs for the SiN vs HighK slides: radStrikeN 51174895. 3D: [[3d-plan]].

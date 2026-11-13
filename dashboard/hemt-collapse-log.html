@@ -120,7 +120,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
   <header class="top">
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">FLOOXS model of an AlGaN/GaN HEMT: what ran each day and what is still open. Id in <span style="white-space:nowrap">mA/mm</span> at Vg = −2 V unless noted; work before Oct 1 used constant mobility and is archived.</p>
-    <p class="meta">Snapshot Nov 11</p>
+    <p class="meta">Snapshot Nov 13, midday</p>
   </header>
 
   <div class="layout">
@@ -128,6 +128,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
       <div class="sep"></div>
       <div class="era">Field mobility</div>
+      <a href="#nov13" data-page="nov13"><span class="d">Nov 12–13</span><span class="t">28 V · strikes · 3D</span></a>
       <a href="#nov11" data-page="nov11"><span class="d">Nov 7–11</span><span class="t">real collapse · final</span></a>
       <a href="#nov05" data-page="nov05"><span class="d">Nov 5</span><span class="t">mesh check · Ron</span></a>
       <a href="#nov04" data-page="nov04"><span class="d">Nov 4</span><span class="t">damage map · merge</span></a>
@@ -159,26 +160,29 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <section class="page" id="overview" data-title="Overview">
         <div class="pagehead">
           <h2>Where things stand</h2>
-          <p>The final rad model now uses a 1.0 eV capture barrier on a fine mesh: SiN collapses once, by about a third near 1.7 V, and HighK doesn't, with the result unchanged at 5 nm. Next is finding what gives the second SiN step, the current staying down, and an onset that moves with Vg.</p>
+          <p>The final model still collapses SiN and not HighK, now checked to Vd 28 V. Where a second strike lands barely changes the SiN curve. The stress moves to 28 V, with its damage scale between 1e18 and 2.5e18. A 3D slice of the device matches 2D, and the first ion-track runs are going. Next: the 0–3 strike runs for the SiN vs HighK slides, due early Nov 14.</p>
         </div>
         <div class="tiles">
-          <div class="tile"><span class="k">Final model, SiN biased</span><span class="v">−32% at 1.7 V</span><span class="s">374 → 255 mA/mm, partial recovery, 370 at 10 V. Same at 5 nm.</span></div>
-          <div class="tile"><span class="k">Final model, HighK biased</span><span class="v">No collapse</span><span class="s">0.92 of pre at every Vd, gm −2%.</span></div>
+          <div class="tile"><span class="k">Final model, SiN biased</span><span class="v">Collapses near 2 V</span><span class="s">Nov 11 run 374 → 255 mA/mm at 1.7 V; runs with the overflow-safe occupancy 457 → 370 at 2.2 V. Checking why they differ.</span></div>
+          <div class="tile"><span class="k">Final model, HighK biased</span><span class="v">No collapse</span><span class="s">0.92–0.93 of pre at every Vd, now to 28 V.</span></div>
           <div class="tile"><span class="k">Vth shift</span><span class="v">+0.21 V</span><span class="s">Every irradiated device; only damage under the gate moves it.</span></div>
         </div>
 
         <div class="panel">
           <h3>Open items</h3>
           <ul class="todo">
-            <li><span class="pill progress">in progress</span><span>Second SiN step: a smooth (Gaussian) second strike, which does converge, instead of the hand-placed uniform one. <a class="daylink" href="#nov11">Nov 11</a></span></li>
-            <li><span class="pill progress">in progress</span><span>SiN current recovers after the drop; measured stays down. Deeper trap levels collapsed and stayed down on a fine mesh. <a class="daylink" href="#nov11">Nov 11</a></span></li>
-            <li><span class="pill open">open</span><span>Onset should move later at higher Vg (R33); the model's is flat, 1.2–1.4 V from Vg −1.5 to +1. <a class="daylink" href="#nov11">Nov 11</a></span></li>
-            <li><span class="pill open">open</span><span>Cause of the biased Ron rise: dielectric charge, access acceptors and mobility loss all fit so far. <a class="daylink" href="#nov05">Nov 5</a></span></li>
+            <li><span class="pill progress">in progress</span><span>0, 1, 2 and 3 strikes in SiN and HighK for the comparison slides: 8 tasks running, results due early Nov 14. <a class="daylink" href="#nov13">Nov 13</a></span></li>
+            <li><span class="pill open">open</span><span>Runs with the overflow-safe occupancy place about 15% less peak damage (5.0e18 vs 5.9e18) and give a weaker SiN collapse than the Nov 11 final run. <a class="daylink" href="#nov13">Nov 13</a></span></li>
+            <li><span class="pill progress">in progress</span><span>28 V stress: SiN damage scale between 1e18 (no collapse) and 2.5e18 (current gone); three tasks hit the 24 h limit. <a class="daylink" href="#nov13">Nov 13</a></span></li>
+            <li><span class="pill progress">in progress</span><span>3D slice: matches 2D within 0.15%; first ion-track runs at 1–1.5 h per Vd point. <a class="daylink" href="#nov13">Nov 13</a></span></li>
+            <li><span class="pill open">open</span><span>SiN current recovers after the drop and the onset doesn't move with Vg; measured stays down and moves later. <a class="daylink" href="#nov11">Nov 11</a></span></li>
             <li><span class="pill noted">noted</span><span>Waiting on a comprehensive measured set: same-device pre and post, width, Vth, Vg order. <a class="daylink" href="#nov05">Nov 5</a></span></li>
           </ul>
           <details class="older">
-            <summary>Older questions (11)</summary>
+            <summary>Older questions (13)</summary>
             <ul class="todo">
+              <li><span class="pill noted">noted</span><span>Second SiN step from a smooth second strike: its position barely moves the curve, so a second strike doesn't make the second step. <a class="daylink" href="#nov13">Nov 13</a></span></li>
+              <li><span class="pill open">open</span><span>Cause of the biased Ron rise: dielectric charge, access acceptors and mobility loss all fit so far. <a class="daylink" href="#nov05">Nov 5</a></span></li>
               <li><span class="pill noted">noted</span><span>Rad model fitting choices: no gate-edge damage, hand-placed second SiN strike site, lumped gate–drain leakage. <a class="daylink" href="#oct27">Oct 27</a></span></li>
               <li><span class="pill open">open</span><span>Pulsed-IV collapse at Vg −2 (~1000× at 0.4–0.5 V): no single trap lever reaches it from the late set. <a class="daylink" href="#oct17">Oct 17</a></span></li>
               <li><span class="pill noted">parked</span><span>Time-limited capture, waiting for the curve-tracer pulse width and onset vs Vg. <a class="daylink" href="#oct21">Oct 21</a></span></li>
@@ -193,6 +197,41 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
             </ul>
           </details>
         </div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- NOV 12-13 -->
+      <section class="page" id="nov13" data-title="Nov 12–13">
+        <div class="pagehead">
+          <h2>Nov 12–13 · 28 V, strike position, and a 3D device</h2>
+          <p>The final model holds to Vd 28 V, a second strike barely changes SiN, the stress moves to 28 V, and a 3D slice of the device now matches 2D.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 51020993 · 51021670 · 51027334 · 51027921 · 51040272 · 51045898 · 51052220 · 51061333–4 · 51174895</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Final model to Vd 28 V: HighK stays at <span class="num">0.93 of pre</span> throughout. SiN at Vg +1 drops near 2 V and again near 9.5 V, then climbs to <span class="num">621 mA/mm</span> at 28 V. At Vg 0 SiN carries almost nothing until 5 V.</li>
+              <li>A second Gaussian strike (3e18, 40 nm) anywhere from y 1.2 to 2.8 µm leaves the SiN curve within <span class="num">a few mA/mm</span>; at 0.8 µm it raises the current by about 30. Cutting the field damage off past 0.7 µm changes nothing, so the dips come from damage near the gate.</li>
+              <li>Other routes to a deeper, later SiN collapse: damage scale 5–6e18 (<span class="num">706–594</span> at 10 V), shorter capture time, a 0.4–0.5 eV level and Gaussian second strikes all recover; none stays down.</li>
+              <li>28 V stress refit: SiN at 1e18 doesn't collapse (626 at 10 V), 1.5e18 drops near 1.8 V (<span class="num">392</span> at 10 V), 2.5e18 shuts the channel; HighK doesn't collapse even at 4e18.</li>
+              <li>3D: TRIM tracks for both decks (Au 2256 MeV, about <span class="num">0.2–0.27</span> vacancies per nm per ion near the 2DEG); a brick-mesh 3D slice builds and matches 2D within <span class="num">0.15%</span>. UMFPACK stops at about 50k points whatever the memory, so larger meshes use BiCGSTAB.</li>
+              <li>Started the 0–3 strike comparison for the SiN vs HighK slides (job 51174895): final model plus strikes at y 0.8, 1.6 and 2.4 µm, both decks.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill progress">in progress</span><span>0–3 strike runs, then the slides.</span></li>
+              <li><span class="pill open">open</span><span>Why the overflow-safe occupancy runs place less damage than the Nov 11 final run.</span></li>
+              <li><span class="pill progress">in progress</span><span>28 V refit: rerun the three SiN tasks that hit the 24 h limit with a longer limit.</span></li>
+              <li><span class="pill progress">in progress</span><span>First 3D ion tracks (slices 0.25, 0.5, 1 µm wide).</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs">
+          <figure><a class="img" href="fig/radHV_28V.jpg" target="_blank" rel="noopener"><img src="fig/radHV_28V.jpg" alt="Final model Id-Vd to 28 V at Vg +1 and 0 V: HighK biased sits just under pre; SiN biased drops near 2 V and 9.5 V then rises to about 620 mA/mm; at Vg 0 SiN is off until 5 V" loading="lazy"></a><figcaption><b>Final model to Vd 28 V</b>HighK stays at 0.93 of pre; SiN dips twice, then climbs to 621 mA/mm.</figcaption></figure>
+          <figure><a class="img" href="fig/radStrike2_pos.jpg" target="_blank" rel="noopener"><img src="fig/radStrike2_pos.jpg" alt="SiN biased Id-Vd with a second Gaussian strike at five positions: all curves overlap within a few mA/mm except y 0.8, which is about 30 mA/mm higher" loading="lazy"></a><figcaption><b>Second strike position, SiN</b>Where the strike lands barely matters; the dips come from damage near the gate.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#nov11">Nov 7–11 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
@@ -227,7 +266,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           <figure><a class="img" href="fig/gauss_mesh.jpg" target="_blank" rel="noopener"><img src="fig/gauss_mesh.jpg" alt="Gaussian traps on the standard and 5 nm meshes, log scale: the collapse survives on 5 nm but the long stay near zero does not" loading="lazy"></a><figcaption><b>Gaussian traps, coarse vs fine mesh</b>The drop is real; its depth and recovery were the mesh.</figcaption></figure>
           <figure><a class="img" href="fig/placement_4e18.jpg" target="_blank" rel="noopener"><img src="fig/placement_4e18.jpg" alt="Id-Vd for one 0.3 micron site at 4e18 at 14 positions on a 5 nm mesh, with the current level and Vd over Id against position" loading="lazy"></a><figcaption><b>Strike placement, 5 nm</b>Only the gate and its neighbours stand out; Vd/Id at 0.25 V barely moves.</figcaption></figure>
         </div>
-        <div class="pager"><a href="#overview">← Overview</a><a href="#nov05">Nov 5 →</a></div>
+        <div class="pager"><a href="#nov13">← Nov 12–13</a><a href="#nov05">Nov 5 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
