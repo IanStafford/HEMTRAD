@@ -2007,3 +2007,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Still running:** radExp2 tasks 0-1 (23 h of 24 h; task 0 at 8.6 V of its last curve, task 1 has no curve yet, so it will time out); radStrike2 y 1.2 (at 7.8 V); rad28fit SiN p2/3/4e18 (20.5 h, no curve yet, likely to time out at 24 h); rad3dTrack1 W 0.25/0.5/1 at 0.75/3.75/1.25 V (18 h of 48 h).
 - The hfport jobs (51096601, 51100607-11, 51171952-55, 51173648-9) belong to the HEMTRAD-FANGS session, not this one.
 - Next: analyse the finished sets (HV figures, strike position against second-dip Vd, 28 V refit).
+
+## 2026-11-13: strike-count slides (Ian)
+
+- Ian asked for slides comparing 1, 2 and 3 ion strikes in SiN and HighK. Decisions (Ian): strikes on top of the final model; 17 V stress; a new short deck.
+- **radStrikeN 51174895** (8 tasks, 48 h limit): final set (biased, hotEb 1.0, occSafe, 17 V) plus 0/1/2/3 Gaussian strikes (sigma 40 nm, 3e18 cm^-3, AlGaN top) at y 0.8, then 1.6, then 2.4 um; both decks. N = 0 rerun on the same mesh (10 nm over y 0.3-2.6, 5 nm around each strike). Expect 15-25 h.
