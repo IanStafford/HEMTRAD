@@ -2020,3 +2020,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - radStrike2: second strike at y 1.2-2.8 leaves the curve within a few mA/mm of the no-strike case; at 0.8 it is ~30 mA/mm higher. Field damage cut at y 0.7 or 1.0 changes nothing. The y 3.1 task failed in the stress ramp at 7 V.
 - radExp2/3: no route stays down (scale 5/5.5/6e18: 706/661/594 at 10 V; tau 5e-15/7e-15: 586/555; Gaussian second strikes ~490; level 0.4-0.5 eV recovers). 28 V: SiN 1e18 626, 1.5e18 392 (drop 63 at 1.8 V), 2.5e18 ~0; HighK 2.5e18/4e18 952/943, no collapse. rad28fit SiN 2/3/4e18 hit the 24 h limit.
 - **Open:** every occSafe run (17 V pinned) reports peakN(GaN) 5.0e18 against 5.9e18 in radEB1 for the same stress field, and a weaker SiN collapse (~500 vs 370 mA/mm at 10 V). Needs a look before the strike-count numbers are compared with the Nov 11 final.
+
+## 2026-11-13 afternoon: occSafe discrepancy explained; 28 V refit resubmitted
+
+- **rad28fitB 51196550** (Ian): rad28fit SiN tasks 1-3 (damPeak 2e18, 3e18, 4e18 at 28 V) rerun with a 48 h limit; the originals hit 24 h still in the stress ramp.
+- **occSafe isn't the cause.** The pre-occSafe final runs (radFinal8 to radEB1) were stressed at about 17.66 V, not 17.0: when the ramp fails above 17 V, `Reach` keeps the converged half steps (radEB1 log: last success 17.66015625 V), the loop breaks with dS 17.0, and the field is taken from the 17.66 V state. (17.66/17)^4 = 1.16 vs peakN ratio 1.18. occSafe runs pinned at 17.0 are really at 17.0, hence less damage and a weaker SiN collapse.
+- Driver fix (no physics change): radIV prints the Vd the stress field was taken at, and adds a last ramp step to Vd_stress when it isn't a multiple of stressStep (no effect for 17.0/28.0). Details `kb/results/rad-model.md`.
+- **Decision for Ian:** the strike-count runs (radStrikeN) are at a true 17.0 V. To match the Nov 11 final numbers they'd need Vd_stress 17.66. Alternatively use them as they are, or move everything to 28 V once the refit settles.

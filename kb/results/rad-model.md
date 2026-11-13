@@ -268,3 +268,11 @@ Figure `figures/rad/radExp1.png`. SiN biased unless stated, Vg +1 V, Id in mA/mm
 - **The SiN Gaussian tasks didn't finish:** two timed out in the stress solve at 12.5–15.5 V (over 200 retries), one overflowed at 17 V. None had occSafe. Rerun in radExp2 with occSafe and the stress pinned at 17 V.
 - **Running (radExp2):** SiN Gaussian second strikes again; damage scale 5e18–6e18 (does the onset move later near threshold?); level 0.40–0.50 eV with a smaller scale (later onset that still stays down?).
 
+
+## The "17 V" stress of the pre-occSafe runs was 17.66 V (found 2026-11-13)
+
+Runs with `occSafe 1` and `Vd_stress=17.0` (radHV, radStrike2, radExp2/3, radStrikeN) place about 15% less peak damage than the Nov 11 final run radEB1 (peakN(GaN) 5.0e18 against 5.9e18) and give a weaker SiN collapse (457 → 370 mA/mm near 2.2 V and about 500 at 10 V, against 374 → 255 near 1.7 V and 370).
+
+The cause is the stress ramp, not occSafe. Without occSafe the ramp aims for 28 V and fails above 17 V. `Reach` bisects the failing step and keeps every half step that converges, so the device ends at the furthest converged point, **17.66 V** in radEB1 (log 50411481_1: last success 17.66015625 V). The loop then breaks with `dS` still 17.0, the field is taken from the 17.66 V state, and the summary says "Vd=17.0". Field scales about with Vd, so damage ∝ E⁴ rises by (17.66/17)⁴ ≈ 1.16, matching the 1.18 ratio of peakN. Every final-model run before `occSafe` (radFinal8 through radEB1/radEB2) was stressed this way, at about 17.6–17.7 V, wherever the overflow stopped it.
+
+`drivers/radIV.tcl` now records the last converged drain voltage and prints it ("field taken at Vd=…"); the physics and the old runs' behaviour are unchanged. It also ends the ramp at `Vd_stress` when that isn't a multiple of `stressStep` (no effect for 17.0 or 28.0), so the Nov 11 final can be reproduced with `occSafe 1` and `Vd_stress=17.66`.

@@ -184,6 +184,7 @@ proc TryBias {c v fill} {
         device
         if {$fill && $::useTraps} { set ::te [FillStep $::fillIters $::fillRelax] }
     }]} { return 0 }
+    set ::lastOK($c) $v
     return 1
 }
 # Reach contact c = v from the converged vPrev, bisecting on failure.
@@ -233,10 +234,18 @@ if {$radState eq "post"} {
         # is at least Vd_stressMin; the damage law's scale absorbs the field magnitude.
         foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue $stressQfnDamp; pdbSetDouble $m Qfn Abs.Error $stressQfnAbs }
         set dS 0.0
-        for {set d $stressStep} {$d <= $Vd_stress + 1e-9} {set d [expr {$d + $stressStep}]} {
+        set ::lastOK(D) 0.0
+        # drain targets: multiples of stressStep, then Vd_stress itself if it isn't one (2026-11-13)
+        set dList {}
+        for {set d $stressStep} {$d <= $Vd_stress + 1e-9} {set d [expr {$d + $stressStep}]} { lappend dList $d }
+        if {[llength $dList] == 0 || abs([lindex $dList end] - $Vd_stress) > 1e-9} { lappend dList $Vd_stress }
+        foreach d $dList {
             if {![Reach D $dS $d $retryDepth 0]} { break }
             set dS $d
         }
+        # A failed Reach leaves the device at its furthest converged bisection point, not at dS
+        # (2026-11-13: the old final runs stopped at 17.66 V and were labelled 17.0). Report it.
+        set dReal $::lastOK(D)
         foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue 0.1; pdbSetDouble $m Qfn Abs.Error 1.0e-2 }
         if {$dS < $Vd_stressMin} { error "stress drain ramp failed at $dS" }
         if {$stressDiag} {
@@ -274,7 +283,7 @@ if {$radState eq "post"} {
         sel z=EstressNE/$neMax name=EstressNE
         puts $sf "stress n*Elat peak $neMax at [lrange [peak GaN] 2 3]"
         sel z=Estress
-        puts $sf "stress Vg=$Vg_stress Vd=$dS (target $Vd_stress) peakElat(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakElat(AlGaN)=[lindex [peak AlGaN] 1]"
+        puts $sf "stress Vg=$Vg_stress Vd=$dS (target $Vd_stress, field taken at Vd=$dReal) peakElat(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakElat(AlGaN)=[lindex [peak AlGaN] 1]"
         flush $sf
         if {![Ramp D $dS 0.0 1.0]} { error "stress drain ramp-down failed" }
         if {![Ramp G $Vg_stress 0.0 0.5]} { error "stress gate ramp-down failed" }
