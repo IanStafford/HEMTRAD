@@ -53,8 +53,6 @@ def main(run, out):
             if c is None:
                 continue
             ax.plot(c[:, 0], c[:, 1], color=ramp[n], lw=2.0, label=f"{n} strike{'s' if n != 1 else ''}")
-            ax.annotate(f"N={n}", (c[-1, 0], c[-1, 1]), xytext=(6, 0), textcoords="offset points",
-                        va="center", color="#2b2f36", fontsize=12)
             g = load(f"{run}/task_*/{d}_N{n}_IdVg.csv")
             m = {"Id1": at(c, 1.0), "Id5": at(c, 5.0), "Id10": at(c, 10.0), "Vdmax": float(c[-1, 0])}
             if g is not None:
@@ -76,7 +74,7 @@ def main(run, out):
         plt.close(fig)
 
     fig, axs = plt.subplots(1, 2, figsize=(11.0, 4.6), sharey=True)
-    for a, (key, lab) in zip(axs, (("Id1", "Vd 1 V"), ("Id10", "Vd 10 V"))):
+    for a, (key, lab) in zip(axs, (("Id1", "Vd 1 V"), ("Id5", "Vd 5 V"))):
         for d, (name, ramp) in DECKS.items():
             ns = [n for n in range(4) if f"N{n}" in met[d]]
             r = [met[d][f"N{n}"][key] / met[d]["pre"][key] for n in ns]

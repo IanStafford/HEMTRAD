@@ -276,3 +276,19 @@ Runs with `occSafe 1` and `Vd_stress=17.0` (radHV, radStrike2, radExp2/3, radStr
 The cause is the stress ramp, not occSafe. Without occSafe the ramp aims for 28 V and fails above 17 V. `Reach` bisects the failing step and keeps every half step that converges, so the device ends at the furthest converged point, **17.66 V** in radEB1 (log 50411481_1: last success 17.66015625 V). The loop then breaks with `dS` still 17.0, the field is taken from the 17.66 V state, and the summary says "Vd=17.0". Field scales about with Vd, so damage ∝ E⁴ rises by (17.66/17)⁴ ≈ 1.16, matching the 1.18 ratio of peakN. Every final-model run before `occSafe` (radFinal8 through radEB1/radEB2) was stressed this way, at about 17.6–17.7 V, wherever the overflow stopped it.
 
 `drivers/radIV.tcl` now records the last converged drain voltage and prints it ("field taken at Vd=…"); the physics and the old runs' behaviour are unchanged. It also ends the ramp at `Vd_stress` when that isn't a multiple of `stressStep` (no effect for 17.0 or 28.0), so the Nov 11 final can be reproduced with `occSafe 1` and `Vd_stress=17.66`.
+
+## Strike count, SiN vs HighK (radStrikeN 51174895, 2026-11-14)
+
+Final set at a true 17.0 V stress (occSafe), biased, plus 0–3 Gaussian strikes (3e18, σ 40 nm, channel) at y 0.8, 1.6, 2.4 µm, same mesh for all. All 8 tasks done, no GAVE UP. Id at Vg +1 relative to pre:
+
+| | 0 | 1 | 2 | 3 |
+|---|---|---|---|---|
+| SiN, Vd 1 V | 0.86 | 0.82 | 0.78 | 0.74 |
+| SiN, Vd 5 V | 0.50 | 0.52 | 0.51 | 0.51 |
+| HighK, Vd 1 V | 0.93 | 0.88 | 0.84 | 0.80 |
+| HighK, Vd 10 V | 0.93 | 0.79 | 0.75 | 0.72 |
+
+- SiN is limited at about half of pre by its stress damage; extra strikes leave 4–9 V within ~15 mA/mm, soften the ~2 V drop (32 → 13–16 mA/mm) and move it to 2.4 V, and remove the 0-strike dip near 9.5 V.
+- HighK has no such limit, so each strike lowers saturation (first strike −136 mA/mm at 10 V, then −45, −27); no collapse.
+- Both: about −0.04 of pre per strike at 1 V, gm −2–3% per strike, Vth +0.21 V unchanged.
+- Figures `figures/rad/strikeN/` (`analysis/plot_radStrikeN.py`); slides https://claude.ai/artifact/JPnVbhvJAwrKyBm2XTFFLs.
