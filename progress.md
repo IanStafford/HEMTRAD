@@ -2028,3 +2028,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - Driver fix (no physics change): radIV prints the Vd the stress field was taken at, and adds a last ramp step to Vd_stress when it isn't a multiple of stressStep (no effect for 17.0/28.0). Details `kb/results/rad-model.md`.
 - **Decision for Ian:** the strike-count runs (radStrikeN) are at a true 17.0 V. To match the Nov 11 final numbers they'd need Vd_stress 17.66. Alternatively use them as they are, or move everything to 28 V once the refit settles.
 - **Decision (Ian, 2026-11-13):** use the radStrikeN runs as they are (true 17.0 V stress) for the strike-count slides; label them 17 V. No 17.66 V rerun.
+
+## 2026-11-13 22:30: status after reconnect
+
+- radStrikeN 51174895: sin_N0 and hk_N0 done; the six strike tasks (13 h in) are at 10.75-15 V of the 17 V stress ramp, no GAVE UP.
+- rad28fitB: tasks 1-2 running (9.8 h); task 3 (4e18) died in 8 s with "Could not find conda environment: flooxs" on c0706a-s23 (environment, not the deck), resubmitted as 51249769.
+- rad3dTrack1 W 0.25 finished (19.4 h); W 0.5 and 1 still running (31 h of 48).
