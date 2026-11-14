@@ -31,3 +31,11 @@ Parameters are `name=value` or boolean flags (`flag` / `!flag`); names can be ab
 - `interpolate`, `profile`, `integrate`, `struct` (save/load), `select`.
 
 All registered commands also include the process-simulation set (`implant`, `etch`, `deposit`, `oxidize`, `diffuse`, `furnace`, `rta`, `stress`…), Schrödinger/k·p solvers (`schro`, `kp`), `picard`, `mc`, `pod` — unused in HEMTRAD.
+
+## `struct`: saving and reloading a solved device (tested 2026-11-14)
+
+- `struct outfile=f.str` writes the whole structure: mesh, contact boundaries and every node field, including the solution variables and any `sel` field (e.g. `Estress`). The 2D deck is about 15 MB.
+- `struct infile=f.str` in a fresh run (after sourcing `GaN_modelfile_masterD`, without the device deck) restores it. After re-issuing the five `contact name=… voltage supply=…` lines, `device` converged in **1 Newton iteration** and gave the same drain current to all printed digits (9.751801e-05 at Vd 0.5 V) as the run that wrote it. `Estress` came back with the same peak.
+- `struct nodedataout=` / `nodedatain=` (fields only, onto a mesh rebuilt by the deck) **fails on our decks**: the reader finds regions by material name (`FieldServer::ReadNodeData`, `src/field/PermStore/struct.cc:887`) and our decks have several regions of one material (Metal, HighK, Nitride ×3), so it panics "Node not found in node data read in". It would need a FLOOXS change to match regions by index.
+- No command maps a 2D field onto a different mesh (`profile` is 1D), so reuse needs exactly the same mesh: same deck, same `meshY`, same coarsening levers.
+

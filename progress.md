@@ -2046,3 +2046,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - radStrikeN 51174895: all 8 tasks COMPLETED, no GAVE UP/OOM. Numbers in `kb/results/rad-model.md` ("Strike count"). SiN stays at ~0.5 of pre above 4 V whatever the strike count; HighK falls 0.93 → 0.79 → 0.75 → 0.72 at 10 V; both lose ~0.04 of pre per strike at 1 V; Vth +0.21 V everywhere.
 - Slides (6): https://claude.ai/artifact/JPnVbhvJAwrKyBm2XTFFLs. Figures `figures/rad/strikeN/`.
 - HPG master dropped ~17:00; reconnected with one Duo push (bin/hpg_reconnect.sh, tmux works again outside the desktop app).
+
+## 2026-11-14 evening: FLOOXS `struct` for reusing the stress solve (local tests, Ian's request)
+
+- `struct outfile=` saves mesh + contacts + all node fields (solution, doping, Estress); `struct infile=` in a fresh run restores it, and after re-issuing the contacts `device` converges in 1 iteration with an identical drain current. The fields-only `nodedataout/nodedatain` route panics on our decks (regions matched by material name; we have several per material).
+- So the 20 h stress could be run once per (deck, mesh, stress bias, calibration), saved after the ramp-down, and every damage variant loaded from it. Needs: identical mesh across variants (no per-strike mesh refinement, or one common refined mesh). Details `kb/flooxs/flooxs-commands.md`. Proposed driver levers stressSave/stressLoad, default off, pending Ian's go-ahead.
