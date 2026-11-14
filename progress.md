@@ -2034,3 +2034,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - radStrikeN 51174895: sin_N0 and hk_N0 done; the six strike tasks (13 h in) are at 10.75-15 V of the 17 V stress ramp, no GAVE UP.
 - rad28fitB: tasks 1-2 running (9.8 h); task 3 (4e18) died in 8 s with "Could not find conda environment: flooxs" on c0706a-s23 (environment, not the deck), resubmitted as 51249769.
 - rad3dTrack1 W 0.25 finished (19.4 h); W 0.5 and 1 still running (31 h of 48).
+
+## 2026-11-14 11:00: run status
+
+- **radStrikeN 51174895:** 5 of 8 done, no GAVE UP. Id at Vg +1 (mA/mm) at Vd 1 / 10 V: SiN N0 317/486, N1 302/533; HighK N0 343/953, N1 325/817, N2 309/772. Vth +0.21 V on all; gm 0.95/0.93 (SiN N0/N1), 0.98/0.96/0.94 (HighK N0-N2). Running (25.6 h of 48): sin_N2 on its Id-Vd (3.7 V), sin_N3 and hk_N3 still before their curves.
+- **rad28fitB:** SiN 2e18 done: 270 at 1 V, drops 173 mA/mm at 1.3 V to ~16, creeps to 108 at 10 V. SiN 3e18: current gone from 0.8 V (curve at 7.1 V). 4e18 (51249769) in its stress ramp at 13.5 V. With 1e18 (626 at 10 V) and 1.5e18 (392), the 28 V SiN scale that matches the old final's collapse lies near 1.5e18.
+- **rad3dTrack1 done (51061334):** all three Id-Vd sweeps gave up early (W 0.25 at 1.0 V, W 0.5 at 5.25 V, W 1 at 1.75 V). W 0.5 with one SiN track (core sigma 30 nm, ~2e19) at y 0.5: 371 / 955 mA/mm at 1 / 5 V vs 376 / 966 for the undamaged 3D slice, about 1% lower. One track barely moves the current. The 16-84 mA/mm "drops" are increases (negative maxdrop).
