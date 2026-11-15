@@ -2062,3 +2062,11 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - 51380388 `sin_save` (final SiN set, 17 V, stress saved): 9 h 07 min, 3.1 GB. 51380389 `sin_load` (same set, stress loaded): **1 h 14 min**, 1.9 GB. Same peakN (4.997257e18), same Vth/gm (-2.78592 V, 64.592), Id-Vd identical (max |diff| 5e-99 mA/mm at Vd 0), Id-Vg identical wherever Id > 0.01 mA/mm (differences only in the 1e-10 mA/mm deep off-state noise). About 7x faster per damage variant.
 - `sin_load_g0.8` (loaded stress + one strike at 0.8 um, 1 h 17 min): 302.1 / 525.4 mA/mm at 1 / 10 V against radStrikeN sin_N1 302.3 / 533.5, but near the ~2 V drop it differs (398.8 vs 425.7 at 2.3 V). The loaded run uses the saving run's mesh (10 nm, no 5 nm refinement round the strike), so strike variants need a stress saved on a mesh refined at every strike position.
 - rad28fitB 4e18 (51249769) done: channel shut to 10 V (Id ~1e-7 mA/mm). 28 V refit complete.
+
+## 2026-11-15: 28 V strike count with saved stresses (Ian)
+
+- **rad28strike** (16 tasks, 48 h limit): final set at a 28 V stress (occSafe, hotEb 1.0) on the mesh refined at all three strike positions (10 nm over y 0.3-2.6, 5 nm round 0.8 / 1.6 / 2.4 um).
+  - 51454301 tasks 0-1: SiN and HighK, damage scale 1.5e18, 0 strikes, stress saved (stress_sin28.str, stress_hk28.str). Expect ~20-25 h.
+  - 51454302 tasks 2-8 (after task 0): SiN loaded, 1.5e18 with 1-3 strikes, 2e18 with 0-3 strikes.
+  - 51454303 tasks 9-15 (after task 1): HighK, same set.
+  - Strikes as radStrikeN (3e18, sigma 40 nm). Both candidate 28 V scales side by side, for Ian to choose.
