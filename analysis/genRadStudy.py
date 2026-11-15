@@ -422,3 +422,22 @@ with open("sweeps/params_radStressIO.txt", "w") as f:
     f.write(f"sin_load|{IOF};stressLoad={IO_FILE}\n")
     f.write(f"sin_load_g0.8|{IOF};stressLoad={IO_FILE};damGauss={{{{0.8 0.0 0.04 3e18}}}}\n")
 print("radStressIO 3")
+
+# ---- 2026-11-15 (Ian): strike count at the 28 V stress, using stressSave/stressLoad. Tasks 0-1 run the 28 V stress
+# once per deck on the mesh refined at all three strike positions (gmN(SY)) and save it (damPeak 1.5e18, 0 strikes).
+# Tasks 2-15 load that stress: damage scale 1.5e18 (1-3 strikes) and 2e18 (0-3 strikes), both decks, same strikes
+# as radStrikeN (3e18, sigma 40 nm, y 0.8 / 1.6 / 2.4 um).
+R28 = "/home/ianstafford/blue/ee1/ianstafford/HEMTRAD/results/20261115_rad28strike"
+S28 = f"{FE};occSafe=1;Vd_stress=28.0{gmN(SY)}"
+def gstr(n):
+    ys = SY[:n]
+    return (";damGauss={" + " ".join(f"{{{y:g} 0.0 0.04 3e18}}" for y in ys) + "}") if ys else ""
+with open("sweeps/params_rad28strike.txt", "w") as f:
+    for deck, dk, t in (("sin", SINd, 0), ("hk", "", 1)):
+        f.write(f"{deck}28_p1.5e+18_N0|{S28}{dk};damPeak=1.5e18;stressSave=stress_{deck}28.str\n")
+    for deck, dk, t in (("sin", SINd, 0), ("hk", "", 1)):
+        src = f"{R28}/task_{t}/stress_{deck}28.str"
+        for p, ns in ((1.5e18, (1, 2, 3)), (2e18, (0, 1, 2, 3))):
+            for n in ns:
+                f.write(f"{deck}28_p{p:g}_N{n}|{S28}{dk};damPeak={p:g}{gstr(n)};stressLoad={src}\n")
+print("rad28strike 16")
