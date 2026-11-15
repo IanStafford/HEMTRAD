@@ -2070,3 +2070,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - 51454302 tasks 2-8 (after task 0): SiN loaded, 1.5e18 with 1-3 strikes, 2e18 with 0-3 strikes.
   - 51454303 tasks 9-15 (after task 1): HighK, same set.
   - Strikes as radStrikeN (3e18, sigma 40 nm). Both candidate 28 V scales side by side, for Ian to choose.
+
+## 2026-11-15: stress library (Ian)
+
+- New radIV levers stressSaveEvery / stressSaveDir / stressSavePrefix / stressResume / stressOnly (default off; `kb/model/levers.md`). Local check (SiN, 3 V): resuming from the 2 V state gives the same 3 V field (5.322858e5); loading the 3 V at-bias state gives the same peakN and Id-Vd as a normal 3 V run. About 8 MB per gzipped state (52k points); ~14 MB expected on the strike-refined mesh (93k), so ~2.5 GB for both decks to 84 V.
+- **stressLib 51459840** (2 tasks, 1 CPU, 8 GB, 4-day limit): SiN and HighK, final model, Vg -10 V, 1 V steps to 84 V, state saved every volt to `/blue/ee1/ianstafford/stress/{sin,hk}_Vg-10/`. No avalanche in the model; convergence above ~40 V untested. If a task stalls or times out, resume from its last file with stressResume.
