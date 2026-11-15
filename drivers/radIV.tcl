@@ -119,6 +119,36 @@ if {![info exists stressSkip]} { set stressSkip 0 }
 # design (checked against <file>.txt where possible). 2D decks only. "" = off (old behaviour).
 if {![info exists stressSave]} { set stressSave "" }
 if {![info exists stressLoad]} { set stressLoad "" }
+# Stress library (2026-11-15). stressSaveEvery (V, 0 = off): during the stress drain ramp, at every Vd that is a
+# multiple of it, compute the stress fields and write the state at bias to
+# <stressSaveDir>/<stressSavePrefix>_Vd<Vd>.str.gz plus <...>.str.txt (Vd_stress = that Vd). Such a file serves
+# stressLoad (damage placed from that Vd) and stressResume. stressResume=<file>: continue a stress ramp from a state
+# saved at bias. stressOnly 1: stop after the stress ramp (no ramp-down, damage or curves); a ramp that stalls
+# saves its last converged state first, so it can be resumed. Off by default.
+if {![info exists stressSaveEvery]}  { set stressSaveEvery 0.0 }
+if {![info exists stressSaveDir]}    { set stressSaveDir "." }
+if {![info exists stressSavePrefix]} { set stressSavePrefix "" }
+if {![info exists stressResume]}     { set stressResume "" }
+if {![info exists stressOnly]}       { set stressOnly 0 }
+if {$stressLoad ne "" && $stressResume ne ""} { error "stressLoad and stressResume together" }
+# struct infile for a .str or .str.gz file (a .gz is unpacked into the working directory first)
+proc StructIn {f} {
+    if {[string match *.gz $f]} {
+        set tmp [file join [pwd] [file rootname [file tail $f]]]
+        exec gzip -dc $f > $tmp
+        struct infile=$tmp
+        file delete $tmp
+    } else {
+        struct infile=$f
+    }
+}
+# the settings file written beside a saved state ("" if none)
+proc StressInfo {f} {
+    set b [expr {[string match *.gz $f] ? [file rootname $f] : $f}]
+    if {![file exists $b.txt]} { return "" }
+    set c [open $b.txt]; set t [read $c]; close $c
+    return $t
+}
 # VgFam: extra Id-Vd curves, one per Vg in the list, in that order (like the measured
 # family; fill-only traps keep their state between curves), to <tag>_IdVdG<Vg>.csv. {} = none.
 if {![info exists emitRest]} { set emitRest 0.0 }  ;# fraction of the captured charge released at rest before each Id-Vd curve
@@ -150,16 +180,19 @@ if {![info exists modelDir]} {
 }
 source [file join $modelDir GaN_modelfile_masterD]
 source [file join $modelDir $deviceDeck]
-if {$stressLoad ne ""} {
-    if {$deviceDim != 2} { error "stressLoad: 2D decks only" }
-    if {![file exists $stressLoad]} { error "stressLoad: no file $stressLoad" }
-    struct infile=$stressLoad
+set loadFile [expr {$stressLoad ne "" ? $stressLoad : $stressResume}]
+if {$loadFile ne ""} {
+    if {$deviceDim != 2} { error "stressLoad/stressResume: 2D decks only" }
+    if {![file exists $loadFile]} { error "stressLoad/stressResume: no file $loadFile" }
+    StructIn $loadFile
     # struct infile clears the device setup: the contact biases of the 2D decks again
     contact name=G current=(Hole_Nitride-Elec_Nitride) voltage supply=0.0
     contact name=B current=(Hole_GaN-Elec_GaN) voltage supply=0.0
     contact name=D current=(Hole_GaN-Elec_GaN) voltage supply=0.0
     contact name=S current=(Hole_GaN-Elec_GaN) voltage supply=0.0
     contact name=FP voltage supply=0.0
+    # Initialize resets the solution; keep the saved one for stressResume
+    if {$stressResume ne ""} { foreach v {DevPsi Qfn Qfp} { sel z=$v name=${v}Res } }
 }
 if {[info exists mobDamFac]} {
     sel z=1.0-(1.0-$mobDamFac)*(x>=0.0)*(x<=$mobDamXmax)*(y>=$mobDamYmin)*(y<=$mobDamYmax)+1.0e-30*(1.0+x*x) name=MobDam
@@ -231,6 +264,33 @@ proc Ramp {c a b st} {
 }
 set te 300.0
 set sf [open ${tag}_summary.txt w]
+# stress fields from the present solution; returns the n*E peak used for normalising EstressNE
+proc StressFields {} {
+    sel z=abs(dot(DevPsi,y*1e-4)) name=Estress
+    sel z=sqrt(dot(DevPsi,DevPsi)) name=EstressT
+    # n*E at stress, normalised to its peak in the semiconductor (damField ne)
+    sel z=Elec name=ElecStress
+    sel z=Elec*Estress name=EstressNE
+    set neMax [expr {max([lindex [peak GaN] 1], [lindex [peak AlGaN] 1])}]
+    sel z=EstressNE/$neMax name=EstressNE
+    return $neMax
+}
+# write the state at the present stress bias (stressSaveEvery, stressOnly)
+proc SaveAtBias {d} {
+    global stressSaveDir stressSavePrefix tag deviceDeck Vg_stress sf
+    StressFields
+    set p [expr {$stressSavePrefix eq "" ? $tag : $stressSavePrefix}]
+    file mkdir $stressSaveDir
+    set b [file join $stressSaveDir [format "%s_Vd%06.2f.str" $p $d]]
+    struct outfile=$b
+    set c [open $b.txt w]
+    puts $c "stress file (at bias) written by tag=$tag deviceDeck=$deviceDeck Vg_stress=$Vg_stress Vd_stress=$d field_at=$d atBias=1 occSafe=[expr {[info exists ::occSafe] ? $::occSafe : 0}] meshY=[expr {[info exists ::meshY] ? [join $::meshY ,] : {none}}]"
+    close $c
+    exec gzip -f $b
+    sel z=Estress
+    puts $sf "stress state saved at Vd=$d to $b.gz peakElat(GaN)=[lindex [peak GaN] 1]"
+    flush $sf
+}
 
 #---------------- irradiation (post) ----------------
 if {$radState eq "post"} {
@@ -242,8 +302,8 @@ if {$radState eq "post"} {
     } elseif {$useTraps && $stressLoad ne ""} {
         if {[catch {sel z=Estress}]} { error "stressLoad: $stressLoad has no Estress field" }
         puts $sf "stress loaded from $stressLoad"
-        if {[file exists $stressLoad.txt]} {
-            set c [open $stressLoad.txt]; set info [read $c]; close $c
+        set info [StressInfo $stressLoad]
+        if {$info ne ""} {
             puts -nonewline $sf $info
             if {[regexp {Vd_stress=(\S+)} $info -> v] && abs($v - $Vd_stress) > 1e-9} { error "stressLoad: file stressed at Vd_stress=$v, this run has $Vd_stress" }
             if {[regexp {Vg_stress=(\S+)} $info -> v] && abs($v - $Vg_stress) > 1e-9} { error "stressLoad: file stressed at Vg_stress=$v, this run has $Vg_stress" }
@@ -258,24 +318,46 @@ if {$radState eq "post"} {
             if {[catch {device}]} { RestoreState; error "no-holes rest solve failed" }
             puts $sf "stress without holes above x=$stressNoHolesX um (Qfp frozen: +50 V there, 0 below)"
         }
-        if {![Ramp G 0.0 $Vg_stress 0.5]} { error "stress gate ramp failed" }
+        if {$stressResume ne ""} {
+            set info [StressInfo $stressResume]
+            if {![regexp {Vd_stress=(\S+)} $info -> vR]} { error "stressResume: no Vd_stress in the settings file of $stressResume" }
+            if {[regexp {Vg_stress=(\S+)} $info -> v] && abs($v - $Vg_stress) > 1e-9} { error "stressResume: file at Vg_stress=$v, this run has $Vg_stress" }
+            if {[regexp {deviceDeck=(\S+)} $info -> v] && $v ne $deviceDeck} { error "stressResume: file built with $v, this run has $deviceDeck" }
+            foreach v {DevPsi Qfn Qfp} { sel z=${v}Res name=$v }
+            contact name=G supply=$Vg_stress
+            contact name=D supply=$vR
+            SaveState
+            if {[catch {device}]} { RestoreState; error "stressResume: solve at Vg=$Vg_stress Vd=$vR failed" }
+            puts $sf "stress resumed from $stressResume at Vd=$vR"
+            flush $sf
+        } elseif {![Ramp G 0.0 $Vg_stress 0.5]} { error "stress gate ramp failed" }
         # The off-state solve stops converging near Vdg ~ 27 V (minority quasi-Fermi
         # levels in the depleted AlGaN, job 47311016). Use the highest converged Vd if it
         # is at least Vd_stressMin; the damage law's scale absorbs the field magnitude.
         foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue $stressQfnDamp; pdbSetDouble $m Qfn Abs.Error $stressQfnAbs }
-        set dS 0.0
-        set ::lastOK(D) 0.0
+        set dS [expr {$stressResume ne "" ? $vR : 0.0}]
+        set ::lastOK(D) $dS
         # drain targets: multiples of stressStep, then Vd_stress itself if it isn't one (2026-11-13)
         set dList {}
-        for {set d $stressStep} {$d <= $Vd_stress + 1e-9} {set d [expr {$d + $stressStep}]} { lappend dList $d }
+        for {set d [expr {$dS + $stressStep}]} {$d <= $Vd_stress + 1e-9} {set d [expr {$d + $stressStep}]} { lappend dList $d }
         if {[llength $dList] == 0 || abs([lindex $dList end] - $Vd_stress) > 1e-9} { lappend dList $Vd_stress }
         foreach d $dList {
             if {![Reach D $dS $d $retryDepth 0]} { break }
             set dS $d
+            if {$stressSaveEvery > 0.0 && abs($d / $stressSaveEvery - round($d / $stressSaveEvery)) < 1e-6} { SaveAtBias $d }
         }
         # A failed Reach leaves the device at its furthest converged bisection point, not at dS
         # (2026-11-13: the old final runs stopped at 17.66 V and were labelled 17.0). Report it.
         set dReal $::lastOK(D)
+        if {$stressOnly} {
+            # the state is at dReal (the furthest converged point); keep it for stressResume if not saved yet
+            if {abs($dReal - $dS) > 1e-9 || $stressSaveEvery <= 0.0} { SaveAtBias $dReal }
+            puts $sf "stress only: target $Vd_stress, last step $dS, last converged Vd=$dReal"
+            puts $sf "done"
+            close $sf
+            puts "RADIV DONE tag=$tag (stress only)"
+            exit
+        }
         foreach m {GaN AlGaN} { pdbSetDouble $m Qfn DampValue 0.1; pdbSetDouble $m Qfn Abs.Error 1.0e-2 }
         if {$dS < $Vd_stressMin} { error "stress drain ramp failed at $dS" }
         if {$stressDiag} {
@@ -304,13 +386,7 @@ if {$radState eq "post"} {
             RestoreState
             contact name=D supply=$dS
         }
-        sel z=abs(dot(DevPsi,y*1e-4)) name=Estress
-        sel z=sqrt(dot(DevPsi,DevPsi)) name=EstressT
-        # n*E at stress, normalised to its peak in the semiconductor (damField ne)
-        sel z=Elec name=ElecStress
-        sel z=Elec*Estress name=EstressNE
-        set neMax [expr {max([lindex [peak GaN] 1], [lindex [peak AlGaN] 1])}]
-        sel z=EstressNE/$neMax name=EstressNE
+        set neMax [StressFields]
         puts $sf "stress n*Elat peak $neMax at [lrange [peak GaN] 2 3]"
         sel z=Estress
         puts $sf "stress Vg=$Vg_stress Vd=$dS (target $Vd_stress, field taken at Vd=$dReal) peakElat(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakElat(AlGaN)=[lindex [peak AlGaN] 1]"

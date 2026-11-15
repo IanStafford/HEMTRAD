@@ -441,3 +441,14 @@ with open("sweeps/params_rad28strike.txt", "w") as f:
             for n in ns:
                 f.write(f"{deck}28_p{p:g}_N{n}|{S28}{dk};damPeak={p:g}{gstr(n)};stressLoad={src}\n")
 print("rad28strike 16")
+
+# ---- 2026-11-15 (Ian): stress library. Off-state stress at Vg -10 V ramped in 1 V steps to 84 V (advertised
+# breakdown), state at bias saved at every volt (stressSaveEvery, stressOnly), final model on the mesh refined at the
+# three strike positions, both decks. Files go to /blue (not the 40 GB home). damPeak is only there so the stress
+# branch runs; no damage is placed (stressOnly). A run that stops is continued with stressResume=<last file>.
+LIB = "/blue/ee1/ianstafford/stress"
+SL = f"{FE};occSafe=1;Vd_stress=84.0;stressStep=1.0{gmN(SY)};damPeak=1.5e18;stressOnly=1;stressSaveEvery=1.0"
+with open("sweeps/params_stressLib.txt", "w") as f:
+    for deck, dk in (("sin", SINd), ("hk", "")):
+        f.write(f"lib_{deck}_Vg-10|{SL}{dk};stressSaveDir={LIB}/{deck}_Vg-10;stressSavePrefix={deck}_Vg-10\n")
+print("stressLib 2")
