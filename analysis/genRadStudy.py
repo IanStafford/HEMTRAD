@@ -411,3 +411,14 @@ with open("sweeps/params_radStrikeN.txt", "w") as f:
             g = (";damGauss={" + " ".join(f"{{{y:g} 0.0 0.04 3e18}}" for y in ys) + "}") if ys else ""
             f.write(f"{deck}_N{n}|{FO}{dk}{g}{gmN(ys)}\n")
 print("radStrikeN 8")
+
+# ---- 2026-11-14 (Ian): check stressSave / stressLoad on HPG. Task 0: final SiN set (17 V, occSafe, 10 nm to 2.6 um)
+# with stressSave. Tasks 1-2 (submitted after task 0 finishes): the same set loaded from task 0's file, and the same
+# plus one Gaussian strike at y 0.8 um. Task 1 must reproduce task 0's curves.
+IOF = f"{FO}{SINd};meshY={{0.3 0.01 2.6 0.01}}"
+IO_FILE = "/home/ianstafford/blue/ee1/ianstafford/HEMTRAD/results/20261114_radStressIO/task_0/stress_sin17.str"
+with open("sweeps/params_radStressIO.txt", "w") as f:
+    f.write(f"sin_save|{IOF};stressSave=stress_sin17.str\n")
+    f.write(f"sin_load|{IOF};stressLoad={IO_FILE}\n")
+    f.write(f"sin_load_g0.8|{IOF};stressLoad={IO_FILE};damGauss={{{{0.8 0.0 0.04 3e18}}}}\n")
+print("radStressIO 3")

@@ -111,6 +111,14 @@ if {![info exists damSites]}  { set damSites {} }
 # stressSkip 1: no stress solve, for damage that doesn't use the stress field (damSites,
 # surfCharge, a uniform dam2/dam3 site). The stress fields are then ~0. 0 = old behaviour.
 if {![info exists stressSkip]} { set stressSkip 0 }
+# stressSave / stressLoad (2026-11-14, kb/flooxs/flooxs-commands.md): reuse one off-state stress for many
+# damage variants. stressSave=<file>: after the stress and the ramp back to rest, write the whole structure
+# (struct outfile) plus <file>.txt with the stress settings. stressLoad=<file>: build the deck, replace the
+# structure with the file (mesh, Estress fields), skip the stress solve, then place damage as usual. The mesh
+# comes from the file, so mesh levers of the loading run are ignored; the stress settings must match by
+# design (checked against <file>.txt where possible). 2D decks only. "" = off (old behaviour).
+if {![info exists stressSave]} { set stressSave "" }
+if {![info exists stressLoad]} { set stressLoad "" }
 # VgFam: extra Id-Vd curves, one per Vg in the list, in that order (like the measured
 # family; fill-only traps keep their state between curves), to <tag>_IdVdG<Vg>.csv. {} = none.
 if {![info exists emitRest]} { set emitRest 0.0 }  ;# fraction of the captured charge released at rest before each Id-Vd curve
@@ -142,6 +150,17 @@ if {![info exists modelDir]} {
 }
 source [file join $modelDir GaN_modelfile_masterD]
 source [file join $modelDir $deviceDeck]
+if {$stressLoad ne ""} {
+    if {$deviceDim != 2} { error "stressLoad: 2D decks only" }
+    if {![file exists $stressLoad]} { error "stressLoad: no file $stressLoad" }
+    struct infile=$stressLoad
+    # struct infile clears the device setup: the contact biases of the 2D decks again
+    contact name=G current=(Hole_Nitride-Elec_Nitride) voltage supply=0.0
+    contact name=B current=(Hole_GaN-Elec_GaN) voltage supply=0.0
+    contact name=D current=(Hole_GaN-Elec_GaN) voltage supply=0.0
+    contact name=S current=(Hole_GaN-Elec_GaN) voltage supply=0.0
+    contact name=FP voltage supply=0.0
+}
 if {[info exists mobDamFac]} {
     sel z=1.0-(1.0-$mobDamFac)*(x>=0.0)*(x<=$mobDamXmax)*(y>=$mobDamYmin)*(y<=$mobDamYmax)+1.0e-30*(1.0+x*x) name=MobDam
 }
@@ -220,6 +239,17 @@ if {$radState eq "post"} {
         if {$damPeak > 0.0 || ($damInsPeak > 0.0 && $damInsM != 0.0) || ($dam2Peak > 0.0 && $dam2M != 0.0) || [llength $damList] > 0} { error "stressSkip with a damage law that needs the stress field" }
         foreach f {Estress EstressT EstressNE ElecStress} { sel z=1.0e-30*(1.0+x*x) name=$f }
         puts $sf "stress skipped"
+    } elseif {$useTraps && $stressLoad ne ""} {
+        if {[catch {sel z=Estress}]} { error "stressLoad: $stressLoad has no Estress field" }
+        puts $sf "stress loaded from $stressLoad"
+        if {[file exists $stressLoad.txt]} {
+            set c [open $stressLoad.txt]; set info [read $c]; close $c
+            puts -nonewline $sf $info
+            if {[regexp {Vd_stress=(\S+)} $info -> v] && abs($v - $Vd_stress) > 1e-9} { error "stressLoad: file stressed at Vd_stress=$v, this run has $Vd_stress" }
+            if {[regexp {Vg_stress=(\S+)} $info -> v] && abs($v - $Vg_stress) > 1e-9} { error "stressLoad: file stressed at Vg_stress=$v, this run has $Vg_stress" }
+            if {[regexp {deviceDeck=(\S+)} $info -> v] && $v ne $deviceDeck} { error "stressLoad: file built with $v, this run has $deviceDeck" }
+        }
+        puts $sf "stress (loaded) peakElat(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakElat(AlGaN)=[lindex [peak AlGaN] 1]"
     } elseif {$useTraps} {
         if {$stressNoHoles} {
             solution name=Qfp nosolve
@@ -293,6 +323,13 @@ if {$radState eq "post"} {
             SaveState
             if {[catch {device}]} { RestoreState; error "holes back: rest solve failed" }
             puts $sf "holes restored at rest"
+        }
+        if {$stressSave ne ""} {
+            struct outfile=$stressSave
+            set c [open $stressSave.txt w]
+            puts $c "stress file written by tag=$tag deviceDeck=$deviceDeck Vg_stress=$Vg_stress Vd_stress=$Vd_stress Vd_reached=$dS field_at=$dReal occSafe=[expr {[info exists occSafe] ? $occSafe : 0}] meshY=[expr {[info exists meshY] ? [join $meshY ,] : {none}}]"
+            close $c
+            puts $sf "stress saved to $stressSave"
         }
     }
 }
