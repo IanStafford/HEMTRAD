@@ -54,3 +54,6 @@ Every lever has an `info exists` default, so a driver or array task sets it befo
 | `VgFam` | {} | Extra Id–Vd curves at these Vg, in order, to `<tag>_IdVdG<Vg>.csv` |
 | `mobDamFac`, `mobDamYmin/Ymax/Xmax` | unset | Low-field mobility factor in a window, GaN (`model/GaN.tcl`) |
 | `polWinFac`, `polWinYmin/Ymax` | unset | Interface polarization charge factor in a y window |
+
+- **stressSave / stressLoad** (radIV, 2026-11-14, default ""): `stressSave=<file>` writes the whole structure after the off-state stress and the ramp back to rest (`struct outfile`), plus `<file>.txt` with the stress settings. `stressLoad=<file>` builds the deck, replaces the structure with the file, re-issues the 2D contact biases, skips the stress and places damage as usual. The mesh comes from the file, so mesh levers of the loading run are ignored; Vg_stress, Vd_stress and deviceDeck are checked against `<file>.txt`. 2D only. Local check: identical Id-Vd to all digits ([[flooxs-commands]]).
+

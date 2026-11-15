@@ -2051,3 +2051,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 - `struct outfile=` saves mesh + contacts + all node fields (solution, doping, Estress); `struct infile=` in a fresh run restores it, and after re-issuing the contacts `device` converges in 1 iteration with an identical drain current. The fields-only `nodedataout/nodedatain` route panics on our decks (regions matched by material name; we have several per material).
 - So the 20 h stress could be run once per (deck, mesh, stress bias, calibration), saved after the ramp-down, and every damage variant loaded from it. Needs: identical mesh across variants (no per-strike mesh refinement, or one common refined mesh). Details `kb/flooxs/flooxs-commands.md`. Proposed driver levers stressSave/stressLoad, default off, pending Ian's go-ahead.
+
+## 2026-11-14 night: stressSave / stressLoad implemented, HPG check submitted
+
+- radIV levers `stressSave`, `stressLoad` (default off; `kb/model/levers.md`). Local smoke test (SiN final set, 2 V stress, Vd to 0.5 V): the load run reproduces the save run's peakN and Id-Vd to all digits and skips the stress (about 1 min against 14).
+- **radStressIO** (Ian approved): 51380388 task 0 `sin_save` (final SiN set, 17 V, occSafe, 10 nm to 2.6 um, stressSave); 51380389 tasks 1-2 after it (afterok): `sin_load` (must match task 0) and `sin_load_g0.8` (plus one Gaussian strike at 0.8 um, compare with radStrikeN sin_N1).
