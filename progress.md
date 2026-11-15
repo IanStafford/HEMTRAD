@@ -2056,3 +2056,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 - radIV levers `stressSave`, `stressLoad` (default off; `kb/model/levers.md`). Local smoke test (SiN final set, 2 V stress, Vd to 0.5 V): the load run reproduces the save run's peakN and Id-Vd to all digits and skips the stress (about 1 min against 14).
 - **radStressIO** (Ian approved): 51380388 task 0 `sin_save` (final SiN set, 17 V, occSafe, 10 nm to 2.6 um, stressSave); 51380389 tasks 1-2 after it (afterok): `sin_load` (must match task 0) and `sin_load_g0.8` (plus one Gaussian strike at 0.8 um, compare with radStrikeN sin_N1).
+
+## 2026-11-15: stressSave / stressLoad validated on HPG (radStressIO)
+
+- 51380388 `sin_save` (final SiN set, 17 V, stress saved): 9 h 07 min, 3.1 GB. 51380389 `sin_load` (same set, stress loaded): **1 h 14 min**, 1.9 GB. Same peakN (4.997257e18), same Vth/gm (-2.78592 V, 64.592), Id-Vd identical (max |diff| 5e-99 mA/mm at Vd 0), Id-Vg identical wherever Id > 0.01 mA/mm (differences only in the 1e-10 mA/mm deep off-state noise). About 7x faster per damage variant.
+- `sin_load_g0.8` (loaded stress + one strike at 0.8 um, 1 h 17 min): 302.1 / 525.4 mA/mm at 1 / 10 V against radStrikeN sin_N1 302.3 / 533.5, but near the ~2 V drop it differs (398.8 vs 425.7 at 2.3 V). The loaded run uses the saving run's mesh (10 nm, no 5 nm refinement round the strike), so strike variants need a stress saved on a mesh refined at every strike position.
+- rad28fitB 4e18 (51249769) done: channel shut to 10 V (Id ~1e-7 mA/mm). 28 V refit complete.
