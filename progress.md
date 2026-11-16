@@ -2075,3 +2075,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 - New radIV levers stressSaveEvery / stressSaveDir / stressSavePrefix / stressResume / stressOnly (default off; `kb/model/levers.md`). Local check (SiN, 3 V): resuming from the 2 V state gives the same 3 V field (5.322858e5); loading the 3 V at-bias state gives the same peakN and Id-Vd as a normal 3 V run. About 8 MB per gzipped state (52k points); ~14 MB expected on the strike-refined mesh (93k), so ~2.5 GB for both decks to 84 V.
 - **stressLib 51459840** (2 tasks, 1 CPU, 8 GB, 4-day limit): SiN and HighK, final model, Vg -10 V, 1 V steps to 84 V, state saved every volt to `/blue/ee1/ianstafford/stress/{sin,hk}_Vg-10/`. No avalanche in the model; convergence above ~40 V untested. If a task stalls or times out, resume from its last file with stressResume.
+
+## 2026-11-16 10:00: status; fallback for the 28 V strike runs (Ian)
+
+- rad28strike save tasks (51454301) at 16.4 V (SiN) / 16.0 V (HighK) of 28 V after 24 h (~0.6-0.7 V/h on the 93k-point strike mesh), close to their 48 h limit. stressLib (51459840) at 16 / 15 V after 23 h, 212 / 200 MB; 84 V will need resumes.
+- **Fallback (Ian OK):** the library ramps are identical to the save tasks' stress (same deck, mesh, levers, 1 V steps), so `sweeps/params_rad28strikeL.txt` loads all 16 cases from the library's 28 V files. If the save tasks haven't reached 28 V by about 40 h, cancel 51454301 and its dependents 51454302/51454303 and submit rad28strikeL once the library has its 28 V files.
