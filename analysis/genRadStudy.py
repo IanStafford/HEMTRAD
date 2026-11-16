@@ -452,3 +452,14 @@ with open("sweeps/params_stressLib.txt", "w") as f:
     for deck, dk in (("sin", SINd), ("hk", "")):
         f.write(f"lib_{deck}_Vg-10|{SL}{dk};stressSaveDir={LIB}/{deck}_Vg-10;stressSavePrefix={deck}_Vg-10\n")
 print("stressLib 2")
+
+# ---- 2026-11-16 (Ian): fallback for rad28strike. If its stress-saving tasks can't reach 28 V within their 48 h
+# limit, load the same 28 V stress from the stress library (stressLib: identical deck, mesh, levers and 1 V steps)
+# for all 16 cases.
+with open("sweeps/params_rad28strikeL.txt", "w") as f:
+    for deck, dk in (("sin", SINd), ("hk", "")):
+        src = f"{LIB}/{deck}_Vg-10/{deck}_Vg-10_Vd028.00.str.gz"
+        for p in (1.5e18, 2e18):
+            for n in range(4):
+                f.write(f"{deck}28_p{p:g}_N{n}|{S28}{dk};damPeak={p:g}{gstr(n)};stressLoad={src}\n")
+print("rad28strikeL 16")
