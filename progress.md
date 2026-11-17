@@ -2091,3 +2091,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 - rad28strikeL 51762900: all 16 tasks died in 30-50 s in Initialize's `device init`, "computed a nan or infinite" (core dumps removed). Cause: the library states are saved at bias, so DevPsi is ~+30 V near the drain at 28 V; Initialize evaluates carrier densities from it with Qfn = 0 and overflows. The local 3 V test didn't show it (exponent still finite).
 - Fix in radIV: after loading a state (stressLoad/stressResume), reset DevPsi/Qfn/Qfp to 0 as in a fresh deck (resume keeps its own copy). Testing locally on the real 28 V SiN library file (2e18, 3 strikes) before resubmitting.
+- Resubmitted as **rad28strikeL 51763582** (16 tasks) with the fix (commit a308148).
