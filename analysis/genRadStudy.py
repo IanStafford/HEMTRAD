@@ -533,3 +533,16 @@ with open("sweeps/params_radStepC.txt", "w") as f:
     for lab, base, lev in rowsC:
         f.write(f"{lab}|{base};{lev}\n")
 print("radStepC", len(rowsC))
+
+# ---- 2026-11-17 goal, round D: checks the literature review asks for. Convergence (Vd step halved to 0.05 V; the
+# mesh is already 5 nm round each strike) for the stepped cases, and knock-out of single strikes from the
+# three-8e18-strike case (independent sites keep their steps at the same Vd; a cascade moves them).
+rowsD = [("D_p1.5_n6e18_N1_dv05", "damPeak=1.5e18" + gN(6e18, 1) + ";Vd_step=0.05"),
+         ("D_p1.7_n6e18_N3_dv05", "damPeak=1.7e18" + gN(6e18, 3) + ";Vd_step=0.05"),
+         ("D_p1.5_n8e18_N3_dv05", "damPeak=1.5e18" + gN(8e18, 3) + ";Vd_step=0.05"),
+         ("D_p1.5_n8e18_ko1", "damPeak=1.5e18" + gl([(1.6, 8e18), (2.4, 8e18)])),
+         ("D_p1.5_n8e18_ko2", "damPeak=1.5e18" + gl([(0.8, 8e18), (2.4, 8e18)]))]
+with open("sweeps/params_radStepD.txt", "w") as f:
+    for lab, lev in rowsD:
+        f.write(f"{lab}|{G28};{lev}\n")
+print("radStepD", len(rowsD))
