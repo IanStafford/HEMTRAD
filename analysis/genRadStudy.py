@@ -463,3 +463,22 @@ with open("sweeps/params_rad28strikeL.txt", "w") as f:
             for n in range(4):
                 f.write(f"{deck}28_p{p:g}_N{n}|{S28}{dk};damPeak={p:g}{gstr(n)};stressLoad={src}\n")
 print("rad28strikeL 16")
+
+# ---- 2026-11-17 goal (Ian): stepped SiN curves at the 28 V stress with 1-3 strikes on top of the stress damage.
+# Every task loads the library's 28 V SiN state (strike-refined mesh). Round A: damage scale alone; strike density
+# 4-8e18 (3e18 does nothing on its own; ~5e18 Gaussians collapse alone at hotEb 1.0) with 1 or 3 strikes at two
+# damage scales; graded densities so each strike might trigger at its own Vd. Id-Vd at Vg +1 to 12 V.
+SRC28 = f"{LIB}/sin_Vg-10/sin_Vg-10_Vd028.00.str.gz"
+G28 = f"{S28}{SINd};stressLoad={SRC28};Vd_max=12.0;doIdVg=0"
+def gl(pairs):
+    return ";damGauss={" + " ".join(f"{{{y:g} 0.0 0.04 {n:g}}}" for y, n in pairs) + "}"
+with open("sweeps/params_radStepA.txt", "w") as f:
+    for p in (1.6e18, 1.7e18, 1.8e18):
+        f.write(f"A_p{p:g}_N0|{G28};damPeak={p:g}\n")
+    for p in (1.5e18, 1.7e18):
+        for n in (4e18, 5e18, 6e18, 8e18):
+            f.write(f"A_p{p:g}_n{n:g}_N1|{G28};damPeak={p:g}{gl([(0.8, n)])}\n")
+            f.write(f"A_p{p:g}_n{n:g}_N3|{G28};damPeak={p:g}{gl([(0.8, n), (1.6, n), (2.4, n)])}\n")
+    f.write(f"A_p1.5e+18_g456_N3|{G28};damPeak=1.5e18{gl([(0.8, 4e18), (1.6, 5e18), (2.4, 6e18)])}\n")
+    f.write(f"A_p1.5e+18_g654_N3|{G28};damPeak=1.5e18{gl([(0.8, 6e18), (1.6, 5e18), (2.4, 4e18)])}\n")
+print("radStepA 21")
