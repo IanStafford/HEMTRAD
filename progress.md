@@ -2102,3 +2102,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - On the 28 V / 2e18 stress damage: 2D references tasks 6-7 job 51784350. 3D tasks 4-5 held: a 3D 28 V stress may exceed 4 days; next is making stressSaveEvery/stressResume work for the 3D deck so they can be resumed.
   - Asked the HEMTRAD-FANGS session to port damRod and run the same tasks.
 - Ian asked why the small second SiN dip (near 6.3-7.7 V in the Nov 9-11 final) is missing now: those runs were stressed at 17.66 V (more damage); at a true 17 V the dip sits near 9.5 V and any strike at 0.8 um removes it; at 28 V / 2e18 the first collapse caps the current. Proposed SiN scales 1.6-1.8e18 to Vd 20 V (waiting for Ian).
+
+## 2026-11-17: goal (Ian) - stepped SiN curves at the 28 V stress with 1-3 strikes
+
+- Ian set the goal: reproduce stepped behaviour at the 28 V stress with 1, 2, 3 strikes on top of the stress damage, using damage scale and other levers; HPG runs and cancelling approved. Deliverable: a series of curves qualitatively like the measured curves and/or the Nov 11 model.
+- **radStepA 51784676** (21 SiN tasks, all loading the library's 28 V state, Vd to 12 V): damage scale 1.6/1.7/1.8e18 alone; strike density 4/5/6/8e18 with 1 strike (y 0.8) or 3 (0.8/1.6/2.4) at damage scale 1.5e18 and 1.7e18; graded 3-strike sets 4/5/6e18 and 6/5/4e18 at 1.5e18.
+- HEMTRAD-FANGS: damRod ported; FANGS rad3dRod jobs 51784597 (3D 0-2), 51784598 (2D 3/6/7), 51784599 (rod_full on STRUMPACK).

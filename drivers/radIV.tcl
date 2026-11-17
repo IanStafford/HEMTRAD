@@ -187,7 +187,7 @@ source [file join $modelDir GaN_modelfile_masterD]
 source [file join $modelDir $deviceDeck]
 set loadFile [expr {$stressLoad ne "" ? $stressLoad : $stressResume}]
 if {$loadFile ne ""} {
-    if {$deviceDim != 2} { error "stressLoad/stressResume: 2D decks only" }
+    # the 2D decks and rfdevice3d.tcl use the same contact names and current expressions (re-issued below)
     if {![file exists $loadFile]} { error "stressLoad/stressResume: no file $loadFile" }
     StructIn $loadFile
     # struct infile clears the device setup: the contact biases of the 2D decks again
