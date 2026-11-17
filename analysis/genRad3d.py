@@ -69,3 +69,28 @@ for w in (0.25, 0.5, 1.0):
     tb = tubes("SiN", 0.5, 0.0, 1.0, 0.03, 5e15, sigma_vac_floor=0.02)
     rows.append((f"sin_trk_W{w:g}", f"{POST};{T3};W3d={w:g};zSpac1={min(0.1, w / 4):g};{tb}"))
 write("rad3dTrack1", rows)
+
+# ---- 2026-11-17 (Ian): ion tracks along the gate width ("into the page" of the 2D cross-section), damRod. The
+# track is the 2D strike spot (Gaussian 3e18 cm^-3, sigma 40 nm, at the AlGaN top, y 0.8 um) run along z from the
+# z = 0 wall for the full slice (W3d 0.5 um: the 2D strike by symmetry), half or a quarter of it. SiN deck.
+# Track only (no stress, like rad3dTrack1) and on the final model's stress damage (28 V, damage scale 2e18, occSafe).
+# 2D references on the same coarsening (bot2d 1.5, yCoarse 2) and the same y refinement.
+ROD = "{{0.8 0.0 0.04 0 %g 3e18}}"
+W = 0.5
+T3R = f"{T3};W3d={W:g};zSpac1=0.1"
+MY_TRK = "meshY={0.64 0.01 0.96 0.01}"
+MY_STR = "meshY={0.3 0.01 2.6 0.01 0.64 0.005 0.96 0.005}"
+C2 = "deviceDeck=rfdevice_SiN.tcl;bot2d=1.5;yCoarse=2"
+FIN28 = ("polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;radState=post;surfCharge=-4.0e11;"
+         "hotEb=1.0;hotTau=1e-14;damXmax=0.05;damMax=1e20;trapLevel=0.30;damField=lat;damEref=5.0e5;damM=4;"
+         "damYmin=0.30;damPeak=2e18;dam2Field=lat;dam2M=0;dam2Ymin=-0.125;dam2Ymax=0.125;dam2Peak=5e17;"
+         "dam2Xmax=0.014;noRampBack=1;retryDepth=8;occSafe=1;Vd_stress=28.0;doIdVg=0;Vd_max=6.0;Vd_step=0.25")
+rows = []
+for lab, L, mz in (("full", W, ""), ("half", W / 2, f";meshZ={{{W / 2:g} 0.01}}"), ("quarter", W / 4, f";meshZ={{{W / 4:g} 0.01}}")):
+    rows.append((f"rod_{lab}", f"{POST};{T3R};{MY_TRK};damRod={ROD % L}{mz}"))
+rows.append(("rod_2dref", f"{POST};{C2};{MY_TRK};damGauss={{{{0.8 0.0 0.04 3e18}}}}"))
+rows.append(("s28_3d_none", f"{FIN28};{T3R};{MY_STR}"))
+rows.append(("s28_3d_half", f"{FIN28};{T3R};{MY_STR};damRod={ROD % (W / 2)};meshZ={{{W / 2:g} 0.01}}"))
+rows.append(("s28_2d_none", f"{FIN28};{C2};{MY_STR}"))
+rows.append(("s28_2d_strike", f"{FIN28};{C2};{MY_STR};damGauss={{{{0.8 0.0 0.04 3e18}}}}"))
+write("rad3dRod", rows)

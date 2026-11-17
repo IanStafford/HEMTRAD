@@ -106,6 +106,11 @@ if {![info exists damGauss]} { set damGauss {} }
 # capped at damMax (bias dependence inside a track); 0 = none.
 if {![info exists deviceDim]}  { set deviceDim 2 }
 if {![info exists damTube]}    { set damTube {} }
+# damRod (2026-11-17, 3D): ion tracks along the gate width ("into the page" of the 2D cross-section), each
+# {y x sigma zmin zmax N} (um, cm^-3): Gaussian in (y, x) of width sigma centred at (y, x), uniform from zmin to
+# zmax, semiconductor only (x >= 0). zmin 0 / zmax W3d spans the slice, which with reflecting walls is the 2D
+# damGauss site {y x sigma N}; shorter rods cover part of the width. {} = none.
+if {![info exists damRod]}     { set damRod {} }
 if {![info exists trackFieldM]} { set trackFieldM 0.0 }   ;# {y x sigma N} list: Gaussian acceptor sites (um, cm^-3), semiconductor only
 if {![info exists damSites]}  { set damSites {} }
 # stressSkip 1: no stress solve, for damage that doesn't use the stress field (damSites,
@@ -171,7 +176,7 @@ if {![info exists hotTau]}    { set hotTau 1.0e-14 }
 if {![info exists fillIters]} { set fillIters 4 }
 if {![info exists fillRelax]} { set fillRelax 0.5 }
 
-set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || $damInsPeak > 0.0 || $dam2Peak > 0.0 || $dam3Peak > 0.0 || [llength $damList] > 0 || [llength $damSites] > 0 || [llength $damGauss] > 0 || [llength $damTube] > 0)}]
+set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || $damInsPeak > 0.0 || $dam2Peak > 0.0 || $dam3Peak > 0.0 || [llength $damList] > 0 || [llength $damSites] > 0 || [llength $damGauss] > 0 || [llength $damTube] > 0 || [llength $damRod] > 0)}]
 set trapEn $useTraps
 set trapShape field
 
@@ -419,7 +424,7 @@ flush $sf
 proc DamageIn {tg} {
     global damPeak damM damEref damMax damXmax damYmin damYmax sf
     global damInsPeak damInsM damInsEref damInsXmin damField damInsField
-    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref dam2Xmax damNexp damNref dam3Peak dam3Ymin dam3Ymax damSites damGauss damTube trackFieldM damMax deviceDim
+    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref dam2Xmax damNexp damNref dam3Peak dam3Ymin dam3Ymax damSites damGauss damTube trackFieldM damMax deviceDim damRod
     ThawTraps
     set fld [expr {$damField eq "tot" ? "EstressT" : ($damField eq "ne" ? "EstressNE" : "Estress")}]
     set n "($damPeak*exp($damM*log($fld/$damEref+1.0e-30)))"
@@ -473,6 +478,15 @@ proc DamageIn {tg} {
             puts $sf "$tg tube damage times ($fld/$damEref)^$trackFieldM"
         }
         set n "$n+TubeSum"
+    }
+    if {[llength $damRod] > 0} {
+        sel z=0.0*x name=RodSum
+        foreach r $damRod {
+            lassign $r y0 x0 sg z0 z1 nr
+            sel z=RodSum+$nr*exp(-((y-$y0)*(y-$y0)+(x-$x0)*(x-$x0))/(2.0*$sg*$sg))*(x>=0.0)*(z>=$z0)*(z<=$z1) name=RodSum
+            puts $sf "$tg rod y=$y0 x=$x0 sigma=$sg z=$z0..$z1 N=$nr"
+        }
+        set n "$n+RodSum"
     }
     foreach s {0.0 0.01 0.03 0.1 0.3 0.6 1.0} {
         sel z=$s*($n)+1.0e-30*(1.0+x*x) name=TrapN
