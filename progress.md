@@ -2080,3 +2080,9 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 
 - rad28strike save tasks (51454301) at 16.4 V (SiN) / 16.0 V (HighK) of 28 V after 24 h (~0.6-0.7 V/h on the 93k-point strike mesh), close to their 48 h limit. stressLib (51459840) at 16 / 15 V after 23 h, 212 / 200 MB; 84 V will need resumes.
 - **Fallback (Ian OK):** the library ramps are identical to the save tasks' stress (same deck, mesh, levers, 1 V steps), so `sweeps/params_rad28strikeL.txt` loads all 16 cases from the library's 28 V files. If the save tasks haven't reached 28 V by about 40 h, cancel 51454301 and its dependents 51454302/51454303 and submit rad28strikeL once the library has its 28 V files.
+
+## 2026-11-17 10:05: 28 V strike runs moved to the stress library (fallback, Ian OK)
+
+- rad28strike save tasks 51454301 reached 47:59 of 48 h without saving (SiN at 27.1 V); cancelled with their dependents 51454302/51454303.
+- stressLib 51459840 at 47 h: SiN 1-28 V (370 MB), HighK 1-32 V (424 MB); ~13.7 MB per state.
+- **rad28strikeL 51762900** (16 tasks, 8 GB, 48 h): SiN and HighK, damage scale 1.5e18 and 2e18, 0-3 strikes, all loading the library's 28 V state. Expect a few hours each.
