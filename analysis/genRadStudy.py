@@ -482,3 +482,34 @@ with open("sweeps/params_radStepA.txt", "w") as f:
     f.write(f"A_p1.5e+18_g456_N3|{G28};damPeak=1.5e18{gl([(0.8, 4e18), (1.6, 5e18), (2.4, 6e18)])}\n")
     f.write(f"A_p1.5e+18_g654_N3|{G28};damPeak=1.5e18{gl([(0.8, 6e18), (1.6, 5e18), (2.4, 4e18)])}\n")
 print("radStepA 21")
+
+# ---- 2026-11-17 goal, round B (in parallel with A): levers A doesn't touch. SiN, 28 V library state, Vd to 12 V,
+# damage scale 1.5e18 unless noted. Trap level (also deepens the stress-damage traps), strike width (narrow
+# TRIM-like and wide), strike depth below the 2DEG, strikes nearer the gate, wide graded densities, capture time,
+# scale 1.6e18, and two-strike cases.
+def glw(items):   # (y, x, sigma, N)
+    return ";damGauss={" + " ".join(f"{{{y:g} {x:g} {s:g} {n:g}}}" for y, x, s, n in items) + "}"
+P3 = (0.8, 1.6, 2.4)
+rowsB = []
+for lv in (0.35, 0.40, 0.45):
+    rowsB.append((f"B_lev{lv:g}_n5e18_N3", f"trapLevel={lv:g};damPeak=1.5e18{gl([(y, 5e18) for y in P3])}"))
+for n in (8e18, 1.2e19):
+    rowsB.append((f"B_s0.02_n{n:g}_N3", f"damPeak=1.5e18{glw([(y, 0.0, 0.02, n) for y in P3])}"))
+for n in (3e18, 4e18):
+    rowsB.append((f"B_s0.1_n{n:g}_N1", f"damPeak=1.5e18{glw([(0.8, 0.0, 0.1, n)])}"))
+    rowsB.append((f"B_s0.1_n{n:g}_N3", f"damPeak=1.5e18{glw([(y, 0.0, 0.1, n) for y in P3])}"))
+rowsB.append(("B_x0.03_n6e18_N3", f"damPeak=1.5e18{glw([(y, 0.03, 0.04, 6e18) for y in P3])}"))
+for n in (5e18, 6e18):
+    rowsB.append((f"B_near_n{n:g}_N3", f"damPeak=1.5e18{gl([(y, n) for y in (0.5, 0.8, 1.1)])}"))
+rowsB.append(("B_g369_N3", f"damPeak=1.5e18{gl([(0.8, 3e18), (1.6, 6e18), (2.4, 9e18)])}"))
+rowsB.append(("B_g963_N3", f"damPeak=1.5e18{gl([(0.8, 9e18), (1.6, 6e18), (2.4, 3e18)])}"))
+for tau in (5e-15, 2e-14):
+    rowsB.append((f"B_tau{tau:g}_n5e18_N3", f"hotTau={tau:g};damPeak=1.5e18{gl([(y, 5e18) for y in P3])}"))
+for n in (5e18, 6e18):
+    rowsB.append((f"B_p1.6_n{n:g}_N3", f"damPeak=1.6e18{gl([(y, n) for y in P3])}"))
+rowsB.append(("B_n6e18_N2", f"damPeak=1.5e18{gl([(0.8, 6e18), (1.6, 6e18)])}"))
+rowsB.append(("B_s0.1_n4e18_N2", f"damPeak=1.5e18{glw([(0.8, 0.0, 0.1, 4e18), (1.6, 0.0, 0.1, 4e18)])}"))
+with open("sweeps/params_radStepB.txt", "w") as f:
+    for lab, lev in rowsB:
+        f.write(f"{lab}|{G28};{lev}\n")
+print("radStepB", len(rowsB))
