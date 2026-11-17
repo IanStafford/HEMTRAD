@@ -546,3 +546,28 @@ with open("sweeps/params_radStepD.txt", "w") as f:
     for lab, lev in rowsD:
         f.write(f"{lab}|{G28};{lev}\n")
 print("radStepD", len(rowsD))
+
+# ---- 2026-11-17 goal, round E (Ian: fill ee1-b): directions from the literature review (kb rad-literature-steps).
+# Stress Vd series (24 and 30 V states from the library; damage scale adjusted for the E^4 law: (28/Vd)^4),
+# strikes at the field-plate edges (y 0.9 and 0.3, then 2.0), trap level 0.40 with 6e18 strikes, wider strikes
+# (sigma 60 nm), and Vg families (0 and -1 V) for the best stepped cases.
+def g28at(vd):
+    return f"{FE};occSafe=1;Vd_stress={vd:g}{gmN(SY)}{SINd};stressLoad={LIB}/sin_Vg-10/sin_Vg-10_Vd{vd:06.2f}.str.gz;Vd_max=12.0;doIdVg=0"
+rowsE = []
+for vd, p in ((24.0, 2.8e18), (30.0, 1.15e18)):
+    for k in (0, 1, 3):
+        rowsE.append((f"E_vs{vd:g}_p{p:g}_n6e18_N{k}", g28at(vd), f"damPeak={p:g}" + gN(6e18, k)))
+FPP = (0.9, 0.3, 2.0)
+for k in (1, 2, 3):
+    rowsE.append((f"E_fp_n6e18_N{k}", G28, "damPeak=1.5e18" + gl([(y, 6e18) for y in FPP[:k]])))
+for k in (1, 2, 3):
+    rowsE.append((f"E_lev0.4_n6e18_N{k}", G28, "trapLevel=0.40;damPeak=1.5e18" + gN(6e18, k)))
+for k in (1, 2, 3):
+    rowsE.append((f"E_s0.06_n6e18_N{k}", G28, "damPeak=1.5e18" + glw([(y, 0.0, 0.06, 6e18) for y in P3[:k]])))
+for lab, lev in (("E_fam_n6e18_N1", "damPeak=1.5e18" + gN(6e18, 1)), ("E_fam_n6e18_N3", "damPeak=1.5e18" + gN(6e18, 3)),
+                 ("E_fam_n8e18_N3", "damPeak=1.5e18" + gN(8e18, 3))):
+    rowsE.append((lab, G28, lev + ";VgFam={0 -1}"))
+with open("sweeps/params_radStepE.txt", "w") as f:
+    for lab, base, lev in rowsE:
+        f.write(f"{lab}|{base};{lev}\n")
+print("radStepE", len(rowsE))
