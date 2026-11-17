@@ -2117,3 +2117,18 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **radStepD 51801163** (5 tasks): Vd step 0.05 for the stepped cases (1.5e18 + one 6e18; 1.7e18 + three 6e18; 1.5e18 + three 8e18) and knock-out of strike 1 or 2 from three 8e18 strikes. Group CPUs ~92 after this; no more submissions until round A frees slots.
 - Ian (17:20): use whatever is free on ee1-b, queueing is fine. **radStepE** 51801897 (15 tasks) + 51801898 (3 Vg-family tasks, 48 h): stress Vd 24 V (scale 2.8e18) and 30 V (1.15e18) with 0/1/3 6e18 strikes; strikes at the field-plate edges (0.9, 0.3, 2.0); trap level 0.40 with 6e18 N1-3; sigma 60 nm N1-3; VgFam {0 -1} for 1.5e18 + 6e18 N1/N3 and 8e18 N3.
 - **3D runs stopped (17:30):** HEMTRAD-FANGS probe shows the 3D brick mesh gets the depth (x) gradient wrong (y is right), in FLOOXS and FANGS alike, so the hot-electron field and capture are wrong in 3D (rod_full peak Te 9146 K vs 867 K in 2D). Cancelled rad3dRod 3D tasks 0-2 (51784348). Details kb/model/3d-plan.md. 2D references keep running.
+
+## 2026-11-17 18:00: test register dashboard (Ian)
+
+- **Stepped-Collapse Test Register:** https://claude.ai/artifact/QEhm71DSp92bNCYGRHNXTm (claude.ai Data dashboard, private). One row per HPG task in the stepped-collapse search (rounds S, A-E, 3D; 104 tests): a plain description of exactly what it changes (deck, stress, damage scale, number/density/position/width/depth of strikes, trap level, capture time, Vd step, Vg family), its job ID and SLURM state, Vd reached, Id at 1 V, and the drops found in its Id-Vd curve so far. Round cards say what each round is for; filters by round, state, device, text and "2+ drops".
+- Built by `analysis/testRegister.py` (params files + sacct + synced results -> JSON); refresh by rerunning it and uploading the JSON to the dashboard's `tests` dataset. At 18:00: 34 done, 58 running, 7 queued, 3 cancelled (3D), 2 held (3D with stress); 13 curves with 2+ drops.
+
+| Round | What it tests |
+|---|---|
+| S | 0-3 strikes of 3e18 on the 28 V stress damage, SiN and HighK, scales 1.5e18 / 2e18 (one drop per SiN curve) |
+| A | damage scale alone; strikes 4-8e18 (1 or 3) at scales 1.5e18 / 1.7e18; graded 4/5/6e18 |
+| B | trap level 0.35-0.45 eV, strike width 20 / 100 nm, strikes below the channel, strikes near the gate, graded 3/6/9e18, capture time, scale 1.6e18, two strikes |
+| C | matched 0/1/2/3-strike series for the stepped cases (6-8e18), 7e18, scale 1.6e18, HighK counterparts |
+| D | halved Vd step for the stepped cases; knock-out of one of three 8e18 strikes |
+| E | stress at 24 / 30 V, field-plate-edge strikes, trap level 0.40 eV, 60 nm strikes, Vg families 0 / -1 V |
+| 3D | tracks along the gate width and 2D references (3D tasks stopped: depth gradient wrong in 3D) |
