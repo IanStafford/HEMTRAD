@@ -2132,3 +2132,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 | D | halved Vd step for the stepped cases; knock-out of one of three 8e18 strikes |
 | E | stress at 24 / 30 V, field-plate-edge strikes, trap level 0.40 eV, 60 nm strikes, Vg families 0 / -1 V |
 | 3D | tracks along the gate width and 2D references (3D tasks stopped: depth gradient wrong in 3D) |
+- **3D brick bug found (HEMTRAD-FANGS):** FLOOXS/FANGS GeomInfoBrick gradient (transposed Jacobian, a wrong shape derivative, a sign flip). Fixed in FANGS (PR #2, unmerged): 3D/2D Id 0.998-1.000 to 2.75 V after the fix, 0.75 before. FLOOXS not patched; that is Ian's call. Details kb/model/3d-plan.md.
