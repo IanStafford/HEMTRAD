@@ -114,3 +114,5 @@ Access: **F** full or most read, **P** partial or fetch summary, **A** abstract,
 - R23 SweepMe wiki, wiki.sweep-me.net/wiki/SMU. P
 
 Related: [[rad-model]], [[damage-region-map]], [[ron-increase]], [[trim]], [[critical-strike]].
+
+- Stepped collapse after heavy ions, and mechanisms that give discrete steps (2026-11-17 review, 28 checked sources): [[rad-literature-steps]].
