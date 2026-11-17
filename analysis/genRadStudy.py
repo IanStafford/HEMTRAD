@@ -513,3 +513,23 @@ with open("sweeps/params_radStepB.txt", "w") as f:
     for lab, lev in rowsB:
         f.write(f"{lab}|{G28};{lev}\n")
 print("radStepB", len(rowsB))
+
+# ---- 2026-11-17 goal, round C: round A found steps with 6-8e18 strikes (6e18, 1 strike at 1.5e18: drops at ~2 V
+# and ~6.3 V, the Nov 11 shape; 8e18, 3 strikes: drops near 1.8, 3.9, 6.7 V). Complete matched 0-3 strike series
+# (N2 cases, 7e18 in between, 1.6e18 scale, N0 to 12 V) and the HighK counterparts (28 V HighK library state).
+SRC28HK = f"{LIB}/hk_Vg-10/hk_Vg-10_Vd028.00.str.gz"
+G28HK = f"{S28};stressLoad={SRC28HK};Vd_max=12.0;doIdVg=0"
+def gN(n, k):
+    return gl([(y, n) for y in P3[:k]]) if k else ""
+rowsC = [("C_p1.7_n6e18_N2", G28, "damPeak=1.7e18" + gN(6e18, 2)),
+         ("C_p1.5_n8e18_N2", G28, "damPeak=1.5e18" + gN(8e18, 2)),
+         ("C_p1.7_n8e18_N2", G28, "damPeak=1.7e18" + gN(8e18, 2)),
+         ("C_p1.5_N0", G28, "damPeak=1.5e18")]
+rowsC += [(f"C_p1.5_n7e18_N{k}", G28, "damPeak=1.5e18" + gN(7e18, k)) for k in (1, 2, 3)]
+rowsC += [(f"C_p1.6_n6e18_N{k}", G28, "damPeak=1.6e18" + gN(6e18, k)) for k in (1, 2)]
+rowsC += [(f"C_hk_p1.5_n6e18_N{k}", G28HK, "damPeak=1.5e18" + gN(6e18, k)) for k in (0, 1, 2, 3)]
+rowsC += [(f"C_hk_p1.5_n8e18_N{k}", G28HK, "damPeak=1.5e18" + gN(8e18, k)) for k in (1, 2, 3)]
+with open("sweeps/params_radStepC.txt", "w") as f:
+    for lab, base, lev in rowsC:
+        f.write(f"{lab}|{base};{lev}\n")
+print("radStepC", len(rowsC))
