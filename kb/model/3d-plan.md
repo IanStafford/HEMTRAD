@@ -113,3 +113,5 @@ Related: [[critical-strike]], [[damage-region-map]], [[mesh]], [[flooxs-overview
 - UMFPACK at 5 z lines fails with "ERROR: out of memory" at 4.4 GB even with 128 GB allocated (job 51061333): the 32-bit index limit of the `di` interface, not RAM. Above about 50k points BiCGSTAB is the solver.
 - First tracks (rad3dTrack1 51061334, SiN, core sigma 30 nm): about 1-1.5 h per Vd point; results pending.
 
+**3D stress field is wrong (2026-11-17, local test on the 3D deck, W 0.25, 3 z lines, 3 V stress):** `Estress = abs(dot(DevPsi, y*1e-4))` gives a GaN peak of 5.5e7 V/cm at 1, 2 and 3 V alike (about 9.5e6 at the source end, smooth along y, identical at z 0 / 0.125 / 0.25), while `sqrt(dot(DevPsi,DevPsi))` peaks at 1.0e6 in the same state; a component can't exceed the magnitude. So the lateral-field expression, valid in 2D, is not the lateral field on the 3D brick mesh, and stress-placed damage (`damField lat`) can't be used in 3D until it is fixed. The rad3dRod 3D with-stress tasks (4-5) stay held. Track-only 3D runs (stressSkip) are unaffected. stressSaveEvery / stressResume now work on the 3D deck (resumed 2 -> 3 V matches the uninterrupted ramp).
+
