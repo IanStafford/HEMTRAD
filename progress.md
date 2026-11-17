@@ -2092,3 +2092,13 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - rad28strikeL 51762900: all 16 tasks died in 30-50 s in Initialize's `device init`, "computed a nan or infinite" (core dumps removed). Cause: the library states are saved at bias, so DevPsi is ~+30 V near the drain at 28 V; Initialize evaluates carrier densities from it with Qfn = 0 and overflows. The local 3 V test didn't show it (exponent still finite).
 - Fix in radIV: after loading a state (stressLoad/stressResume), reset DevPsi/Qfn/Qfp to 0 as in a fresh deck (resume keeps its own copy). Testing locally on the real 28 V SiN library file (2e18, 3 strikes) before resubmitting.
 - Resubmitted as **rad28strikeL 51763582** (16 tasks) with the fix (commit a308148).
+
+## 2026-11-17 afternoon: 28 V strike figures, 3D render, 3D tracks along the gate width (Ian)
+
+- rad28strikeL 51763582: 11 of 16 done at the time of writing; all 2e18 done. Figures `figures/rad/strike28/strike28_{2e18,1.5e18}.png` (`analysis/plot_rad28strike.py`). 2e18, 3 strikes: SiN collapses 277 -> 41 mA/mm near 1.3-1.6 V (164 at 10 V); every strike count collapses, strikes only delay it slightly (1.1 -> 1.3 V). HighK never collapses: 954 / 766 / 737 / 718 mA/mm at 10 V for 0-3 strikes.
+- 3D render: `drivers/render3d_build.tcl` (3D SiN slice W 1 um, one Gaussian track down the depth at y 0.5, struct vtk=) and `analysis/render3d.py` (PyVista, ~/venvs/render, offscreen). Figures `figures/rad3d/sin3d_track_{overview,closeup}.png`.
+- Ian: the track should run "into the page" (along the gate width z), not down the depth. New radIV lever `damRod` {y x sigma zmin zmax N} (default off); local 3D check OK. **rad3dRod** (params_rad3dRod.txt): track = 2D strike spot (3e18, sigma 40 nm, AlGaN top, y 0.8) along z for the full slice (W 0.5 um), half or a quarter, SiN.
+  - Track only: tasks 0-2 (3D, 257k points, BiCGSTAB) job 51784348 (32 GB, 4 days); 2D reference task 3 job 51784349.
+  - On the 28 V / 2e18 stress damage: 2D references tasks 6-7 job 51784350. 3D tasks 4-5 held: a 3D 28 V stress may exceed 4 days; next is making stressSaveEvery/stressResume work for the 3D deck so they can be resumed.
+  - Asked the HEMTRAD-FANGS session to port damRod and run the same tasks.
+- Ian asked why the small second SiN dip (near 6.3-7.7 V in the Nov 9-11 final) is missing now: those runs were stressed at 17.66 V (more damage); at a true 17 V the dip sits near 9.5 V and any strike at 0.8 um removes it; at 28 V / 2e18 the first collapse caps the current. Proposed SiN scales 1.6-1.8e18 to Vd 20 V (waiting for Ian).
