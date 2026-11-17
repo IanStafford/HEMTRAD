@@ -193,6 +193,10 @@ if {$loadFile ne ""} {
     contact name=FP voltage supply=0.0
     # Initialize resets the solution; keep the saved one for stressResume
     if {$stressResume ne ""} { foreach v {DevPsi Qfn Qfp} { sel z=$v name=${v}Res } }
+    # A state saved at a high stress bias has DevPsi of tens of volts near the drain; Initialize computes carrier
+    # densities from it with Qfn = 0 and overflows (exp(38.7*30), "computed a nan or infinite", rad28strikeL
+    # 51762900). Start from zero potentials, as a freshly built deck does.
+    foreach v {DevPsi Qfn Qfp} { sel z=0.0 name=$v }
 }
 if {[info exists mobDamFac]} {
     sel z=1.0-(1.0-$mobDamFac)*(x>=0.0)*(x<=$mobDamXmax)*(y>=$mobDamYmin)*(y<=$mobDamYmax)+1.0e-30*(1.0+x*x) name=MobDam

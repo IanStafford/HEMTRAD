@@ -2086,3 +2086,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - rad28strike save tasks 51454301 reached 47:59 of 48 h without saving (SiN at 27.1 V); cancelled with their dependents 51454302/51454303.
 - stressLib 51459840 at 47 h: SiN 1-28 V (370 MB), HighK 1-32 V (424 MB); ~13.7 MB per state.
 - **rad28strikeL 51762900** (16 tasks, 8 GB, 48 h): SiN and HighK, damage scale 1.5e18 and 2e18, 0-3 strikes, all loading the library's 28 V state. Expect a few hours each.
+
+## 2026-11-17 10:10: rad28strikeL failed at once; fix
+
+- rad28strikeL 51762900: all 16 tasks died in 30-50 s in Initialize's `device init`, "computed a nan or infinite" (core dumps removed). Cause: the library states are saved at bias, so DevPsi is ~+30 V near the drain at 28 V; Initialize evaluates carrier densities from it with Qfn = 0 and overflows. The local 3 V test didn't show it (exponent still finite).
+- Fix in radIV: after loading a state (stressLoad/stressResume), reset DevPsi/Qfn/Qfp to 0 as in a fresh deck (resume keeps its own copy). Testing locally on the real 28 V SiN library file (2e18, 3 strikes) before resubmitting.
