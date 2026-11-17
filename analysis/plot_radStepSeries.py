@@ -1,0 +1,111 @@
+"""Deliverable for the stepped-collapse goal (2026-11-17): matched 0/1/2/3-strike series at the 28 V stress.
+One row per candidate series: SiN on the left with the Nov 11 model (radEB1, SiN biased) as a reference,
+HighK with the same levers on the right when it exists. Drops (>= 10 mA/mm) are marked.
+
+usage: python3 analysis/plot_radStepSeries.py <out prefix>
+Writes <prefix>_<series>.png per series and <prefix>_all.png with every series.
+"""
+import glob
+import sys
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+
+sys.path.insert(0, "analysis")
+from plot_radStep import drops  # noqa: E402
+
+R = "results/20261117_"
+PRE = {"sin": "results/20261104_radMap1/task_*/sin_ref_IdVd.csv", "hk": "results/20261104_radMap1/task_*/hk_ref_IdVd.csv"}
+NOV11 = "results/20261109_radEB1/task_*/sin_b_eb1_IdVd.csv"
+SIN_RAMP = ["#9aa0a8", "#f0a060", "#d0611d", "#7a2a06"]
+HK_RAMP = ["#9aa0a8", "#8db8e6", "#3f7fc4", "#123f7a"]
+
+# series: title, {N: glob} for SiN, {N: glob} for HighK
+SERIES = {
+    "p15_n6": ("Damage scale 1.5e18, strikes of 6e18 at y 0.8 / 1.6 / 2.4 µm",
+               {0: R + "radStepC/task_*/C_p1.5_N0_IdVd.csv", 1: R + "radStepA/task_*/A_p1.5e+18_n6e+18_N1_IdVd.csv",
+                2: R + "radStepB/task_*/B_n6e18_N2_IdVd.csv", 3: R + "radStepA/task_*/A_p1.5e+18_n6e+18_N3_IdVd.csv"},
+               {k: R + f"radStepC/task_*/C_hk_p1.5_n6e18_N{k}_IdVd.csv" for k in range(4)}),
+    "p15_n8": ("Damage scale 1.5e18, strikes of 8e18 at y 0.8 / 1.6 / 2.4 µm",
+               {0: R + "radStepC/task_*/C_p1.5_N0_IdVd.csv", 1: R + "radStepA/task_*/A_p1.5e+18_n8e+18_N1_IdVd.csv",
+                2: R + "radStepC/task_*/C_p1.5_n8e18_N2_IdVd.csv", 3: R + "radStepA/task_*/A_p1.5e+18_n8e+18_N3_IdVd.csv"},
+               {k: R + f"radStepC/task_*/C_hk_p1.5_n8e18_N{k}_IdVd.csv" for k in (1, 2, 3)}),
+    "p17_n6": ("Damage scale 1.7e18, strikes of 6e18 at y 0.8 / 1.6 / 2.4 µm",
+               {0: R + "radStepA/task_*/A_p1.7e+18_N0_IdVd.csv", 1: R + "radStepA/task_*/A_p1.7e+18_n6e+18_N1_IdVd.csv",
+                2: R + "radStepC/task_*/C_p1.7_n6e18_N2_IdVd.csv", 3: R + "radStepA/task_*/A_p1.7e+18_n6e+18_N3_IdVd.csv"},
+               {}),
+    "fp_n6": ("Damage scale 1.5e18, strikes of 6e18 at the field-plate edges (y 0.9, then 0.3, then 2.0 µm)",
+              {0: R + "radStepC/task_*/C_p1.5_N0_IdVd.csv", 1: R + "radStepE/task_*/E_fp_n6e18_N1_IdVd.csv",
+               2: R + "radStepE/task_*/E_fp_n6e18_N2_IdVd.csv", 3: R + "radStepE/task_*/E_fp_n6e18_N3_IdVd.csv"},
+              {}),
+}
+plt.rcParams.update({"font.size": 11, "axes.edgecolor": "#8a8f98", "axes.labelcolor": "#2b2f36",
+                     "xtick.color": "#4a4f58", "ytick.color": "#4a4f58"})
+
+
+def load(p):
+    f = glob.glob(p)
+    if not f:
+        return None
+    d = np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(f[0]) if l.strip()])
+    return d if d.ndim == 2 and len(d) >= 3 else None
+
+
+def panel(a, curves, ramp, pre, ref=None, title=""):
+    a.plot(pre[:, 0], pre[:, 1], color="#c5c9ce", lw=1.4, ls="--", label="pre-irradiation")
+    if ref is not None:
+        a.plot(ref[:, 0], ref[:, 1], color="#5b616b", lw=1.2, ls=":", label="Nov 11 model (17.66 V stress)")
+    for k in sorted(curves):
+        d = curves[k]
+        if d is None:
+            continue
+        a.plot(d[:, 0], d[:, 1], color=ramp[k], lw=2.6 if k == 3 else 1.7,
+               label=f"{k} strike{'s' if k != 1 else ''}", zorder=3)
+        for s in drops(d[:, 0], d[:, 1], 10.0):
+            a.annotate("", xy=(s[1], s[3]), xytext=(s[0], s[2]),
+                       arrowprops=dict(arrowstyle="-|>", color=ramp[k], lw=1.0, shrinkA=0, shrinkB=0))
+    a.set_title(title, fontsize=11, loc="left")
+    a.set_xlim(0, 12.2)
+    a.set_ylim(0, None)
+    a.set_xlabel("Vd (V)")
+    a.grid(color="#e3e5e8", lw=0.8)
+    a.spines[["top", "right"]].set_visible(False)
+    a.legend(frameon=False, fontsize=8.5, loc="center right", bbox_to_anchor=(1.0, 0.62))
+
+
+def main(prefix):
+    pre = {d: load(p) for d, p in PRE.items()}
+    nov = load(NOV11)
+    rows = []
+    for key, (title, sin, hk) in SERIES.items():
+        sc = {k: load(p) for k, p in sin.items()}
+        hc = {k: load(p) for k, p in hk.items()}
+        rows.append((key, title, sc, hc))
+        two = any(v is not None for v in hc.values())
+        fig, axs = plt.subplots(1, 2 if two else 1, figsize=(12.5 if two else 7.0, 4.6), sharey=True, squeeze=False)
+        panel(axs[0][0], sc, SIN_RAMP, pre["sin"], nov, "SiN passivation")
+        if two:
+            panel(axs[0][1], hc, HK_RAMP, pre["hk"], None, "HighK passivation")
+        axs[0][0].set_ylabel("Id (mA/mm) at Vg +1 V")
+        fig.suptitle(f"28 V off-state stress (Vg −10 V), {title}", fontsize=11.5, x=0.01, ha="left")
+        fig.tight_layout()
+        fig.savefig(f"{prefix}_{key}.png", dpi=180)
+        plt.close(fig)
+        print("wrote", f"{prefix}_{key}.png")
+    fig, axs = plt.subplots(len(rows), 2, figsize=(12.5, 4.0 * len(rows)), sharex=True, squeeze=False)
+    for i, (key, title, sc, hc) in enumerate(rows):
+        panel(axs[i][0], sc, SIN_RAMP, pre["sin"], nov, f"SiN: {title}")
+        if any(v is not None for v in hc.values()):
+            panel(axs[i][1], hc, HK_RAMP, pre["hk"], None, "HighK, same levers")
+        else:
+            axs[i][1].set_visible(False)
+        axs[i][0].set_ylabel("Id (mA/mm)")
+    fig.tight_layout()
+    fig.savefig(f"{prefix}_all.png", dpi=130)
+    print("wrote", f"{prefix}_all.png")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1])
