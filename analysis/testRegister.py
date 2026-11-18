@@ -44,7 +44,7 @@ ROUNDS = [
      [("51823696", 0, 18)]),
     ("H", "radStepH", "20261118_radStepH",
      "Field-scaled strikes under the T-gate overhang (gaussFieldM: strike density times (E/Eref)^m), so strikes are dense in SiN and weak in HighK; both decks",
-     [("JOBH", 0, 25)]),
+     [("51871249", 0, 25)]),
     ("3D", "rad3dRod", "20261117_rad3dRod",
      "Ion tracks along the gate width (3D) and their 2D references; 3D tasks stopped (3D x-gradient is wrong)",
      [("51784348", 0, 2), ("51784349", 3, 3), ("51784350", 6, 7)]),
