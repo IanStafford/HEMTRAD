@@ -621,3 +621,21 @@ with open("sweeps/params_radStepH.txt", "w") as f:
     for lab, base, lev in rowsH:
         f.write(f"{lab}|{base};{lev}\n")
 print("radStepH", len(rowsH))
+
+# ---- 2026-11-18 goal, round I: round H's field-scaled strikes keep HighK flat to 7 V, but a single SiN strike at
+# y 0.5 (base 2-4e18, m 2 or 4) collapses SiN completely at 0.4-1.0 V, so strikes 2-3 add nothing. SiN's 28 V field
+# exceeds HighK's over y 0.45-0.65 um ((E_SiN/E_HK)^4 = 3.7-30 at 10 nm depth). Lower base densities: one strike at
+# y 0.5 (3e17 / 6e17 / 1e18) or y 0.6 / 0.65; and three strikes spread over the band (0.65, 0.6, 0.55 in that order).
+rowsI = []
+for deck, base in (("sin", G28), ("hk", G28HK)):
+    rowsI += [(f"I_{deck}_y0.5_n{n:g}_N1", base, "damPeak=1.5e18" + gl([(0.5, n)]) + ";gaussFieldM=4")
+              for n in (3e17, 6e17, 1e18)]
+    rowsI += [(f"I_{deck}_y{y:g}_n{n:g}_N1", base, "damPeak=1.5e18" + gl([(y, n)]) + ";gaussFieldM=4")
+              for y, n in ((0.6, 1e18), (0.65, 3e18))]
+    for tag, trio in (("a", ((0.65, 3e18), (0.6, 1e18), (0.55, 3e17))), ("b", ((0.65, 2e18), (0.6, 6e17), (0.55, 2e17)))):
+        rowsI += [(f"I_{deck}_band{tag}_N{k}", base, "damPeak=1.5e18" + gl(trio[:k]) + ";gaussFieldM=4")
+                  for k in ((2, 3) if tag == "a" else (1, 2, 3))]   # band a N1 = y0.65_n3e18_N1
+with open("sweeps/params_radStepI.txt", "w") as f:
+    for lab, base, lev in rowsI:
+        f.write(f"{lab}|{base};{lev}\n")
+print("radStepI", len(rowsI))
