@@ -2,8 +2,10 @@
 One row per candidate series: SiN on the left with the Nov 11 model (radEB1, SiN biased) as a reference,
 HighK with the same levers on the right when it exists. Drops (>= 10 mA/mm) are marked.
 
-usage: python3 analysis/plot_radStepSeries.py <out prefix>
-Writes <prefix>_<series>.png per series and <prefix>_all.png with every series.
+usage: python3 analysis/plot_radStepSeries.py <out prefix> [key key ...]
+Writes <prefix>_<series>.png per series and <prefix>_all.png with every series; with keys, also
+<prefix>_deliverable.png with just those series, one row each (2026-11-18, Ian chose the two partial results:
+plain strikes for the SiN steps, field-scaled strikes for the SiN vs HighK contrast).
 """
 import glob
 import sys
@@ -48,7 +50,14 @@ SERIES = {
               {0: R + "radStepC/task_*/C_p1.5_N0_IdVd.csv", 1: R + "radStepE/task_*/E_fp_n6e18_N1_IdVd.csv",
                2: R + "radStepE/task_*/E_fp_n6e18_N2_IdVd.csv", 3: R + "radStepE/task_*/E_fp_n6e18_N3_IdVd.csv"},
               {}),
+    "fs_bandb": ("field-scaled strikes (damage × (E/E_ref)⁴) at y 0.65 / 0.6 / 0.55 µm, damage scale 1.5e18",
+                 {0: R + "radStepC/task_*/C_p1.5_N0_IdVd.csv",
+                  **{k: f"results/20261118_radStepI/task_*/I_sin_bandb_N{k}_IdVd.csv" for k in (1, 2, 3)}},
+                 {0: R + "radStepC/task_*/C_hk_p1.5_n6e18_N0_IdVd.csv",
+                  **{k: f"results/20261118_radStepI/task_*/I_hk_bandb_N{k}_IdVd.csv" for k in (1, 2, 3)}}),
 }
+ROWTITLE = {"p15_n6": ("Plain strikes: SiN steps", "HighK, same strikes: drops too"),
+            "fs_bandb": ("Field-scaled strikes: SiN collapses deeper per strike", "HighK, same strikes: flat")}
 plt.rcParams.update({"font.size": 11, "axes.edgecolor": "#8a8f98", "axes.labelcolor": "#2b2f36",
                      "xtick.color": "#4a4f58", "ytick.color": "#4a4f58"})
 
@@ -83,7 +92,7 @@ def panel(a, curves, ramp, pre, ref=None, title=""):
     a.legend(frameon=False, fontsize=8.5, loc="center right", bbox_to_anchor=(1.0, 0.62))
 
 
-def main(prefix):
+def main(prefix, *keys):
     pre = {d: load(p) for d, p in PRE.items()}
     nov = load(NOV11)
     rows = []
@@ -113,7 +122,22 @@ def main(prefix):
     fig.tight_layout()
     fig.savefig(f"{prefix}_all.png", dpi=130)
     print("wrote", f"{prefix}_all.png")
+    if keys:
+        sel = [r for r in rows if r[0] in keys]
+        fig, axs = plt.subplots(len(sel), 2, figsize=(12.5, 4.3 * len(sel)), sharex=True, squeeze=False)
+        for i, (key, title, sc, hc) in enumerate(sel):
+            ts, th = ROWTITLE.get(key, (f"SiN: {title}", "HighK, same levers"))
+            panel(axs[i][0], sc, SIN_RAMP, pre["sin"], nov, f"{'AB'[i] if i < 2 else i + 1}. {ts}\n{title}")
+            panel(axs[i][1], hc, HK_RAMP, pre["hk"], None, f"{th}\n ")
+            axs[i][0].set_ylabel("Id (mA/mm) at Vg +1 V")
+            for a in axs[i]:
+                a.title.set_fontsize(10)
+                a.tick_params(labelbottom=True)
+        fig.suptitle("28 V off-state stress (Vg −10 V) plus 0–3 ion strikes, model output", fontsize=12, x=0.01, ha="left")
+        fig.tight_layout()
+        fig.savefig(f"{prefix}_deliverable.png", dpi=170)
+        print("wrote", f"{prefix}_deliverable.png")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(*sys.argv[1:])

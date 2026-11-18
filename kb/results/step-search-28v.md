@@ -49,7 +49,14 @@ Field-scaled (m 4) strikes at lower density inside y 0.5-0.65 µm, both decks, a
 
 Round H at 12 V: SiN with field-scaled strikes at y 0.5 (base 2-4e18) stays at ~0 after its 0.4-1.0 V collapse; HighK flat (m 4: 951-956 at 12 V; m 2 with 4e18: 860-902).
 
-## Where the goal stands (2026-11-18 evening)
+## Deliverable (Ian, 2026-11-18: option (b), the partial result is fine)
+
+`figures/rad/step28/series_deliverable.png` (`analysis/plot_radStepSeries.py figures/rad/step28/series p15_n6 fs_bandb`), 0-3 strikes on the 28 V stress damage, Vg +1 V, with the Nov 11 model as reference:
+- **A. Plain strikes** (damage scale 1.5e18, 6e18 strikes at y 0.8 / 1.6 / 2.4 µm): stepped SiN curves, qualitatively like the Nov 11 model (one strike: drops near 2, 6.3 and 10.5 V). HighK with the same strikes drops too (near 1.5-2.5 V), unlike the measured HighK.
+- **B. Field-scaled strikes** (damage × (E/E_ref)⁴, y 0.65 / 0.6 / 0.55 µm): HighK stays on its no-strike curve; SiN has one drop near 1.3-2.1 V that deepens with each strike (386 -> 174, 345 -> 91, 310 -> 38 mA/mm), then partly recovers.
+- Step positions are provisional until the mesh check (meshChkStress 51883722) reports; the y 0.8 strike sits on 15 nm cells.
+
+## Where the goal stood before Ian's choice (2026-11-18 evening)
 
 No single strike model yet gives both stepped SiN and flat HighK: plain strikes step SiN but drop HighK; field-scaled strikes keep HighK flat but give SiN one drop. A what-if (not a simulation): if each strike switched only its own share of the gate width and the columns carried current independently, the round I single strikes (whose onsets move with density) would add a small step each between ~0.9 and 2 V while HighK stays flat (`figures/rad/step28/fieldscaled_segments.png`, 25% of the width per strike). Whether one strike can switch that much width is the open 3D question ([[3d-plan]]); decision for Ian.
 
