@@ -571,3 +571,16 @@ with open("sweeps/params_radStepE.txt", "w") as f:
     for lab, base, lev in rowsE:
         f.write(f"{lab}|{base};{lev}\n")
 print("radStepE", len(rowsE))
+
+# ---- 2026-11-17 goal, round F: trap level 0.40 eV with 6e18 strikes gave a staircase whose step count grows with
+# the strike count (E_lev0.4: 3 steps near 1.7 / 2.9 / 4.4 V with 3 strikes). Complete it: 0 strikes, HighK
+# counterparts, strike densities 5e18 and 7e18, and Vd step 0.05 V for the 1-3 strike cases.
+L4 = "trapLevel=0.40;damPeak=1.5e18"
+rowsF = [("F_lev0.4_N0", G28, L4)]
+rowsF += [(f"F_hk_lev0.4_n6e18_N{k}", G28HK, L4 + gN(6e18, k)) for k in range(4)]
+rowsF += [(f"F_lev0.4_n{n:g}_N{k}", G28, L4 + gN(n, k)) for n in (5e18, 7e18) for k in (1, 2, 3)]
+rowsF += [(f"F_lev0.4_n6e18_N{k}_dv05", G28, L4 + gN(6e18, k) + ";Vd_step=0.05") for k in (1, 2, 3)]
+with open("sweeps/params_radStepF.txt", "w") as f:
+    for lab, base, lev in rowsF:
+        f.write(f"{lab}|{base};{lev}\n")
+print("radStepF", len(rowsF))
