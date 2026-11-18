@@ -121,3 +121,6 @@ Related: [[critical-strike]], [[damage-region-map]], [[mesh]], [[flooxs-overview
 
 
 FLOOXS brick check (from HEMTRAD-FANGS): `~/HEMTRAD-FANGS/port-runs/brick/brick.tcl` (bricks) and `brick_tet.tcl` (tet control), README there; `flooxs brick.tcl`, seconds, no solve. Correct output: dot/GradC lines 1, cross terms 0, MagGrad sqrt(2), relative errors ~1e-15, every POINT equal to its ref. Stock FLOOXS (md5 19b4614f): bricks dot(x,x) 0.00105-94.5, dot(z,z) 0.0106-952, y exact; tets exact. Rerun after any FLOOXS rebuild with the fix.
+
+**FLOOXS patched in a separate copy (2026-11-17, Ian: write the patch but don't modify the main repo):** `~/flooxs-brickfix` ([[flooxs-builds]]). Checks: the brick box test is exact on every MESH and POINT line (stock reproduces dot(x,x) 0.00105-94.5, dot(z,z) up to 952); the 2D strike reference (SiN, bot2d 1.5, yCoarse 2, 3e18 strike at y 0.8, track only, to 2.75 V) is identical to stock at every point; the 3D full-width rod (W 0.25, 3 z lines, 51k points) gives 3D/2D Id 0.9994 / 1.0004 / 1.0007 / 1.0019 at 0.25 / 1.25 / 2.0 / 2.75 V and peak Te 450 K vs 404 K in 2D (FANGS after its fix: 0.998-1.000, 450 K). Not built on HPG; HPG's stock FLOOXS still has the bug, so 3D runs with traps on HPG need a separate patched build there first.
+
