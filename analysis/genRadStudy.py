@@ -655,3 +655,28 @@ with open("sweeps/params_meshChkStress.txt", "w") as f:
         f.write(f"mc_sin_{tag}|{FE};occSafe=1;Vd_stress=28.0;stressStep=1.0;meshY={{{my}}};damPeak=1.5e18;stressOnly=1;"
                 f"stressSaveEvery=1.0{SINd};stressSaveDir={LIB}/meshchk/sin_{tag};stressSavePrefix=sin_{tag}\n")
 print("meshChkStress", len(MESHCHK))
+
+# ---- 2026-11-18 goal, round J: field-scaled strikes keep HighK flat but give SiN one drop that only deepens with
+# more strikes (round I), because every SiN-favoured strike sits in the same band (y 0.45-0.65) and shares the first
+# capture onset. Levers that might separate the onsets inside the band: a deeper trap level (0.40 eV gave the
+# plain-strike staircases, rounds E/F; 0.35 as a middle value), and strikes at different depths in the band
+# (x 0, 30 and 60 nm below the AlGaN top). Both decks; field scaling m 4 throughout.
+BANDB = ((0.65, 2e18), (0.6, 6e17), (0.55, 2e17))
+YSING = (3e17, 6e17, 1e18)
+rowsJ = []
+for lv in (0.40, 0.35):
+    for deck, base in (("sin", G28), ("hk", G28HK)):
+        ks = (1, 2, 3) if (lv == 0.40 or deck == "sin") else (3,)
+        rowsJ += [(f"J_{deck}_lev{lv:g}_bandb_N{k}", base, f"trapLevel={lv:g};damPeak=1.5e18" + gl(BANDB[:k]) + ";gaussFieldM=4")
+                  for k in ks]
+for deck, base in (("sin", G28), ("hk", G28HK)):
+    rowsJ += [(f"J_{deck}_lev0.4_y0.5_n{n:g}_N1", base, "trapLevel=0.40;damPeak=1.5e18" + gl([(0.5, n)]) + ";gaussFieldM=4")
+              for n in YSING]
+DEPTH = ((0.55, 0.0, 0.04, 6e17), (0.55, 0.03, 0.04, 6e17), (0.55, 0.06, 0.04, 6e17))
+rowsJ += [(f"J_sin_depth_N{k}", G28, "damPeak=1.5e18" + glw(DEPTH[:k]) + ";gaussFieldM=4") for k in (1, 2, 3)]
+rowsJ += [("J_hk_depth_N3", G28HK, "damPeak=1.5e18" + glw(DEPTH) + ";gaussFieldM=4")]
+rowsJ += [("J_sin_lev0.4_bandb_N3_dv05", G28, "trapLevel=0.40;damPeak=1.5e18" + gl(BANDB) + ";gaussFieldM=4;Vd_step=0.05")]
+with open("sweeps/params_radStepJ.txt", "w") as f:
+    for lab, base, lev in rowsJ:
+        f.write(f"{lab}|{base};{lev}\n")
+print("radStepJ", len(rowsJ))
