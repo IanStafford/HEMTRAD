@@ -584,3 +584,20 @@ with open("sweeps/params_radStepF.txt", "w") as f:
     for lab, base, lev in rowsF:
         f.write(f"{lab}|{base};{lev}\n")
 print("radStepF", len(rowsF))
+
+# ---- 2026-11-17 goal, round G: strikes of 6e18 and up collapse HighK too (C_hk, F_hk), which the measured HighK
+# devices don't do. Find the strike-density window where SiN still steps and HighK stays flat: HighK and SiN at
+# 5e18 / 5.5e18 (trap level 0.30) and 4e18 / 5e18 (trap level 0.40), 1-3 strikes.
+L3 = "damPeak=1.5e18"
+rowsG = []
+for n in (5e18, 5.5e18):
+    rowsG += [(f"G_hk_n{n:g}_N{k}", G28HK, L3 + gN(n, k)) for k in (1, 2, 3)]
+rowsG += [("G_n5e18_N2", G28, L3 + gN(5e18, 2))]
+rowsG += [(f"G_n5.5e18_N{k}", G28, L3 + gN(5.5e18, k)) for k in (1, 2, 3)]
+for n in (4e18, 5e18):
+    rowsG += [(f"G_hk_lev0.4_n{n:g}_N{k}", G28HK, L4 + gN(n, k)) for k in (1, 2, 3)]
+rowsG += [(f"G_lev0.4_n4e18_N{k}", G28, L4 + gN(4e18, k)) for k in (1, 2, 3)]
+with open("sweeps/params_radStepG.txt", "w") as f:
+    for lab, base, lev in rowsG:
+        f.write(f"{lab}|{base};{lev}\n")
+print("radStepG", len(rowsG))
