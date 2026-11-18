@@ -68,6 +68,7 @@ Second brain for the FLOOXS model of **radiation-induced current collapse** in a
 - [[rad-model]] — pre/post-irradiation model, HPD vs SiN (qualitative)
 - [[rad-literature]] — literature on Vth, Ron and steps in irradiated HEMTs; nothing at our fluence (Nov 4)
 - [[rad-literature-steps]] — stepped collapse after heavy ions: what is reported, proposed mechanisms, what the model can test (Nov 17)
+- [[step-search-28v]] — stepped SiN collapse at the 28 V stress with strikes, HighK contrast, field-scaled strikes (rounds A-I, Nov 17-18)
 - [[damage-region-map]] — what damage in each device region does, one to five sites (Nov 2026)
 - [[ron-increase]] — Ron rise after biased irradiation: candidates and simulations (Nov 2026)
 - [[3d-plan]] — plan for a 3D slice of the gate width: FLOOXS support, phases, risks (Nov 12)

@@ -292,3 +292,5 @@ Final set at a true 17.0 V stress (occSafe), biased, plus 0–3 Gaussian strikes
 - HighK has no such limit, so each strike lowers saturation (first strike −136 mA/mm at 10 V, then −45, −27); no collapse.
 - Both: about −0.04 of pre per strike at 1 V, gm −2–3% per strike, Vth +0.21 V unchanged.
 - Figures `figures/rad/strikeN/` (`analysis/plot_radStrikeN.py`); slides https://claude.ai/artifact/JPnVbhvJAwrKyBm2XTFFLs.
+
+At the 28 V stress, the strike-step search (rounds A-I) is in [[step-search-28v]].
