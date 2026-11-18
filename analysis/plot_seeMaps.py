@@ -2,10 +2,11 @@
 hole (or electron) current density on the 2D cross-section at several times, with arrows for its direction.
 
 usage: ~/venvs/render/bin/python analysis/plot_seeMaps.py <out.png> <row label>=<prefix> [<row label>=<prefix> ...]
-           [--carrier p|n] [--y ymin ymax] [--x xmin xmax] [--clim lo hi] [--strike y0]
+           [--carrier p|n] [--y ymin ymax] [--x xmin xmax] [--clim lo hi] [--strike y0] [--ncol k]
 
 Each <prefix> names the snapshots written by drivers/seeIV.tcl with seeMapTimes (and seeMapDC): <prefix>_map_dc.vtk,
-<prefix>_map_0.vtk, ... each with a <file>.txt holding "t <seconds>". One row per prefix, one panel per snapshot.
+<prefix>_map_0.vtk, ... each with a <file>.txt holding "t <seconds>". One row per prefix, one panel per snapshot;
+with a single prefix, --ncol wraps the panels into rows of k (2 x 3 like the paper's figure).
 FLOOXS writes XML VTK under a .vtk name, so the files are read with vtkXMLUnstructuredGridReader. Coordinates are
 cm with x = depth (down) and y = along the channel; the plot uses um, channel across, depth down.
 Material outlines come from the MatID field (0 Metal, 1 passivation, 2 AlGaN, 3 GaN).
@@ -96,7 +97,7 @@ def panel(ax, path, t, dc, car, xr, yr, clim, y0):
 
 def main(argv):
     out = argv[0]
-    rows, car, yr, xr, clim, y0 = [], "p", (-0.4, 1.4), (-0.45, 1.5), (-2.0, 6.0), None
+    rows, car, yr, xr, clim, y0, ncol = [], "p", (-0.4, 1.4), (-0.45, 1.5), (-2.0, 6.0), None, 0
     i = 1
     while i < len(argv):
         a = argv[i]
@@ -110,10 +111,15 @@ def main(argv):
             clim = (float(argv[i + 1]), float(argv[i + 2])); i += 3
         elif a == "--strike":
             y0 = float(argv[i + 1]); i += 2
+        elif a == "--ncol":
+            ncol = int(argv[i + 1]); i += 2
         else:
             lab, pre = a.split("=", 1)
             rows.append((lab, pre)); i += 1
     sets = [(lab, snaps(pre)) for lab, pre in rows]
+    if len(sets) == 1 and ncol > 0:          # wrap one run's snapshots into rows of ncol
+        lab, ss = sets[0]
+        sets = [(lab if k == 0 else "", ss[k:k + ncol]) for k in range(0, len(ss), ncol)]
     nc = max(len(s) for _, s in sets)
     fig, axs = plt.subplots(len(sets), nc, figsize=(3.3 * nc + 1.0, 3.4 * len(sets) + 0.4), squeeze=False)
     pc = None
@@ -126,9 +132,11 @@ def main(argv):
             t, f, dc = ss[c]
             pc = panel(ax, f, t, dc, car, xr, yr, clim, y0)
             if c == 0:
-                ax.set_ylabel(f"{lab}\ndepth (µm)")
+                ax.set_ylabel(f"{lab}\ndepth (µm)" if lab else "depth (µm)")
+            else:
+                ax.set_yticklabels([])
             if r == len(sets) - 1:
-                ax.set_xlabel("position along the channel (µm)")
+                ax.set_xlabel("along the channel (µm)")
     cb = fig.colorbar(pc, ax=axs, shrink=0.8, pad=0.02)
     name = "hole" if car == "p" else "electron"
     cb.set_label(f"log10 {name} current density (A/cm²)")
