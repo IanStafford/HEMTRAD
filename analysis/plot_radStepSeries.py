@@ -24,6 +24,14 @@ HK_RAMP = ["#9aa0a8", "#8db8e6", "#3f7fc4", "#123f7a"]
 
 # series: title, {N: glob} for SiN, {N: glob} for HighK
 SERIES = {
+    "lev04_n6": ("trap level 0.40 eV, damage scale 1.5e18, strikes of 6e18 at y 0.8 / 1.6 / 2.4 µm",
+                 {0: R + "radStepF/task_*/F_lev0.4_N0_IdVd.csv", 1: R + "radStepE/task_*/E_lev0.4_n6e18_N1_IdVd.csv",
+                  2: R + "radStepE/task_*/E_lev0.4_n6e18_N2_IdVd.csv", 3: R + "radStepE/task_*/E_lev0.4_n6e18_N3_IdVd.csv"},
+                 {k: R + f"radStepF/task_*/F_hk_lev0.4_n6e18_N{k}_IdVd.csv" for k in range(4)}),
+    "s06_n6": ("Damage scale 1.5e18, strikes of 6e18, sigma 60 nm, at y 0.8 / 1.6 / 2.4 µm",
+               {0: R + "radStepC/task_*/C_p1.5_N0_IdVd.csv", 1: R + "radStepE/task_*/E_s0.06_n6e18_N1_IdVd.csv",
+                2: R + "radStepE/task_*/E_s0.06_n6e18_N2_IdVd.csv", 3: R + "radStepE/task_*/E_s0.06_n6e18_N3_IdVd.csv"},
+               {}),
     "p15_n6": ("Damage scale 1.5e18, strikes of 6e18 at y 0.8 / 1.6 / 2.4 µm",
                {0: R + "radStepC/task_*/C_p1.5_N0_IdVd.csv", 1: R + "radStepA/task_*/A_p1.5e+18_n6e+18_N1_IdVd.csv",
                 2: R + "radStepB/task_*/B_n6e18_N2_IdVd.csv", 3: R + "radStepA/task_*/A_p1.5e+18_n6e+18_N3_IdVd.csv"},
