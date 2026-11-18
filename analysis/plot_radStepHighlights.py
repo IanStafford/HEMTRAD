@@ -34,6 +34,36 @@ def load(p):
     return d if d.ndim == 2 and len(d) >= 3 else None
 
 
+BEST = [PICK[0], PICK[2], PICK[5]]
+
+
+def best(out):
+    """One row: the three curves the deck shows."""
+    pre = load("results/20261104_radMap1/task_*/sin_ref_IdVd.csv")
+    nov = load("results/20261109_radEB1/task_*/sin_b_eb1_IdVd.csv")
+    fig, axs = plt.subplots(1, 3, figsize=(15, 4.6), sharey=True)
+    for a, (run, lab, title) in zip(axs, BEST):
+        d = load(f"{R}{run}/task_*/{lab}_IdVd.csv")
+        a.plot(pre[:, 0], pre[:, 1], color="#c5c9ce", lw=1.2, ls="--", label="pre-irradiation")
+        a.plot(nov[:, 0], nov[:, 1], color="#7a808a", lw=1.2, ls=":", label="Nov 11 model")
+        a.plot(d[:, 0], d[:, 1], color="#b8460f", lw=2.4, label="28 V stress + strikes")
+        for k, s in enumerate(drops(d[:, 0], d[:, 1], 10.0), 1):
+            a.annotate("", xy=(s[1], s[3]), xytext=(s[0], s[2]),
+                       arrowprops=dict(arrowstyle="-|>", color="#1d5fa8", lw=1.5, shrinkA=0, shrinkB=0))
+            a.text(s[1] + 0.15, s[3] - 22, f"{k}", color="#1d5fa8", fontsize=11, fontweight="bold")
+        a.set_title(title, fontsize=11.5, loc="left")
+        a.set_xlim(0, 12.2)
+        a.set_ylim(0, 1080)
+        a.set_xlabel("Vd (V)")
+        a.grid(color="#e3e5e8", lw=0.8)
+        a.spines[["top", "right"]].set_visible(False)
+    axs[0].set_ylabel("Id (mA/mm), Vg +1 V")
+    axs[0].legend(frameon=False, fontsize=10, loc="upper left")
+    fig.tight_layout()
+    fig.savefig(out, dpi=200)
+    print("wrote", out)
+
+
 def main(out):
     pre = load("results/20261104_radMap1/task_*/sin_ref_IdVd.csv")
     nov = load("results/20261109_radEB1/task_*/sin_b_eb1_IdVd.csv")
@@ -66,4 +96,4 @@ def main(out):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    (best if len(sys.argv) > 2 and sys.argv[2] == "best" else main)(sys.argv[1])
