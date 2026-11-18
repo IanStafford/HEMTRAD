@@ -279,7 +279,7 @@ The cause is the stress ramp, not occSafe. Without occSafe the ramp aims for 28 
 
 ## Strike count, SiN vs HighK (radStrikeN 51174895, 2026-11-14)
 
-Final set at a true 17.0 V stress (occSafe), biased, plus 0–3 Gaussian strikes (3e18, σ 40 nm, channel) at y 0.8, 1.6, 2.4 µm, same mesh for all. All 8 tasks done, no GAVE UP. Id at Vg +1 relative to pre:
+Final set at a true 17.0 V stress (occSafe), biased, plus 0–3 Gaussian strikes (3e18, σ 40 nm, channel) at y 0.8, 1.6, 2.4 µm. N1-N3 share a mesh with 5 nm patches at the strikes; N0 ran without the patches (meshY {0.3 0.01 2.6 0.01}), so the 0-vs-1 strike difference includes a mesh change. All 8 tasks done, no GAVE UP. Id at Vg +1 relative to pre:
 
 | | 0 | 1 | 2 | 3 |
 |---|---|---|---|---|
