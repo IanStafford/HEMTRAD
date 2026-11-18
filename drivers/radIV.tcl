@@ -111,7 +111,11 @@ if {![info exists damTube]}    { set damTube {} }
 # zmax, semiconductor only (x >= 0). zmin 0 / zmax W3d spans the slice, which with reflecting walls is the 2D
 # damGauss site {y x sigma N}; shorter rods cover part of the width. {} = none.
 if {![info exists damRod]}     { set damRod {} }
-if {![info exists trackFieldM]} { set trackFieldM 0.0 }   ;# {y x sigma N} list: Gaussian acceptor sites (um, cm^-3), semiconductor only
+if {![info exists trackFieldM]} { set trackFieldM 0.0 }
+# gaussFieldM (2026-11-18): damGauss strike damage times (field/damEref)^m from the stored stress field (the same
+# field as damField), capped at damMax: a strike leaves dense damage only where the field was high during the biased
+# irradiation (field-driven defect generation; kb/results/rad-literature-steps.md). 0 = off (old behaviour).
+if {![info exists gaussFieldM]} { set gaussFieldM 0.0 }   ;# {y x sigma N} list: Gaussian acceptor sites (um, cm^-3), semiconductor only
 if {![info exists damSites]}  { set damSites {} }
 # stressSkip 1: no stress solve, for damage that doesn't use the stress field (damSites,
 # surfCharge, a uniform dam2/dam3 site). The stress fields are then ~0. 0 = old behaviour.
@@ -424,7 +428,7 @@ flush $sf
 proc DamageIn {tg} {
     global damPeak damM damEref damMax damXmax damYmin damYmax sf
     global damInsPeak damInsM damInsEref damInsXmin damField damInsField
-    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref dam2Xmax damNexp damNref dam3Peak dam3Ymin dam3Ymax damSites damGauss damTube trackFieldM damMax deviceDim damRod
+    global dam2Peak dam2M dam2Ymin dam2Ymax dam2Field dam2Eref dam2Xmax damNexp damNref dam3Peak dam3Ymin dam3Ymax damSites damGauss damTube trackFieldM damMax deviceDim damRod gaussFieldM
     ThawTraps
     set fld [expr {$damField eq "tot" ? "EstressT" : ($damField eq "ne" ? "EstressNE" : "Estress")}]
     set n "($damPeak*exp($damM*log($fld/$damEref+1.0e-30)))"
@@ -462,6 +466,12 @@ proc DamageIn {tg} {
             lassign $g y0 x0 sg ng
             sel z=GaussSum+$ng*exp(-((y-$y0)*(y-$y0)+(x-$x0)*(x-$x0))/(2.0*$sg*$sg))*(x>=0.0) name=GaussSum
             puts $sf "$tg gauss y=$y0 x=$x0 sigma=$sg N=$ng"
+        }
+        if {$gaussFieldM != 0.0} {
+            sel z=GaussSum*exp($gaussFieldM*log($fld/$damEref+1.0e-30)) name=GaussSum
+            sel z=0.5*(GaussSum+$damMax-abs(GaussSum-$damMax)) name=GaussSum
+            sel z=GaussSum
+            puts $sf "$tg gauss damage times ($fld/$damEref)^$gaussFieldM: peak [lindex [peak GaN] 1] at [lrange [peak GaN] 2 3]"
         }
         set n "$n+GaussSum"
     }

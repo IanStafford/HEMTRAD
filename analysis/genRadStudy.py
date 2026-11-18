@@ -601,3 +601,23 @@ with open("sweeps/params_radStepG.txt", "w") as f:
     for lab, base, lev in rowsG:
         f.write(f"{lab}|{base};{lev}\n")
 print("radStepG", len(rowsG))
+
+# ---- 2026-11-18 goal, round H: strikes dense enough to step SiN (>= 5e18) also step HighK (round G), so strike
+# damage alone can't keep HighK flat. Field-scaled strikes (new lever gaussFieldM: strike density times
+# (Estress/damEref)^m from the stored 28 V field): under the T-gate overhang SiN's field is 2.1x HighK's (y 0.5), so
+# strikes there are dense in SiN and weak in HighK. Strikes at y 0.5, then 0.35, then 0.65 um (150 nm apart),
+# both decks, scale 1.5e18, trap level 0.30; plus field-scaled 6e18 strikes at the old positions as a check.
+POH = (0.5, 0.35, 0.65)
+def gP(n, k, pos):
+    return gl([(y, n) for y in pos[:k]]) if k else ""
+rowsH = []
+for tag, extra, n in (("nofm_n3e18", "", 3e18), ("fm4_n3e18", ";gaussFieldM=4", 3e18),
+                      ("fm4_n2e18", ";gaussFieldM=4", 2e18), ("fm2_n4e18", ";gaussFieldM=2", 4e18)):
+    for deck, base in (("sin", G28), ("hk", G28HK)):
+        rowsH += [(f"H_{deck}_{tag}_N{k}", base, "damPeak=1.5e18" + gP(n, k, POH) + extra) for k in (1, 2, 3)]
+for deck, base in (("sin", G28), ("hk", G28HK)):
+    rowsH.append((f"H_{deck}_fm4_old_n6e18_N3", base, "damPeak=1.5e18" + gN(6e18, 3) + ";gaussFieldM=4"))
+with open("sweeps/params_radStepH.txt", "w") as f:
+    for lab, base, lev in rowsH:
+        f.write(f"{lab}|{base};{lev}\n")
+print("radStepH", len(rowsH))
