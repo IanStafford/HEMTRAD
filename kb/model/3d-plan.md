@@ -126,3 +126,7 @@ FLOOXS brick check (from HEMTRAD-FANGS): `~/HEMTRAD-FANGS/port-runs/brick/brick.
 
 
 **FANGS reruns with the brick fix on HPG (2026-11-18, HEMTRAD-FANGS, tree fangs-3af77fc, STRUMPACK):** rad3dRod rod_full (51824509) 3D/2D Id 0.998-0.999 to 3 V and 0.986 at 6 V (799.7 vs 811.0 mA/mm; 616.3 before the fix), peak Te 938 K vs 867 K in 2D (9146 K before). rad3dTrack1 tracks down the depth, W 0.25/0.5/1 um: Id(6 V) 993.5/1002.6/1005.4 mA/mm, peak Te 750-1030 K (10000-13000 K before), no retries. The 2D references agree with FLOOXS (strike case to 2e-5; the no-strike case 1e-5 at both ends, 2-6% at single points inside the collapse because the bisection paths differ).
+
+## Render of a half-width track (2026-11-18)
+
+Patched FLOOXS, SiN slice W 0.4 µm (5 z planes, buffer 1 µm, yCoarse 3, BiCGSTAB), track only, `damRod {{0.8 0.0 0.04 0 0.2 8e18}}`, Vg +1 V, Vd 0.25 V (the iterative solve needed deep bisection beyond that). The 2DEG 2 nm below the AlGaN/GaN interface at y 0.79 µm holds 2.8e17 cm⁻³ under the rod against 1.05e19 beside it: the depletion stays under the track. Figure `figures/rad3d/half3d_render.png` (`analysis/render3d_slice.py`; FLOOXS writes XML VTK under a .vtk name, so the script uses vtkXMLUnstructuredGridReader). Used in the Nov 18 deck.
