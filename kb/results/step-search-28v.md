@@ -40,8 +40,17 @@ The dose is resolved (box integration of the Gaussian within 0.4% at every site)
 
 Mesh-check stresses (meshChkStress 51883722, SiN, 28 V, saved every volt to `/blue/ee1/ianstafford/stress/meshchk/`): **m10**, 10 nm uniform over 0.3-2.6 µm (~64k points, ~22 h), and **m5fix**, the library mesh with a true 5 nm at y 0.8 (~99k points, ~51 h). The best step cases and a no-strike reference get rerun on each. A 2.5 nm mesh at the strike sites (~135k points, ~90 h) is the next level if needed.
 
-## Round I (51878761, submitted 2026-11-18)
+## Round I (51878761, 2026-11-18): field-scaled strikes in the SiN-favoured band
 
-Field-scaled (m 4) strikes at lower density inside the SiN-favoured band: y 0.5 at 3e17 / 6e17 / 1e18; y 0.6 at 1e18; y 0.65 at 3e18; three strikes at 0.65 / 0.6 / 0.55 (3e18 / 1e18 / 3e17 and 2e18 / 6e17 / 2e17). Both decks, 20 tasks. Question: do partial SiN drops stack into steps while HighK stays flat?
+Field-scaled (m 4) strikes at lower density inside y 0.5-0.65 µm, both decks, all to 12 V (no GAVE UP):
+- HighK stays on its no-strike curve in every case (~955 mA/mm at 12 V).
+- SiN has exactly one drop, near 0.9-2.1 V, whose depth follows strike density and count, then partly recovers. y 0.5 single strikes: 3e17 337 -> 164 at 1.3-1.7 V, 6e17 287 -> 68 at 1.1-1.5 V, 1e18 232 -> 5 at 0.9-1.3 V. Band b (0.65 / 0.6 / 0.55 at 2e18 / 6e17 / 2e17): 1 / 2 / 3 strikes 386 -> 174, 345 -> 91, 310 -> 38. No later steps: strikes in the band all act on the same first collapse.
+- Figure `figures/rad/step28/fieldscaled_series.png` (`analysis/plot_radStepFS.py`): 0-3 strikes, SiN collapses deeper with each strike, HighK flat.
+
+Round H at 12 V: SiN with field-scaled strikes at y 0.5 (base 2-4e18) stays at ~0 after its 0.4-1.0 V collapse; HighK flat (m 4: 951-956 at 12 V; m 2 with 4e18: 860-902).
+
+## Where the goal stands (2026-11-18 evening)
+
+No single strike model yet gives both stepped SiN and flat HighK: plain strikes step SiN but drop HighK; field-scaled strikes keep HighK flat but give SiN one drop. A what-if (not a simulation): if each strike switched only its own share of the gate width and the columns carried current independently, the round I single strikes (whose onsets move with density) would add a small step each between ~0.9 and 2 V while HighK stays flat (`figures/rad/step28/fieldscaled_segments.png`, 25% of the width per strike). Whether one strike can switch that much width is the open 3D question ([[3d-plan]]); decision for Ian.
 
 Related: [[rad-literature-steps]] (mechanisms), [[3d-plan]] (part-width tracks), [[rad-model]].
