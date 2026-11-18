@@ -48,6 +48,13 @@ if {![info exists seeTinit]}   { set seeTinit 1.0e-15 }
 if {![info exists seeTend]}    { set seeTend 1.0e-9 }
 if {![info exists seeUserStep]} { set seeUserStep 0.0 } ;# 0 = no cap on the time step
 if {![info exists seeCutTimes]} { set seeCutTimes {1e-13 1e-12 1e-11 1e-10 1e-9 1e-8 1e-7} }
+# seeMapTimes (s, default none): at each listed time (and at the DC state when seeMapDC 1) write the
+# whole 2D state as <tag>_map_<k>.vtk (struct vtk=, XML) with the carrier current densities in A/cm^2,
+# JnX/JnY/JnMag and JpX/JpY/JpMag = q mu n grad(Qfn) and q mu p grad(Qfp) (Qfn, Qfp are the Fermi levels
+# in V; with tranSign 1 these are the flux terms of Continuity.tcl, same mobility expressions), and the
+# densities MapN, MapP (cm^-3). For Fig. 5-style maps (analysis/plot_seeMaps.py).
+if {![info exists seeMapTimes]} { set seeMapTimes {} }
+if {![info exists seeMapDC]}    { set seeMapDC 0 }
 # Numerics as in radIV's stress (which reaches Vd 28 V, job 48182110): the trap model is
 # on with an empty trap density (TrapN = 1e-30*(1+x^2), physically no traps) and the
 # overflow-safe occupancy. With trapEn 0 the off-state drain ramp diverges in Qfn/Qfp
@@ -116,6 +123,27 @@ proc Flux {c s} {
     if {[catch {set f [contact name=$c sol=$s flux]}]} { return nan }
     return $f
 }
+# current-density fields and a VTK snapshot (seeMapTimes); mobility as in Continuity.tcl
+proc MapDump {f t} {
+    foreach {car qf mob} {n Qfn Elec p Qfp Hole} {
+        # one sel per material and per step: the field-dependent electron mobility written out for both
+        # materials in one expression overflows FLOOXS's parser buffer ("buffer overflow detected")
+        sel z=([pdbDelayDouble GaN $mob mob]) name=MapMuG
+        sel z=([pdbDelayDouble AlGaN $mob mob]) name=MapMuA
+        sel z=1.602177e-19*(MapMuG*Material(GaN)+MapMuA*Material(AlGaN))*$mob name=MapQMuN
+        set J "J$car"
+        sel z=MapQMuN*gradx($qf) name=${J}X
+        sel z=MapQMuN*grady($qf) name=${J}Y
+        sel z=sqrt(${J}X*${J}X+${J}Y*${J}Y) name=${J}Mag
+    }
+    # the carrier densities themselves: struct vtk writes the const solutions Elec/Hole as placeholders
+    sel z=Elec name=MapN
+    sel z=Hole name=MapP
+    struct vtk=$f
+    set m [open $f.txt w]
+    puts $m "t $t"
+    close $m
+}
 
 set sf [open ${tag}_summary.txt w]
 puts $sf "deck $deviceDeck Vg $Vg_bias Vd $Vd_bias strike $seeStrike method $seeMethod tau $seeGenTau y0 $seeY0 sigma $seeSigma Weff $seeWeff pairs/cm $seePairs x $seeXmin..$seeXmax"
@@ -128,6 +156,7 @@ set contacts {S D G FP B}
 set line "DC"
 foreach c $contacts { foreach s {Qfn Qfp} { append line " $c.$s=[Flux $c $s]" } }
 puts $sf $line; flush $sf
+if {$seeMapDC} { MapDump ${tag}_map_dc.vtk 0.0 }
 
 # 2. inject the plasma
 if {$seeStrike && $seeMethod eq "gen"} {
@@ -190,6 +219,8 @@ foreach c $contacts { foreach s {Qfn Qfp DevPsi} { append hdr ",$c.$s" } }
 puts $cf $hdr
 set ::cutTimes [lsort -real $seeCutTimes]
 set ::cutK 0
+set ::mapTimes [lsort -real $seeMapTimes]
+set ::mapK 0
 proc LogStep {} {
     global cf contacts tag
     sel z=Time
@@ -206,6 +237,10 @@ proc LogStep {} {
         }
         close $c2
         incr ::cutK
+    }
+    while {$::mapK < [llength $::mapTimes] && $t >= [lindex $::mapTimes $::mapK]} {
+        MapDump ${tag}_map_$::mapK.vtk $t
+        incr ::mapK
     }
 }
 if {$seeUserStep > 0.0} {

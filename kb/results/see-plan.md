@@ -78,3 +78,10 @@ Same strikes as seeGen1, aimed at 10 ns. Both tasks accepted one bad step (HighK
 - **The current does turn over**, peaking near 0.7 ns. If the fall from 0.8 ns continued as an exponential, the time constant would be about 3.5 ns (HighK) and 7.6 ns (SiN), so it would take over 10 ns to end. That's an extrapolation from a short stretch.
 - **Charge through the drain is already 4× the deposited 6.9e-13 C/µm.**
 - The bad steps came at dt of 6e-11 to 9e-11 s. A rerun would need a maximum time step, and would cost well over a day per task.
+
+## Current-density maps (2026-11-18, side project after Sun et al., IEEE EDL 46, 813 (2025), Fig. 5)
+
+- seeIV levers `seeMapTimes` (s, list) and `seeMapDC` (default off) write the 2D state at those times as `<tag>_map_<k>.vtk` (XML VTK under a .vtk name, `struct vtk=`) plus `<file>.txt` with the time. Fields added before each dump: `JnX/JnY/JnMag`, `JpX/JpY/JpMag` = q·µ·n·∇Qfn and q·µ·p·∇Qfp in A/cm² (Qfn, Qfp are Fermi levels in V, so with `tranSign 1` these are the Continuity.tcl flux terms, same mobility expressions), and `MapN`, `MapP`, the carrier densities. `struct vtk` writes the const solutions Elec and Hole as placeholders (1.0), so use MapN/MapP.
+- The mobility is built in stages (one `sel` per material): the field-dependent electron mobility for both materials in one expression overflows FLOOXS's parser buffer ("buffer overflow detected").
+- `analysis/plot_seeMaps.py` (~/venvs/render): log10 |Jp| (or |Jn|) on the cross-section, one row per run, one panel per snapshot, white arrows for the direction (probed on the semiconductor cells with VTK; matplotlib's tri-finder rejects FLOOXS's repeated interface points).
+- Smoke test (local, SiN, Vg −4 / Vd 2 V, strike y 0.2 µm, τ 2 ps, to 4 ps): snapshots and plot work. At 3.2 ps electrons in the channel flow to the drain and holes at the track move down toward the substrate contact. Unexplained so far: |Jp| ~1e4 A/cm² across the whole buffer far from the track; the densities (MapN/MapP, added after this test) decide whether that is real.
