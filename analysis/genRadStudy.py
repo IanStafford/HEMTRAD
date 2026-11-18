@@ -639,3 +639,19 @@ with open("sweeps/params_radStepI.txt", "w") as f:
     for lab, base, lev in rowsI:
         f.write(f"{lab}|{base};{lev}\n")
 print("radStepI", len(rowsI))
+
+# ---- 2026-11-18 (Ian: check the mesh refinement of the strike steps). Every round A-I task loads the library mesh
+# (stressLoad keeps the file's mesh): 93,080 points, but the deck's own rightFP line (y 0.725, 20 nm) sits inside the
+# 0.64-0.96 meshY patch, so the y 0.8 strike is on ~15 nm cells (2.7 per sigma), while 1.6 and 2.4 are on a true
+# 5 nm; the SiN E^4 damage core (y 0.48-0.63) is on 6-10 nm. No A-I case has a second mesh. Two new 28 V SiN
+# stresses (stressOnly, saved every volt so a stalled run can resume), same levers as the library:
+#   m10:   10 nm uniform over 0.3-2.6 (helper lines 0.715/0.735 cancel the 20 nm rightFP line), ~64k points;
+#   m5fix: the library mesh with a true 5 nm at 0.8 (helper lines 0.72/0.73), ~99k points.
+# Never put a meshY line exactly on a deck line (zero-area faces abort FLOOXS). Loading runs follow once saved.
+MESHCHK = {"m10": "0.3 0.01 0.715 0.01 0.735 0.01 2.6 0.01",
+           "m5fix": "0.3 0.01 2.6 0.01 0.64 0.005 0.72 0.005 0.73 0.005 0.96 0.005 1.44 0.005 1.76 0.005 2.24 0.005 2.56 0.005"}
+with open("sweeps/params_meshChkStress.txt", "w") as f:
+    for tag, my in MESHCHK.items():
+        f.write(f"mc_sin_{tag}|{FE};occSafe=1;Vd_stress=28.0;stressStep=1.0;meshY={{{my}}};damPeak=1.5e18;stressOnly=1;"
+                f"stressSaveEvery=1.0{SINd};stressSaveDir={LIB}/meshchk/sin_{tag};stressSavePrefix=sin_{tag}\n")
+print("meshChkStress", len(MESHCHK))
