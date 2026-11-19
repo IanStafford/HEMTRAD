@@ -719,3 +719,13 @@ with open("sweeps/params_radStepK.txt", "w") as f:
     for lab, base, lev in rowsK:
         f.write(f"{lab}|{base};{lev}\n")
 print("radStepK", len(rowsK))
+
+# ---- 2026-11-18 (Ian): Fig. 5-style strike maps at the irradiation bias (after the local proof of concept at
+# Vg -5 / Vd 10 V): SiN and HighK, Vg -10 / Vd 28 V, strike at y 0.2 um (between the gate foot's drain edge and the
+# field plate), tau 2 ps, maps from DC to 1 ns. drivers/seeIV.tcl via DRV=seeIV.
+SEEB = ("polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;occSafe=1;Vd_bias=28;Vg_bias=-10;"
+        "seeY0=0.2;seeGenTau=2e-12;seeTend=1e-9;seeMapTimes={3e-12 6e-12 1.2e-11 3e-11 1e-10 3e-10 1e-9};seeMapDC=1;seeCutTimes={}")
+with open("sweeps/params_seeMap28.txt", "w") as f:
+    f.write(f"sin_y0.2_map|{SEEB};deviceDeck=rfdevice_SiN.tcl\n")
+    f.write(f"hk_y0.2_map|{SEEB}\n")
+print("seeMap28 2")

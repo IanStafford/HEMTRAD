@@ -1,0 +1,2 @@
+sin_y0.2_map|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;occSafe=1;Vd_bias=28;Vg_bias=-10;seeY0=0.2;seeGenTau=2e-12;seeTend=1e-9;seeMapTimes={3e-12 6e-12 1.2e-11 3e-11 1e-10 3e-10 1e-9};seeMapDC=1;seeCutTimes={};deviceDeck=rfdevice_SiN.tcl
+hk_y0.2_map|polCharge=1.0e13;phiB=2.94;mobNref=1e18;mobVsat=1.75e7;mobMumax=2100;occSafe=1;Vd_bias=28;Vg_bias=-10;seeY0=0.2;seeGenTau=2e-12;seeTend=1e-9;seeMapTimes={3e-12 6e-12 1.2e-11 3e-11 1e-10 3e-10 1e-9};seeMapDC=1;seeCutTimes={}
