@@ -740,3 +740,12 @@ with open("sweeps/params_radStepDiag.txt", "w") as f:
     for lab in ("C_p1.5_N0", "A_p1.5e+18_n6e+18_N1", "B_n6e18_N2", "A_p1.5e+18_n6e+18_N3"):
         f.write(f"D_{lab}|{orig[lab]};vdCuts=1\n")
 print("stressLibResume 1, radStepDiag 4")
+
+# ---- 2026-11-19: the 5 nm mesh check (meshChkLoad_m5fix 51939192) keeps the stress-only drop but shrinks and moves the
+# strike steps, so the per-Vd diagnostic cuts are repeated on the m5fix mesh for the cases that still step there.
+with open("sweeps/params_radStepDiag5.txt", "w") as f:
+    for line in open("sweeps/params_meshChkLoad_m5fix.txt"):
+        lab, lev = line.rstrip("\n").split("|", 1)
+        if lab.split("_", 1)[1] in ("C_p1.5_N0", "A_p1.5e+18_n6e+18_N1", "E_lev0.4_n6e18_N2", "C_p1.5_n8e18_N2"):
+            f.write(f"D5_{lab}|{lev};vdCuts=1\n")
+print("radStepDiag5 4")
