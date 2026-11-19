@@ -2180,3 +2180,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **stressLib 51459840**: hits its 4-day limit around Nov 19 11:00; resume SiN with `stressResume=<last /blue/ee1/ianstafford/stress/sin_Vg-10/*.str.gz>` (HighK too if short of 84 V).
 - Round J: 2 collapsed SiN tasks may still be running; nothing to do.
 - No local FLOOXS running; HPG master will drop with the workstation (reconnect per CLAUDE.md §2 when back).
+
+## 2026-11-19 morning: overnight results
+
+- **Round K (51939558) done:** the hybrid fails. SiN with the near-gate field-scaled strike plus 1-3 plain far strikes (3e18 or 4e18) has only the near-gate drop (386 -> 174-180 at 1.7-2.5 V); the far strikes add no steps. HighK: 3e18 far strikes no drop (lower saturation, 735-795 at 12 V); 4e18 gives small dips (~15-20 mA/mm at 2.4-3.1 V), so HighK's threshold is near 4e18. No single strike model with SiN steps and HighK flat.
+- **Mesh check, 10 nm (meshChkLoad_m10 51939191, all 6 done):** the stepped character survives: every strike case still has three drops, and the no-strike curve is unchanged (1.6-2.0 V, 395 -> 273 vs 281). But later step positions and sizes are not converged: A_p1.5_n6e18_N1 1.9-2.2 / 6.1-6.6 / 9.9-10.9 V (library) vs 1.8-2.2 / 4.1-4.7 / 10.0-11.5 V (10 nm), its third drop 398 -> 222 vs 398 -> 348; B_n6e18_N2 one drop at 3.0-3.3 V vs three (2.1-2.5, 3.5-3.9, 7.7-8.6); A_N3 one at 4.4-4.8 vs three (2.4-2.7, 3.9-4.3, 5.6-6.1); E_lev0.4_N2 1.4/2.8/10.3-11.5 vs 1.4/3.1/7.7-8.9; C_n8e18_N2 1.4/3.9-4.1/7.0-9.1 vs 1.4/5.8-6.1/9.5-10.5. First drop converged; later steps move 1-3 V. m5fix (51939192) running.
+- **seeMap28 (51945449) done to 1 ns:** figures `figures/see/map28_holeJ.png`, `map28_elecJ.png`. SiN and HighK nearly identical: hole current down the track (~1e6 A/cm2 at 6-12 ps), through the p-type buffer to the substrate contact (0.34 mA/um from 100 ps on), none to the gate; drain current 1.9-2.0 mA/um at 1 ns in both.
+- stressLib 51459840: HighK finished; SiN hit the 4-day limit (needs a stressResume from its last saved state).
