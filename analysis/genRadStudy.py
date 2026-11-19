@@ -680,3 +680,26 @@ with open("sweeps/params_radStepJ.txt", "w") as f:
     for lab, base, lev in rowsJ:
         f.write(f"{lab}|{base};{lev}\n")
 print("radStepJ", len(rowsJ))
+
+# ---- 2026-11-18: loading runs for the mesh check of the strike steps (meshChkStress 51883722). The deliverable's
+# row A series (0-3 plain 6e18 strikes at scale 1.5e18) and the other two best step cases, rerun on each new 28 V
+# stress (m10, m5fix): the same parameter lines as the library runs, with stressLoad and meshY swapped (stressLoad
+# takes the file's mesh anyway; meshY is matched so the deck build agrees). Submitted with afterok on each stress task.
+LIBMESH = "meshY={0.3 0.01 2.6 0.01 0.64 0.005 0.96 0.005 1.44 0.005 1.76 0.005 2.24 0.005 2.56 0.005}"
+LIBSRC = f"stressLoad={LIB}/sin_Vg-10/sin_Vg-10_Vd028.00.str.gz"
+CHK_CASES = ("C_p1.5_N0", "A_p1.5e+18_n6e+18_N1", "B_n6e18_N2", "A_p1.5e+18_n6e+18_N3", "E_lev0.4_n6e18_N2",
+             "C_p1.5_n8e18_N2")
+orig = {}
+for r in "ABCE":
+    for line in open(f"sweeps/params_radStep{r}.txt"):
+        lab, lev = line.rstrip("\n").split("|", 1)
+        orig[lab] = lev
+for tag, my in MESHCHK.items():
+    with open(f"sweeps/params_meshChkLoad_{tag}.txt", "w") as f:
+        for lab in CHK_CASES:
+            lev = orig[lab]
+            assert LIBMESH in lev and LIBSRC in lev, lab
+            lev = lev.replace(LIBMESH, f"meshY={{{my}}}").replace(
+                LIBSRC, f"stressLoad={LIB}/meshchk/sin_{tag}/sin_{tag}_Vd028.00.str.gz")
+            f.write(f"{tag}_{lab}|{lev}\n")
+print("meshChkLoad", len(CHK_CASES), "x", len(MESHCHK))
