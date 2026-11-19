@@ -2171,3 +2171,12 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **n·E check (no runs):** stress-time ElecStress × Estress at the 2DEG favours SiN only at its depletion edge (y ~0.8, ratio ~5e13) and HighK beyond (0.40 / 0.13 / 0.09 at 1.2 / 1.6 / 2.4). No field-weighted strike law gives SiN-only damage far from the gate; option (c) closed for that family. Waiting for meshChkLoad (51939191/51939192, afterok on the stresses).
 - New radIV lever **damGaussF / gaussFieldMF** (default off): a separate always-field-scaled strike list, so field-scaled near-gate strikes and plain far strikes can be mixed in one run. Local check exact (peak 1.400982e18 = round I band b N1).
 - **radStepK** (15 tasks, both decks): hybrid, field-scaled 2e18 at y 0.65 (damGaussF) + 1-3 plain far strikes (0.8/1.6/2.4) at 3e18 or 4e18; plus plain 4e18 HighK N1-3 (threshold check). Question: does SiN, with its near-gate region already collapsed, step on weaker far strikes while HighK stays flat?
+
+## 2026-11-18 night: PARKED (workstation shut down by Ian) - where to pick up
+
+- **seeMap28 51945449** (2 tasks, DRV=seeIV, 2-day limit, Ian approved): Fig. 5-style strike maps at Vg -10 / Vd 28 V, SiN and HighK, strike y 0.2 um, tau 2 ps, maps at DC and 3 ps-1 ns (`results/20261118_seeMap28/task_*/*_map_*.vtk`). Pending at submission. Pick up: check the logs for ramp failures, rsync the VTKs (~15 MB each), plot with `~/venvs/render/bin/python analysis/plot_seeMaps.py figures/see/map28_holeJ.png "SiN=<sin prefix>" "HighK=<hk prefix>" --strike 0.2` (two rows) and the same with `--carrier n --clim -2 7`.
+- **radStepK 51939558** (15 tasks): hybrid strikes (field-scaled near the gate + plain far 3e18/4e18) and plain 4e18 HighK. Pick up: rsync results/20261118_radStepK, `python3 analysis/plot_radStep.py results/20261118_radStepK <png> 10`; success = SiN with separate later drops while HighK stays flat.
+- **meshChkStress 51883722** (running) -> **meshChkLoad 51939191 / 51939192** (afterok): compare drops with the library runs (rows of the deliverable).
+- **stressLib 51459840**: hits its 4-day limit around Nov 19 11:00; resume SiN with `stressResume=<last /blue/ee1/ianstafford/stress/sin_Vg-10/*.str.gz>` (HighK too if short of 84 V).
+- Round J: 2 collapsed SiN tasks may still be running; nothing to do.
+- No local FLOOXS running; HPG master will drop with the workstation (reconnect per CLAUDE.md §2 when back).
