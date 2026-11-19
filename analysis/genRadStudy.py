@@ -729,3 +729,14 @@ with open("sweeps/params_seeMap28.txt", "w") as f:
     f.write(f"sin_y0.2_map|{SEEB};deviceDeck=rfdevice_SiN.tcl\n")
     f.write(f"hk_y0.2_map|{SEEB}\n")
 print("seeMap28 2")
+
+# ---- 2026-11-19 (Ian): resume the SiN stress library from its last state (Vd 60 V at the 4-day limit), and rerun
+# the deliverable's row A series with vdCuts (filled traps, electrons, lateral field, Te along y at every Vd) to show
+# which damage fills at each drop.
+with open("sweeps/params_stressLibResume.txt", "w") as f:
+    lab, lev = open("sweeps/params_stressLib.txt").readline().rstrip("\n").split("|", 1)
+    f.write(f"{lab}_r60|{lev};stressResume={LIB}/sin_Vg-10/sin_Vg-10_Vd060.00.str.gz\n")
+with open("sweeps/params_radStepDiag.txt", "w") as f:
+    for lab in ("C_p1.5_N0", "A_p1.5e+18_n6e+18_N1", "B_n6e18_N2", "A_p1.5e+18_n6e+18_N3"):
+        f.write(f"D_{lab}|{orig[lab]};vdCuts=1\n")
+print("stressLibResume 1, radStepDiag 4")

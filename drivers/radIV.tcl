@@ -549,6 +549,19 @@ proc DamageIn {tg} {
 }
 
 # One Id-Vd curve at gate voltage vg, from rest and back, to file fn.
+# vdCuts (2026-11-19, default 0): at every Id-Vd point write cuts along y, 1 nm below the AlGaN/GaN interface
+# (x 0.016 um), of the filled traps (IonAcceptor), the electron density, the lateral field and the hot-electron
+# temperature to <tag>_vdcuts.txt, to see which damage fills at each drop.
+if {![info exists vdCuts]} { set vdCuts 0 }
+proc VdCuts {tg d} {
+    set c [open ${tg}_vdcuts.txt a]
+    foreach {lab ex} {IonAcceptor IonAcceptor Elec Elec Ey "abs(dot(DevPsi,y*1.0e-4))" TeTrap TeTrap} {
+        sel z=$ex
+        puts $c "# Vd=$d $lab"
+        if {[catch {puts $c [print1d xv=0.016]}]} { puts $c "{ cut failed }" }
+    }
+    close $c
+}
 proc IdVdCurve {tg vg fn} {
     global Vd_max Vd_step retryDepth useTraps te emitRest
     if {$useTraps && $emitRest > 0.0} {
@@ -571,6 +584,7 @@ proc IdVdCurve {tg vg fn} {
         puts $f "$d, [IdDev], [IdExt $d $vg], $te"
         flush $f
         puts "IDVD $tg Vg=$vg Vd=$d Id=[IdDev] peakTe=$te"
+        if {$::vdCuts} { VdCuts $tg $d }
     }
     close $f
     if {$::noRampBack && [llength $::VgFam] == 0 && [llength $::damList] == 0} { return 1 }
