@@ -551,7 +551,7 @@ proc DamageIn {tg} {
 # One Id-Vd curve at gate voltage vg, from rest and back, to file fn.
 # vdCuts (2026-11-19, default 0): at every Id-Vd point write cuts along y, 1 nm below the AlGaN/GaN interface
 # (x 0.016 um), of the filled traps (IonAcceptor), the electron density, the lateral field and the hot-electron
-# temperature to <tag>_vdcuts.txt, to see which damage fills at each drop.
+# temperature to <tag>_vdcuts.txt, plus IonAcceptor and TeTrap mid-barrier (x 0.008 um, labels *_x0.008), to see which damage fills at each drop.
 if {![info exists vdCuts]} { set vdCuts 0 }
 proc VdCuts {tg d} {
     set c [open ${tg}_vdcuts.txt a]
@@ -559,6 +559,12 @@ proc VdCuts {tg d} {
         sel z=$ex
         puts $c "# Vd=$d $lab"
         if {[catch {puts $c [print1d xv=0.016]}]} { puts $c "{ cut failed }" }
+    }
+    # the AlGaN barrier (x 0.008 um, mid-barrier): its damage traps are nearly empty at rest and fill with hot electrons
+    foreach lab {IonAcceptor TeTrap} {
+        sel z=$lab
+        puts $c "# Vd=$d ${lab}_x0.008"
+        if {[catch {puts $c [print1d xv=0.008]}]} { puts $c "{ cut failed }" }
     }
     close $c
 }

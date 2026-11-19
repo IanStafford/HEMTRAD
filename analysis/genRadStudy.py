@@ -748,4 +748,6 @@ with open("sweeps/params_radStepDiag5.txt", "w") as f:
         lab, lev = line.rstrip("\n").split("|", 1)
         if lab.split("_", 1)[1] in ("C_p1.5_N0", "A_p1.5e+18_n6e+18_N1", "E_lev0.4_n6e18_N2", "C_p1.5_n8e18_N2"):
             f.write(f"D5_{lab}|{lev};vdCuts=1\n")
-print("radStepDiag5 4")
+    # plus the library-mesh 1-strike case (three drops there), now that VdCuts also cuts the AlGaN barrier
+    f.write(f"D5_lib_A_p1.5e+18_n6e+18_N1|{orig['A_p1.5e+18_n6e+18_N1']};vdCuts=1\n")
+print("radStepDiag5 5")
