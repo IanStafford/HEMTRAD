@@ -703,3 +703,19 @@ for tag, my in MESHCHK.items():
                 LIBSRC, f"stressLoad={LIB}/meshchk/sin_{tag}/sin_{tag}_Vd028.00.str.gz")
             f.write(f"{tag}_{lab}|{lev}\n")
 print("meshChkLoad", len(CHK_CASES), "x", len(MESHCHK))
+
+# ---- 2026-11-18 goal, round K: hybrid strikes. A field-scaled strike near the gate (damGaussF, 2e18 at y 0.65 um, m 4:
+# SiN partial drop 386 -> 174, HighK untouched; round I band b N1) plus 1-3 plain strikes further out (damGauss at
+# y 0.8 / 1.6 / 2.4 um, unscaled) at 3e18 or 4e18, below the density that drops HighK (5e18; 3e18 left HighK flat,
+# rad28strikeL). Does SiN, with its near-gate region already collapsed, step on the far strikes while HighK stays
+# flat? Plus plain 4e18 HighK (trap level 0.30) to place HighK's threshold between 3e18 and 5e18.
+NEARF = ";damGaussF={{0.65 0.0 0.04 2e+18}};gaussFieldMF=4"
+rowsK = []
+for deck, base in (("sin", G28), ("hk", G28HK)):
+    for nf in (3e18, 4e18):
+        rowsK += [(f"K_{deck}_hyb_far{nf:g}_N{k}", base, "damPeak=1.5e18" + NEARF + gN(nf, k)) for k in (1, 2, 3)]
+rowsK += [(f"K_hk_n4e18_N{k}", G28HK, "damPeak=1.5e18" + gN(4e18, k)) for k in (1, 2, 3)]
+with open("sweeps/params_radStepK.txt", "w") as f:
+    for lab, base, lev in rowsK:
+        f.write(f"{lab}|{base};{lev}\n")
+print("radStepK", len(rowsK))
