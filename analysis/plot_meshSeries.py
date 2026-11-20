@@ -23,8 +23,7 @@ SETS = {
     "lev30_n8": ("trap 0.30 eV, 8e18 strikes", {0: "C_p1.5_N0", 1: "A_p1.5e+18_n8e+18_N1", 2: "C_p1.5_n8e18_N2", 3: "A_p1.5e+18_n8e+18_N3"}),
 }
 MESHES = [("library (15 nm at y 0.8)", ("",)), ("10 nm uniform", ("M_m10_", "m10_", "D5_m10_")),
-          ("2.5 nm at the strikes", ("M_m2p5_",)),
-          ("5 nm at y 0.8", ("M_m5fix_", "m5fix_", "D5_m5fix_"))]
+          ("5 nm at y 0.8", ("M_m5fix_", "m5fix_", "D5_m5fix_")), ("2.5 nm at the strikes", ("M_m2p5_",))]
 COL = ["#9aa0a8", "#e0a060", "#c8641e", "#7a2e05"]
 
 
