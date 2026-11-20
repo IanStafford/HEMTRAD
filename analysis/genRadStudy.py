@@ -784,3 +784,16 @@ with open("sweeps/params_meshChkStress2p5.txt", "w") as f:
     lev = lev.replace(f"meshY={{{MESHCHK['m10']}}}", f"meshY={{{M2P5}}}").replace("sin_m10", "sin_m2p5")
     f.write(f"mc_sin_m2p5|{lev}\n")
 print("meshChkStress2p5 1")
+
+# radStepM2 (2026-11-19 night): on m5fix, trap 0.40 eV with 7e18 strikes gives one drop per strike (1 / 2 / 3 drops
+# with 1 / 2 / 3 strikes) and trap 0.30 with 8e18 keeps 2 / 3 / 3 drops as on the library mesh. Same series on m10
+# for the three-mesh check (m10 C_p1.5_n8e18_N2 exists from meshChkLoad).
+with open("sweeps/params_radStepM2.txt", "w") as f:
+    for lab in ("F_lev0.4_n7e+18_N1", "F_lev0.4_n7e+18_N2", "F_lev0.4_n7e+18_N3", "A_p1.5e+18_n8e+18_N1",
+                "A_p1.5e+18_n8e+18_N3"):
+        lev = orig[lab]
+        assert LIBMESH in lev and LIBSRC in lev, lab
+        lev = lev.replace(LIBMESH, f"meshY={{{MESHCHK['m10']}}}").replace(
+            LIBSRC, f"stressLoad={LIB}/meshchk/sin_m10/sin_m10_Vd028.00.str.gz")
+        f.write(f"M_m10_{lab}|{lev};vdCuts=1\n")
+print("radStepM2 5")
