@@ -29,7 +29,8 @@ COL = ["#9aa0a8", "#e0a060", "#c8641e", "#7a2e05"]
 
 def index():
     idx = {}
-    pats = ["results/2026111*_radStep[A-F]/task_*", "results/20261118_meshChkLoad_*/task_*", "results/20261119_radStepM/task_*"]
+    pats = ["results/2026111*_radStep[A-F]/task_*", "results/20261118_meshChkLoad_*/task_*", "results/20261119_radStepM/task_*",
+            "results/20261120_radStepM2/task_*"]
     for pat in pats:
         for t in glob.glob(pat):
             try:

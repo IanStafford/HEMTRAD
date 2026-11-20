@@ -120,7 +120,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
   <header class="top">
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">FLOOXS model of an AlGaN/GaN HEMT: what ran each day and what is still open. Id in <span style="white-space:nowrap">mA/mm</span> at Vg = −2 V unless noted; work before Oct 1 used constant mobility and is archived.</p>
-    <p class="meta">Snapshot Nov 19, evening</p>
+    <p class="meta">Snapshot Nov 20, morning</p>
   </header>
 
   <div class="layout">
@@ -128,6 +128,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
       <div class="sep"></div>
       <div class="era">Field mobility</div>
+      <a href="#nov20" data-page="nov20"><span class="d">Nov 20</span><span class="t">mesh-robust steps</span></a>
       <a href="#nov19" data-page="nov19"><span class="d">Nov 19</span><span class="t">why it steps · mesh</span></a>
       <a href="#nov18" data-page="nov18"><span class="d">Nov 17–18</span><span class="t">steps · 3D fix</span></a>
       <a href="#nov16" data-page="nov16"><span class="d">Nov 14–16</span><span class="t">saved stress · library</span></a>
@@ -163,26 +164,27 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <section class="page" id="overview" data-title="Overview">
         <div class="pagehead">
           <h2>Where things stand</h2>
-          <p>Each drop is one damaged spot of the 2DEG switching once about 0.5 V of the shared drain voltage sits across it, so strikes add or delay steps; on a finer mesh the strike steps shrink (one strike's y 0.8 drop goes from 105 to 20 mA/mm). Next: a 2.5 nm check (~90 h stress), Ian's call.</p>
+          <p>With 8e18 strikes at trap level 0.30 eV, every 1-, 2- and 3-strike SiN curve so far steps two or three times on all three meshes (two 10 nm runs still going; first drop starting at 1.1–1.7 V everywhere, later steps move with the mesh); each first drop is one damaged spot switching at about 0.5 V across it, but HighK collapses with the same strikes. Next: the four-mesh check once the 2.5 nm stress (running) finishes.</p>
         </div>
         <div class="tiles">
           <div class="tile"><span class="k">Why the curves step</span><span class="v">One spot per drop</span><span class="s">Every first switch came at 0.46–0.59 V across the spot (14 of 14, both meshes); spots in series share Vd.</span></div>
-          <div class="tile"><span class="k">Mesh check of the steps</span><span class="v">Stress drop converged; strike steps not</span><span class="s">Stress-only drop 395 → 273–281 on all three meshes. 5 nm at y 0.8: one strike's y 0.8 drop shrinks 105 → 20 mA/mm and its 10.5 V drop is gone.</span></div>
+          <div class="tile"><span class="k">Mesh-robust series</span><span class="v">Steps on every mesh</span><span class="s">Trap 0.30 eV, 8e18 strikes: 2–3 drops for 1, 2 and 3 strikes on the 15, 10 and 5 nm meshes (two 10 nm runs still going); first drop starts at 1.1–1.7 V on all three.</span></div>
           <div class="tile"><span class="k">3D slice</span><span class="v">Matches 2D</span><span class="s">After the brick-gradient fix: 0.999 of 2D at 3 V (0.65 before; FANGS port, patched FLOOXS agrees), for tracks without stress damage.</span></div>
         </div>
 
         <div class="panel">
           <h3>Open items</h3>
           <ul class="todo">
-            <li><span class="pill open">open</span><span>Strike steps are mesh-dependent: with 5 nm at y 0.8 they shrink (3 strikes: no drop left). A 2.5 nm check needs a new ~90 h stress; Ian's call. <a class="daylink" href="#nov19">Nov 19</a></span></li>
-            <li><span class="pill noted">accepted</span><span>No single strike model steps SiN and keeps HighK flat (rounds H–K); goal closed on two partial results (Ian). <a class="daylink" href="#nov19">Nov 19</a></span></li>
+            <li><span class="pill progress">in progress</span><span>Four-mesh check: 2.5 nm stress at the strike sites running (Ian: keep it), then the trap 0.30 eV / 8e18 and trap 0.40 eV / 6e18 and 7e18 series on it; 10 nm runs (52072550) finishing. <a class="daylink" href="#nov20">Nov 20</a></span></li>
+            <li><span class="pill open">open</span><span>HighK collapses with the same 8e18 strikes (one strike, 15 nm mesh: 262 → 7 mA/mm at 1.0–1.4 V; HighK not run on the finer meshes), so the mesh-robust series steps SiN without the SiN vs HighK contrast. <a class="daylink" href="#nov20">Nov 20</a></span></li>
             <li><span class="pill open">open</span><span>3D stress damage: the stress field in 3D still has an unexplained 5.5e7 V/cm peak, and the gradient fix is only in a local FLOOXS copy. <a class="daylink" href="#nov18">Nov 18</a></span></li>
             <li><span class="pill open">open</span><span>SiN current recovers after each drop, and the onset doesn't move later with Vg as measured. <a class="daylink" href="#nov11">Nov 11</a></span></li>
             <li><span class="pill noted">noted</span><span>Waiting on a comprehensive measured set: same-device pre and post, width, Vth, Vg order. <a class="daylink" href="#nov05">Nov 5</a></span></li>
           </ul>
           <details class="older">
-            <summary>Older questions (13)</summary>
+            <summary>Older questions (14)</summary>
             <ul class="todo">
+              <li><span class="pill noted">accepted</span><span>No single strike model steps SiN and keeps HighK flat (rounds H–K); goal closed on two partial results (Ian). <a class="daylink" href="#nov19">Nov 19</a></span></li>
               <li><span class="pill noted">noted</span><span>Second SiN step from a smooth second strike: its position barely moves the curve, so a second strike doesn't make the second step. <a class="daylink" href="#nov13">Nov 13</a></span></li>
               <li><span class="pill open">open</span><span>Cause of the biased Ron rise: dielectric charge, access acceptors and mobility loss all fit so far. <a class="daylink" href="#nov05">Nov 5</a></span></li>
               <li><span class="pill noted">noted</span><span>Rad model fitting choices: no gate-edge damage, hand-placed second SiN strike site, lumped gate–drain leakage. <a class="daylink" href="#oct27">Oct 27</a></span></li>
@@ -199,6 +201,39 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
             </ul>
           </details>
         </div>
+      </section>
+      <div class="no-js-sep"></div>
+
+      <!-- NOV 20 -->
+      <section class="page" id="nov20" data-title="Nov 20">
+        <div class="pagehead">
+          <h2>Nov 20 · Stepped SiN curves that survive the mesh</h2>
+          <p>Full 0–3 strike series on three meshes: with 8e18 strikes at trap level 0.30 eV, every strike count so far steps two or three times on every mesh (two 10 nm runs still going), and only the later steps move.</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 52044406 · 52072550 · 52044407 · 51998839</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Mesh-robust series (trap 0.30 eV, 8e18 strikes at y 0.8 / 1.6 / 2.4 µm, 28 V stress at scale 1.5e18): every 1-, 2- and 3-strike curve so far has two or three drops on all three meshes, <span class="num">2 / 3 / 3</span> on 15 and 5 nm and 2 / 3 / 2 on 10 nm (the 10 nm 1- and 3-strike runs are at 7.7 and 8.8 V of 12; the 15 nm 3-strike third drop, 274 → 262 mA/mm, is its last step before the solver gave up at 7.0 V). The first drop starts at 1.1–1.2 / 1.4 / 1.6–1.7 V for 1 / 2 / 3 strikes, within 0.1 V on every mesh. The second moves with the mesh: for 2 and 3 strikes at 3.3–4.1 V on 15 and 5 nm and 5.8–6.8 V on 10 nm; for 1 strike at 4.5–6.1, 5.6–7.2 and 8.8–9.1 V on 15, 10 and 5 nm.</li>
+              <li>Trap 0.40 eV with 7e18 strikes gives one drop per strike on the 5 nm mesh (<span class="num">1 / 2 / 3</span> drops; 3 strikes at 1.4, 3.3 and 5.5 V), but not on the others (15 nm 3 / 2 / 2, its 3-strike run to 6.0 V; 10 nm 2 / 3 / 2 so far, at 7.4–7.7 V), so that clean staircase is a 5 nm result only.</li>
+              <li>Other settings on 5 nm: trap 0.40 eV with 6e18 keeps 2 / 3 / 3 (as on 15 nm; 3 / 3 / 4 on 10 nm), though its 3-strike later drops are only 13 and 10 mA/mm. Trap 0.40 eV with 5e18 loses its strike steps (one drop at every strike count, like the no-strike curve) and trap 0.30 eV with 6e18 (the Nov 18 series) keeps only 2 / 1 / 0. Trap 0.30 eV with 7e18 keeps 3 / 2 / 2 with small later drops (8–18 mA/mm; not run on 10 nm).</li>
+              <li>All 17 runs of radStepM (14 on the 5 nm mesh, 3 on 10 nm) reached 12 V (none gave up), through an HPG scheduler outage overnight. The SiN stress library (Vg −10 V, a state every volt) is complete to 84 V; the 2.5 nm stress at the strike sites is at 13 V of 28.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill progress">in progress</span><span>10 nm runs of the trap 0.40 eV / 7e18 series and the trap 0.30 eV / 8e18 1- and 3-strike curves (52072550), at 7.4–9 V of 12.</span></li>
+              <li><span class="pill progress">in progress</span><span>2.5 nm stress (52044407, Ian: keep it running), then the trap 0.30 eV / 8e18 and trap 0.40 eV / 6e18 and 7e18 series on it for a four-mesh check.</span></li>
+              <li><span class="pill open">open</span><span>HighK collapses with the same 8e18 strikes (one strike: 262 → 7 mA/mm at 1.0–1.4 V, 15 nm mesh), so this series has no SiN vs HighK contrast.</span></li>
+              <li><span class="pill open">open</span><span>Why the later steps move with the mesh (2- and 3-strike second drop at 3.3–4.1 V on 15 and 5 nm, 5.8–6.8 V on 10 nm; 1-strike second drop at 4.5–9.1 V).</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs wide">
+          <figure><a class="img" href="fig/mesh_deliverable.jpg" target="_blank" rel="noopener"><img src="fig/mesh_deliverable.jpg" alt="Six SiN Id-Vd panels at Vg +1 after the 28 V stress plus 0 to 3 strikes, drops marked with arrows. Top row, trap 0.30 eV with 8e18 strikes on the 15 nm, 10 nm and 5 nm meshes: every strike curve drops near 1.1-2.0 V and again later. Bottom row, trap 0.40 eV with 7e18 strikes: on the 5 nm mesh 1, 2 and 3 strikes give 1, 2 and 3 drops; the 15 nm and 10 nm meshes do not. The 10 nm strike curves stop at 7.4-8.8 V (runs still going)" loading="lazy"></a><figcaption><b>Stepped series on three meshes</b>Trap 0.30 eV, 8e18: 2–3 drops at every strike count on every mesh so far, first drop starting at 1.1–1.7 V. Trap 0.40 eV, 7e18: one drop per strike on 5 nm only. Nov 11 model dotted in the left panels; arrows mark drops of 10 mA/mm or more. Two 15 nm 3-strike runs end at 6.0 and 6.9 V (solver gave up); the 10 nm strike curves end at 7.4–8.8 V because those runs are still going (except the 8e18 2-strike curve).</figcaption></figure>
+          <figure><a class="img" href="fig/mesh_series.jpg" target="_blank" rel="noopener"><img src="fig/mesh_series.jpg" alt="Grid of SiN Id-Vd panels at Vg +1, one row per strike setting (trap 0.40 eV with 6, 5 and 7e18 strikes; trap 0.30 eV with 6, 7 and 8e18) and one column per mesh (15 nm, 10 nm, 5 nm), 0 to 3 strikes each; some 10 nm panels have only the no-strike curve, and the running 10 nm strike curves stop at 7.4-8.8 V" loading="lazy"></a><figcaption><b>Every setting on every mesh run so far</b>On 5 nm, 5e18 (at 0.40 eV) loses its strike steps, 6e18 (at 0.30 eV) keeps 2 / 1 / 0 drops and 7e18 (at 0.30 eV) keeps 3 / 2 / 2 with small later drops.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#nov19">Nov 19 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
@@ -223,7 +258,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
             <ul class="todo">
               <li><span class="pill open">open</span><span>2.5 nm check of the strike steps: needs a new 28 V stress (~90 h). Ian's call.</span></li>
               <li><span class="pill open">open</span><span>Drop size per switch (some ~100 mA/mm, others under 10), why ~0.5 V is sometimes not enough (2-strike stress band holds 0.50–0.54 V without switching), and why the 10.5 V second stage is missing on 5 nm.</span></li>
-              <li><span class="pill progress">in progress</span><span>SiN stress library: resumed from its 60 V state (51998839), at 69 V of 84.</span></li>
+              <li><span class="pill resolved">fixed Nov 20</span><span>SiN stress library: resumed from its 60 V state (51998839), at 69 V of 84.</span></li>
             </ul>
           </div>
         </div>
@@ -233,7 +268,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           <figure><a class="img" href="fig/series_deliverable.jpg" target="_blank" rel="noopener"><img src="fig/series_deliverable.jpg" alt="Four panels, 28 V stress plus 0 to 3 strikes at Vg +1. Plain strikes: SiN steps, HighK also drops. Field-scaled strikes: SiN one drop that deepens with each strike, HighK stays on its no-strike curve" loading="lazy"></a><figcaption><b>The two partial results (goal deliverable)</b>Plain strikes step SiN but drop HighK; field-scaled strikes keep HighK flat. Row A's steps are on the 15 nm mesh.</figcaption></figure>
           <figure><a class="img" href="fig/map28_holeJ.jpg" target="_blank" rel="noopener"><img src="fig/map28_holeJ.jpg" alt="Two rows of hole current density maps, SiN and HighK, from before the strike to 1 ns at Vg -10 and Vd 28 V: a vertical track of high hole current under the strike at y 0.2 um that spreads through the buffer, nearly identical in both decks" loading="lazy"></a><figcaption><b>Strike transient at 28 V, hole current</b>Holes leave down the track and through the buffer to the substrate (0.34 mA/µm from 100 ps in both decks); SiN and HighK look alike.</figcaption></figure>
         </div>
-        <div class="pager"><a href="#overview">← Overview</a><a href="#nov18">Nov 17–18 →</a></div>
+        <div class="pager"><a href="#nov20">← Nov 20</a><a href="#nov18">Nov 17–18 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 
@@ -296,7 +331,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           <div class="panel"><h3>Needed work</h3>
             <ul class="todo">
               <li><span class="pill resolved">fixed Nov 17</span><span>Loading an at-bias state overflowed at 28 V; the driver now resets the potentials after loading.</span></li>
-              <li><span class="pill progress">in progress</span><span>Library above ~40 V: convergence untested; resume SiN from its last state at the 4-day limit.</span></li>
+              <li><span class="pill resolved">fixed Nov 20</span><span>Library above ~40 V: convergence untested; resume SiN from its last state at the 4-day limit.</span></li>
             </ul>
           </div>
         </div>

@@ -2244,3 +2244,5 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **radStepM2 52072550 submitted 08:28** (the Nov 19-20 retries never got through): m10 trap 0.40 7e18 N1-3, trap 0.30 8e18 N1 / N3.
 - **meshChkStress2p5 52044407** at Vd 12 of 28 after 12 h. **SiN stress library resume 51998839 COMPLETED** (to 84 V).
 - **Ian (Nov 20): "keep the 2.5 nm stress running"** (meshChkStress2p5 52044407). Next after it saves Vd 28: load the trap 0.40 / 7e18, trap 0.30 / 8e18 and trap 0.40 / 6e18 0-3 strike series on it (four-mesh check).
+- **Dashboard Nov 20 page** (mesh-robust series), fact-checked by two agents (workflow wf_0888c116-17b, ~90 claims, 28 findings applied): 10 nm counts marked partial; first drop starts at 1.1-1.7 V (within 0.1 V across meshes per strike count); second-drop ranges given per strike count; trap 0.30 / 7e18 on 5 nm keeps 3 / 2 / 2 (small later drops), not "loses its steps"; radStepM is 14 runs on 5 nm + 3 on 10 nm. meshChkStress2p5 was at Vd 13 of 28 at 09:40 (HPG listing).
+- **Dashboard** republished with the Nov 20 page (https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd).
