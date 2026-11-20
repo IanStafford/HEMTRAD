@@ -2243,3 +2243,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - **Lose their steps on 5 nm:** trap 0.40 with 5e18 (stress drop only, all N); trap 0.30 with 6e18 (row A: 2 / 1 / 0) and with 7e18 (2 / 2 / 2, but small).
 - **radStepM2 52072550 submitted 08:28** (the Nov 19-20 retries never got through): m10 trap 0.40 7e18 N1-3, trap 0.30 8e18 N1 / N3.
 - **meshChkStress2p5 52044407** at Vd 12 of 28 after 12 h. **SiN stress library resume 51998839 COMPLETED** (to 84 V).
+- **Ian (Nov 20): "keep the 2.5 nm stress running"** (meshChkStress2p5 52044407). Next after it saves Vd 28: load the trap 0.40 / 7e18, trap 0.30 / 8e18 and trap 0.40 / 6e18 0-3 strike series on it (four-mesh check).
