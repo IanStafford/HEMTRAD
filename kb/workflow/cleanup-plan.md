@@ -6,6 +6,8 @@ source: survey workflow wf_fb7accb6-e0e (seven readers, each finding re-checked 
 ---
 # Clean-up plan and KB audit (2026-11-20)
 
+Published page: https://claude.ai/artifact/QTDF84jNysUWQcsTfsswKp (rebuild with `python3 dashboard/build_cleanup_page.py`, then republish `dashboard/cleanup-plan.html`).
+
 **How this was made.** Seven readers each surveyed one slice of the repo: drivers, model, `analysis/genRadStudy.py`, the other analysis scripts, sweeps / bin / layout, the KB results notes, and the rest of the KB. A separate skeptic then re-checked every finding against the files. Of 156 findings, 155 survived (115 confirmed, 40 confirmed with corrections) and 1 was refuted. IDs (DRV-, MOD-, GEN-, AN-, LAY-, KB-R-, KBC-) refer to the appendix. **Nothing has been changed yet.** Every step below is behaviour-preserving unless it says otherwise, and each code stage has an acceptance test.
 
 **Baseline facts the plan relies on:**
@@ -15,11 +17,11 @@ source: survey workflow wf_fb7accb6-e0e (seven readers, each finding re-checked 
 
 ## 1. Decisions for Ian (before any clean-up)
 
-1. **FP contact covers the drain half of the T-gate head (MOD-1, confirmed locally).**
+1. **DONE 2026-11-20 (Ian: fix it). FP contact covers the drain half of the T-gate head (MOD-1, confirmed locally).** Fixed in all three decks (lever `fpBoxOld`, default 0 = fixed). The 2.5 nm stress (old box) was cancelled; the stress library, the pre-irradiation curves and the Nov 11 model are being rerun ([[fp-contact-fix]]).
    - The FP contact box in all three decks reaches into the head metal (`rfdevice.tcl:88`, `rfdevice_SiN.tcl:91`, `rfdevice3d.tcl:103`).
    - At the 28 V stress the head's drain corner sits at −0.5 to −0.6 V against the FP instead of −10 V. Numbers and the check are in `progress.md` (2026-11-20 afternoon).
    - It probably changes the stress field and damage in every rad-era result. Fixing it is a physics change: fix and redo the library and key results, or keep it as a documented caveat?
-   - The deck clean-up (stage 3d) touches the same lines, so it waits for this.
+   - Stage 3d can go ahead after the fix tests.
 2. **Measured numbers in tracked files of the public repo (AN-2, KB-R-14, LAY-7 / DRV-18).**
    - `analysis/radCompare.py` hard-codes three measured pre-irradiation values. By default it overlays the measured curves on any output path when the local targets file exists.
    - `kb/results/rad-model.md` has a "Measured" column (:61), and its :129 and :266 give or imply a measured onset.
@@ -116,7 +118,7 @@ The main theme is an **era gap**. Most orientation docs were written in the puls
 | a | `analysis/common.py`: CSV readers and column constants, label index, one drop finder with both modes, collapse classifier, REF registry for the reference curves (pre-irradiation, Nov 11, onsetField3, Run F), style palettes; `radMetrics.py` becomes a re-export shim | AN-1, -3, -5, -6, -7, -14, -15, -20 | Rerun every script that used the moved helpers on the same inputs; printed tables and CSVs identical; figures checked by eye |
 | b | `genRadStudy.py` → `analysis/radparams.py` (constants and builders, no side effects) + one function per study + a study registry (params file, run dirs, job IDs, driver, status); derived studies read their parents' rows in memory; rename the "FINAL*" base sets by source and date | GEN-1, -4 to -8, -11 to -13 | `git archive HEAD` copy, run, `diff -rq sweeps/`: no difference in all 55 generated files |
 | c | `radIV.tcl` in stage order: header; lever block grouped by stage, with a "legacy, kept for old params files" group (DRV-9); model and deck; stress (split the 115-line if/elseif); DamageIn with small procs for the cap, field scaling, Gaussian sum and solve-or-restore; measurement | DRV-3, -5, -6, -9, -13 | Local before/after `cmp` of `_summary.txt`, `_IdVd.csv` and `_cuts.txt` for (1) a pre run, (2) a short stress + damage + Id-Vd, (3) stressLoad + damGauss + damGaussF + vdCuts. Lever defaults stay before `source GaN_modelfile_masterD`; no line may start with `window` (radIV.slurm blanks those) |
-| d | **After decision 1.** Decks: a `passMat` lever folds `rfdevice_SiN.tcl` into `rfdevice.tcl` (they differ in 3 region lines); a coordinate table and named literals (`FP2` is an offset, not a length; the gate-insulator 0.005); a shared contacts block; keep `rfdevice3d.tcl` in sync | MOD-3, -4, -6, -14, -17 | Commit before the change; HighK and SiN pre Id-Vg / Id-Vd byte-identical locally; `file` check on the CRLF files |
+| d | **After the fix tests (decision 1 done).** Decks: a `passMat` lever folds `rfdevice_SiN.tcl` into `rfdevice.tcl` (they differ in 3 region lines); a coordinate table and named literals (`FP2` is an offset, not a length; the gate-insulator 0.005); a shared contacts block; keep `rfdevice3d.tcl` in sync | MOD-3, -4, -6, -14, -17 | Commit before the change; HighK and SiN pre Id-Vg / Id-Vd byte-identical locally; `file` check on the CRLF files |
 | e | Deferred: one retry/bisection helper shared by the drivers. There are four variants today. radIV.slurm copies only the driver into the task directory, so this needs a template change | DRV-12 | Document the four variants in retry-bisection.md now |
 
 ## 5. Stage 4: moves to archive/ (README per folder; update references in the same commit)

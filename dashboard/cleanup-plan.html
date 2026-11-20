@@ -1,0 +1,536 @@
+<title>HEMTRAD Clean-up Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  /* layout: one reading column with a sticky contents rail on wide screens */
+  --bg:#f5f6f4; --panel:#ffffff; --ink:#17201f; --muted:#5d6866; --line:#dfe3e0; --accent:#0e6d68; --accent-soft:#e1efed;
+  --hi:#b23a2e; --hi-bg:#f8e6e3; --md:#9a6a08; --md-bg:#f8efd9; --lo:#56636b; --lo-bg:#e9edef; --done:#2f7a3d; --done-bg:#e3f1e5;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-head:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111716; --panel:#182120; --ink:#e3e9e7; --muted:#97a4a1; --line:#2b3634; --accent:#5cc2b9; --accent-soft:#1d3532;
+  --hi:#f08b7f; --hi-bg:#3a1f1c; --md:#e4b65a; --md-bg:#362c16; --lo:#a9b4ba; --lo-bg:#252d31; --done:#7fcb8b; --done-bg:#1d3121; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111716; --panel:#182120; --ink:#e3e9e7; --muted:#97a4a1; --line:#2b3634; --accent:#5cc2b9; --accent-soft:#1d3532;
+  --hi:#f08b7f; --hi-bg:#3a1f1c; --md:#e4b65a; --md-bg:#362c16; --lo:#a9b4ba; --lo-bg:#252d31; --done:#7fcb8b; --done-bg:#1d3121; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--f-body);margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:28px 64px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:40px}
+@media (max-width:860px){.wrap{grid-template-columns:minmax(0,1fr);gap:16px;padding-inline:16px}.rail{position:static!important}}
+header{grid-column:1/-1;border-bottom:1px solid var(--line);padding-bottom:18px}
+.eyebrow{font:600 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font:600 clamp(26px,4vw,36px)/1.15 var(--f-head);margin:.35em 0 .3em;text-wrap:balance}
+.lede{color:var(--muted);max-width:68ch;margin:0}
+.stats{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px;font:500 13px/1.4 var(--f-mono);color:var(--muted)}
+.stats b{color:var(--ink);font-weight:600}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;font-size:13px}
+.rail a{display:block;color:var(--muted);text-decoration:none;padding:5px 0 5px 10px;border-left:2px solid var(--line)}
+.rail a:hover,.rail a:focus-visible{color:var(--ink);border-left-color:var(--accent)}
+main{min-width:0;max-width:78ch}
+h2{font:600 22px/1.25 var(--f-head);margin:2.2em 0 .6em;padding-top:.2em;text-wrap:balance;scroll-margin-top:16px}
+main>h2:first-child{margin-top:.4em}
+p{margin:.7em 0}
+ul,ol{padding-left:1.3em;margin:.5em 0}
+li{margin:.3em 0}
+li>ul,li>ol{margin:.25em 0}
+strong{font-weight:600}
+code{font:500 .86em/1 var(--f-mono);background:var(--accent-soft);padding:.12em .35em;border-radius:3px;word-break:break-word}
+.wl{color:var(--accent);font-weight:500}
+.tw{overflow-x:auto;margin:1em 0;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.45}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+th{font:600 12px/1.3 var(--f-head);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:500}
+.decisions ol>li{margin:.8em 0}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:1em 0}
+.f{font:500 13px/1 var(--f-body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+.f.on{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.f:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+details.slice{border:1px solid var(--line);border-radius:6px;background:var(--panel);margin:.7em 0}
+details.slice>summary{cursor:pointer;padding:11px 14px;font:600 15px/1.3 var(--f-head)}
+details.slice>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.fl{list-style:none;margin:0;padding:0 0 4px}
+.fi{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:4px 10px;align-items:baseline;padding:9px 14px;border-top:1px solid var(--line);font-size:14px}
+.fi[hidden]{display:none!important}
+.sev{font:600 11px/1 var(--f-mono);letter-spacing:.04em;text-transform:uppercase;padding:4px 7px;border-radius:4px;min-width:3.6em;text-align:center}
+.sH{color:var(--hi);background:var(--hi-bg)} .sM{color:var(--md);background:var(--md-bg)} .sL{color:var(--lo);background:var(--lo-bg)}
+.fid{font:600 12.5px/1 var(--f-mono);color:var(--muted);white-space:nowrap}
+.txt{min-width:0}
+.meta{display:block;color:var(--muted);font-size:12.5px;margin-top:3px;overflow-wrap:anywhere}
+.meta code{background:none;padding:0}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 6px 6px 0;margin:1em 0}
+.done{display:inline-block;font:600 11px/1 var(--f-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--done);background:var(--done-bg);padding:4px 7px;border-radius:4px;margin-right:6px}
+@media (max-width:520px){.fi{grid-template-columns:auto minmax(0,1fr)}.fid{grid-column:2}.txt{grid-column:1/-1}}
+@media (prefers-reduced-motion:no-preference){.f{transition:background .15s,color .15s}}
+</style>
+<div class="wrap">
+<header>
+  <div class="eyebrow">FLOOXS HEMT model · repo survey · 2026-11-20</div>
+  <h1>HEMTRAD Clean-up Plan</h1>
+  <p class="lede">A staged, behaviour-preserving plan to make the code and knowledge base easier to read, plus the conflicts found in the KB. Every finding was checked by a second, independent reviewer.</p>
+  <div class="stats"><span><b>156</b> findings</span><span><b>155</b> kept</span><span><b>115</b> confirmed</span><span><b>40</b> confirmed with corrections</span><span><b>1</b> refuted</span></div>
+</header>
+<nav class="rail" aria-label="Contents"><a href="#1-decisions-for-ian-before-any-clean-up">1. Decisions for Ian (before any clean-up)</a><a href="#2-stage-1-docs-kb-and-comments-no-behavi">2. Stage 1: docs, KB and comments (no behaviour change)</a><a href="#3-stage-2-safety-rails-small-behaviour-p">3. Stage 2: safety rails (small, behaviour-preserving)</a><a href="#4-stage-3-refactors-each-with-a-regressi">4. Stage 3: refactors, each with a regression test</a><a href="#5-stage-4-moves-to-archive-readme-per-fo">5. Stage 4: moves to archive/ (README per folder; update references in the same commit)</a><a href="#6-kb-issues-and-conflicts">6. KB issues and conflicts</a><a href="#7-suggested-order">7. Suggested order</a><a href="#refuted">Refuted</a><a href="#appendix">Appendix: all findings</a></nav>
+<main>
+<p>Published page: https://claude.ai/artifact/QTDF84jNysUWQcsTfsswKp (rebuild with <code>python3 dashboard/build_cleanup_page.py</code>, then republish <code>dashboard/cleanup-plan.html</code>).</p>
+<p><strong>How this was made.</strong> Seven readers each surveyed one slice of the repo: drivers, model, <code>analysis/genRadStudy.py</code>, the other analysis scripts, sweeps / bin / layout, the KB results notes, and the rest of the KB. A separate skeptic then re-checked every finding against the files. Of 156 findings, 155 survived (115 confirmed, 40 confirmed with corrections) and 1 was refuted. IDs (DRV-, MOD-, GEN-, AN-, LAY-, KB-R-, KBC-) refer to the appendix. <strong>Nothing has been changed yet.</strong> Every step below is behaviour-preserving unless it says otherwise, and each code stage has an acceptance test.</p>
+<p><strong>Baseline facts the plan relies on:</strong></p>
+<ul>
+<li><code>genRadStudy.py</code> run on a clean <code>git archive</code> copy reproduces all 55 params files it writes byte-for-byte.
+</li>
+<li>The three CRLF model files are fully CRLF.
+</li>
+<li>No wikilink in the KB is broken.
+</li></ul>
+<h2 id="1-decisions-for-ian-before-any-clean-up">1. Decisions for Ian (before any clean-up)</h2>
+<div class="decisions"><ol>
+<li><span class="done">Done Nov 20</span><strong> (Ian: fix it). FP contact covers the drain half of the T-gate head (MOD-1, confirmed locally).</strong> Fixed in all three decks (lever <code>fpBoxOld</code>, default 0 = fixed). The 2.5 nm stress (old box) was cancelled; the stress library, the pre-irradiation curves and the Nov 11 model are being rerun (<span class="wl">fp-contact-fix</span>).
+<ul>
+<li>The FP contact box in all three decks reaches into the head metal (<code>rfdevice.tcl:88</code>, <code>rfdevice_SiN.tcl:91</code>, <code>rfdevice3d.tcl:103</code>).
+</li>
+<li>At the 28 V stress the head's drain corner sits at −0.5 to −0.6 V against the FP instead of −10 V. Numbers and the check are in <code>progress.md</code> (2026-11-20 afternoon).
+</li>
+<li>It probably changes the stress field and damage in every rad-era result. Fixing it is a physics change: fix and redo the library and key results, or keep it as a documented caveat?
+</li>
+<li>Stage 3d can go ahead after the fix tests.
+</li></ul>
+</li>
+<li><strong>Measured numbers in tracked files of the public repo (AN-2, KB-R-14, LAY-7 / DRV-18).</strong>
+<ul>
+<li><code>analysis/radCompare.py</code> hard-codes three measured pre-irradiation values. By default it overlays the measured curves on any output path when the local targets file exists.
+</li>
+<li><code>kb/results/rad-model.md</code> has a "Measured" column (:61), and its :129 and :266 give or imply a measured onset.
+</li>
+<li>Is <code>radPlot1</code> measured or simulated? It is cited in <code>static-era-lessons.md:10</code>.
+</li>
+<li>The untracked <code>drivers/trim/TRIM_NCY2_SiN_Au2256.IN</code> names the measured device.
+</li>
+<li>Proposal: qualitative wording in tracked files, numbers moved to the untracked measured notes, and a <code>.gitignore</code> rule for <code>*NCY2*</code>. These lines have been in public history since October, so a further history purge is a separate yes/no.
+</li></ul>
+</li>
+<li><strong>useTraps / stressSkip guards (DRV-7).</strong>
+<ul>
+<li>A run with only <code>damGaussF</code> strikes (damPeak 0, no damGauss) gets <code>trapEn 0</code>, and the strikes are silently ignored.
+</li>
+<li>The stressSkip check misses the field-scaled strike levers.
+</li>
+<li>Fixing either changes behaviour, though only for configurations no committed params file uses.
+</li></ul>
+</li>
+<li><strong>energy-balance "first Newton update" readings (DRV-11, KBC-9).</strong> The eTempDebug dumps were never capped at one or two iterations, because <code>iterLimit</code> is read once at solver build. The energy-balance note's reading of them is unverified. Record that as a caveat, or recheck if the thermo term is ever resumed?
+</li>
+<li><strong>Archive or keep:</strong>
+<ul>
+<li><code>drivers/stressFreeze.tcl</code>: still named as the tool for the open off-state pre-stress test (DRV-15).
+</li>
+<li>The untracked <code>bin/hpg_sbatch.sh</code>: obsolete for radIV.slurm, so delete it or rewrite it (LAY-6).
+</li></ul>
+</li>
+<li><strong>Restore the October radFine record (GEN-2, KB-GEN-1, KB-R-13).</strong> <code>params_radFine.txt</code> was overwritten on Nov 5 by a different study. Write <code>git show 0fbf0ce:sweeps/params_radFine.txt</code> to <code>archive/radFine_2026-10-24/</code> with a README (job 47562303).
+</li></ol></div>
+<h2 id="2-stage-1-docs-kb-and-comments-no-behavi">2. Stage 1: docs, KB and comments (no behaviour change)</h2>
+<p>The main theme is an <strong>era gap</strong>. Most orientation docs were written in the pulsedIV curve-tracer era (Sep 23 – Oct 16) and never brought forward to radIV.tcl / radIV.slurm / the stress library, which all work since Oct 23 uses. Several gaps can cause a wrong or wasted run.</p>
+<p><strong>2a. Orientation docs (do first):</strong></p>
+<ul>
+<li><strong>High: the log check misses radIV failures.</strong> The mandatory post-array log check (CLAUDE.md §2, <code>kb/workflow/sweep-pattern.md</code> step 7) names only <code>PULSED GAVE UP</code>. radIV / seeIV failures print <code>IDVD GAVE UP</code>, <code>IDVG GAVE UP</code>, <code>RAMP GAVE UP</code>, <code>DAMAGE solve failed</code> and <code>&lt;tg&gt; measurement failed</code>; normal runs end with <code>RADIV DONE</code> / <code>SEEIV DONE</code> (KBC-1).
+<ul>
+<li>Add a per-driver marker table to sweep-pattern, and have §2 point to it.
+</li></ul>
+</li>
+<li><strong>sweep-pattern rewrite: the radIV.slurm recipe</strong> (KBC-5, LAY-4, KB-GEN-2):
+<ul>
+<li>the <code>label|k=v;…</code> format;
+</li>
+<li><code>RUN</code>, <code>PARAMS</code>, <code>DRV</code> and <code>REPO</code>, with <code>mkdir -p results/$RUN</code> first;
+</li>
+<li>the last value wins;
+</li>
+<li>the params file is read at task start;
+</li>
+<li>ETemp.tcl is not copied into task directories.
+</li></ul>
+</li>
+<li><strong>README layout table</strong> (LAY-1), <strong>drivers.md</strong> (DRV-1, KBC-11) and <strong>index.md</strong>:
+<ul>
+<li>radIV.tcl is the main driver; pulsedIV.tcl is the Sep–Oct curve-tracer driver;
+</li>
+<li>add entries for seeIV, fieldPlate, render3d_build, rfdevice3d and drivers/trim/.
+</li></ul>
+</li>
+<li><strong>CLAUDE.md:</strong>
+<ul>
+<li>§7 KB map: it omits all 12 rad-era notes. Replace the per-note list with a pointer to <code>kb/index.md</code> plus the entry notes (LAY-11, KB-R-20, KBC-15).
+</li>
+<li>§4 data rule: "commit <code>data/</code>" conflicts with the measured-data rule in <code>.gitignore</code>. Add the public-repo rule and "stage by explicit path" (KBC-4).
+</li>
+<li>§6: add a 3D brick-gradient bullet (KBC-3) and a "pdb solver parameters are read once at solver build" bullet (KBC-9).
+</li></ul>
+</li>
+<li><strong>levers.md:</strong> restructure into one table per source file (model, GaN/Metal/Continuity/Poisson, decks, pulsedIV, radIV, seeIV, rfdevice3d).
+<ul>
+<li>Record radIV's own defaults (trapLevel 0.30, hotEb 1.0, hotTau 1e-14, dampValue 0.05, retryDepth 6, Vd_max 10, Vd_step 0.25, Vg_out +1, Vd_stress 28) and its overrides of trapEn / trapShape.
+</li>
+<li>About 31 levers used in current params files are undocumented (KBC-2, DRV-10, KB-GEN-3, MOD-10).
+</li>
+<li>Fix the <code>deviceDeck</code> example path (DRV-22).
+</li></ul>
+</li>
+<li><strong>analysis-scripts.md:</strong> it lists 13 of 58 scripts. Regenerate from the docstrings, grouped by study, and add the generators genRadStudy.py, genRad3d.py and testRegister.py (AN-KB-1, KBC-12, LAY-3).
+</li>
+<li><strong>Other notes:</strong>
+<ul>
+<li>project-goal: add the rad-model goal (KBC-16).
+</li>
+<li>glossary: rad-era terms such as library / m10 / m5fix / m2p5, pocket, row A, band b and HPD (KBC-21).
+</li>
+<li>repo-locations: the <code>/blue</code> stress library and HEMTRAD-FANGS (KBC-6).
+</li>
+<li>hpg-workflow: the current reconnect script (KBC-7).
+</li>
+<li>dashboard.md: the third tracked page and the branch wording (LAY-15, KBC-25).
+</li></ul>
+</li>
+<li><strong>New atomic notes:</strong>
+<ul>
+<li><code>kb/model/damage-model.md</code>: the damage laws, which field each uses, and which runs used them.
+</li>
+<li><code>kb/workflow/stress-library.md</code>: save, load, resume, mesh caveat.
+</li>
+<li>A radIV driver note (KBC-13).
+</li></ul>
+</li></ul>
+<p><strong>2b. KB conflicts and stale notes:</strong> see §6. The biggest are current-status (KB-R-1, -2, -6), rad-model (KB-R-4), see-plan (KB-R-3, -15) and the radFine name (KB-GEN-1).</p>
+<p><strong>2c. Code comments only:</strong></p>
+<ul>
+<li>radIV:
+<ul>
+<li>a header that maps the stages and lists all outputs (DRV-8);
+</li>
+<li>the <code>dam2*</code> and <code>damYmin</code> comments, which describe old roles (DRV-2);
+</li>
+<li>comments detached from their levers (DRV-3; move comments only, not code, in this stage).
+</li></ul>
+</li>
+<li>Model files:
+<ul>
+<li><code>Metal.tcl</code> comments say AlGaN Ec, but the code uses Nitride Ec (MOD-2);
+</li>
+<li>the "25 nm AlGaN" comment next to <code>Al_Thick 0.015</code> (MOD-5);
+</li>
+<li>GaN.tcl's unused Farahmand high-field keys, to be marked "reference only" (MOD-7);
+</li>
+<li>masterD's stale <code>CLAUDE.md 10m</code> reference and the hotMu claim (MOD-8);
+</li>
+<li>ETemp.tcl's k/q constant, which needs a comment (MOD-9).
+</li></ul>
+</li>
+<li>Analysis and drivers:
+<ul>
+<li>references to CLAUDE.md §10.x sections that no longer exist, to be repointed to KB notes (AN-11, LAY-10, KBC-28);
+</li>
+<li>seeIV's qf-route comments (DRV-14);
+</li>
+<li>fieldPlate.tcl's reference to a missing <code>plot_fieldPlate.py</code> (AN-9, DRV-21);
+</li>
+<li>the genRadStudy docstring (GEN-10).
+</li></ul>
+</li>
+<li>CRLF files must be edited from Python with <code>newline=''</code>; check with <code>file</code> afterwards.
+</li></ul>
+<h2 id="3-stage-2-safety-rails-small-behaviour-p">3. Stage 2: safety rails (small, behaviour-preserving)</h2>
+<ul>
+<li><strong>Generators:</strong>
+<ul>
+<li><code>genRadStudy.py --check</code> diffs against the committed files.
+</li>
+<li>It refuses to overwrite a tracked params file whose content would change unless <code>--force &lt;name&gt;</code> is given (GEN-2).
+</li>
+<li><code>--show &lt;study&gt; [task]</code> prints the effective lever set. about 420 of the ~790 generated lines repeat a lever with conflicting values; the last one wins, which hides the real settings (GEN-3).
+</li>
+<li>Hard-code the three radMulti orders (GEN-9).
+</li>
+<li>The same treatment for <code>genRad3d.py</code> (AN-18).
+</li></ul>
+</li>
+<li><strong><code>sweeps/README.md</code>:</strong>
+<ul>
+<li>the template families;
+</li>
+<li>an index of params file → template / DRV → run dir(s) → job IDs → commit → KB note → branch (LAY-2, LAY-3, LAY-19);
+</li>
+<li>the rules "never edit or regenerate a params file after its job ran" and "never reuse a study name".
+</li></ul>
+</li>
+<li><strong>Templates:</strong> <code>radIV.slurm</code> and <code>pulsedIV_eTemp.slurm</code> copy all of <code>model/</code>. ETemp.tcl is missing today, so an <code>eTemp 1</code> radIV run would fail on HPG (LAY-5, DRV-23).
+</li>
+<li><strong>radIV dead lines:</strong> delete the two no-op <code>pdbSetDouble</code> lines for <code>stressQfnDamp</code> / <code>stressQfnAbs</code> (<code>radIV.tcl:355</code>, <code>:379</code>). Keep their <code>info exists</code> defaults so the two old params files still parse (DRV-4). Acceptance: a short local stress before and after, with <code>cmp</code> on the outputs.
+</li>
+<li><strong>Analysis thresholds:</strong> name them <code>DROP_MIN_FIG = 10</code> and <code>DROP_MIN_TABLE = 8</code>, and say in the KB which one each count uses (AN-1). The two drop finders give different counts on 3 of 66 curves.
+</li>
+<li><strong>Measured-data guard:</strong> after decision 2, <code>guard_private_output()</code> refuses to write measured overlays under <code>figures/</code> or <code>dashboard/</code> (AN-2).
+</li></ul>
+<h2 id="4-stage-3-refactors-each-with-a-regressi">4. Stage 3: refactors, each with a regression test</h2>
+<div class="tw"><table class=""><thead><tr><th>Order</th><th>What</th><th>Findings</th><th>Acceptance test</th></tr></thead><tbody>
+<tr><td>a</td><td><code>analysis/common.py</code>: CSV readers and column constants, label index, one drop finder with both modes, collapse classifier, REF registry for the reference curves (pre-irradiation, Nov 11, onsetField3, Run F), style palettes; <code>radMetrics.py</code> becomes a re-export shim</td><td>AN-1, -3, -5, -6, -7, -14, -15, -20</td><td>Rerun every script that used the moved helpers on the same inputs; printed tables and CSVs identical; figures checked by eye</td></tr>
+<tr><td>b</td><td><code>genRadStudy.py</code> → <code>analysis/radparams.py</code> (constants and builders, no side effects) + one function per study + a study registry (params file, run dirs, job IDs, driver, status); derived studies read their parents' rows in memory; rename the "FINAL*" base sets by source and date</td><td>GEN-1, -4 to -8, -11 to -13</td><td><code>git archive HEAD</code> copy, run, <code>diff -rq sweeps/</code>: no difference in all 55 generated files</td></tr>
+<tr><td>c</td><td><code>radIV.tcl</code> in stage order: header; lever block grouped by stage, with a "legacy, kept for old params files" group (DRV-9); model and deck; stress (split the 115-line if/elseif); DamageIn with small procs for the cap, field scaling, Gaussian sum and solve-or-restore; measurement</td><td>DRV-3, -5, -6, -9, -13</td><td>Local before/after <code>cmp</code> of <code>_summary.txt</code>, <code>_IdVd.csv</code> and <code>_cuts.txt</code> for (1) a pre run, (2) a short stress + damage + Id-Vd, (3) stressLoad + damGauss + damGaussF + vdCuts. Lever defaults stay before <code>source GaN_modelfile_masterD</code>; no line may start with <code>window</code> (radIV.slurm blanks those)</td></tr>
+<tr><td>d</td><td><strong>After the fix tests (decision 1 done).</strong> Decks: a <code>passMat</code> lever folds <code>rfdevice_SiN.tcl</code> into <code>rfdevice.tcl</code> (they differ in 3 region lines); a coordinate table and named literals (<code>FP2</code> is an offset, not a length; the gate-insulator 0.005); a shared contacts block; keep <code>rfdevice3d.tcl</code> in sync</td><td>MOD-3, -4, -6, -14, -17</td><td>Commit before the change; HighK and SiN pre Id-Vg / Id-Vd byte-identical locally; <code>file</code> check on the CRLF files</td></tr>
+<tr><td>e</td><td>Deferred: one retry/bisection helper shared by the drivers. There are four variants today. radIV.slurm copies only the driver into the task directory, so this needs a template change</td><td>DRV-12</td><td>Document the four variants in retry-bisection.md now</td></tr>
+</tbody></table></div>
+<h2 id="5-stage-4-moves-to-archive-readme-per-fo">5. Stage 4: moves to archive/ (README per folder; update references in the same commit)</h2>
+<ul>
+<li><strong>drivers:</strong>
+<ul>
+<li><code>trapPlot.tcl</code> and <code>figures/radPlot*.csv</code> → <code>archive/static_mobility/</code> (LAY-9);
+</li>
+<li><code>eTempDebug_tail.tcl</code> with its slurm and params files, and the two <code>test20</code> TRIM inputs (DRV-17);
+</li>
+<li><code>stressFreeze.tcl</code> only after decision 5.
+</li></ul>
+</li>
+<li><strong>analysis:</strong>
+<ul>
+<li>the one-off day-figure scripts (plot_gaussFine, plot_radExp1, radEBFig, radGaussFig, radFineFig, plot_nov12, plot_rad28fit, plot_rad3dFix, plot_radStepHighlights) → <code>archive/analysis_dayfigs/</code>, with a script → figure → dashboard day → job table (AN-8);
+</li>
+<li>analyze_mobCompare and plot_eTemp to the static / etstats archive.
+</li></ul>
+</li>
+<li><strong>figures and notebook:</strong> <code>figures.ipynb</code> → <code>archive/static_mobility/</code> (LAY-14), and <code>figures/README.md</code> stating the per-study folder rule and the frames policy (LAY-12, AN-17).
+</li>
+<li><strong>Do not rename params files</strong>, even where the naming schemes are mixed (LAY-16). Old scripts, KB notes and progress.md cite them. The sweeps index (stage 2) does the job instead (LAY-21).
+</li>
+<li><strong>Local clutter:</strong> <code>vdc_sin.log</code>, the log of a failed local run (LAY-8).
+</li></ul>
+<h2 id="6-kb-issues-and-conflicts">6. KB issues and conflicts</h2>
+<div class="tw"><table class=""><thead><tr><th>Note(s)</th><th>Issue</th><th>Which is right / fix</th><th>ID</th></tr></thead><tbody>
+<tr><td>current-status</td><td>"Key results" still describes the Oct 27 model (17 V, two steps near 4.5 / 5.8 V, jobs 47887339 / 47959281). Energy-balance paragraph says eTemp 1 is standard. Several lines say runs are still going or decisions are pending when they are done.</td><td>The 28 V model in step-search-28v and rad-model, and eTemp 0 (standard since Oct 16). Rebuild as Now / Current answers / Parked, with history in progress.md.</td><td>KB-R-1, -2, -6</td></tr>
+<tr><td>rad-model</td><td>Several inconsistent "final" states: refit "running" but done Nov 15; 17 V vs 17.66 V; hotEb 0.5 vs 1.0; "unchanged" vs the Nov 11 change; "branch" wording</td><td>Restructure into Current model / Superseded / History</td><td>KB-R-4, DRV-24, KB-GEN-4</td></tr>
+<tr><td>rad-model, static-era-lessons</td><td>Measured numbers or offsets in a public note</td><td>Decision 2</td><td>KB-R-14</td></tr>
+<tr><td>see-plan</td><td>Presents the quasi-Fermi route as the method, but it failed: the TR-BDF2 first step never converges. TR-BDF2 and tranSign are not documented anywhere. Decisions not marked as taken. seeMap28 missing.</td><td>Generation pulse (<code>seeMethod gen</code>, <code>tranSign 1</code>). Add a "Method as run" section and put the TR-BDF2 / tranSign facts in gotchas.</td><td>KB-R-3, -15</td></tr>
+<tr><td>rad-model, damage-region-map, current-status</td><td>"radFine" names two studies: Oct 24 (47562303) and Nov 5 (49735196)</td><td>Cite with the job ID; restore the Oct params (decision 6)</td><td>KB-GEN-1, KB-R-13</td></tr>
+<tr><td>step-search-28v</td><td>Not in date or importance order. Case labels are never defined. The Nov 18 audit's "15 nm at y 0.8" disagrees with the true-node 9.5–17.2 nm. Reproduction command misses the output argument. Rounds S and K and the 28 V refit are missing.</td><td>Current-answer box at the top; label legend table; true-node spacings; full command</td><td>KB-R-5, -7 to -10, -17</td></tr>
+<tr><td>damage-region-map</td><td>The opening summary contradicts the note's own later correction: Gaussian traps at hotEb 1.0 do collapse, converged at 2.5 nm</td><td>Summarise both outcomes</td><td>KB-R-11</td></tr>
+<tr><td>highk-vs-sin, index</td><td>"The trap model cannot make SiN collapse while HighK does not" reads as contradicting the rad result</td><td>Qualify: with hand-placed traps; the deck difference comes from the stress field</td><td>KB-R-12</td></tr>
+<tr><td>rad-literature-steps</td><td>The test plan does not say which tests have been run</td><td>Add an outcome column</td><td>KB-R-16</td></tr>
+<tr><td>energy-balance, drivers, gotchas, flooxs-solver, flooxs-commands</td><td>Muddled "standard" mode. iterLimit described as a live setting. eTempDebug dumps read as capped iterations.</td><td>eTemp 0 is standard; pdb solver parameters are read once at solver build; the dumps' readings are unverified</td><td>KBC-8, -9, DRV-11</td></tr>
+<tr><td>calibration, mobility-models</td><td>Only the Oct 1 HfO2 calibration. The rad baseline (polCharge 1e13, phiB 2.94, mob* levers, 2026-10-23) is missing.</td><td>Add a rad-baseline section</td><td>KBC-10</td></tr>
+<tr><td>device-structure, Metal.tcl</td><td>FP "0.42 µm thick" (it spans 0.27 µm). Passivation stack described wrongly. Metal comments contradict the code.</td><td>Correct from the deck coordinates</td><td>MOD-11, MOD-2</td></tr>
+<tr><td>mesh</td><td>Stale next to step-search-28v (spacings, meshY recipe, size rules)</td><td>Rewrite as current facts, including the print1d resampling caveat</td><td>KBC-14</td></tr>
+<tr><td>levers</td><td>Called "every knob" but about 31 current levers are missing; radIV defaults are not recorded</td><td>Stage 2a</td><td>KBC-2, DRV-10, KB-GEN-3</td></tr>
+<tr><td>flooxs-gotchas</td><td>Missing: the 3D brick-gradient bug; <code>struct infile</code> clears contacts; the high-bias Initialize overflow; others</td><td>Add bullets with links</td><td>KBC-3, -19</td></tr>
+<tr><td>CLAUDE.md §4, git-conventions, README</td><td>"Commit data/" vs the measured-data rule</td><td>Public-repo rule</td><td>KBC-4</td></tr>
+<tr><td>repo-locations, hpg-workflow</td><td>The /blue stress library is missing. The reconnect description is out of date.</td><td>Update from the scripts</td><td>KBC-6, -7</td></tr>
+<tr><td>trim, insulator-traps, model-caveats</td><td>Stale: the real ion still called "pending"; field-mobility retest; rad-era caveats missing</td><td>Update</td><td>DRV-16, KBC-17, -22, -23</td></tr>
+<tr><td>munmap-crash vs energy-balance</td><td>"Zero munmap crashes since Sep 27" vs one on Oct 12 (45692147 / 8)</td><td>energy-balance is right</td><td>KBC-20</td></tr>
+<tr><td>critical-strike; munmap-crash and two others</td><td>Broken figure path (the file now lives in archive/static_mobility/figures/). <code>flooxs-crashfix.patch</code> is cited but does not exist.</td><td>Fix the path; say where the patch lives or that it is lost</td><td>KB-R-18, KBC-18</td></tr>
+<tr><td>3d-plan</td><td>A plan that has grown into a dated results log</td><td>Split into plan / results</td><td>KBC-27</td></tr>
+<tr><td>several</td><td>Small in-note staleness (a job "running" that has a result; frontmatter keys; index dates)</td><td>Polish</td><td>KB-R-19, -21, -22, KBC-24, -26</td></tr>
+</tbody></table></div>
+<h2 id="7-suggested-order">7. Suggested order</h2>
+<ol>
+<li>Decisions 1–6 (Ian).
+</li>
+<li>Stage 1 (docs and KB): a day or two of edits, no risk. 2a first, because sweep-pattern / CLAUDE.md §2 can cause missed failures.
+</li>
+<li>Stage 2 (rails): the <code>genRadStudy --check</code> / no-overwrite rule and the sweeps index first.
+</li>
+<li>Stage 3 a → b → c, one per commit, each with its acceptance test logged in progress.md. Then d, after decision 1.
+</li>
+<li>Stage 4 moves, one folder per commit.
+</li></ol>
+<p>The low-priority polish items are in the appendix (severity "low").</p>
+<h2 id="refuted">Refuted</h2>
+<p>AN-16 claimed that eleven scripts crash on a fresh clone because they write to figures/ folders that don't exist. Every such folder holds tracked files, so it exists in any clone.</p>
+<p>Related: <span class="wl">current-status</span>, <span class="wl">levers</span>, <span class="wl">sweep-pattern</span>, <span class="wl">analysis-scripts</span>, <span class="wl">rad-model</span>, <span class="wl">step-search-28v</span>, <span class="wl">step-mechanism</span>, <span class="wl">flooxs-gotchas</span>.</p>
+<h2 id="appendix">Appendix: all verified findings</h2>
+<p>Severity: H high, M medium, L low. Effort: S/M/L. Verdict: ✓ confirmed, ~ confirmed with corrections (the corrected wording is in the survey output). The full text of every finding and verdict is in the workflow journal (wf_fb7accb6-e0e).</p>
+<div class="filters" role="group" aria-label="Filter findings by severity"><button type="button" class="f on" data-sev="all" id="f-all">All</button><button type="button" class="f" data-sev="H" id="f-h">High</button><button type="button" class="f" data-sev="M" id="f-m">Medium</button><button type="button" class="f" data-sev="L" id="f-l">Low</button></div>
+<details class="slice" open><summary><span>Drivers (25)</span></summary><ul class="fl">
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">DRV-1</span><span class="txt">The orientation docs omit the drivers the current work runs on.<span class="meta"><code>kb/tools/drivers.md:9, README.md:12 (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">DRV-11</span><span class="txt">Correct drivers.md:13, energy-balance.md:19 and energy-balance.md:21.<span class="meta"><code>drivers/eTempDebug_tail.tcl:1, drivers/eTempDebug_tail.tcl:39 (+3)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">DRV-2</span><span class="txt">Two radIV lever comments describe roles the levers no longer have in the final model.<span class="meta"><code>drivers/radIV.tcl:71, drivers/radIV.tcl:86 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-10</span><span class="txt">levers.md documents only a few radIV levers and none of seeIV's, and it never records that radIV uses its own trap and solver defaults.<span class="meta"><code>kb/model/levers.md:44, kb/model/levers.md:28 (+3)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-12</span><span class="txt">There are four separate retry-bisection implementations with small semantic differences, and retry-bisection.md describes only pulsedIV's.<span class="meta"><code>drivers/pulsedIV.tcl:104, drivers/radIV.tcl:242 (+4)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-14</span><span class="txt">For the tolerance comment (seeIV.tcl:90-93): do not reword it to 'also needed when trapEn 0'.<span class="meta"><code>drivers/seeIV.tcl:1, drivers/seeIV.tcl:40 (+4)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-15</span><span class="txt">Archive trapPlot.tcl to archive/static_mobility/ and list it in that folder's README.<span class="meta"><code>drivers/stressFreeze.tcl:15, drivers/stressFreeze.tcl:23 (+4)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-16</span><span class="txt">trim.md is stale on three points. It describes only the 10 MeV / 20-ion template and calls the real ion 'pending (2026-10-21)', although the production model-deck inputs (Au 2256 MeV, 200 ions, full cascades) ran on Nov 12.<span class="meta"><code>kb/tools/trim.md, drivers/trim/TRIM_HighK_Au2256.IN (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-3</span><span class="txt">Risk: behaviour-preserving only if every lever default stays ahead of <code>source GaN_modelfile_masterD</code> (radIV.tcl:195).<span class="meta"><code>drivers/radIV.tcl:89, drivers/radIV.tcl:100 (+4)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-4</span><span class="txt">stressQfnDamp and stressQfnAbs do nothing: they set pdb values mid-run, and FLOOXS reads those only when it builds the solver.<span class="meta"><code>drivers/radIV.tcl:52, drivers/radIV.tcl:59 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-5</span><span class="txt">radIV.tcl's layout follows the order in which features were added, not the order it runs in.<span class="meta"><code>drivers/radIV.tcl:27, drivers/radIV.tcl:149 (+2)</code> · effort L · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-6</span><span class="txt">DamageIn and the stress-file code repeat themselves.<span class="meta"><code>drivers/radIV.tcl:438, drivers/radIV.tcl:441 (+7)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-7</span><span class="txt">Two guards have fallen behind the newer damage levers.<span class="meta"><code>drivers/radIV.tcl:188, drivers/radIV.tcl:317</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-8</span><span class="txt">radIV's header describes the Oct 23-25 driver.<span class="meta"><code>drivers/radIV.tcl:1, drivers/radIV.tcl:2 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">DRV-9</span><span class="txt">Evidence corrections for the legacy-group annotations: damIns* is used by radIns, radFam, radRon, radVth and radVth2 (Oct 24 - Nov 4).<span class="meta"><code>drivers/radIV.tcl:51, drivers/radIV.tcl:56 (+7)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">DRV-13</span><span class="txt">Within radIV.tcl, the 2D DamageIn cut (543) is the only print1d without a catch.<span class="meta"><code>drivers/radIV.tcl:392, drivers/radIV.tcl:535 (+6)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">DRV-17</span><span class="txt">The two test20 TRIM inputs are smoke-test copies of the production inputs, differ only in the ion count, and are referenced nowhere.<span class="meta"><code>drivers/trim/TRIM_HighK_Au2256_test20.IN, drivers/trim/TRIM_SiN_Au2256_test20.IN (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">DRV-18</span><span class="txt">drivers/trim/ contains an untracked CRLF TRIM input, next to the tracked ones, that describes the measured device's layer stack.<span class="meta"><code>drivers/trim/TRIM_NCY2_SiN_Au2256.IN, vdc_sin.log</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">DRV-19</span><span class="txt">render3d_build.tcl hard-codes <code>set modelDir model</code> and <code>source model/...</code> instead of the shared modelDir lookup, sets the 3D deck levers without <code>info exists</code>, and writes a 45 MB sin3d.vtk into the current directory, normally the<span class="meta"><code>drivers/render3d_build.tcl:3, drivers/render3d_build.tcl:15 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">DRV-20</span><span class="txt">The drivers use different lever names for the same concept, and different defaults for shared levers.<span class="meta"><code>drivers/pulsedIV.tcl:35, drivers/radIV.tcl:39 (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">DRV-21</span><span class="txt">Header: 'The field-mobility run (job 46241088) was collected into figures/fieldPlateFM_sweep.csv and figures/fieldPlateFM_cuts.csv (the conversion is not in a tracked script).<span class="meta"><code>drivers/fieldPlate.tcl:8, kb/results/highk-vs-sin.md:12</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">DRV-22</span><span class="txt">levers.md gives the alternative deviceDeck value as <code>model/rfdevice_SiN.tcl</code>.<span class="meta"><code>kb/model/levers.md:39, kb/model/levers.md:55 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">DRV-23</span><span class="txt">radIV and seeIV expose an eTemp lever, but radIV.slurm doesn't copy ETemp.tcl into the task directory, and the model file sources ETemp.tcl when eTemp is 1.<span class="meta"><code>drivers/radIV.tcl:31, sweeps/radIV.slurm:38 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">DRV-24</span><span class="txt">rad-model.md and see-plan.md still call radIV, seeIV and the mob* levers branch-only, although they were merged to main on 2026-11-04.<span class="meta"><code>kb/results/rad-model.md:7, kb/results/rad-model.md:20 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">DRV-25</span><span class="txt">Small polish items in pulsedIV and calibIdVg.<span class="meta"><code>drivers/pulsedIV.tcl:72, drivers/pulsedIV.tcl:157 (+3)</code> · effort S · confirmed</span></span></li>
+</ul></details>
+<details class="slice" open><summary><span>Model (21)</span></summary><ul class="fl">
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">MOD-1</span><span class="txt">The FP contact box does not match the FP metal region and reaches into the T-gate head.<span class="meta"><code>model/rfdevice.tcl:88, model/rfdevice_SiN.tcl:91 (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">MOD-2</span><span class="txt">Comments in Metal.tcl contradict the code.<span class="meta"><code>model/Metal.tcl:1-3, model/Metal.tcl:50-53 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">MOD-10</span><span class="txt">Add a 'Model numerics and SEE hooks' table to levers.md with tranSign (default 0 in Continuity.tcl, 1 in seeIV.tcl), srhTau, carFloor, occSafe, pGaN, mobMumax, mobNref and mobVsat.<span class="meta"><code>kb/model/levers.md:9-26, model/Metal.tcl:46 (+5)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">MOD-11</span><span class="txt">device-structure.md misdescribes the deck in two places.<span class="meta"><code>kb/device/device-structure.md:14, kb/device/device-structure.md:19 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">MOD-3</span><span class="txt">rfdevice_SiN.tcl is a 125-line copy of rfdevice.tcl.<span class="meta"><code>model/rfdevice_SiN.tcl, model/rfdevice.tcl:66-71 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">MOD-4</span><span class="txt">Low-cost option, as proposed: add 'keep in sync with rfdevice.tcl' comments in both decks, and change rfdevice3d.tcl:11 to 'bot3d buffer depth (um);<span class="meta"><code>model/rfdevice3d.tcl:36-124, model/rfdevice.tcl:13-119 (+1)</code> · effort M · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">MOD-5</span><span class="txt">A stale structure comment says the AlGaN is 25 nm thick, six lines below <code>set Al_Thick 0.015 ;# 15nm AlGaN thickness</code>.<span class="meta"><code>model/rfdevice.tcl:31, model/rfdevice_SiN.tcl:34 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">MOD-6</span><span class="txt">The geometry variables do not mean what their names say, and several mesh coordinates are unnamed numbers.<span class="meta"><code>model/rfdevice.tcl:13-24, model/rfdevice.tcl:40-59 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">MOD-7</span><span class="txt">GaN.tcl sets the full Farahmand high-field parameter set (hfalpha, n1, n2, Ecmob) and a GaN vsat, but the GaN field model uses Heller saturation with vs = mobVsat or 3.3e7-3e6*T/300.<span class="meta"><code>model/GaN.tcl:36-41, model/GaN.tcl:43-44 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">MOD-8</span><span class="txt">There are stale cross-references and claims.<span class="meta"><code>model/GaN_modelfile_masterD:19, model/GaN_modelfile_masterD:82 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">MOD-9</span><span class="txt">For legibility, add a comment at ETemp.tcl:17: 'local k/q = 8.625e-5 eV/K, differs by 0.09% from masterD kev = 8.617e-5;<span class="meta"><code>model/ETemp.tcl:17, model/ETemp.tcl:53 (+3)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">MOD-12</span><span class="txt">Insulator.tcl has dead and unclear parts.<span class="meta"><code>model/Insulator.tcl:1-5, model/Insulator.tcl:21 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">MOD-13</span><span class="txt">InitMetal ('#now Metal' in Initialize) only writes a data field, MetalDevPsi, seeded from the AlGaN affinity + phiB.<span class="meta"><code>model/Metal.tcl:46-47, model/Metal.tcl:72-75 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">MOD-14</span><span class="txt">The doping block's names and numbers are unclear.<span class="meta"><code>model/rfdevice.tcl:103-117, model/rfdevice3d.tcl:117-123 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">MOD-15</span><span class="txt">Poisson.tcl is mostly not about Poisson. Lines 1-20 are Poisson/InsPoisson;<span class="meta"><code>model/Poisson.tcl:22-158, README.md:11</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">MOD-16</span><span class="txt">The Farahmand low-field mobility (Tn, N with IonAcceptor, seg1/seg2/Nr/a, lowfldmob) is the same block in GaN.tcl and AlGaN.tcl apart from the material name.<span class="meta"><code>model/GaN.tcl:48-58, model/AlGaN.tcl:51-60</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">MOD-17</span><span class="txt">The five contact bias/current lines (G current=(Hole_Nitride-Elec_Nitride), B/D/S current=(Hole_GaN-Elec_GaN), FP) exist in four copies: three decks plus the stressLoad re-issue in radIV.tcl.<span class="meta"><code>model/rfdevice.tcl:97-101, model/rfdevice_SiN.tcl:100-104 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">MOD-18</span><span class="txt">Small clarity gaps in the shared code. The physical constants have no units (k J/K, q C, eps0 F/cm, kev V/K), and two are unused: hbar, and egan = 7.88e-13 = 8.9*eps0 F/cm.<span class="meta"><code>model/GaN_modelfile_masterD:9-16, model/Continuity.tcl:24 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">MOD-19</span><span class="txt">Make one whitespace-only commit. Dedent the file-level blocks in GaN.tcl (lines 3-75) and in Insulator.tcl (Oxide :35-46, HighK :49-57) to column 0, replace the tabs in GaN.tcl:3-5, and strip trailing whitespace outside quoted str<span class="meta"><code>model/GaN.tcl:3-75, model/rfdevice.tcl (+4)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">MOD-20</span><span class="txt">The line-ending state is currently correct and consistent: the three required files are 100% CRLF in both the index and the worktree (masterD 213/213, Metal 81/81, Continuity 94/94;<span class="meta"><code>model/GaN_modelfile_masterD, model/Metal.tcl (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">MOD-21</span><span class="txt">Add rfdevice3d.tcl (3D slice, <span class="wl">3d-plan</span>) to README.md:11.<span class="meta"><code>README.md:11, model/rfdevice.tcl:1-11 (+1)</code> · effort S · confirmed, corrected</span></span></li>
+</ul></details>
+<details class="slice" open><summary><span>genRadStudy.py (17)</span></summary><ul class="fl">
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">GEN-2</span><span class="txt">Nothing stops the generator from replacing a committed params file that is already the record of a job, and this has already happened.<span class="meta"><code>analysis/genRadStudy.py:144, analysis/genRadStudy.py:177 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">GEN-3</span><span class="txt">Lines are built as 'old base + overrides', and radIV.slurm turns each lever into a <code>set k v</code> line in order, so the last value wins.<span class="meta"><code>analysis/genRadStudy.py:237, analysis/genRadStudy.py:314 (+4)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KB-GEN-1</span><span class="txt">Severity medium. The KB uses 'radFine' for two studies: Oct 24 (job 47562303, 8 tasks, m4 damPeak 4-7.5e18, surfCharge -1.2e12;<span class="meta"><code>kb/results/rad-model.md:41, kb/results/rad-model.md:76 (+3)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">GEN-1</span><span class="txt">Same description and proposal, but the generator writes 55 committed params files (788 lines), not 57;<span class="meta"><code>analysis/genRadStudy.py</code> · effort L · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">GEN-10</span><span class="txt">The module docstring is out of date. It describes 'the 2026-11 damage-region and Vth studies', but the script also writes the stress library (stressLib, stressLibResume, meshChkStress, meshChkStress2p5), the SEE maps and rounds A-<span class="meta"><code>analysis/genRadStudy.py:1, analysis/genRadStudy.py:723 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">GEN-11</span><span class="txt">Keep a study registry (name -&gt; params file, RUN dir(s), job IDs with task ranges, driver radIV/seeIV, mem/time, status done/cancelled/superseded/composite, purpose) in a module with no side effects on import.<span class="meta"><code>sweeps/params_radExp1b.txt, sweeps/params_radStepDiag5.txt (+3)</code> · effort M · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">GEN-4</span><span class="txt">Several base sets are named as if they were 'the final' model, but each belongs to a different date.<span class="meta"><code>analysis/genRadStudy.py:172, analysis/genRadStudy.py:237 (+6)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">GEN-5</span><span class="txt">Shared lever strings are copied as literals instead of being defined once.<span class="meta"><code>analysis/genRadStudy.py:7, analysis/genRadStudy.py:33 (+6)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">GEN-6</span><span class="txt">As described, except: g2() generalises gcase() only when a mesh is given.<span class="meta"><code>analysis/genRadStudy.py:19, analysis/genRadStudy.py:70 (+11)</code> · effort M · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">GEN-7</span><span class="txt">Derived studies get their data by re-reading files the script wrote earlier in the same run (8 reads).<span class="meta"><code>analysis/genRadStudy.py:300, analysis/genRadStudy.py:369 (+6)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">GEN-9</span><span class="txt">The radMulti random strike sets come from <code>random.Random(seed).sample(POOL, 5)</code>.<span class="meta"><code>analysis/genRadStudy.py:196, sweeps/params_radMulti.txt</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-GEN-2</span><span class="txt">As described, with the evidence fixed to radIV.slurm:34 (`LINE=$(sed -n ...<span class="meta"><code>kb/tools/analysis-scripts.md, kb/workflow/sweep-pattern.md:9 (+3)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-GEN-3</span><span class="txt">kb/model/levers.md has no entry for 31 of the 86 lever names the generated params use, including the core radIV levers (radState, damPeak, damM, damYmin/damYmax, damXmax, dam2*, dam3Peak, occSafe, doIdVg, Vg_out, stressStep, mobMu<span class="meta"><code>kb/model/levers.md:45</code> · effort M · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">GEN-12</span><span class="txt">Label conventions are mixed. The deck tag is 'hk' in write()/writex() but 'highk' in the nb_ labels of radChk, radEB1 and radExp3.<span class="meta"><code>analysis/genRadStudy.py:37, analysis/genRadStudy.py:287 (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">GEN-13</span><span class="txt">Small dead or confusing code. The M05 lambda is never used.<span class="meta"><code>analysis/genRadStudy.py:148, analysis/genRadStudy.py:436 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">GEN-8</span><span class="txt">The assertions are weak and the counts are maintained by hand.<span class="meta"><code>analysis/genRadStudy.py:783, analysis/genRadStudy.py:701 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KB-GEN-4</span><span class="txt">rad-model.md still describes the radIV work as living on a branch.<span class="meta"><code>kb/results/rad-model.md:5, kb/results/rad-model.md:7 (+2)</code> · effort S · confirmed</span></span></li>
+</ul></details>
+<details class="slice" open><summary><span>Analysis scripts (21)</span></summary><ul class="fl">
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">AN-1</span><span class="txt">Five scripts define a function named drops(), with two incompatible definitions.<span class="meta"><code>analysis/plot_radStep.py:26, analysis/plot_meshSeries.py:50 (+8)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">AN-2</span><span class="txt">radCompare loads the measured targets file from the default path whenever that file exists on the workstation.<span class="meta"><code>analysis/radCompare.py:29, analysis/radCompare.py:70 (+6)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-10</span><span class="txt">radFineFig.py:27 reads its 'standard mesh' curve from the undocumented FINAL_REF environment variable.<span class="meta"><code>analysis/radFineFig.py:2, analysis/radFineFig.py:27</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-11</span><span class="txt">Several docstrings point to things that no longer exist or no longer match the code.<span class="meta"><code>analysis/analyze_onset.py:3, analysis/analyze_onset.py:9 (+7)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-20</span><span class="txt">Shared code currently lives in random leaf scripts.<span class="meta"><code>analysis/radMetrics.py, analysis/plot_radStep.py (+2)</code> · effort L · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-3</span><span class="txt">The 2026-10-01 collapse-classification rule is re-implemented at least seven times, and the copies have drifted.<span class="meta"><code>analysis/analyze_onset.py:35, analysis/analyze_onset.py:75 (+10)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-4</span><span class="txt">Three committed metrics CSVs have a column named onset_Vd, and it means three different things.<span class="meta"><code>analysis/analyze_trapMapSets.py:80, analysis/analyze_mobCompare.py:68 (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-5</span><span class="txt">The tolerant CSV reader idiom <code>np.array([[float(v) for v in l.split(',') if v.strip()] for l in open(f) if l.strip()])</code> is copied into 23 scripts (24 sites;<span class="meta"><code>analysis/plot_meshSeries.py:45, analysis/plot_radStepSeries.py:65 (+8)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-6</span><span class="txt">Seven scripts build a label -&gt; data map from task_*/params.json: plot_meshSeries, plot_meshChkSteps, plot_radStepFS, plot_radStepH, plot_radStep, plot_radFinal and plot_deckVg1 (plus radFineFig and radMap).<span class="meta"><code>analysis/plot_meshSeries.py:30, analysis/plot_meshChkSteps.py:16 (+6)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-7</span><span class="txt">The same reference curves are hard-coded again and again as results/&lt;date&gt;_&lt;run&gt; paths, some with task numbers.<span class="meta"><code>analysis/plot_lateIdVd.py:8, analysis/plot_curveTracer.py:20 (+6)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-8</span><span class="txt">Move the hard-coded, single-figure scripts (plot_gaussFine, plot_radExp1, radEBFig, radGaussFig, radFineFig, plot_nov12, plot_rad28fit, plot_rad3dFix, plot_radStepHighlights) to archive/analysis_dayfigs/ with the README table.<span class="meta"><code>analysis/plot_meshChkSteps.py, analysis/analyze_mobCompare.py (+12)</code> · effort M · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-9</span><span class="txt">plot_strikeSlides reads figures/fieldPlateFM_cuts.csv, which comes from the field-mobility rerun (job 46241088).<span class="meta"><code>analysis/plot_strikeSlides.py:176, drivers/fieldPlate.tcl:8 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-KB-1</span><span class="txt">kb/tools/analysis-scripts.md documents 13 of the 57 analysis scripts plus webfig.<span class="meta"><code>kb/tools/analysis-scripts.md:7, README.md:15</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">AN-12</span><span class="txt">There is no common command-line convention.<span class="meta"><code>analysis/plot_radStep.py:4, analysis/radPlacementFig.py:2 (+5)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">AN-13</span><span class="txt">testRegister feeds the 'Stepped-Collapse Test Register' dashboard.<span class="meta"><code>analysis/testRegister.py:20, analysis/testRegister.py:52 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">AN-14</span><span class="txt">Style constants are copied rather than shared.<span class="meta"><code>analysis/analyze_onset.py:28, analysis/plot_posVd.py:27 (+7)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">AN-15</span><span class="txt">Nine scripts add to sys.path by hand: seven with the cwd-relative "analysis", two with os.path.dirname(__file__).<span class="meta"><code>analysis/plot_eTempStd.py:17, analysis/plot_meshDeliverable.py:11 (+7)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">AN-17</span><span class="txt">.gitignore protects only *_onset3d_frames/.<span class="meta"><code>.gitignore:11, analysis/plot_posVd.py:132 (+1)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">AN-18</span><span class="txt">genRad3d.py rewrites all four of its sweeps/params_*.txt files (rad3dBuild, rad3dSolve, rad3dTrack1, rad3dRod) every time it runs.<span class="meta"><code>analysis/genRad3d.py:10, analysis/genRad3d.py:44 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">AN-19</span><span class="txt">These are generic tools that take a run directory, yet their titles hard-code run-specific facts ('σ 40 nm', 'Vg = −2 V', 'field mobility').<span class="meta"><code>analysis/plot_posVd.py:120, analysis/plot_posOnset.py:133 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">AN-KB-2</span><span class="txt">Several rows in the existing note are wrong.<span class="meta"><code>kb/tools/analysis-scripts.md:18, kb/tools/analysis-scripts.md:24 (+3)</code> · effort S · confirmed</span></span></li>
+</ul></details>
+<details class="slice" open><summary><span>Sweeps, bin, layout (21)</span></summary><ul class="fl">
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">LAY-1</span><span class="txt">README.md has not changed since 2026-10-13 (git log 503f5ab), so it predates the whole rad era.<span class="meta"><code>README.md:11, README.md:12 (+5)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">LAY-2</span><span class="txt">The params files are treated as the record of what each HPG job ran, but nothing maps a params file to its run directories, job IDs or git commit.<span class="meta"><code>sweeps/params_radFine.txt, sweeps/params_radExp1b.txt (+5)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">LAY-10</span><span class="txt">Repoint as follows: 10.0 -&gt; kb/results/collapse-classification.md;<span class="meta"><code>sweeps/pulsedIV_onsetField3Ramp.slurm:4, sweeps/pulsedIV_onsetField3Retry.slurm:3 (+11)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">LAY-11</span><span class="txt">The CLAUDE.md §7 KB map, which every session reads, leaves out 12 of the 54 tracked KB notes.<span class="meta"><code>CLAUDE.md:93, CLAUDE.md:98</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">LAY-21</span><span class="txt">Same target layout and order with these fixes.<span class="meta"><code>sweeps/, figures/ (+3)</code> · effort M · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">LAY-3</span><span class="txt">About 45 of the rad-era params files are generated, not hand-written.<span class="meta"><code>analysis/genRadStudy.py:1, analysis/genRadStudy.py:19 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">LAY-4</span><span class="txt">The sweep-pattern note describes October practice.<span class="meta"><code>kb/workflow/sweep-pattern.md:8, kb/workflow/sweep-pattern.md:9 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">LAY-5</span><span class="txt">The model files copied into task directories differ from template to template.<span class="meta"><code>sweeps/radIV.slurm:38, sweeps/pulsedIV_eTemp.slurm:38 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">LAY-6</span><span class="txt">The untracked bin/hpg_sbatch.sh (2026-10-21, not executable, referenced nowhere) is obsolete for the current workflow.<span class="meta"><code>bin/hpg_sbatch.sh</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">LAY-7</span><span class="txt">drivers/trim/TRIM_NCY2_SiN_Au2256.IN is untracked (2026-10-21) next to five tracked TRIM inputs.<span class="meta"><code>drivers/trim/TRIM_NCY2_SiN_Au2256.IN, .gitignore:13</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">LAY-9</span><span class="txt">Move drivers/trapPlot.tcl to archive/static_mobility/ and figures/radPlot{,1,2}.csv to archive/static_mobility/figures/.<span class="meta"><code>drivers/trapPlot.tcl:60, figures/radPlot.csv (+3)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">LAY-12</span><span class="txt">Add figures/README.md: the root holds frozen October field-era outputs;<span class="meta"><code>figures/, figures/posMapLate_frames (+4)</code> · effort M · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">LAY-13</span><span class="txt">The README and repo-locations describe data/ as 'measured inputs', but data/ also holds model outputs: data/rad3d_fangs/ (its own README says 'Model output only') and TRIM-derived tracks in data/trim/*.json.<span class="meta"><code>README.md:16, kb/workflow/repo-locations.md:14 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">LAY-14</span><span class="txt">Move figures.ipynb to archive/static_mobility/figures.ipynb and update its 5 referencing files (README.md, kb/index.md, kb/tools/notebook.md, kb/workflow/repo-locations.md, archive/static_mobility/README.md).<span class="meta"><code>figures.ipynb</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">LAY-15</span><span class="txt">Three dashboard pages are tracked, but kb/workflow/dashboard.md documents only two.<span class="meta"><code>kb/workflow/dashboard.md:9, dashboard/rad-week.html (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">LAY-16</span><span class="txt">Params names use several schemes at once.<span class="meta"><code>sweeps/params_onsetField3Ramp.txt, sweeps/params_onsetField3Retry.txt (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">LAY-17</span><span class="txt">Optional, low value. Add .gitattributes with <code>model/GaN_modelfile_masterD -text</code>, <code>model/Metal.tcl -text</code> and <code>model/Continuity.tcl -text</code> to document the intent and block renormalisation (behaviour-preserving;<span class="meta"><code>model/GaN_modelfile_masterD, model/Metal.tcl (+1)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">LAY-18</span><span class="txt">All three archive subfolders have a README, which is good.<span class="meta"><code>README.md:20, archive/fangs-hpg-tests/README.md (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">LAY-19</span><span class="txt">Add a branch column to the sweeps index for the 11 branch-only params files (fieldCap on both branches;<span class="meta"><code>sweeps/</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">LAY-20</span><span class="txt">progress.md is 277 KB, 2,257 lines and 129 '##' headings in one chronological file: about 43 KB for September, 140 KB for October and 92 KB for November.<span class="meta"><code>progress.md</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">LAY-8</span><span class="txt">Local clutter. vdc_sin.log at the repo root is the log of a failed FLOOXS run (Nov 19;<span class="meta"><code>vdc_sin.log, .gitignore (+2)</code> · effort S · confirmed</span></span></li>
+</ul></details>
+<details class="slice" open><summary><span>KB results notes (22)</span></summary><ul class="fl">
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KB-R-1</span><span class="txt">The current-status 'Key results' bullet for the pre/post-irradiation model still describes the Oct 27 model as current.<span class="meta"><code>kb/current-status.md:24, kb/results/rad-model.md:9 (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KB-R-14</span><span class="txt">Tracked notes in the public repo may contain measured-device numbers (locations only): rad-model.md:61 (the Measured column), :266 (second clause, a measured onset voltage) and :129 (a model-vs-measured offset that reveals the mea<span class="meta"><code>kb/results/rad-model.md:61, kb/results/rad-model.md:266 (+4)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KB-R-2</span><span class="txt">current-status.md:36 gives the 2026-10-13 decision ('standard = eTemp 1 ...') without the 2026-10-16 reversal to eTemp 0, which line 10 and GaN_modelfile_masterD:38 record.<span class="meta"><code>kb/current-status.md:36, kb/current-status.md:10 (+2)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KB-R-3</span><span class="txt">see-plan presents quasi-Fermi injection as the strike method, and index.md repeats it.<span class="meta"><code>kb/results/see-plan.md:8, kb/results/see-plan.md:16 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KB-R-4</span><span class="txt">rad-model.md has stale or contradictory 'current' statements: :9 (refit 'being' done;<span class="meta"><code>kb/results/rad-model.md:2, kb/results/rad-model.md:9 (+7)</code> · effort M · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KB-R-6</span><span class="txt">Apart from KB-R-1 and KB-R-2, current-status.md has many dated paragraphs that are stale or contradict each other: - Line 14 calls the 2.5 nm check 'a decision for Ian', but it was submitted (52044407) and Ian said to keep it runn<span class="meta"><code>kb/current-status.md:14, kb/current-status.md:16 (+7)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-R-10</span><span class="txt">The strike-step notes rely on case labels that are never defined in one place: - In C_p1.5_N0, A_p1.5e+18_n6e+18_N1, B_n6e18_N2, A_N3, E_lev0.4_N2, C_n8e18_N2, lev30_n8 and lev40_n7, the leading letter is the HPG round, not the se<span class="meta"><code>kb/results/step-mechanism.md:45, kb/results/step-mechanism.md:14 (+3)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-R-11</span><span class="txt">The opening summary of damage-region-map says the radMap1 steps were mesh artifacts and that a dense site acts as a current limit.<span class="meta"><code>kb/results/damage-region-map.md:8, kb/results/damage-region-map.md:79 (+8)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-R-12</span><span class="txt">highk-vs-sin states without qualification that 'the trap model cannot make SiN collapse while HighK does not', and index.md summarises the note as 'passivation dielectric does not matter at ≤3 V'.<span class="meta"><code>kb/results/highk-vs-sin.md:21, kb/index.md:67 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-R-13</span><span class="txt">The run name 'radFine' refers to two different jobs: 47562303 (Oct 24, the m4 damage scale, rad-model:41/76) and 49735196 (Nov 5, the fine-mesh current limit;<span class="meta"><code>kb/results/rad-model.md:76, kb/results/rad-model.md:235 (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-R-15</span><span class="txt">Beyond KB-R-3, see-plan is stale in several places: - It is still titled and tagged as a plan, though most of it is results.<span class="meta"><code>kb/results/see-plan.md:2, kb/results/see-plan.md:37 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-R-16</span><span class="txt">The 'What our model could test' and 'Runs that distinguish them' sections (written Nov 17) read as an open plan, but most of the tests have since been run and none is marked: - knock-out (radStepD: other steps moved only slightly);<span class="meta"><code>kb/results/rad-literature-steps.md:165, kb/results/rad-literature-steps.md:191 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-R-20</span><span class="txt">The KB map in CLAUDE.md §7, which agents read first, leaves out the notes most used now: rad-model, step-search-28v, step-mechanism, damage-region-map, ron-increase, see-plan, rad-literature, rad-literature-steps, trap-sensitivity<span class="meta"><code>CLAUDE.md:7</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-R-5</span><span class="txt">Results missing from the owning notes: rad28fitB 51196550/51249769 (SiN 2e18-4e18 at 28 V), round S rad28strikeL 51763582 (every SiN strike count collapses, HighK never does), round K radStepK 51939558 (hybrid fails, HighK thresho<span class="meta"><code>kb/results/rad-model.md, kb/results/step-search-28v.md:2 (+4)</code> · effort M · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-R-7</span><span class="txt">Mesh facts in step-search-28v come from the Nov 18 audit and estimates that later results superseded: - The library spacing at the y 0.8 strike is given as '15 nm' (lines 55, 71).<span class="meta"><code>kb/results/step-search-28v.md:49, kb/results/step-search-28v.md:55 (+5)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-R-8</span><span class="txt">step-search-28v is ordered neither by date nor by importance.<span class="meta"><code>kb/results/step-search-28v.md:2, kb/results/step-search-28v.md:4 (+3)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KB-R-9</span><span class="txt">The reproduction command for the headline figure leaves out the script's required first argument, the output path.<span class="meta"><code>kb/results/step-search-28v.md:53, analysis/plot_meshDeliverable.py:4 (+1)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KB-R-17</span><span class="txt">step-search-28v.md:16 gives an interpretation ('Strikes interact') with no job ID.<span class="meta"><code>kb/results/step-search-28v.md:16, progress.md:2136</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KB-R-18</span><span class="txt">critical-strike.md:8 points to a nonexistent <code>figures/criticalStrike*</code>;<span class="meta"><code>kb/results/critical-strike.md:8, kb/results/critical-strike.md:17</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KB-R-19</span><span class="txt">index.md has small problems: - Its frontmatter says 'updated: 2026-10-12'.<span class="meta"><code>kb/index.md:4, kb/index.md:51 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KB-R-21</span><span class="txt">Smaller in-note staleness in the older notes: - vg-dependence:21 says job 46057777 is 'running', but :49 reports its result.<span class="meta"><code>kb/results/vg-dependence.md:21, kb/results/flooxs-pyplot-regression.md:28 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KB-R-22</span><span class="txt">Three notes use frontmatter keys outside CLAUDE.md §9's 'title, tags, optional date/source': index.md and current-status.md ('updated:') and static-era-lessons.md ('period:').<span class="meta"><code>kb/index.md:4, kb/current-status.md:4 (+2)</code> · effort S · confirmed, corrected</span></span></li>
+</ul></details>
+<details class="slice" open><summary><span>KB other notes, CLAUDE.md, README (28)</span></summary><ul class="fl">
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KBC-1</span><span class="txt">Proposal: add a per-driver check table to sweep-pattern step 7.<span class="meta"><code>CLAUDE.md:48, kb/workflow/sweep-pattern.md:13 (+7)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KBC-2</span><span class="txt">index.md advertises levers.md as 'every model/driver knob and its default', but the note is incomplete and partly misleading for the drivers in use now.<span class="meta"><code>kb/model/levers.md:8, kb/model/levers.md:43 (+10)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KBC-3</span><span class="txt">Stock FLOOXS computes gradients wrongly on 3D brick meshes: the x and z components are scaled by (hx/hz)^±1, and only y is exact.<span class="meta"><code>kb/model/3d-plan.md:116, kb/flooxs/flooxs-builds.md:12 (+6)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KBC-4</span><span class="txt">CLAUDE.md §4 and git-conventions tell agents to commit <code>data/</code>, and README calls data/ 'measured inputs'.<span class="meta"><code>CLAUDE.md:63, kb/workflow/git-conventions.md:8 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="H"><span class="sev sH">High</span><span class="fid">KBC-5</span><span class="txt">CLAUDE.md §2 says to follow 'the standard sweep pattern' exactly, but the note describes only the pulsedIV templates.<span class="meta"><code>kb/workflow/sweep-pattern.md:9, kb/workflow/sweep-pattern.md:10 (+6)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-10</span><span class="txt">The device notes describe one calibration: the Oct 1 HfO2 transfer curve at Vds 10 V, 'no parameters changed', polCharge 7e12, phiB 1.65, GaN mumax 1907.<span class="meta"><code>kb/device/calibration.md:12, kb/device/calibration.md:27 (+5)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-11</span><span class="txt">drivers.md still calls pulsedIV 'the main tool'.<span class="meta"><code>kb/tools/drivers.md:9, kb/tools/drivers.md:14 (+6)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-12</span><span class="txt">analysis-scripts.md lists 13 of the 58 tracked analysis scripts (plus dashboard/webfig.py), none from the rad era.<span class="meta"><code>kb/tools/analysis-scripts.md:7, kb/tools/analysis-scripts.md:25 (+4)</code> · effort M · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-13</span><span class="txt">The physics and machinery behind every current result have no atomic notes.<span class="meta"><code>kb/model/trap-model.md:8, kb/model/levers.md:58 (+6)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-14</span><span class="txt">mesh.md is stale next to step-search-28v.<span class="meta"><code>kb/device/mesh.md:8, kb/device/mesh.md:16 (+5)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-15</span><span class="txt">CLAUDE.md §7's KB map omits 12 tracked notes, which is every rad-era note: model/3d-plan.md, tools/trim.md, and results/ damage-region-map, rad-literature, rad-literature-steps, rad-model, ron-increase, see-plan, step-mechanism, s<span class="meta"><code>CLAUDE.md:93, CLAUDE.md:97 (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-16</span><span class="txt">project-goal.md is the first 'Start here' note.<span class="meta"><code>kb/project-goal.md:13, CLAUDE.md:5 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-17</span><span class="txt">trim.md still calls the ion line a placeholder, with the real ion 'pending (2026-10-21)', and its 'Use in the model' section proposes a TRIM TrapConc proc after a mesh refinement.<span class="meta"><code>kb/tools/trim.md:33, kb/tools/trim.md:39 (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-19</span><span class="txt">Several FLOOXS behaviours that cost jobs are recorded only in code comments or results notes, not in flooxs-gotchas: <code>struct infile</code> clears the contact setup, so the contact lines must be re-issued;<span class="meta"><code>kb/numerics/flooxs-gotchas.md:23, kb/flooxs/flooxs-expressions.md:13 (+5)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-21</span><span class="txt">The glossary stops at the field era. It has no entries for terms used across many notes: FANGS / flooxs-pyplot / HEMTRAD-FANGS (5 notes), HPD (4), strike (15), pocket (4), stress library, library mesh, m10/m5fix/m2p5, pre/nb/biase<span class="meta"><code>kb/glossary.md, sweeps/params_radEB1.txt (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-6</span><span class="txt">repo-locations states that HEMTRAD, its worktrees and its results live on the home path while only FANGS is on /blue, and that 'writing /blue/ee1/...<span class="meta"><code>kb/workflow/repo-locations.md:24, kb/workflow/hpg-workflow.md:22 (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-7</span><span class="txt">hpg-workflow describes an older bin/hpg_reconnect.sh: <code>ssh -fN hpg</code> in a detached tmux window, or in its own session <code>hpg-auth</code> when no tmux server is running.<span class="meta"><code>kb/workflow/hpg-workflow.md:13, bin/hpg_reconnect.sh:5 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-8</span><span class="txt">Which energy-balance mode is 'standard' is muddled.<span class="meta"><code>kb/model/energy-balance.md:9, kb/model/energy-balance.md:25 (+4)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">KBC-9</span><span class="txt">Several notes treat Math iterLimit and the per-solution convergence parameters as live settings.<span class="meta"><code>kb/numerics/flooxs-gotchas.md:18, kb/numerics/flooxs-gotchas.md:25 (+9)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KBC-18</span><span class="txt">Three notes cite <code>flooxs-crashfix.patch</code> (munmap-crash adds '(untracked, repo root)'), but no such file exists in the repo root or anywhere under /home/staffian.<span class="meta"><code>kb/numerics/munmap-crash.md:18, kb/flooxs/flooxs-builds.md:11 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KBC-20</span><span class="txt">munmap-crash.md says there have been zero munmap crashes in HPG sweeps since the retry driver of Sep 27.<span class="meta"><code>kb/numerics/munmap-crash.md:20, kb/model/energy-balance.md:21</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KBC-22</span><span class="txt">insulator-traps.md says the insulator charge was 'Only tested with static mobility;<span class="meta"><code>kb/model/insulator-traps.md:10, kb/model/insulator-traps.md:16 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KBC-23</span><span class="txt">model-caveats lists only static- and field-era caveats.<span class="meta"><code>kb/model/model-caveats.md:9, kb/model/model-caveats.md:12 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KBC-24</span><span class="txt">git-conventions.md:7-12 and local-runs.md:8-12 restate CLAUDE.md §3 and §4 nearly word for word, and the copies have already drifted together.<span class="meta"><code>kb/workflow/git-conventions.md:7, kb/workflow/local-runs.md:8 (+3)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KBC-25</span><span class="txt">dashboard.md presents the rad-model explainer as belonging to 'branch explore/rad-model', but that branch is merged into main.<span class="meta"><code>kb/workflow/dashboard.md:9, kb/workflow/dashboard.md:14 (+2)</code> · effort S · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KBC-26</span><span class="txt">local-runs.md:7's 'run from the repo root' fits pulsedIV (ivCSV defaults to figures/...).<span class="meta"><code>kb/workflow/local-runs.md:7, kb/workflow/local-runs.md:10 (+2)</code> · effort S · confirmed, corrected</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KBC-27</span><span class="txt">Several notes break the 'atomic notes' convention of CLAUDE.md §9 and index.md:8.<span class="meta"><code>kb/model/3d-plan.md:85, kb/model/levers.md:58 (+2)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="L"><span class="sev sL">Low</span><span class="fid">KBC-28</span><span class="txt">Several references point to CLAUDE.md §10 sections, which no longer exist: the static-era sections moved to archive/static_mobility/RESULTS.md, where 10h and 10j are headings.<span class="meta"><code>kb/device/mesh.md:10, kb/model/insulator-traps.md:10 (+4)</code> · effort S · confirmed</span></span></li>
+</ul></details>
+</main>
+</div>
+<script>
+(function(){
+  var btns=[].slice.call(document.querySelectorAll('.f'));
+  var rows=[].slice.call(document.querySelectorAll('.fi'));
+  function apply(sev){
+    btns.forEach(function(b){b.classList.toggle('on',b.dataset.sev===sev);b.setAttribute('aria-pressed',b.dataset.sev===sev)});
+    rows.forEach(function(r){r.hidden=!(sev==='all'||r.dataset.sev===sev)});
+    try{localStorage.setItem('cleanupSev',sev)}catch(e){}
+  }
+  btns.forEach(function(b){b.addEventListener('click',function(){apply(b.dataset.sev)})});
+  var s='all';try{s=localStorage.getItem('cleanupSev')||'all'}catch(e){}
+  apply(['all','H','M','L'].indexOf(s)>=0?s:'all');
+})();
+</script>

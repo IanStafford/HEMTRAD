@@ -2266,3 +2266,11 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - The likely fix is the box matching the FP metal: xhi = -(Gate_Thick+HPD_Thick)+buf, yhi = Gtr+FP2+buf. It changes the physics, so it is **not done**.
   - **DECISION FOR IAN:** fix the FP box and redo the 28 V stress library and key results, or keep the geometry and document it as a model caveat?
 - **Clean-up plan written:** `kb/workflow/cleanup-plan.md`, with 6 decisions for Ian, 4 stages each with acceptance tests, a KB conflict table and an appendix of all 155 verified findings. Linked from kb/index.md.
+- **Ian: "Let's fix that contact node bug"; then "yes cancel it and run the EB1 tests too".**
+  - **The fix:** all three decks now build an FP contact box matching the FP metal; deck lever `fpBoxOld` (default 0 = fixed, 1 = old box for reproduction).
+  - **Grid-only verification, both decks:** the T-gate head test box is accepted (no longer on FP). FP size 3.064678e-8 vs 3.614441e-8 old; `fpBoxOld 1` reproduces the old value exactly.
+  - **radIV:** writes `fpBox=fixed|old` into every saved state's settings file, and stressLoad / stressResume refuse a state whose box differs from fpBoxOld (no entry = old). A saved state carries its own contacts (`B FP Metal` in the .str file), so every pre-fix library / mesh-check state has the old box.
+  - Local smoke test of the stamped save running. KB [[fp-contact-fix]], levers.md.
+  - **Cancelled meshChkStress2p5 52044407** (old box, 21.6 h, reached Vd 20). The local radStepM3 watcher was stopped, so radStepM3 was never submitted.
+  - HPG master was down at 17:4x; one reconnect (Duo) succeeded.
+- **Clean-up plan published as a page:** https://claude.ai/artifact/QTDF84jNysUWQcsTfsswKp (`dashboard/cleanup-plan.html`, built from `kb/workflow/cleanup-plan.md` by `dashboard/build_cleanup_page.py`). Decision 1 marked done.
