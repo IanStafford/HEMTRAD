@@ -48,6 +48,8 @@ def with_r(v, i, r, v0=0.0):
 
 
 T = targets(TGT)
+from radMetrics import guard_private_output  # noqa: E402
+guard_private_output(plot, bool(T))
 mpre = T["IdVd_pre_SiN"]
 pv, pi = idvd(args[0])
 res = []

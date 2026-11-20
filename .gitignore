@@ -12,5 +12,6 @@ figures/*_onset3d_frames/
 
 # measured device data and notes: never tracked (Ian)
 kb/results/measured-*.md
+drivers/trim/*NCY2*
 data/rad_y2/
 data/rad_y3/

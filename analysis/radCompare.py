@@ -2,8 +2,9 @@
 pre/post-irradiation set.
 
 usage: python3 analysis/radCompare.py <run_or_task_dir>... [--targets t.csv] [--plot out.png] [--ref LABEL]
-  targets.csv: digitized measured curves (curve,x,y; kept outside git, default
-  ~/HEMTRAD/data/rad_y2/targets.csv).
+  --targets: digitized measured curves (curve,x,y), kept outside git (e.g. data/rad_y2/targets.csv); opt-in
+  since 2026-11-20. The measured pre scalars (Vth, gm, Ioff) are read from pre_scalars.csv beside it. With
+  targets, --plot refuses paths under figures/ or dashboard/ (public repo).
 Per task: Vth (linear extrapolation at max gm, Vd 0.1), gm max (mS/mm), Id at
 Vg -2.6/-2.0/-1.4 (Vd 0.1), Id-Vd at Vg +1 at 1/2/4/6/10 V, Ron, the largest Id-Vd step,
 Ioff at the lowest Vg.
@@ -17,7 +18,7 @@ import sys
 
 import numpy as np
 
-from radMetrics import ron_step, vth_gm
+from radMetrics import guard_private_output, load_pre_scalars, ron_step, vth_gm
 
 args = [a for a in sys.argv[1:]]
 plot = None
@@ -26,7 +27,7 @@ if "--plot" in args:
     i = args.index("--plot"); plot = args[i + 1]; del args[i:i + 2]
 if "--ref" in args:
     i = args.index("--ref"); ref = args[i + 1]; del args[i:i + 2]
-TGT = os.path.expanduser("~/HEMTRAD/data/rad_y2/targets.csv")
+TGT = None
 if "--targets" in args:
     i = args.index("--targets"); TGT = args[i + 1]; del args[i:i + 2]
 VG_PTS = (-2.6, -2.0, -1.4)
@@ -35,7 +36,7 @@ VD_PTS = (1.0, 2.0, 4.0, 6.0, 10.0)
 
 def load_targets(path):
     t = {}
-    if not os.path.exists(path):
+    if not path or not os.path.exists(path):
         return t
     for r in csv.reader(l for l in open(path) if not l.startswith("#")):
         if r[0] == "curve":
@@ -68,6 +69,7 @@ def metrics(t):
 
 
 T = load_targets(TGT)
+guard_private_output(plot, bool(T))
 tasks = []
 for a in args:
     if os.path.exists(os.path.join(a, "params.json")):
@@ -82,7 +84,7 @@ for t in tasks:
 cols = ["Vth", "gm"] + [f"Ig{v}" for v in VG_PTS] + [f"Id{v:g}" for v in VD_PTS] + ["Ron", "drop", "dropVd", "Ioff", "lastVd"]
 print(f"{'label':<18}" + "".join(f"{c:>10}" for c in cols))
 if T:
-    meas = {"Vth": -2.97, "gm": 53.5, "Ioff": 5.4e-6}
+    meas = load_pre_scalars(TGT)
     for v, y in T.get("IdVg_pre_SiN", []):
         meas[f"Ig{v:g}"] = y
     for v in VD_PTS:

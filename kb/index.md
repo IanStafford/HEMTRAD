@@ -49,7 +49,7 @@ Second brain for the FLOOXS model of **radiation-induced current collapse** in a
 - [[git-conventions]] — what to commit, CRLF files, archiving
 - [[dashboard]] — the work-log artifact and the "wrap up for the day" procedure
 - [[cleanup-plan]] — code legibility clean-up plan and KB audit (2026-11-20): decisions for Ian, staged steps with acceptance tests, the list of KB conflicts
-- [[drivers]] — `drivers/pulsedIV.tcl`, `drivers/calibIdVg.tcl`, `drivers/stressFreeze.tcl` …
+- [[drivers]] — `drivers/pulsedIV.tcl`, `drivers/calibIdVg.tcl`, `drivers/radIV.tcl`, `drivers/seeIV.tcl` …
 - [[analysis-scripts]] — Python analysis and plotting
 - [[notebook]] — `figures.ipynb`
 - [[trim]] — SRIM-2013 TRIM under Wine on the workstation, batch wrapper, HEMT template

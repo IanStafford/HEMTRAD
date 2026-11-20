@@ -16,6 +16,7 @@ import json
 import os
 import sys
 
+from radMetrics import guard_private_output  # noqa: E402  (measured overlays never go to tracked folders)
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -34,6 +35,7 @@ for flag in ("--targets", "--out", "--damPeak", "--pre"):
         else: dp = val
 if args:
     run = args[0]
+guard_private_output(out, bool(tgt))
 
 INK, MUTED, GRID = "#14171F", "#646B78", "#E2E4E9"
 COL = {"highk": "#1B4F9C", "sin": "#C2410C"}

@@ -15,7 +15,8 @@ are superseded.
   critical-strike band, x-y map + sign-0 companion, deep traps, HighK vs SiN),
   their analysis scripts (`analyze_*.py`, `critical_strike.py`,
   `plot_*.py`), old drivers (`fieldpeak.tcl` — note its HighK εr bug,
-  `transfer.tcl`, `run_measurements.tcl`, `mobilityCompare.tcl`, `IV.tcl` — which
+  `transfer.tcl`, `run_measurements.tcl`, `mobilityCompare.tcl`, `stressFreeze.tcl` (quiescent off-state stress then
+  Id–Vd; moved here 2026-11-20, superseded by the stress stage of `drivers/radIV.tcl`), `IV.tcl` — which
   sources a missing `powerdevice.tcl`), and `figures/` with all their outputs.
 - **Raw results** (not in git): `results/archive_static_mobility/` on the
   workstation; the HPG copies are still under `results/` there. The analysis
