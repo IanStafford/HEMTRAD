@@ -27,6 +27,7 @@
 if {![info exists radState]}  { set radState pre }
 if {![info exists tag]}       { set tag $radState }
 if {![info exists deviceDeck]} { set deviceDeck rfdevice.tcl }
+if {![info exists fpBoxOld]} { set fpBoxOld 0 }  ;# 1 = the pre-2026-11-20 FP contact box (covers part of the T-gate head); 0 = fixed
 if {![info exists mobModel]}  { set mobModel field }
 if {![info exists eTemp]}     { set eTemp 0 }
 if {![info exists dampValue]} { set dampValue 0.05 }
@@ -162,6 +163,13 @@ proc StressInfo {f} {
     if {![file exists $b.txt]} { return "" }
     set c [open $b.txt]; set t [read $c]; close $c
     return $t
+}
+# FP contact box of a saved state (the state file carries its own contacts). Settings files written before the
+# 2026-11-20 fix have no fpBox= entry and hold the old box, which also covers part of the T-gate head.
+proc CheckFpBox {what info} {
+    set st [expr {[regexp {fpBox=(\S+)} $info -> v] ? $v : "old"}]
+    set want [expr {$::fpBoxOld ? "old" : "fixed"}]
+    if {$st ne $want} { error "$what: state has the $st FP contact box, this run expects $want (fpBoxOld=$::fpBoxOld; kb/results/fp-contact-fix.md)" }
 }
 # VgFam: extra Id-Vd curves, one per Vg in the list, in that order (like the measured
 # family; fill-only traps keep their state between curves), to <tag>_IdVdG<Vg>.csv. {} = none.
@@ -302,7 +310,7 @@ proc SaveAtBias {d} {
     set b [file join $stressSaveDir [format "%s_Vd%06.2f.str" $p $d]]
     struct outfile=$b
     set c [open $b.txt w]
-    puts $c "stress file (at bias) written by tag=$tag deviceDeck=$deviceDeck Vg_stress=$Vg_stress Vd_stress=$d field_at=$d atBias=1 occSafe=[expr {[info exists ::occSafe] ? $::occSafe : 0}] meshY=[expr {[info exists ::meshY] ? [join $::meshY ,] : {none}}]"
+    puts $c "stress file (at bias) written by tag=$tag deviceDeck=$deviceDeck Vg_stress=$Vg_stress Vd_stress=$d field_at=$d atBias=1 occSafe=[expr {[info exists ::occSafe] ? $::occSafe : 0}] meshY=[expr {[info exists ::meshY] ? [join $::meshY ,] : {none}}] fpBox=[expr {$::fpBoxOld ? {old} : {fixed}}]"
     close $c
     exec gzip -f $b
     sel z=Estress
@@ -327,6 +335,7 @@ if {$radState eq "post"} {
             if {[regexp {Vg_stress=(\S+)} $info -> v] && abs($v - $Vg_stress) > 1e-9} { error "stressLoad: file stressed at Vg_stress=$v, this run has $Vg_stress" }
             if {[regexp {deviceDeck=(\S+)} $info -> v] && $v ne $deviceDeck} { error "stressLoad: file built with $v, this run has $deviceDeck" }
         }
+        CheckFpBox stressLoad $info
         puts $sf "stress (loaded) peakElat(GaN)=[lindex [peak GaN] 1] at [lrange [peak GaN] 2 3] peakElat(AlGaN)=[lindex [peak AlGaN] 1]"
     } elseif {$useTraps} {
         if {$stressNoHoles} {
@@ -341,6 +350,7 @@ if {$radState eq "post"} {
             if {![regexp {Vd_stress=(\S+)} $info -> vR]} { error "stressResume: no Vd_stress in the settings file of $stressResume" }
             if {[regexp {Vg_stress=(\S+)} $info -> v] && abs($v - $Vg_stress) > 1e-9} { error "stressResume: file at Vg_stress=$v, this run has $Vg_stress" }
             if {[regexp {deviceDeck=(\S+)} $info -> v] && $v ne $deviceDeck} { error "stressResume: file built with $v, this run has $deviceDeck" }
+            CheckFpBox stressResume $info
             foreach v {DevPsi Qfn Qfp} { sel z=${v}Res name=$v }
             contact name=G supply=$Vg_stress
             contact name=D supply=$vR
@@ -421,7 +431,7 @@ if {$radState eq "post"} {
         if {$stressSave ne ""} {
             struct outfile=$stressSave
             set c [open $stressSave.txt w]
-            puts $c "stress file written by tag=$tag deviceDeck=$deviceDeck Vg_stress=$Vg_stress Vd_stress=$Vd_stress Vd_reached=$dS field_at=$dReal occSafe=[expr {[info exists occSafe] ? $occSafe : 0}] meshY=[expr {[info exists meshY] ? [join $meshY ,] : {none}}]"
+            puts $c "stress file written by tag=$tag deviceDeck=$deviceDeck Vg_stress=$Vg_stress Vd_stress=$Vd_stress Vd_reached=$dS field_at=$dReal occSafe=[expr {[info exists occSafe] ? $occSafe : 0}] meshY=[expr {[info exists meshY] ? [join $meshY ,] : {none}}] fpBox=[expr {$::fpBoxOld ? {old} : {fixed}}]"
             close $c
             puts $sf "stress saved to $stressSave"
         }

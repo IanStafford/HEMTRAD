@@ -71,6 +71,7 @@ Second brain for the FLOOXS model of **radiation-induced current collapse** in a
 - [[rad-literature-steps]] — stepped collapse after heavy ions: what is reported, proposed mechanisms, what the model can test (Nov 17)
 - [[step-search-28v]] — stepped SiN collapse at the 28 V stress with strikes, HighK contrast, field-scaled strikes, mesh check (rounds A-K, Nov 17-19)
 - [[step-mechanism]] — why the strike curves step: each damaged pocket switches at ~0.5 V across it (barrier traps fill with hot electrons); pockets in series share the drain voltage (Nov 19)
+- [[fp-contact-fix]] — the FP contact covered the drain half of the T-gate head (head drain edge ~0 V instead of Vg during the stress); fixed 2026-11-20, tests of the effect
 - [[damage-region-map]] — what damage in each device region does, one to five sites (Nov 2026)
 - [[ron-increase]] — Ron rise after biased irradiation: candidates and simulations (Nov 2026)
 - [[3d-plan]] — plan for a 3D slice of the gate width: FLOOXS support, phases, risks (Nov 12)

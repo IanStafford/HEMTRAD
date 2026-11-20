@@ -2274,3 +2274,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - **Cancelled meshChkStress2p5 52044407** (old box, 21.6 h, reached Vd 20). The local radStepM3 watcher was stopped, so radStepM3 was never submitted.
   - HPG master was down at 17:4x; one reconnect (Duo) succeeded.
 - **Clean-up plan published as a page:** https://claude.ai/artifact/QTDF84jNysUWQcsTfsswKp (`dashboard/cleanup-plan.html`, built from `kb/workflow/cleanup-plan.md` by `dashboard/build_cleanup_page.py`). Decision 1 marked done.
+  - **Local smoke test passed:** a 1 V stress saved with `fpBox=fixed` in its settings file; stressLoad of it ran to RADIV DONE (Id 126 mA/mm at Vd 0.3); the same load with fpBoxOld=1 was refused ('state has the fixed FP contact box, this run expects old').

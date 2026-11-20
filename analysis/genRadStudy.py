@@ -812,3 +812,55 @@ with open("sweeps/params_radStepM3.txt", "w") as f:
             LIBSRC, f"stressLoad={LIB}/meshchk/sin_m2p5/sin_m2p5_Vd028.00.str.gz")
         f.write(f"M_m2p5_{lab}|{lev};vdCuts=1\n")
 print("radStepM3", len(M3))
+
+# ---- 2026-11-20 (Ian: "Let's fix that contact node bug"): the FP contact box covered the drain half of the T-gate
+# head (kb/results/fp-contact-fix.md); the decks now build a box that matches the FP metal (fpBoxOld 0, default).
+# A saved state carries its own contacts, so every earlier library state still has the old box (radIV refuses to
+# load it unless fpBoxOld=1). Tests of the effect:
+#   fpFixPre:    pre-irradiation baseline, both decks (radMap1 sin_ref / hk_ref, unchanged levers).
+#   fpFixStress: the 28 V stress library again (stressLib levers, saved every volt to 28 V), both decks.
+#   fpFixEB1:    the Nov 11 model (radEB1, 17.66 V stress from scratch), all six cases.
+#   fpFixLoad:   after fpFixStress: stress-only, damage scale, mesh-robust 8e18 series, row A, field-scaled band b,
+#                SiN and HighK, loading the new states (same labels with an fpfix_ prefix).
+FIXLIB = f"{LIB}/fpfix"
+with open("sweeps/params_fpFixPre.txt", "w") as f:
+    for line in open("sweeps/params_radMap1.txt"):
+        lab, lev = line.rstrip("\n").split("|", 1)
+        if lab in ("sin_ref", "hk_ref"):
+            f.write(f"fpfix_{lab}|{lev}\n")
+with open("sweeps/params_fpFixStress.txt", "w") as f:
+    for line in open("sweeps/params_stressLib.txt"):
+        lab, lev = line.rstrip("\n").split("|", 1)
+        deck = "sin" if "rfdevice_SiN.tcl" in lev else "hk"
+        assert "Vd_stress=84.0" in lev and f"stressSaveDir={LIB}/{deck}_Vg-10" in lev, lab
+        lev = lev.replace("Vd_stress=84.0", "Vd_stress=28.0").replace(
+            f"stressSaveDir={LIB}/{deck}_Vg-10;stressSavePrefix={deck}_Vg-10",
+            f"stressSaveDir={FIXLIB}/{deck}_Vg-10;stressSavePrefix=fpfix_{deck}_Vg-10")
+        assert f"{FIXLIB}/{deck}_Vg-10" in lev, lab
+        f.write(f"fpfix_{lab}|{lev}\n")
+with open("sweeps/params_fpFixEB1.txt", "w") as f:
+    for line in open("sweeps/params_radEB1.txt"):
+        lab, lev = line.rstrip("\n").split("|", 1)
+        f.write(f"fpfix_{lab}|{lev}\n")
+for r in "I":
+    for line in open(f"sweeps/params_radStep{r}.txt"):
+        lab, lev = line.rstrip("\n").split("|", 1)
+        orig[lab] = lev
+FIX_LOAD = ("C_p1.5_N0", "A_p1.6e+18_N0", "A_p1.8e+18_N0",                                   # SiN stress only, scale
+            "A_p1.5e+18_n8e+18_N1", "C_p1.5_n8e18_N2", "A_p1.5e+18_n8e+18_N3",               # mesh-robust series
+            "A_p1.5e+18_n6e+18_N1", "B_n6e18_N2", "A_p1.5e+18_n6e+18_N3",                    # row A
+            "I_sin_bandb_N1", "I_sin_bandb_N2", "I_sin_bandb_N3",                            # field-scaled, SiN
+            "C_hk_p1.5_n6e18_N0", "C_hk_p1.5_n8e18_N1", "C_hk_p1.5_n8e18_N2", "C_hk_p1.5_n8e18_N3",
+            "I_hk_bandb_N1", "I_hk_bandb_N2", "I_hk_bandb_N3")
+CUTS = {"C_p1.5_N0", "A_p1.5e+18_n8e+18_N1", "C_p1.5_n8e18_N2", "A_p1.5e+18_n8e+18_N3"}
+with open("sweeps/params_fpFixLoad.txt", "w") as f:
+    for lab in FIX_LOAD:
+        lev = orig[lab]
+        n = 0
+        for deck in ("sin", "hk"):
+            old = f"stressLoad={LIB}/{deck}_Vg-10/{deck}_Vg-10_Vd028.00.str.gz"
+            if old in lev:
+                lev = lev.replace(old, f"stressLoad={FIXLIB}/{deck}_Vg-10/fpfix_{deck}_Vg-10_Vd028.00.str.gz"); n += 1
+        assert n == 1, lab
+        f.write(f"fpfix_{lab}|{lev}{';vdCuts=1' if lab in CUTS else ''}\n")
+print("fpFix pre 2, stress 2, EB1 6, load", len(FIX_LOAD))

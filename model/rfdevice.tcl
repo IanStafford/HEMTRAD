@@ -85,7 +85,21 @@ proc HEMT_Struct { } {
     set buf 0.001
 
     #Contacts
-    contact name=FP Metal xlo=[expr 0.0-$SiN_Thick-$HPD_Thick-$FP_Thick-$buf] xhi=[expr 0.0-$SiN_Thick-$HPD_Thick] ylo=[expr $Gtr+$FP_Offset-$buf] yhi=[expr $Gtr+$FP_Offset+$FP2+$buf] add depth=1.0 width=1.0
+    # FP contact box (fixed 2026-11-20). The old box (xhi = -(SiN_Thick+HPD_Thick) = -0.15 um,
+    # yhi = Gtr+FP_Offset+FP2 = 0.886 um) reached past the FP metal (x topFP..bottomFP = -0.57..-0.30,
+    # y leftFP..rightFP = 0.285..0.725) into the T-gate head (x -0.20..-0.05, y to 0.485), so the head's top and
+    # upper drain wall were FP contact nodes: at Vg -10 / FP 0 the head's drain corner sat near 0 V instead of the
+    # gate potential (kb/results/fp-contact-fix.md). Default: the box matches the FP metal. fpBoxOld 1 rebuilds the
+    # old box, only to reproduce pre-2026-11-20 runs.
+    if {![info exists ::fpBoxOld]} { set ::fpBoxOld 0 }
+    if {$::fpBoxOld} {
+        set fpXhi [expr 0.0-$SiN_Thick-$HPD_Thick]
+        set fpYhi [expr $Gtr+$FP_Offset+$FP2+$buf]
+    } else {
+        set fpXhi [expr 0.0-$Gate_Thick-$HPD_Thick+$buf]
+        set fpYhi [expr $Gtr+$FP2+$buf]
+    }
+    contact name=FP Metal xlo=[expr 0.0-$SiN_Thick-$HPD_Thick-$FP_Thick-$buf] xhi=$fpXhi ylo=[expr $Gtr+$FP_Offset-$buf] yhi=$fpYhi add depth=1.0 width=1.0
     contact name=G Metal xlo=[expr 0.0-$SiN_Thick-$buf] xhi=[expr -0.005+$buf] ylo=[expr $Gtl] yhi=[expr $Gtr] add depth=1.0 width=1.0
 
     set l [expr $Gtl-$SourceGate-0.125] 
