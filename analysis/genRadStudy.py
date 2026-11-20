@@ -797,3 +797,18 @@ with open("sweeps/params_radStepM2.txt", "w") as f:
             LIBSRC, f"stressLoad={LIB}/meshchk/sin_m10/sin_m10_Vd028.00.str.gz")
         f.write(f"M_m10_{lab}|{lev};vdCuts=1\n")
 print("radStepM2 5")
+
+# radStepM3 (2026-11-20): the four-mesh check. The stepping series on the 2.5 nm stress (meshChkStress2p5 52044407,
+# Ian: keep it running): trap 0.30 / 8e18 (mesh-robust 2/3/3 on library, m10, m5fix), trap 0.40 / 7e18 (1/2/3 on m5fix
+# only) and trap 0.40 / 6e18, with their no-strike references. Submitted once sin_m2p5_Vd028.00.str.gz exists.
+M3 = ("C_p1.5_N0", "A_p1.5e+18_n8e+18_N1", "C_p1.5_n8e18_N2", "A_p1.5e+18_n8e+18_N3", "F_lev0.4_N0",
+      "F_lev0.4_n7e+18_N1", "F_lev0.4_n7e+18_N2", "F_lev0.4_n7e+18_N3", "E_lev0.4_n6e18_N1", "E_lev0.4_n6e18_N2",
+      "E_lev0.4_n6e18_N3")
+with open("sweeps/params_radStepM3.txt", "w") as f:
+    for lab in M3:
+        lev = orig[lab]
+        assert LIBMESH in lev and LIBSRC in lev, lab
+        lev = lev.replace(LIBMESH, f"meshY={{{M2P5}}}").replace(
+            LIBSRC, f"stressLoad={LIB}/meshchk/sin_m2p5/sin_m2p5_Vd028.00.str.gz")
+        f.write(f"M_m2p5_{lab}|{lev};vdCuts=1\n")
+print("radStepM3", len(M3))
