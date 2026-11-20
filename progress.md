@@ -2275,3 +2275,8 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - HPG master was down at 17:4x; one reconnect (Duo) succeeded.
 - **Clean-up plan published as a page:** https://claude.ai/artifact/QTDF84jNysUWQcsTfsswKp (`dashboard/cleanup-plan.html`, built from `kb/workflow/cleanup-plan.md` by `dashboard/build_cleanup_page.py`). Decision 1 marked done.
   - **Local smoke test passed:** a 1 V stress saved with `fpBox=fixed` in its settings file; stressLoad of it ran to RADIV DONE (Id 126 mA/mm at Vd 0.3); the same load with fpBoxOld=1 was refused ('state has the fixed FP contact box, this run expects old').
+- **Submitted (commit 591715e):**
+  - fpFixStress 52134552: 2 tasks, 8 GB, 4-day limit; the 28 V library with the fixed box, saved every volt to /blue/ee1/ianstafford/stress/fpfix/.
+  - fpFixPre 52134553: 2 tasks; pre-irradiation baseline, both decks.
+  - fpFixEB1 52134554: 6 tasks, 8 GB, 2-day limit; the Nov 11 model, Ian approved.
+  - fpFixLoad (19 tasks) waits for fpFixStress to save its 28 V state.
