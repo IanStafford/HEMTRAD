@@ -9,3 +9,8 @@ __pycache__/
 
 # GIF frames from plot_posOnset.py (regenerate; only the GIFs are committed)
 figures/*_onset3d_frames/
+
+# measured device data and notes: never tracked (Ian)
+kb/results/measured-*.md
+data/rad_y2/
+data/rad_y3/
