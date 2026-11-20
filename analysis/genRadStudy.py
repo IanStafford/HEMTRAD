@@ -751,3 +751,36 @@ with open("sweeps/params_radStepDiag5.txt", "w") as f:
     # plus the library-mesh 1-strike case (three drops there), now that VdCuts also cuts the AlGaN barrier
     f.write(f"D5_lib_A_p1.5e+18_n6e+18_N1|{orig['A_p1.5e+18_n6e+18_N1']};vdCuts=1\n")
 print("radStepDiag5 5")
+
+# ---- 2026-11-19 goal (stop hook: the stepped 1/2/3-strike series must survive mesh refinement). On m5fix (5 nm over
+# y 0.64-0.96) row A's plain 6e18 strikes at trap 0.30 lose their 2- and 3-strike steps, but trap 0.40 with two 6e18
+# strikes keeps three drops on all three meshes (library 1.4/2.7/10.4, m10 1.4/3.1/7.7, m5fix 1.4/2.4/6.3 V) and
+# 8e18 at trap 0.30 keeps two. radStepM: full 0-3 strike series at those settings on the m5fix stress (trap 0.40 with
+# 5, 6, 7e18; trap 0.30 with 7 and 8e18), plus the trap-0.40 6e18 series on m10, all with vdCuts.
+for r in "F":
+    for line in open(f"sweeps/params_radStep{r}.txt"):
+        lab, lev = line.rstrip("\n").split("|", 1)
+        orig[lab] = lev
+M_CASES = {"m5fix": ("F_lev0.4_N0", "E_lev0.4_n6e18_N1", "E_lev0.4_n6e18_N3", "F_lev0.4_n5e+18_N1", "F_lev0.4_n5e+18_N2",
+                     "F_lev0.4_n5e+18_N3", "F_lev0.4_n7e+18_N1", "F_lev0.4_n7e+18_N2", "F_lev0.4_n7e+18_N3",
+                     "A_p1.5e+18_n8e+18_N1", "A_p1.5e+18_n8e+18_N3", "C_p1.5_n7e18_N1", "C_p1.5_n7e18_N2",
+                     "C_p1.5_n7e18_N3"),
+           "m10": ("F_lev0.4_N0", "E_lev0.4_n6e18_N1", "E_lev0.4_n6e18_N3")}
+with open("sweeps/params_radStepM.txt", "w") as f:
+    for tag, labs in M_CASES.items():
+        for lab in labs:
+            lev = orig[lab]
+            assert LIBMESH in lev and LIBSRC in lev, lab
+            lev = lev.replace(LIBMESH, f"meshY={{{MESHCHK[tag]}}}").replace(
+                LIBSRC, f"stressLoad={LIB}/meshchk/sin_{tag}/sin_{tag}_Vd028.00.str.gz")
+            f.write(f"M_{tag}_{lab}|{lev};vdCuts=1\n")
+print("radStepM", sum(len(v) for v in M_CASES.values()))
+
+# 2.5 nm at the three strike sites (m2p5), same levers as the library and meshChkStress, saved every volt.
+M2P5 = "0.3 0.01 2.6 0.01 0.64 0.0025 0.72 0.0025 0.73 0.0025 0.96 0.0025 1.44 0.0025 1.76 0.0025 2.24 0.0025 2.56 0.0025"
+with open("sweeps/params_meshChkStress2p5.txt", "w") as f:
+    lab, lev = open("sweeps/params_meshChkStress.txt").readline().rstrip("\n").split("|", 1)
+    assert "sin_m10" in lev
+    lev = lev.replace(f"meshY={{{MESHCHK['m10']}}}", f"meshY={{{M2P5}}}").replace("sin_m10", "sin_m2p5")
+    f.write(f"mc_sin_m2p5|{lev}\n")
+print("meshChkStress2p5 1")
