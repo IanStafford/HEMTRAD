@@ -26,7 +26,7 @@ Parameters are `name=value` or boolean flags (`flag` / `!flag`); names can be ab
 
 ## Output and inspection
 - `peak <Material>` — "Peak <value> at <x> <y> <z>" of the selected field (locations in cm); `[lindex [peak GaN] 1]` = value.
-- `print1d xv=<x>` / `yv=<y>` — text cut through the selected field along y (or x); returns `{distance value material}` rows. A cut exactly on a mesh line can panic ([[flooxs-gotchas]]).
+- `print1d xv=<x>` / `yv=<y>` — text cut through the selected field along y (or x); returns `{distance value material}` rows on the plot grid, which is resampled to at most 500 points per direction (not the mesh nodes on fine meshes). A cut exactly on a mesh line can panic ([[flooxs-gotchas]]).
 - `window`, `chart graph= curve= xval= yval=`, `plot1d`, `plot2d`, `plot3d` — PLplot windows (segfault headless in the stock build; strip them).
 - `interpolate`, `profile`, `integrate`, `struct` (save/load), `select`.
 

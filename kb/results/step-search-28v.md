@@ -2,7 +2,7 @@
 title: Stepped collapse at the 28 V stress (rounds A-K, mesh check)
 tags: [results, rad-model, strikes]
 date: 2026-11-19
-source: progress.md 2026-11-17/18; HPG jobs radStepA-I; test register https://claude.ai/artifact/QEhm71DSp92bNCYGRHNXTm
+source: progress.md 2026-11-17/18/19; HPG jobs radStepA-K, meshChkStress 51883722, meshChkLoad 51939191/51939192; test register https://claude.ai/artifact/QEhm71DSp92bNCYGRHNXTm
 ---
 # Stepped SiN collapse at the 28 V stress with ion strikes
 
@@ -10,7 +10,7 @@ Goal set by Ian on 2026-11-17: reproduce stepped Id-Vd curves at the 28 V stress
 
 ## SiN steps (rounds A-G, strikes at y 0.8 / 1.6 / 2.4 µm)
 
-- Stress damage alone (scale 1.5-1.8e18) gives one drop near 1.5-2 V (C_p1.5_N0: 395 → 280 mA/mm at 1.6-2 V, then a creep to ~430 at 12 V).
+- Stress damage alone (scale 1.5-1.8e18) gives one drop near 1.5-2 V (C_p1.5_N0: 395 → 281 mA/mm at 1.6-2.0 V, then a creep to ~430 at 12 V).
 - Strikes of 5-8e18 add later steps. One 6e18 strike: drops near 2, 6.3 and 10.5 V (the Nov 11 shape plus one). Trap level 0.40 eV with two 6e18 strikes: drops near 1.5, 2.8 and ~10.5-11 V. Figures `figures/rad/step28/step_best3.png`, `series_*.png`.
 - Convergence at Vd step 0.05 V (rounds D/F): step counts hold, step positions move by up to ~0.7-1 V; steps under ~15 mA/mm are not robust (trap 0.40 with three strikes loses its small middle step).
 - Strikes interact: any two of the three strikes give a step near 4 V.
@@ -31,18 +31,22 @@ Lever `gaussFieldM` m multiplies strike damage by (E/E_ref)^m from the stored st
 ## Mesh check result (2026-11-19): the stress drop converges, the strike steps don't
 
 Same six cases on the library mesh, m10 (meshChkLoad_m10 51939191) and m5fix (51939192); figure `figures/rad/step28/meshchk_steps.png` (`analysis/plot_meshChkSteps.py`).
-- **Stress only:** 1.6-2.0 V, 395 → 281 / 273 / 279 mA/mm on library / m10 / m5fix. Converged.
-- **Row A plain strikes:** steps shrink and fall in number as the y 0.8 strike is refined:
+- **Stress only:** 1.6-2.0 V, 395 → 281 / 273 / 279 mA/mm on library / m10 / m5fix. Converged within 8 mA/mm.
+- **What the check meshes change** (true nodes, from a VTK export of locally built meshes; 520 / 554 y lines):
+  - m5fix is a clean 5 nm over y 0.64-0.96 (library 4.8-19.6 nm there) and identical elsewhere, including 5 nm at 1.6 and 2.4. So it isolates the y 0.8 refinement.
+  - m10 is 10 nm uniform: finer at y 0.8, coarser at 1.6 and 2.4.
+  - Spacings read from `print1d` cuts are not reliable on these meshes: the cut is resampled to 500 points ([[flooxs-gotchas]]).
+- **Row A plain strikes:** from the library mesh to m5fix the drops shrink and fall in number (3 / 2 / 1 → 2 / 1 / 0 for 1 / 2 / 3 strikes). m10 instead gives three smaller drops for every strike count:
 
 | Case | Library | m10 | m5fix |
 |---|---|---|---|
-| 1 strike | 3 drops (2.0, 6.3, 10.5 V; the last 398 → 222) | 3 drops (2.0, 4.4, 10.7 V) | 2 drops (1.8-2.1 V 381 → 361, 3.1-3.6 V 397 → 341) |
-| 2 strikes | 2 drops (2.2, 3.1 V) | 3 drops | one 22 mA/mm dip at 6.3-6.8 V |
+| 1 strike | 3 drops (2.0 V 105, 6.3 V 53, 10.5 V 176 mA/mm) | 3 drops (2.0, 4.4, 10.7 V) | 2 drops: y 0.8 at 1.8-2.1 V (20 mA/mm), stress band at 3.1-3.6 V (56 mA/mm, moved from 6.3 V); the 10.5 V drop is gone |
+| 2 strikes | 2 drops (2.2, 3.1 V) | 3 drops | one 22 mA/mm drop at 6.3-6.8 V |
 | 3 strikes | 1 drop (4.4-4.8 V) | 3 small drops | no drop above 8 mA/mm |
 
 - **Denser or deeper settings keep their steps, smaller:** E_lev0.4_N2 drops at 1.4 / 2.4 / 6.3 V; C_n8e18_N2 at 1.4 / 3.3 V plus a dip at 11.4 V.
-- **Why the steps move:** see [[step-mechanism]]. A pocket switches at a mesh-independent ~0.5 V across it, but the voltage share after a switch depends on the 20-40 nm switched region, which the mesh resolves differently.
-- **Next level:** a 2.5 nm stress (~90 h) has not been run.
+- **Why the steps move:** see [[step-mechanism]]. The first-switch threshold (~0.5 V across a damaged pocket) agrees within 0.04 V on both meshes. The switched region (22-35 nm) is only ~2 cells on the library mesh at y 0.84, so it holds more voltage there, and the next pocket switches later. Why the 10.5 V second-stage drop is missing on 5 nm is open.
+- **Next level:** 2.5 nm at the strike sites (new stress, ~90 h); Ian's call.
 
 ## Mesh (audit 2026-11-18, before the check)
 
@@ -70,7 +74,7 @@ Round H at 12 V: SiN with field-scaled strikes at y 0.5 (base 2-4e18) stays at ~
 `figures/rad/step28/series_deliverable.png` (`analysis/plot_radStepSeries.py figures/rad/step28/series p15_n6 fs_bandb`), 0-3 strikes on the 28 V stress damage, Vg +1 V, with the Nov 11 model as reference:
 - **A. Plain strikes** (damage scale 1.5e18, 6e18 strikes at y 0.8 / 1.6 / 2.4 µm): stepped SiN curves, qualitatively like the Nov 11 model (one strike: drops near 2, 6.3 and 10.5 V). HighK with the same strikes drops too (near 1.5-2.5 V), unlike the measured HighK.
 - **B. Field-scaled strikes** (damage × (E/E_ref)⁴, y 0.65 / 0.6 / 0.55 µm): HighK stays on its no-strike curve; SiN has one drop near 1.3-2.1 V that deepens with each strike (386 -> 174, 345 -> 91, 310 -> 38 mA/mm), then partly recovers.
-- Mesh check (2026-11-19): row A's steps are not mesh-robust. On a true 5 nm mesh at y 0.8, the 1-strike curve keeps two smaller drops and the 2- and 3-strike curves lose theirs (section above). The mechanism is in [[step-mechanism]].
+- Mesh check (2026-11-19): row A's steps are not mesh-robust. With 5 nm at y 0.8, the 1-strike curve's y 0.8 drop shrinks from 105 to 20 mA/mm, its stress-band drop moves from 6.3 to 3.3 V and its 10.5 V drop is gone. The 2-strike curve keeps one 22 mA/mm drop at 6.5 V; the 3-strike curve has none. The mechanism is in [[step-mechanism]].
 
 Round J (51922589, follow-up, field-scaled m 4, both decks): a deeper trap level or depth-separated strikes don't split the drop. HighK flat in all 8 cases (946-956 mA/mm at 12 V). SiN: one drop per curve, earlier and deeper at 0.40 eV (band b 1/2/3 strikes 244 -> 45, 208 -> 5, 172 -> 0 near 0.8-1.5 V; 0.35 eV 311 -> 99, 272 -> 33, 239 -> 5); strikes at 0, 30 and 60 nm depth at y 0.55 also give one drop (287 -> 79 with one, ~0 with two or three). The halved Vd step reproduces the 3-strike drop (175 -> 5 at 0.8-1.1 V). So strikes confined to the SiN-favoured band act on one onset whatever the trap level or depth.
 

@@ -120,7 +120,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
   <header class="top">
     <h1>Radiation-induced current collapse: work log</h1>
     <p class="lede">FLOOXS model of an AlGaN/GaN HEMT: what ran each day and what is still open. Id in <span style="white-space:nowrap">mA/mm</span> at Vg = −2 V unless noted; work before Oct 1 used constant mobility and is archived.</p>
-    <p class="meta">Snapshot Nov 18, midday</p>
+    <p class="meta">Snapshot Nov 19, evening</p>
   </header>
 
   <div class="layout">
@@ -128,6 +128,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <a href="#overview" data-page="overview"><span class="d">Overview</span><span class="t">status</span></a>
       <div class="sep"></div>
       <div class="era">Field mobility</div>
+      <a href="#nov19" data-page="nov19"><span class="d">Nov 19</span><span class="t">why it steps · mesh</span></a>
       <a href="#nov18" data-page="nov18"><span class="d">Nov 17–18</span><span class="t">steps · 3D fix</span></a>
       <a href="#nov16" data-page="nov16"><span class="d">Nov 14–16</span><span class="t">saved stress · library</span></a>
       <a href="#nov13" data-page="nov13"><span class="d">Nov 12–13</span><span class="t">28 V · strikes · 3D</span></a>
@@ -162,21 +163,20 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       <section class="page" id="overview" data-title="Overview">
         <div class="pagehead">
           <h2>Where things stand</h2>
-          <p>Strikes on top of the 28 V stress give stepped SiN curves, up to three drops (one 6e18 strike: near 2, 6.3 and 10.5 V at Vg +1), but strikes that dense also make HighK drop. Strikes whose damage scales with the stress field keep HighK flat and collapse SiN completely in a single drop. The 3D slice matches 2D after a gradient fix. Next: weaker field-scaled strikes (round I) and a mesh check of the steps, both running.</p>
+          <p>Each drop is one damaged spot of the 2DEG switching once about 0.5 V of the shared drain voltage sits across it, so strikes add or delay steps; on a finer mesh the strike steps shrink (one strike's y 0.8 drop goes from 105 to 20 mA/mm). Next: a 2.5 nm check (~90 h stress), Ian's call.</p>
         </div>
         <div class="tiles">
-          <div class="tile"><span class="k">SiN at 28 V, with strikes</span><span class="v">Up to 3 drops</span><span class="s">One 6e18 strike: drops near 2, 6.3 and 10.5 V. Counts hold at a halved Vd step; not yet mesh-checked.</span></div>
-          <div class="tile"><span class="k">HighK with strikes</span><span class="v">Drops with SiN-stepping strikes</span><span class="s">Plain strikes dense enough to step SiN (5e18 and up; 4e18 at trap level 0.40) drop HighK too; field-scaled ones keep it on its no-strike curve to 7 V.</span></div>
+          <div class="tile"><span class="k">Why the curves step</span><span class="v">One spot per drop</span><span class="s">Every first switch came at 0.46–0.59 V across the spot (14 of 14, both meshes); spots in series share Vd.</span></div>
+          <div class="tile"><span class="k">Mesh check of the steps</span><span class="v">Stress drop converged; strike steps not</span><span class="s">Stress-only drop 395 → 273–281 on all three meshes. 5 nm at y 0.8: one strike's y 0.8 drop shrinks 105 → 20 mA/mm and its 10.5 V drop is gone.</span></div>
           <div class="tile"><span class="k">3D slice</span><span class="v">Matches 2D</span><span class="s">After the brick-gradient fix: 0.999 of 2D at 3 V (0.65 before; FANGS port, patched FLOOXS agrees), for tracks without stress damage.</span></div>
         </div>
 
         <div class="panel">
           <h3>Open items</h3>
           <ul class="todo">
-            <li><span class="pill progress">in progress</span><span>Weaker field-scaled strikes (round I, 20 tasks) for SiN steps with HighK flat; round H's single strike collapses SiN outright. <a class="daylink" href="#nov18">Nov 18</a></span></li>
-            <li><span class="pill progress">in progress</span><span>Mesh check of the steps: the y 0.8 strike sits on 15 nm cells; new 28 V stresses on a 10 nm uniform mesh and on the library mesh with a true 5 nm patch at y 0.8 (job 51883722). <a class="daylink" href="#nov18">Nov 18</a></span></li>
+            <li><span class="pill open">open</span><span>Strike steps are mesh-dependent: with 5 nm at y 0.8 they shrink (3 strikes: no drop left). A 2.5 nm check needs a new ~90 h stress; Ian's call. <a class="daylink" href="#nov19">Nov 19</a></span></li>
+            <li><span class="pill noted">accepted</span><span>No single strike model steps SiN and keeps HighK flat (rounds H–K); goal closed on two partial results (Ian). <a class="daylink" href="#nov19">Nov 19</a></span></li>
             <li><span class="pill open">open</span><span>3D stress damage: the stress field in 3D still has an unexplained 5.5e7 V/cm peak, and the gradient fix is only in a local FLOOXS copy. <a class="daylink" href="#nov18">Nov 18</a></span></li>
-            <li><span class="pill progress">in progress</span><span>Fig. 5-style hole-current maps of a strike transient (after Sun et al. 2025): snapshot output added to the strike driver; local proof of concept on the unirradiated device running. <a class="daylink" href="#nov18">Nov 18</a></span></li>
             <li><span class="pill open">open</span><span>SiN current recovers after each drop, and the onset doesn't move later with Vg as measured. <a class="daylink" href="#nov11">Nov 11</a></span></li>
             <li><span class="pill noted">noted</span><span>Waiting on a comprehensive measured set: same-device pre and post, width, Vth, Vg order. <a class="daylink" href="#nov05">Nov 5</a></span></li>
           </ul>
@@ -202,6 +202,41 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
       </section>
       <div class="no-js-sep"></div>
 
+      <!-- NOV 19 -->
+      <section class="page" id="nov19" data-title="Nov 19">
+        <div class="pagehead">
+          <h2>Nov 19 · Why the strike curves step, and a mesh check that weakens them</h2>
+          <p>Per-Vd cuts show each first drop is one damaged spot switching at about 0.5 V across it (two late drops are a switched spot switching again); with 5 nm at y 0.8 the threshold holds but the steps shrink. Also covers the evening of Nov 18 (rounds I–K, goal closed).</p>
+          <div class="chips"><span class="chip era-field">field mobility</span><span class="chip">jobs 51878761 · 51922589 · 51939558 · 51939191–2 · 51945449 · 51998839 · 51998840 · 52018703</span></div>
+        </div>
+        <div class="cols">
+          <div class="panel"><h3>Done</h3>
+            <ul class="done">
+              <li>Why the curves step (cuts of field, electrons, electron temperature and filled traps at every Vd): each damaged spot of the 2DEG, the stress band at y 0.45–0.72 µm and each strike, is a partly depleted pocket. The pockets sit in series and share the drain voltage. Every first switch came once about <span class="num">0.5 V</span> sat across the pocket (0.46–0.59 V, 14 of 14, both meshes). The barrier traps over its drain flank, already partly filled, finish filling with hot electrons (to 90–100% of the local damage; seen directly in the 10 switches with a barrier cut) and Id drops.</li>
+              <li>So the first large drop in the 1-, 2- and 3-strike curves is the same y 0.8 µm strike switching each time, at Vd <span class="num">1.9 / 3.0 / 4.4 V</span>, because the strikes further out take a growing share of the voltage. One strike's three drops are the y 0.8 strike (2 V), the stress band (6.3 V) and the y 0.8 spot's high-field region spreading toward the drain (10.5 V). Far-strike switches can cost under 8 mA/mm, so with 3 strikes three spots switch but only one drop shows.</li>
+              <li>Mesh check (new 28 V stresses on a 10 nm uniform mesh and with 5 nm at y 0.8): the stress-only drop is converged (395 → <span class="num">281 / 273 / 279</span> mA/mm). With one strike on 5 nm the y 0.8 drop shrinks from 105 to <span class="num">20 mA/mm</span>, the stress-band drop (56 mA/mm) moves from 6.3 to 3.3 V and the 10.5 V drop is gone. The 2-strike curve keeps one 22 mA/mm drop and the 3-strike curve none. The switch threshold agrees within 0.04 V on both meshes; the switched region (~25 nm) holds less voltage on the finer mesh. (FLOOXS's <code>print1d</code> resamples cuts to 500 points, so mesh spacings were read from VTK exports.)</li>
+              <li>Rounds I–K (Nov 18 evening–overnight): field-scaled strikes (m 4) keep HighK on its no-strike curve (946–958 mA/mm at 12 V) but give SiN one drop that deepens per strike (386 → 174, 345 → 91, 310 → 38). Neither a deeper trap level nor depth-separated strikes split it, and a field-scaled near-gate strike plus plain far strikes gives no later SiN steps. Goal closed on two partial results (Ian, option b).</li>
+              <li>Strike-transient maps at the irradiation bias (Vg −10, Vd 28 V, Fig. 5 style): SiN and HighK look alike. Holes run down the track (~<span class="num">1e6 A/cm²</span> at 6–12 ps) and out through the p-type buffer to the substrate contact (0.34 mA/µm from 100 ps), none to the gate.</li>
+            </ul>
+          </div>
+          <div class="panel"><h3>Needed work</h3>
+            <ul class="todo">
+              <li><span class="pill open">open</span><span>2.5 nm check of the strike steps: needs a new 28 V stress (~90 h). Ian's call.</span></li>
+              <li><span class="pill open">open</span><span>Drop size per switch (some ~100 mA/mm, others under 10), why ~0.5 V is sometimes not enough (2-strike stress band holds 0.50–0.54 V without switching), and why the 10.5 V second stage is missing on 5 nm.</span></li>
+              <li><span class="pill progress">in progress</span><span>SiN stress library: resumed from its 60 V state (51998839), at 69 V of 84.</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="figs wide">
+          <figure><a class="img" href="fig/pocket_volts.jpg" target="_blank" rel="noopener"><img src="fig/pocket_volts.jpg" alt="Top row: SiN Id-Vd at Vg +1 for 0, 1, 2 and 3 strikes on the library mesh and 1 strike on the 5 nm mesh, each drop shaded in the colour of the damaged spot that switches. Bottom row: voltage across each damaged spot against Vd on a log scale, with a dashed line at 0.5 V; each spot's voltage jumps when it crosses about 0.5 V, mostly at the same time as a drop; with 3 strikes the y 2.4 and 1.6 jumps give dips under 8 mA/mm, and the 1-strike drop near 10.5 V is the y 0.8 spot switching again" loading="lazy"></a><figcaption><b>Why the curves step</b>Each spot switches once about 0.5 V sits across it; strikes nearer the drain take part of the voltage, so the y 0.8 strike switches at Vd 1.9 / 3.0 / 4.4 V with 1 / 2 / 3 strikes.</figcaption></figure>
+          <figure><a class="img" href="fig/meshchk_steps.jpg" target="_blank" rel="noopener"><img src="fig/meshchk_steps.jpg" alt="Six SiN Id-Vd panels, each with the library mesh, a 10 nm uniform mesh and a 5 nm mesh at y 0.8: the stress-only curves overlap; the strike curves' later drops move and shrink with the mesh, and the 3-strike curve has no drop on the 5 nm mesh" loading="lazy"></a><figcaption><b>Mesh check of the steps</b>Stress drop the same within 8 mA/mm (395 → 273–281); one strike's y 0.8 drop shrinks from 105 to 20 mA/mm on 5 nm.</figcaption></figure>
+          <figure><a class="img" href="fig/series_deliverable.jpg" target="_blank" rel="noopener"><img src="fig/series_deliverable.jpg" alt="Four panels, 28 V stress plus 0 to 3 strikes at Vg +1. Plain strikes: SiN steps, HighK also drops. Field-scaled strikes: SiN one drop that deepens with each strike, HighK stays on its no-strike curve" loading="lazy"></a><figcaption><b>The two partial results (goal deliverable)</b>Plain strikes step SiN but drop HighK; field-scaled strikes keep HighK flat. Row A's steps are on the 15 nm mesh.</figcaption></figure>
+          <figure><a class="img" href="fig/map28_holeJ.jpg" target="_blank" rel="noopener"><img src="fig/map28_holeJ.jpg" alt="Two rows of hole current density maps, SiN and HighK, from before the strike to 1 ns at Vg -10 and Vd 28 V: a vertical track of high hole current under the strike at y 0.2 um that spreads through the buffer, nearly identical in both decks" loading="lazy"></a><figcaption><b>Strike transient at 28 V, hole current</b>Holes leave down the track and through the buffer to the substrate (0.34 mA/µm from 100 ps in both decks); SiN and HighK look alike.</figcaption></figure>
+        </div>
+        <div class="pager"><a href="#overview">← Overview</a><a href="#nov18">Nov 17–18 →</a></div>
+      </section>
+      <div class="no-js-sep"></div>
+
       <!-- NOV 17-18 -->
       <section class="page" id="nov18" data-title="Nov 17–18">
         <div class="pagehead">
@@ -222,11 +257,11 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           </div>
           <div class="panel"><h3>Needed work</h3>
             <ul class="todo">
-              <li><span class="pill progress">in progress</span><span>Round I: weaker field-scaled strikes at y 0.5–0.65 µm (single and three-strike sets), both decks; round H still finishing.</span></li>
-              <li><span class="pill progress">in progress</span><span>Mesh check: rerun the best step cases on a 10 nm uniform stress and on the library mesh with a true 5 nm patch at y 0.8 (51883722, about 1 and 2 days).</span></li>
+              <li><span class="pill resolved">fixed Nov 18</span><span>Round I: weaker field-scaled strikes at y 0.5–0.65 µm (single and three-strike sets), both decks; round H still finishing.</span></li>
+              <li><span class="pill resolved">fixed Nov 19</span><span>Mesh check: rerun the best step cases on a 10 nm uniform stress and on the library mesh with a true 5 nm patch at y 0.8 (51883722, about 1 and 2 days).</span></li>
               <li><span class="pill open">open</span><span>3D on the stress damage: explain the 3D stress field's 5.5e7 V/cm peak; build the patched FLOOXS on HPG.</span></li>
-              <li><span class="pill progress">in progress</span><span>Strike-transient hole-current maps (Fig. 5 style, after Sun et al. 2025): snapshot output added to the strike driver; local proof of concept on the unirradiated device running.</span></li>
-              <li><span class="pill progress">in progress</span><span>SiN stress library: resume at the 4-day limit (39 V of 84 at 3 days; HighK at 67 V).</span></li>
+              <li><span class="pill resolved">fixed Nov 19</span><span>Strike-transient hole-current maps (Fig. 5 style, after Sun et al. 2025): snapshot output added to the strike driver; local proof of concept on the unirradiated device running.</span></li>
+              <li><span class="pill resolved">fixed Nov 19</span><span>SiN stress library: resume at the 4-day limit (39 V of 84 at 3 days; HighK at 67 V).</span></li>
             </ul>
           </div>
         </div>
@@ -237,7 +272,7 @@ code { font-family: var(--f-mono); font-size: .88em; background: var(--gray-soft
           <figure><a class="img" href="fig/rad3d_fix.jpg" target="_blank" rel="noopener"><img src="fig/rad3d_fix.jpg" alt="Left: 2D strike vs the same strike as a full-width 3D track, before the fix far below, after the fix on top of the 2D curve. Right: current lost at 1 V against the fraction of the width the track covers" loading="lazy"></a><figcaption><b>3D matches 2D after the fix (FANGS port runs)</b>0.999 at 3 V; partial quarter- and half-width runs cost less than their share at 1 V.</figcaption></figure>
           <figure><a class="img" href="fig/half3d_render.jpg" target="_blank" rel="noopener"><img src="fig/half3d_render.jpg" alt="3D render of a 0.4 um slice of the SiN device: a damage rod across half the width, centred at the AlGaN top (drawn below the 2DEG plane); the 2DEG is depleted only where the rod is" loading="lazy"></a><figcaption><b>Half-width track, rendered</b>2DEG about 37× lower where the track crosses it (2.8e17 vs 1.05e19 cm⁻³), full beside it (Vd 0.25 V).</figcaption></figure>
         </div>
-        <div class="pager"><a href="#overview">← Overview</a><a href="#nov16">Nov 14–16 →</a></div>
+        <div class="pager"><a href="#nov19">← Nov 19</a><a href="#nov16">Nov 14–16 →</a></div>
       </section>
       <div class="no-js-sep"></div>
 

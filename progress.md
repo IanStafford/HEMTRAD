@@ -2207,3 +2207,16 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - **Mesh:** the threshold is the same on both meshes; the post-switch voltage share isn't (1 strike at Vd 3.1: y 0.8 pocket 1.93 V library vs 1.57 V 5 nm, stress band 0.36 vs 0.55 V). So on 5 nm the stress band switches at 3.1-3.6 V, and the second-stage switch at 10.5 V never comes.
   - Open: drop size per switch (some ~100 mA/mm, some < 10); whether the 5 nm 2- and 3-strike pockets still switch silently (no barrier cuts for them).
   - Next: dashboard Nov 19 page.
+- **Backfill (submitted Nov 19 midday, not logged then):** stressLibResume 51998839 (SiN library resume from its `sin_Vg-10_Vd060.00.str.gz` state, `params_stressLibResume.txt`) and radStepDiag 51998840 (vdCuts, library mesh, row A 0-3 strikes, 4 tasks).
+- **Fact-check (workflow wf_0a18b21d-f13, three independent agents, ~180 claims) of [[step-mechanism]], the step-search mesh section and the dashboard page; corrections applied:**
+  - The |Ey| integral counts each pocket's built-in barrier on both flanks (0.13-0.24 V at Vd 0.1). Reaching ~0.5 V is necessary but not always enough: the 2-strike stress band holds 0.50-0.54 V from Vd 10.6 to 12 without switching.
+  - The barrier fill is gradual: 27-73% of the peak-cell rise comes before the drop. At the drop the cells finish filling to 90-100% of the local damage.
+  - The second-stage drops (10.5 V library, 11.4 V 5 nm 8e18) are the switched region spreading toward the drain into nearly undamaged channel. The 5 nm y 0.8 pocket passes 6 V without a second stage, so the voltage share doesn't explain its absence.
+  - Far-strike switches can cost 0-8 mA/mm, so switches and drops are not one-to-one.
+  - Wording fixes: stress-only drop 395 -> 273-281 on all meshes; on 5 nm the 1-strike y 0.8 drop shrinks 105 -> 20 mA/mm while the stress-band drop (56) only moves; 2 strikes keep one 22 mA/mm drop; HighK 946-958 at 12 V.
+  - Earlier progress lines here: library B_N2 has 2 drops (2.1-2.4 V of 8 mA/mm, 3.0-3.3 V); m10 A_N1 drops at 4.2-4.7 / 10.1-11.4 V; barrier Te ~350 -> 550-700 K (the 18:08 range was partial).
+- **FLOOXS gotcha found: `print1d` resamples to at most 500 points per direction** (`src/plplot/PlotMesh.cc`: merges the closest pair until ≤ 500). A reviewer's cut-based spacing showed m5fix coarser at y 1.6. True nodes from a VTK export of locally built meshes (grid only, a few seconds of local FLOOXS) say otherwise:
+  - library: 520 y lines, 9.5-17.2 nm at y 0.76-0.90, 5 nm at 1.6 and 2.4;
+  - m5fix: 554 lines, a clean 5 nm over 0.64-0.96, identical elsewhere.
+  - So the m5fix comparison is clean for every strike count. KB [[flooxs-gotchas]], [[flooxs-commands]].
+- **DECISION FOR IAN:** the strike steps shrink with mesh refinement at y 0.8 (1 strike: y 0.8 drop 105 -> 20 mA/mm, 10.5 V drop gone; 3 strikes: no drop left). Run a 2.5 nm check (new 28 V stress, ~90 h on 1 CPU, then ~4 h of loading runs) to see whether they converge or vanish? Not submitted.

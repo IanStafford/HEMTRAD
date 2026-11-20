@@ -2,57 +2,82 @@
 title: Why the 28 V strike curves step
 tags: [results, rad-model, strikes, mechanism]
 date: 2026-11-19
-source: progress.md 2026-11-19; HPG jobs radStepDiag 51998840, radStepDiag5b 52018703, meshChkLoad_m5fix 51939192
+source: progress.md 2026-11-19; HPG jobs radStepDiag 51998840, radStepDiag5b 52018703, meshChkLoad_m5fix 51939192; fact-checked by three independent agents (workflow wf_0a18b21d-f13)
 ---
-# Why the 28 V strike curves step (one drop per damaged spot)
+# Why the 28 V strike curves step (each drop is one damaged spot switching)
 
-Diagnostic reruns of the [[step-search-28v]] cases with `vdCuts=1` ([[levers]]). At every Id-Vd point they cut along the channel 1 nm below the AlGaN/GaN interface (x 0.016 µm) and mid-barrier (x 0.008 µm). SiN deck, 28 V stress damage (scale 1.5e18), 6e18 strikes (σ 40 nm) at y 0.8 / 1.6 / 2.4 µm, trap level 0.30 eV, hotEb 1.0 eV, Vg +1 V. The cuts don't change the curves: they are identical to the original runs to the last digit. Read the cuts with `analysis/vdcuts.py`, tabulate the drops with `analysis/vdcutsDropTable.py`.
+**Setup.** Diagnostic reruns of the [[step-search-28v]] cases with `vdCuts=1` ([[levers]]). SiN deck, 28 V stress damage (scale 1.5e18), Vg +1 V, hotEb 1.0 eV. Strikes are 6e18 (σ 40 nm) at y 0.8 / 1.6 / 2.4 µm with trap level 0.30 eV, except E_lev0.4_N2 (0.40 eV) and C_n8e18_N2 (8e18).
+
+**Runs and what they cut.**
+- radStepDiag 51998840: library mesh, 0-3 strikes. Cuts along the channel at every Id-Vd point, 1 nm below the AlGaN/GaN interface (x 0.016 µm): filled traps, electrons, lateral field, TeTrap.
+- radStepDiag5b 52018703: the four 5 nm ("m5fix") cases plus the library 1-strike case. Also cuts mid-barrier (x 0.008 µm).
+- Barrier filling is seen directly at 10 of the 14 first switches. For the 4 library-only ones (C_N0, B_N2 ×2, A_N3) it is inferred from the 2DEG cut.
+- The cuts don't change the curves: they are identical to the original runs to the last digit.
+- Tools: read the cuts with `analysis/vdcuts.py`, tabulate the drops with `analysis/vdcutsDropTable.py`, plot with `analysis/plot_pocketVolts.py`.
+- **Cut resolution:** FLOOXS's `print1d` samples on a plot grid of at most 500 points per direction, merging the closest pairs ([[flooxs-gotchas]]). The library mesh has 520 y lines and m5fix 554, so some 5 nm cells are sampled at ~10 nm in the cuts. Pocket voltages are integrals and robust, but peak fields and widths below ~10-20 nm are approximate.
 
 ## The mechanism
 
-1. **Each damaged spot is a partly depleted "pocket" in the 2DEG.** The damage below the interface (GaN side) is completely filled at rest and stays constant through the sweep (IonAcceptor = TrapN at x 0.016). The same damage in the AlGaN barrier is only partly filled at rest: mid-barrier (x 0.008) 4-5e17 cm⁻³ in the pockets against ~6e18 of damage at the strike centre; at the AlGaN top (x 0.001) ~1% (5e16 of 6e18 under the y 0.8 strike). The pockets are the stress band at y 0.45-0.72 µm (under the field-plate edge) and one per strike.
-2. **The pockets sit in series along the channel and share the drain voltage.** The voltage across each one is the integral of the lateral field over its y range.
-3. **A pocket switches when about 0.5 V sits across it.** At that point its drain edge heats (barrier electron temperature ~330-370 → 550-700 K). Hot-electron capture lowers the barrier trap level and the barrier traps fill: mid-barrier IonAcceptor rises by 2.5-4e18 cm⁻³ (0.4-1e18 → 3.3-4.5e18) in a 20-40 nm band. This deepens the pocket: 2DEG density there falls 2-10× and the local field rises 1.5-10×. The feedback makes the switch take only 0.3-0.8 V of Vd, which is the drop in Id. Voltage across the switching pocket just before it switches: 0.46-0.59 V for all 14 first switches with a drop of at least 8 mA/mm (6 on the library mesh, 8 on the 5 nm mesh). The two later drops near 10.5 V (library, 1 strike) and 11.5 V (5 nm, 8e18) are a pocket that has already switched switching a second time, with several volts across it.
-4. **After it switches, a pocket takes most of any further drain voltage.** One strike, library mesh: the y 0.8 pocket goes from 0.52 V at Vd 1.9 to 1.35 V at 2.2 and 4.3 V at 6.1, while the stress band falls back below 0.5 V. That delays the next pocket's switch and makes the steps separate.
+1. **Each damaged spot is a partly depleted "pocket" in the 2DEG.**
+   - The damage on the GaN side (x 0.016) is completely filled at rest and stays constant through the sweep (IonAcceptor = TrapN).
+   - The same damage in the AlGaN barrier is only partly filled at rest. Mid-barrier at Vd 0.1 it is 4-5e17 cm⁻³ at trap level 0.30 eV (8.5-9.8e17 at 0.40 eV), against ~6e18 of damage at a strike centre. At the AlGaN top (x 0.001) it is ~1% (5e16 of 6e18 under the y 0.8 strike).
+   - The pockets are the stress band (y 0.45-0.72 µm, under the field plate between the T-gate head edge at 0.485 and the field-plate edge at 0.725; it switches at y 0.57-0.60) and one per strike.
+2. **The pockets sit in series along the channel and share the drain voltage.** The voltage across a pocket is measured as the integral of |Ey| over its y range (stress 0.45-0.72, strikes 0.72-1.1, 1.45-1.85, 2.25-2.65 µm).
+   - This overcounts slightly: |Ey| counts the pocket's own built-in barrier on both flanks. That already gives 0.13-0.24 V at Vd 0.1, against 0.006-0.012 V over undamaged stretches.
+3. **Each first switch came once ~0.5 V sat across the pocket.**
+   - The |Ey| integral was 0.46-0.59 V at every one of the 14 first switches with a drop of at least 8 mA/mm (6 on the library mesh, 8 on the 5 nm mesh).
+   - Counting field reversals inside the pocket as negative gives 0.36-0.59 V.
+   - Reaching 0.5 V is necessary but not always enough. With 2 strikes (library), the stress band holds 0.50-0.54 V from Vd 10.6 to 12 V without switching: TeTrap stays at 365-379 K and there is no runaway.
+4. **What happens at the switch.**
+   - As a pocket's voltage rises, the barrier traps over its drain flank fill gradually. When the drop starts they are already at 1.4-3.1e18, i.e. 27-73% of the rise at the peak cell.
+   - The local-field electron temperature there (TeTrap, set by |∇Qfn|: [[hot-electron-capture]]) rises from ~330-370 K to 550-700 K. This lowers the trap level by hotEb·(1 − T/TeTrap).
+   - During the 0.3-0.8 V of Vd that the drop takes, the fill front completes. Those cells reach full occupancy (3.3-4.5e18, 90-100% of the local damage) in a 10-35 nm band, 10-20 nm at the strike edges on the 5 nm mesh.
+   - The 2DEG beneath falls 2-10× and the peak lateral field in the pocket rises 2-4× (about 1e5 → 2.4-4.1e5 V/cm).
+   - Partial filling also happens without a drop. On the 5 nm E and C runs the y 0.8 pocket fills to 2.1-2.6e18 and stops there once the y 1.6 pocket switches.
+   - TeTrap is computed from the local field, so the heating is not independent evidence. It is the model's field → capture → depletion loop.
+5. **After it switches, a pocket takes most of any further drain voltage.** One strike, library mesh: the y 0.8 pocket goes from 0.52 V at Vd 1.9 to 1.35 V at 2.2 and 4.3 V at 6.1. Over the same switch the stress band's share falls from 0.44 to 0.29 V, and it reaches 0.5 V again only at Vd 5.9. That is what separates the steps.
+6. **Second-stage drops** (library 1 strike, 10.0-10.8 V; 5 nm 8e18, 11.4-11.8 V) come from a pocket that has already switched and carries 6.0 and 7.3 V.
+   - Its high-field region spreads toward the drain into nearly undamaged channel: n falls 2-10× at y 0.94 and 1.74, where TrapN is ~1e16.
+   - Some extra fill happens in one core cell (y 0.81: 1.5 → 5.3e18; y 1.62: 4.6 → 6.1e18).
 
 ## What switches in the deliverable's row A (library mesh, `figures/rad/step28/diag/pocket_volts.png`)
 
 | Strikes | Drops (≥ 8 mA/mm) | What switches |
 |---|---|---|
-| 0 | 1.6-2.0 V, 395 → 281 | stress band (0.52 V across it at 1.6 V) |
-| 1 | 1.9-2.2 V, 388 → 283; 6.1-6.6 V, 401 → 348; 10.0-10.8 V, 398 → 222 | y 0.8 strike (0.52 V); stress band (0.59 V); the y 0.8 pocket again: its core barrier traps fill further (1.5e18 → 5.3e18 at y 0.81) and it widens toward the drain (6.0 → 9.1 V across it) |
+| 0 | 1.6-2.0 V, 395 → 281 | stress band (0.52 V at 1.6 V) |
+| 1 | 1.9-2.2 V, 388 → 283; 6.1-6.6 V, 401 → 348; 10.0-10.8 V, 398 → 222 | y 0.8 strike (0.52 V); stress band (0.59 V); the y 0.8 pocket's second stage (6.0 → 9.1 V across it) |
 | 2 | 2.1-2.4 V, 379 → 371; 3.0-3.3 V, 390 → 307 | y 1.6 strike (0.54 V); y 0.8 strike (0.52 V) |
-| 3 | 4.4-4.8 V, 389 → 324 | y 0.8 strike (0.52 V). The y 2.4 and y 1.6 pockets switch earlier (cross 0.5 V at Vd 2.4 and 3.0 V) with dips under 8 mA/mm (373 → 368 at 2.4-2.6 V) |
+| 3 | 4.4-4.8 V, 389 → 324 | y 0.8 strike (0.52 V). The y 2.4 and y 1.6 pockets cross 0.5 V earlier (Vd 2.4 and 3.0 V). The y 2.4 crossing gives one 5 mA/mm dip (373 → 368 at 2.4-2.6 V); the y 1.6 crossing only flattens Id. |
 
-- The large drop in the 1-, 2- and 3-strike curves is the same y 0.8 strike pocket each time. It switches at the same ~0.52 V across it, but at Vd 1.9 / 3.0 / 4.4 V, because the strikes further out take a growing share of the drain voltage.
-- With 2 and 3 strikes the stress band's drop disappears. With 2 strikes it reaches 0.5 V only at Vd 10.6 V (a small dip near 11 V). With 3 strikes it never does (at most 0.43 V).
-- The drop count is therefore the number of pockets (and second-stage switches) that reach the threshold before 12 V. It is not one drop per strike.
-- Drop size varies with the spot, the strike density and the mesh. In row A the far strikes' switches cost under 10 mA/mm. With 8e18 strikes on the 5 nm mesh, the y 1.6 strike's switch costs 107 mA/mm (263 → 156).
-- Pockets switch in order from the drain side toward the gate. All pockets carry a similar voltage before any switch, with the drain-side ones slightly ahead (e.g. 2 strikes at Vd 1.9: 0.43 V across y 1.6, 0.38 across y 0.8, 0.36 across the stress band).
+- **The y 0.8 strike in every curve.** The first large drop in the 1-, 2- and 3-strike curves is the y 0.8 strike pocket switching each time. It switches at the same ~0.52 V across it but at Vd 1.9 / 3.0 / 4.4 V, because the strikes further out take a growing share of the drain voltage.
+- **The stress band's drop disappears with 2 and 3 strikes.** With 2 strikes it reaches 0.5 V only at Vd 10.6 and doesn't switch (a 7.7 mA/mm dip at 10.8-11.3 V). With 3 strikes it never does (at most 0.43 V).
+- **Switches and drops are not one-to-one.** Every drop of at least 8 mA/mm is one spot switching, but not every switch is a drop: in row A the far strikes' switches cost 0-8 mA/mm. So it is neither one drop per strike nor one drop per spot (3 strikes: three switches, one drop; 1 strike: two spots, three drops).
+- **Drop size varies.** It depends on the spot, the strike density and the mesh, and is not yet understood. In row A the far strikes' switches cost under 10 mA/mm. With 8e18 strikes on the 5 nm mesh the y 1.6 strike's switch costs 106 mA/mm (263 → 156).
+- **Order of switching.** In every case run, the pocket nearest the drain switched first (barrier-confirmed in 4 runs). The margin can be small: on the 5 nm E and C runs the y 0.8 pocket was filling alongside y 1.6 until y 1.6 switched. Much of the drain-side pockets' lead in |Ey| integral is already there at Vd 0.1. Why the drain side leads is not established.
 
 ## Why the steps move with the mesh
 
-- The switch threshold (~0.5 V across a pocket) is the same on the library mesh and the 5 nm mesh.
-- What changes is how the drain voltage is shared after a pocket switches, which sets when the next pocket reaches 0.5 V. One strike at Vd 3.1: the switched y 0.8 pocket carries 1.93 V on the library mesh (15 nm cells at y 0.8) and 1.57 V on the 5 nm mesh; the stress band 0.36 V and 0.55 V. So on the 5 nm mesh the stress band switches at 3.1-3.6 V instead of 6.1-6.6 V. The y 0.8 pocket never builds up the ~6 V it carries on the library mesh before its second-stage switch near 10.5 V (2.85 V at Vd 6.1 against 4.31), and that switch doesn't happen.
-- The post-switch high-field region is 20-40 nm wide, a few cells, so its extent is set by the mesh ([[step-search-28v]], mesh check).
-- 5 nm results with barrier cuts (radStepDiag5b):
+**What the 5 nm check mesh actually changes** (true node positions, from a VTK export of locally built meshes):
+- m5fix is a clean 5 nm over y 0.64-0.96, where the library mesh has 4.8-19.6 nm (9.5-17.2, mean 13, at 0.76-0.90).
+- Elsewhere the two meshes are the same, including 5 nm at y 1.6 and 2.4.
+- So every m5fix comparison isolates the refinement at the y 0.8 strike.
+- m10 is 10 nm uniform, so it is finer than the library at y 0.8 but coarser at 1.6 and 2.4.
+- A cut-based spacing check suggested m5fix was coarser at y 1.6. That was the 500-point resampling of `print1d`, not the mesh.
 
-| Case | Switch | y (µm) | Voltage across the pocket |
-|---|---|---|---|
-| A_N1 | 1.8-2.1 V | 0.84 | 0.50 V |
-| | 3.1-3.6 V | 0.58 | 0.55 V |
-| E_lev0.4_N2 | 1.4-1.7 V | 1.64 | 0.48 V |
-| | 2.4-2.7 V | 0.84 | 0.52 V |
-| | 6.3-6.8 V | 0.57 | 0.53 V |
-| C_n8e18_N2 | 1.4-1.8 V | 1.64 | 0.46 V |
-| | 3.3-3.6 V | 0.845 | 0.47 V |
-| | 11.4-11.8 V | 1.62 | small |
-| C_N0 | 1.6-2.0 V | 0.57 | 0.53 V |
+**The first-switch threshold.** It agrees within 0.04 V for the three pockets run on both meshes (C_N0 stress band 0.52 / 0.53 V; A_N1 y 0.8 0.52 / 0.50 V; A_N1 stress band 0.59 / 0.55 V).
+
+**The switched region.** After the y 0.8 switch it is about 22-35 nm wide (FWHM of |Ey| in the cuts) on both meshes. On the library mesh that is about 2 cells (spacing ~12 nm at y 0.84-0.87), and it holds a higher peak field and more voltage: 4.5e5 vs 3.6e5 V/cm and 1.93 vs 1.57 V at Vd 3.1.
+- So on the 5 nm mesh the stress band reaches its threshold sooner (0.55 V at Vd 3.1 against 0.36 V) and switches at 3.1-3.6 V instead of 6.1-6.6 V.
+- The y 0.8 drop itself shrinks from 105 to 20 mA/mm. The stress-band drop keeps its size (56 vs 53 mA/mm).
+
+**The second-stage switch near 10.5 V doesn't happen on 5 nm, and the voltage share doesn't explain why.** The 5 nm y 0.8 pocket carries 5.76 V at Vd 10.0 (6.00 on the library mesh), passes 6 V at 10.4 and reaches 7.5 V at 12 V without switching. This is open.
 
 ## Open
 
-- Why some switches cost ~100 mA/mm and others under 10. Not analysed.
-- The 2- and 3-strike row A cases lost their drops on the 5 nm mesh (meshChkLoad_m5fix). They have no barrier cuts, so it isn't checked whether their pockets still switch, just with smaller current changes.
-- A 2.5 nm mesh (new stress run, ~90 h) would show whether the post-switch voltage share converges.
+- Drop size per switch (some ~100 mA/mm, some under 10).
+- Why reaching ~0.5 V is sometimes not enough (2-strike stress band).
+- Why the drain-side pocket switches first.
+- Why the second-stage switch is missing on the 5 nm mesh.
+- Whether the steps converge: 2.5 nm at the strike sites needs a new stress run (~90 h). The 5 nm m5fix B_N2 and A_N3 cases have no vdCuts run.
 
 Related: [[step-search-28v]], [[hot-electron-capture]], [[trap-model]], [[rad-literature-steps]].
