@@ -2280,3 +2280,15 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - fpFixPre 52134553: 2 tasks; pre-irradiation baseline, both decks.
   - fpFixEB1 52134554: 6 tasks, 8 GB, 2-day limit; the Nov 11 model, Ian approved.
   - fpFixLoad (19 tasks) waits for fpFixStress to save its 28 V state.
+- **Ian's decisions (Nov 20 evening, via the question dialog):**
+  1. Measured numbers in tracked files (radCompare.py, rad-model.md): replace them with qualitative wording; the numbers move to the untracked measured notes; radCompare's targets become opt-in with an output guard.
+  2. History for those: current files only, no rewrite.
+  3. drivers/trim/TRIM_NCY2_SiN_Au2256.IN: gitignore (`drivers/trim/*NCY2*`).
+  4. GitHub Support request for the purged commit: skip (leave it to GitHub's GC).
+  5. useTraps / stressSkip guard (DRV-7): fix.
+  6. stressFreeze.tcl: archive.
+  7. bin/hpg_sbatch.sh: delete.
+  8. Oct radFine params: leave in git history (cite 0fbf0ce in the KB).
+  9. eTempDebug readings: mark unverified in the KB.
+  10. Clean-up stage 1 (docs, KB, comments): start now; numbers the FP fix may change are marked pre-fix.
+  11. Mesh redo with the fixed box: queue the 5 nm and 2.5 nm stresses now.

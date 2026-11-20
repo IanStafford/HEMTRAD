@@ -864,3 +864,15 @@ with open("sweeps/params_fpFixLoad.txt", "w") as f:
         assert n == 1, lab
         f.write(f"fpfix_{lab}|{lev}{';vdCuts=1' if lab in CUTS else ''}\n")
 print("fpFix pre 2, stress 2, EB1 6, load", len(FIX_LOAD))
+
+# fpFixMesh (2026-11-20, Ian: "queue it now"): the mesh check again with the fixed FP box, SiN, the same levers as
+# meshChkStress: m5fix (5 nm over y 0.64-0.96) and m2p5 (2.5 nm at the three strike sites), saved every volt.
+with open("sweeps/params_fpFixMesh.txt", "w") as f:
+    for line in open("sweeps/params_meshChkStress.txt"):
+        lab, lev = line.rstrip("\n").split("|", 1)
+        if lab != "mc_sin_m5fix":
+            continue
+        f.write(f"fpfix_{lab}|{lev.replace(f'{LIB}/meshchk/sin_m5fix', f'{FIXLIB}/meshchk/sin_m5fix').replace('stressSavePrefix=sin_m5fix', 'stressSavePrefix=fpfix_sin_m5fix')}\n")
+    lab, lev = open("sweeps/params_meshChkStress2p5.txt").readline().rstrip("\n").split("|", 1)
+    f.write(f"fpfix_{lab}|{lev.replace(f'{LIB}/meshchk/sin_m2p5', f'{FIXLIB}/meshchk/sin_m2p5').replace('stressSavePrefix=sin_m2p5', 'stressSavePrefix=fpfix_sin_m2p5')}\n")
+print("fpFixMesh 2")
