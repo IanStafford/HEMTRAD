@@ -1,7 +1,7 @@
 ---
-title: Stepped collapse at the 28 V stress (rounds A-I)
+title: Stepped collapse at the 28 V stress (rounds A-K, mesh check)
 tags: [results, rad-model, strikes]
-date: 2026-11-18
+date: 2026-11-19
 source: progress.md 2026-11-17/18; HPG jobs radStepA-I; test register https://claude.ai/artifact/QEhm71DSp92bNCYGRHNXTm
 ---
 # Stepped SiN collapse at the 28 V stress with ion strikes
@@ -28,7 +28,23 @@ Lever `gaussFieldM` m multiplies strike damage by (E/E_ref)^m from the stored st
 - Unscaled 3e18 at y 0.5: SiN 240 → 8 near 1 V; HighK flattens to ~650.
 - Figure `figures/rad/step28/fieldstrike_H.png` (`analysis/plot_radStepH.py`).
 
-## Mesh (audit 2026-11-18): the strike steps are not mesh-checked
+## Mesh check result (2026-11-19): the stress drop converges, the strike steps don't
+
+Same six cases on the library mesh, m10 (meshChkLoad_m10 51939191) and m5fix (51939192); figure `figures/rad/step28/meshchk_steps.png` (`analysis/plot_meshChkSteps.py`).
+- **Stress only:** 1.6-2.0 V, 395 → 281 / 273 / 279 mA/mm on library / m10 / m5fix. Converged.
+- **Row A plain strikes:** steps shrink and fall in number as the y 0.8 strike is refined:
+
+| Case | Library | m10 | m5fix |
+|---|---|---|---|
+| 1 strike | 3 drops (2.0, 6.3, 10.5 V; the last 398 → 222) | 3 drops (2.0, 4.4, 10.7 V) | 2 drops (1.8-2.1 V 381 → 361, 3.1-3.6 V 397 → 341) |
+| 2 strikes | 2 drops (2.2, 3.1 V) | 3 drops | one 22 mA/mm dip at 6.3-6.8 V |
+| 3 strikes | 1 drop (4.4-4.8 V) | 3 small drops | no drop above 8 mA/mm |
+
+- **Denser or deeper settings keep their steps, smaller:** E_lev0.4_N2 drops at 1.4 / 2.4 / 6.3 V; C_n8e18_N2 at 1.4 / 3.3 V plus a dip at 11.4 V.
+- **Why the steps move:** see [[step-mechanism]]. A pocket switches at a mesh-independent ~0.5 V across it, but the voltage share after a switch depends on the 20-40 nm switched region, which the mesh resolves differently.
+- **Next level:** a 2.5 nm stress (~90 h) has not been run.
+
+## Mesh (audit 2026-11-18, before the check)
 
 Every round A-I task runs on the 28 V library mesh (93,080 points, identical for SiN and HighK; stressLoad keeps the file's mesh). The depth (x) mesh is fine: 1 nm through the AlGaN, first GaN line 1 nm below the interface. The channel (y) spacing at the 2DEG:
 - y 0.8 (first strike of every A-G case): **15 nm**, 2.7 cells per σ. The deck's rightFP line (y 0.725, 20 nm) sits inside the 0.64-0.96 meshY patch, so the patch is not 5 nm there.
@@ -54,7 +70,7 @@ Round H at 12 V: SiN with field-scaled strikes at y 0.5 (base 2-4e18) stays at ~
 `figures/rad/step28/series_deliverable.png` (`analysis/plot_radStepSeries.py figures/rad/step28/series p15_n6 fs_bandb`), 0-3 strikes on the 28 V stress damage, Vg +1 V, with the Nov 11 model as reference:
 - **A. Plain strikes** (damage scale 1.5e18, 6e18 strikes at y 0.8 / 1.6 / 2.4 µm): stepped SiN curves, qualitatively like the Nov 11 model (one strike: drops near 2, 6.3 and 10.5 V). HighK with the same strikes drops too (near 1.5-2.5 V), unlike the measured HighK.
 - **B. Field-scaled strikes** (damage × (E/E_ref)⁴, y 0.65 / 0.6 / 0.55 µm): HighK stays on its no-strike curve; SiN has one drop near 1.3-2.1 V that deepens with each strike (386 -> 174, 345 -> 91, 310 -> 38 mA/mm), then partly recovers.
-- Step positions are provisional until the mesh check (meshChkStress 51883722) reports; the y 0.8 strike sits on 15 nm cells.
+- Mesh check (2026-11-19): row A's steps are not mesh-robust. On a true 5 nm mesh at y 0.8, the 1-strike curve keeps two smaller drops and the 2- and 3-strike curves lose theirs (section above). The mechanism is in [[step-mechanism]].
 
 Round J (51922589, follow-up, field-scaled m 4, both decks): a deeper trap level or depth-separated strikes don't split the drop. HighK flat in all 8 cases (946-956 mA/mm at 12 V). SiN: one drop per curve, earlier and deeper at 0.40 eV (band b 1/2/3 strikes 244 -> 45, 208 -> 5, 172 -> 0 near 0.8-1.5 V; 0.35 eV 311 -> 99, 272 -> 33, 239 -> 5); strikes at 0, 30 and 60 nm depth at y 0.55 also give one drop (287 -> 79 with one, ~0 with two or three). The halved Vd step reproduces the 3-strike drop (175 -> 5 at 0.8-1.1 V). So strikes confined to the SiN-favoured band act on one onset whatever the trap level or depth.
 
@@ -64,4 +80,4 @@ Why no field-weighted strike law can give SiN-only steps far from the gate (28 V
 
 No single strike model yet gives both stepped SiN and flat HighK: plain strikes step SiN but drop HighK; field-scaled strikes keep HighK flat but give SiN one drop. A what-if (not a simulation): if each strike switched only its own share of the gate width and the columns carried current independently, the round I single strikes (whose onsets move with density) would add a small step each between ~0.9 and 2 V while HighK stays flat (`figures/rad/step28/fieldscaled_segments.png`, 25% of the width per strike). Whether one strike can switch that much width is the open 3D question ([[3d-plan]]); decision for Ian.
 
-Related: [[rad-literature-steps]] (mechanisms), [[3d-plan]] (part-width tracks), [[rad-model]].
+Related: [[step-mechanism]] (why the curves step), [[rad-literature-steps]] (mechanisms), [[3d-plan]] (part-width tracks), [[rad-model]].

@@ -1,15 +1,17 @@
 ---
 title: Current status
 tags: [status]
-updated: 2026-11-18
+updated: 2026-11-19
 ---
-# Current status (as of 2026-11-18)
+# Current status (as of 2026-11-19)
 
 **Repo:** reorganised 2026-10-12 into `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/` ([[repo-locations]]); FLOOXS internals in [[flooxs-overview]].
 
 **Model:** calibrated field mobility ([[calibration]]), local-field hot-electron capture ([[hot-electron-capture]]), Te-ramp stall rescue ([[te-ramp]]). **Since 2026-10-16 (Ian) the local-field model (`eTemp 0`, the model-file default) is the standard again, to save computation time.** The standard electron energy balance (`eTemp 1`, `etStats 0`, `etThermo 0`; standard Oct 13–16) is kept as an option: it collapses at the measured voltage but costs ~1.9 s per Newton iteration ([[energy-balance]]).
 
-**Now (Nov 18):** goal (Ian, Nov 17): stepped curves at the 28 V stress with 1-3 strikes. SiN steps with 5-8e18 strikes (one 6e18 strike: drops near 2, 6.3, 10.5 V), but strikes that dense also drop HighK. Field-scaled strikes (`gaussFieldM`, rounds H/I) keep HighK flat but give SiN one drop that deepens with each strike. Goal closed with two partial results (Ian, Nov 18): `figures/rad/step28/series_deliverable.png`. Mesh check of the steps running (51883722); round J (51922589, trap level / depth with field-scaled strikes) running as an optional follow-up. 3D brick-gradient bug fixed in a patched FLOOXS copy (3D matches 2D for tracks). Deck: https://claude.ai/artifact/5gkYKv6DZjGL7PAuTvZxR6. Details: [[step-search-28v]], [[3d-plan]].
+**Now (Nov 19):** why the strike curves step, from per-Vd cuts (radStepDiag 51998840, radStepDiag5b 52018703). Every damaged spot (the stress band at y 0.45-0.72 and each strike) is a partly depleted pocket of the 2DEG. A pocket switches when ~0.5 V sits across it (0.46-0.59 V in all 14 first switches, both meshes): the barrier traps over its drain edge fill with hot electrons (+2.5-4e18 cm⁻³, Te ~350 → 550-700 K), and Id drops. Pockets in series share the drain voltage, so with 1 / 2 / 3 strikes the same y 0.8 pocket switches at Vd 1.9 / 3.0 / 4.4 V. The steps are not mesh-robust: on a true 5 nm mesh at y 0.8 (meshChkLoad_m5fix 51939192) the stress drop is unchanged, the 1-strike curve keeps 2 smaller drops, and the 2- and 3-strike curves lose theirs. The threshold is the same on both meshes; the post-switch voltage share is not. Details: [[step-mechanism]], [[step-search-28v]]. SiN stress library resume (51998839) at 69 V of 84.
+
+**Earlier (Nov 18):** goal (Ian, Nov 17): stepped curves at the 28 V stress with 1-3 strikes. SiN steps with 5-8e18 strikes (one 6e18 strike: drops near 2, 6.3, 10.5 V), but strikes that dense also drop HighK. Field-scaled strikes (`gaussFieldM`, rounds H/I) keep HighK flat but give SiN one drop that deepens with each strike. Goal closed with two partial results (Ian, Nov 18): `figures/rad/step28/series_deliverable.png`. Mesh check of the steps running (51883722); round J (51922589, trap level / depth with field-scaled strikes) running as an optional follow-up. 3D brick-gradient bug fixed in a patched FLOOXS copy (3D matches 2D for tracks). Deck: https://claude.ai/artifact/5gkYKv6DZjGL7PAuTvZxR6. Details: [[step-search-28v]], [[3d-plan]].
 
 **Earlier (Nov 11):** final rad model updated (Ian): capture barrier 1.0 eV and a 10 nm mesh, no hand-placed second site. SiN biased collapses once, by about a third near 1.7 V, converged at 5 nm; HighK and non-biased devices don't. The two measured SiN steps are not reproduced. Measured data still incomplete. Details: [[rad-model]], [[damage-region-map]], [[ron-increase]].
 
