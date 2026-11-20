@@ -2233,3 +2233,13 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - **Trap 0.40, 6e18: 2 / 3 / 3 drops on the library and m5fix meshes** (m10 3 / 3 / 4). The m5fix N3 second and third drops are small (12 and 10 mA/mm).
   - **Lose their steps on 5 nm:** trap 0.40 with 5e18 (one drop for every strike count, the stress drop only); trap 0.30 with 6e18 (row A); trap 0.30 with 7e18 (smaller second drops).
   - **radStepM2** (m10: trap 0.40 7e18 N1-3, trap 0.30 8e18 N1/N3, 5 tasks): sbatch failed at 00:15 (slurm controller unreachable); retry loop running. The 2.5 nm stress 52044407 is at Vd 4 of 28.
+
+## 2026-11-20 morning: mesh-robust step series
+
+- **radStepM 52044406 done** (17/17 RADIV DONE, no IDVD GAVE UP; the scheduler outage of Nov 19-20 23:45-~08:00 didn't stop the running tasks). Figures `figures/rad/step28/mesh_series.png` (`analysis/plot_meshSeries.py`, all settings × meshes) and `figures/rad/step28/mesh_deliverable.png` (`analysis/plot_meshDeliverable.py lev40_n7 lev30_n8`). Drops ≥ 8 mA/mm for 1 / 2 / 3 strikes:
+  - **Trap 0.40 eV, 7e18, 5 nm: 1 / 2 / 3 drops, one per strike** (N1 0.8-1.1 V 174 -> 46; N2 1.1-1.4 V 171 -> 75, 2.9-3.2 V 159 -> 100; N3 1.3-1.6 V 170 -> 86, 3.2-3.5 V 169 -> 119, 5.4-5.7 V 173 -> 131). On the library mesh this setting is different: N1 collapses to ~10 near 1 V and drops again at 7-10 V; N2 has 2 drops; N3 has 2 drops and IDVD GAVE UP at 6.1 V (radStepF). The m10 series (radStepM2) decides it.
+  - **Trap 0.30 eV, 8e18: 2 / 3 / 3 drops on the library and 5 nm meshes.** The first two drops stay put (N2: 1.4-1.7 and 3.9-4.1 V library vs 1.4-1.8 and 3.3-3.6 V 5 nm; N3: 1.6-2.0 and 3.7-4.0 V on both). The third drop moves (N2 7.0-8.8 vs 11.4-11.8 V; N3 6.8 V library, where IDVD GAVE UP at 7.0 V, vs 5.9-6.3 V). m10 N2: 3 drops (1.4-1.7, 5.8-6.1, 9.5-10.4 V).
+  - **Trap 0.40 eV, 6e18: 2 / 3 / 3 on the library and 5 nm meshes, 3 / 3 / 4 on m10.** The 5 nm N3 second and third drops are small (12 and 10 mA/mm).
+  - **Lose their steps on 5 nm:** trap 0.40 with 5e18 (stress drop only, all N); trap 0.30 with 6e18 (row A: 2 / 1 / 0) and with 7e18 (2 / 2 / 2, but small).
+- **radStepM2 52072550 submitted 08:28** (the Nov 19-20 retries never got through): m10 trap 0.40 7e18 N1-3, trap 0.30 8e18 N1 / N3.
+- **meshChkStress2p5 52044407** at Vd 12 of 28 after 12 h. **SiN stress library resume 51998839 COMPLETED** (to 84 V).
