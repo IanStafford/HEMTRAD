@@ -2246,3 +2246,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Ian (Nov 20): "keep the 2.5 nm stress running"** (meshChkStress2p5 52044407). Next after it saves Vd 28: load the trap 0.40 / 7e18, trap 0.30 / 8e18 and trap 0.40 / 6e18 0-3 strike series on it (four-mesh check).
 - **Dashboard Nov 20 page** (mesh-robust series), fact-checked by two agents (workflow wf_0888c116-17b, ~90 claims, 28 findings applied): 10 nm counts marked partial; first drop starts at 1.1-1.7 V (within 0.1 V across meshes per strike count); second-drop ranges given per strike count; trap 0.30 / 7e18 on 5 nm keeps 3 / 2 / 2 (small later drops), not "loses its steps"; radStepM is 14 runs on 5 nm + 3 on 10 nm. meshChkStress2p5 was at Vd 13 of 28 at 09:40 (HPG listing).
 - **Dashboard** republished with the Nov 20 page (https://claude.ai/artifact/7gwNdzD3SysL7TP9swRkEd).
+- **Purge done (Ian: "Yeah purge it").** `git filter-branch --index-filter` over 902efe7..main removed `kb/results/measured-r33.md` and `measured-rad-y2.md` from the 11 commits from 48f40f1 on. HEAD tree identical; the notes are in no commit.
+  - Force-pushed with lease: main 8dcedff -> c47f047. Only main contained it; no forks, no tags.
+  - Local and HPG clones reset, reflog expired, gc'd; 48f40f1 is gone from both. Local note files kept (gitignored).
+  - Backup bundle of the old main and copies of the two notes in the session scratchpad: local only, never pushed, cleared with the scratchpad.
+  - **Still on GitHub by SHA:** `gh api .../commits/48f40f15a2b75f55c7ed385784844ac6bd60bfd4` still resolves; GitHub keeps unreferenced commits until its garbage collection. To clear it now, Ian files a GitHub Support request (sensitive-data removal) for 48f40f15a2b75f55c7ed385784844ac6bd60bfd4.
+  - **Ian's laptop clone:** run `git fetch origin && git reset --hard origin/main` (it never pushes, so nothing is lost).
+  - Every commit hash after 902efe7 quoted earlier in this log is now different.
