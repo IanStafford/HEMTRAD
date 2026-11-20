@@ -54,14 +54,14 @@ Full 0-3 strike series of the settings that kept steps at 5 nm, rerun on m5fix a
 
 | Setting | Library (15 nm at y 0.8) | m10 | m5fix |
 |---|---|---|---|
-| trap 0.30, 8e18 | 2 / 3 / 3 (N3 gave up at 7.0 V) | 2 / 3 / 2 (N1, N3 partial at 7.7 / 8.8 V) | 2 / 3 / 3 |
-| trap 0.40, 7e18 | 3 / 2 / 2 (N3 gave up at 6.1 V) | 2 / 3 / 2 (partial, 7.4-7.7 V) | **1 / 2 / 3** |
+| trap 0.30, 8e18 | 2 / 3 / 3 (N3 gave up at 7.0 V) | 2 / 3 / 3 | 2 / 3 / 3 |
+| trap 0.40, 7e18 | 3 / 2 / 2 (N3 gave up at 6.1 V) | 2 / 3 / 3 | **1 / 2 / 3** |
 | trap 0.40, 6e18 | 2 / 3 / 3 | 3 / 3 / 4 | 2 / 3 / 3 (later drops 10-12 mA/mm) |
 | trap 0.40, 5e18 | 2 / 2 / 2 | — | 1 / 1 / 1 (stress drop only) |
 | trap 0.30, 7e18 | 2 / 3 / 4 | — | 3 / 2 / 2 (later drops 8-18 mA/mm) |
 | trap 0.30, 6e18 (row A) | 3 / 2 / 1 | 3 / 3 / 3 | 2 / 1 / 0 |
 
-- **Trap 0.30 eV with 8e18 strikes is the mesh-robust stepped series.** Every 1-, 2- and 3-strike curve drops two or three times on all three meshes. The first drop starts at 1.1-1.2 / 1.4 / 1.6-1.7 V for 1 / 2 / 3 strikes, within 0.1 V on every mesh. The second moves with the mesh: for 2 and 3 strikes at 3.3-4.1 V on library and m5fix and 5.8-6.8 V on m10; for 1 strike at 4.5-6.1 / 5.6-7.2 / 8.8-9.1 V (library / m10 / m5fix). HighK with the same strikes collapses (library: one strike 262 → 7 mA/mm near 1 V), so the SiN vs HighK contrast is not part of this result.
+- **Trap 0.30 eV with 8e18 strikes is the mesh-robust stepped series.** Every 1-, 2- and 3-strike curve drops two or three times, 2 / 3 / 3 on all three meshes. The first drop starts at 1.1-1.2 / 1.4 / 1.6-1.7 V for 1 / 2 / 3 strikes, within 0.1 V on every mesh. The second moves with the mesh: for 2 and 3 strikes at 3.3-4.1 V on library and m5fix and 5.8-6.8 V on m10; for 1 strike at 4.5-6.1 / 5.6-7.2 / 8.8-9.1 V (library / m10 / m5fix). HighK with the same strikes collapses (library: one strike 262 → 7 mA/mm near 1 V), so the SiN vs HighK contrast is not part of this result.
 - **Trap 0.40 eV with 7e18 gives one drop per strike only on m5fix** (3 strikes at 1.4, 3.3, 5.5 V).
 - **Next:** the 2.5 nm stress (meshChkStress2p5 52044407, Ian: keep it running), then these series on it.
 
