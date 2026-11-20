@@ -2292,3 +2292,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   9. eTempDebug readings: mark unverified in the KB.
   10. Clean-up stage 1 (docs, KB, comments): start now; numbers the FP fix may change are marked pre-fix.
   11. Mesh redo with the fixed box: queue the 5 nm and 2.5 nm stresses now.
+- **useTraps / stressSkip guard fixed (DRV-7, Ian):** useTraps now counts damGaussF, and the stressSkip error covers field-scaled damGauss, damGaussF and field-scaled tracks. Local check: a damGaussF-only run (damPeak 0) now places its strikes and reaches RADIV DONE; stressSkip with damGaussF stops with 'stressSkip with a damage law that needs the stress field'. No committed params file is affected.

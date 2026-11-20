@@ -193,7 +193,8 @@ if {![info exists hotTau]}    { set hotTau 1.0e-14 }
 if {![info exists fillIters]} { set fillIters 4 }
 if {![info exists fillRelax]} { set fillRelax 0.5 }
 
-set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || $damInsPeak > 0.0 || $dam2Peak > 0.0 || $dam3Peak > 0.0 || [llength $damList] > 0 || [llength $damSites] > 0 || [llength $damGauss] > 0 || [llength $damTube] > 0 || [llength $damRod] > 0)}]
+# useTraps: any damage lever set (2026-11-20: damGaussF added; a damGaussF-only run used to get no traps at all)
+set useTraps [expr {$radState eq "post" && ($damPeak > 0.0 || $damInsPeak > 0.0 || $dam2Peak > 0.0 || $dam3Peak > 0.0 || [llength $damList] > 0 || [llength $damSites] > 0 || [llength $damGauss] > 0 || [llength $damGaussF] > 0 || [llength $damTube] > 0 || [llength $damRod] > 0)}]
 set trapEn $useTraps
 set trapShape field
 
@@ -322,7 +323,10 @@ proc SaveAtBias {d} {
 if {$radState eq "post"} {
     if {[info exists surfCharge]} { puts $sf "surfCharge $surfCharge" }
     if {$useTraps && $stressSkip} {
-        if {$damPeak > 0.0 || ($damInsPeak > 0.0 && $damInsM != 0.0) || ($dam2Peak > 0.0 && $dam2M != 0.0) || [llength $damList] > 0} { error "stressSkip with a damage law that needs the stress field" }
+        # every damage law that reads the stress field (2026-11-20: field-scaled strikes added)
+        if {$damPeak > 0.0 || ($damInsPeak > 0.0 && $damInsM != 0.0) || ($dam2Peak > 0.0 && $dam2M != 0.0) || [llength $damList] > 0
+            || ([llength $damGauss] > 0 && $gaussFieldM != 0.0) || [llength $damGaussF] > 0
+            || (([llength $damTube] > 0 || [llength $damRod] > 0) && $trackFieldM != 0.0)} { error "stressSkip with a damage law that needs the stress field" }
         foreach f {Estress EstressT EstressNE ElecStress} { sel z=1.0e-30*(1.0+x*x) name=$f }
         puts $sf "stress skipped"
     } elseif {$useTraps && $stressLoad ne ""} {
