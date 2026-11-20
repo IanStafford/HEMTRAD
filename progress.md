@@ -2265,3 +2265,4 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - That is the region where the SiN E^4 stress damage concentrates (y 0.45-0.65) and where SiN and HighK differ, so the stress field and the damage of every rad-era result are probably affected. Both decks are affected the same way (same geometry).
   - The likely fix is the box matching the FP metal: xhi = -(Gate_Thick+HPD_Thick)+buf, yhi = Gtr+FP2+buf. It changes the physics, so it is **not done**.
   - **DECISION FOR IAN:** fix the FP box and redo the 28 V stress library and key results, or keep the geometry and document it as a model caveat?
+- **Clean-up plan written:** `kb/workflow/cleanup-plan.md`, with 6 decisions for Ian, 4 stages each with acceptance tests, a KB conflict table and an appendix of all 155 verified findings. Linked from kb/index.md.
