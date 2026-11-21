@@ -2,10 +2,15 @@
 title: Damage-region map
 tags: [results, radiation, model]
 date: 2026-11-04
+source: progress.md 2026-11-04 to 2026-11-07; radGauss / radGauss2 later-drop comparison read from the synced results on 2026-11-20
 ---
 # Damage-region map
 
-Empirical map of what a damaged section does, by position, on both decks. **Corrected 2026-11-05: the steps and the position dependence at high Vd in radMap1 were mesh artifacts** (radMesh, job 49606872). Vth, Ron and gm stand. On a fine mesh, a dense site acts as a current limit set by its density, independent of Vg and mostly of position (radFine, job 49735196), and each extra site adds a fixed series resistance (radMulti, job 49735488).
+Empirical map of what a damaged section does, by position, on both decks. Two mesh results set the picture:
+- **Uniform sites give no real step.** The steps and the position dependence at high Vd in radMap1 were mesh artifacts (radMesh, job 49606872, corrected 2026-11-05). Vth, Ron and gm stand. On a fine mesh, a dense site acts as a current limit set by its density, independent of Vg and mostly of position (radFine Nov 5, job 49735196), and each extra site adds a fixed series resistance (radMulti, job 49735488). These sites used hotEb 0.5.
+- **Gaussian traps at hotEb 1.0 do collapse, converged.** A σ 40 nm Gaussian drops abruptly on 5 nm and 2.5 nm alike (radGauss 50128863, radGauss2 50148046, 2026-11-07). Its later drops (7-9 V) still move with the mesh.
+
+All runs here used the old FP contact box ([[fp-contact-fix]]). Most had no stress solve, so the effect is smaller: the drain half of the T-gate head sat near the FP's 0 V instead of at the gate bias (+1 V for most curves). Two results here rest on a stress solve and are pre-fix: the biased deck check (radChk2, marked below) and the final SiN curve at 10 nm (radFine `sin_final_m10`).
 
 ## Mesh check (radMesh, job 49606872, 11 tasks, no crashes)
 
@@ -56,9 +61,9 @@ Standard-mesh numbers; the fine-mesh runs confirm them at the three positions ch
 - **Current at high Vd no longer distinguishes positions** at 0.3 µm and 4e18: 0.54–0.55 at 10 V on the fine mesh. The earlier claim that the source side is worst, and the Id(4 V) and Id(10 V) panels of `figures/rad/radMap1.png`, are withdrawn.
 - **The decks barely differ here.** Without a stress solve the deck's main route to the damage is gone, so this says nothing about how irradiation would place damage in each deck.
 
-## A dense site is a current limit (radFine, job 49735196)
+## A dense site is a current limit (radFine Nov 5, job 49735196)
 
-Figure: `figures/rad/radFine.png`. 5 nm in the site, y 1.5, top 50 nm. 17 of 19 tasks finished, no crashes. Id is the mean from 3 to 10 V, in mA/mm.
+Figure: `figures/rad/radFine.png`. 5 nm in the site, y 1.5, top 50 nm. All 19 tasks ended with no crashes (the 2 Vg-family tasks finished after the first reading, every Vg curve to 10 V). This is not the Oct 24 radFine (job 47562303, params at commit 0fbf0ce), which [[rad-model]] cites. Id is the mean from 3 to 10 V, in mA/mm.
 
 | Density (cm⁻³) | 0.3 µm wide | 0.1 µm wide |
 |---|---|---|
@@ -76,7 +81,7 @@ Figure: `figures/rad/radFine.png`. 5 nm in the site, y 1.5, top 50 nm. 17 of 19 
 
 With curves run in the order Vg +1, then −2 upward, traps stay filled, because capture is fill-only.
 
-- **It survives 5 nm (radFine; 2 family tasks still running at the last Vg values).** At y 3.0, 0.3 µm, 4e18, the Vg −1 and −0.5 curves agree within 8% over the whole sweep, from nearly zero at low Vd up to about 500 mA/mm at 10 V. Curves at lower Vg leave that line when the gate limits them (244 at Vg −2, 378 at −1.5). The first +1 V curve doesn't show this; it stays at about 557.
+- **It survives 5 nm (radFine Nov 5, job 49735196).** At y 3.0, 0.3 µm, 4e18, the Vg −1 and −0.5 curves agree within 8% over the whole sweep, from nearly zero at low Vd up to about 500 mA/mm at 10 V. Curves at lower Vg leave that line when the gate limits them (244 at Vg −2, 378 at −1.5). The first +1 V curve doesn't show this; it stays at about 557.
 - **A denser site blocks almost completely, then turns on.** At 0.1 µm and 1.2e19, Vg −2 to 0 pass nearly no current to 7 V, then rise together to 129–137 mA/mm at 10 V.
 - **Unlike R33, low Vd is dead here.** R33 curves start normally and then drop onto their line. The model has no emission, so it overstates memory. A real device may sit between the two.
 - **The earlier standard-mesh results (radFam, job 49606874) agree in kind but not in numbers.**
@@ -145,8 +150,8 @@ SiN, 5 nm in the site, all reached 10 V. Curves run in the order Vg +1, −1.5, 
 | B, 99% | 66 | 247 | 242 | normal low Vd, shallower drops near 7–8 V |
 
 - **Trap memory holds with cold electrons:** the rising, Vg-independent line is not from the stale TeTrap.
-- **Low Vd switches between dead and normal somewhere under 50% released.** Between the two extremes is untested (radEmit3).
-- **Site B's drops (24–52 mA/mm per point) don't count yet.** They come at about the same Vd for every Vg, return to the same limit rather than settling on a lower line, and look like the wiggles already seen at this density. A 2.5 nm check is running. Measured onset moves with Vg; these don't.
+- **Low Vd switches between dead and normal somewhere under 50% released.** radEmit3 then tested 10-30% (below); 30-50% is untested.
+- **Site B's drops (24–52 mA/mm per point) don't count yet.** They come at about the same Vd for every Vg, return to the same limit rather than settling on a lower line, and look like the wiggles already seen at this density. Measured onset moves with Vg; these don't. The 2.5 nm check (radEmit3) found they persist (below).
 
 ## Refined position map (radMap2, job 50128864, 56 tasks, no crashes, 2 stopped before 10 V)
 
@@ -176,21 +181,24 @@ Figure: `figures/rad/gauss_mesh.png`. σ 40 nm at the surface, hotEb 1.0, Vd ste
 - **The onset no longer depends on position**, at least between these two sites (1.2–1.3 V, not 1.5 and 1.7 V).
 - **The 0.55 eV shape resembles the original collapse target:** sharp drop at low Vd, then creep. That target is at Vg −2; this is Vg +1.
 - **The Oct 29 slide's "only the recovery differs":** at 5 nm SiN recovers higher above 6 V (about 180 against 115–123 at 10 V), the reverse of the standard-mesh result.
-- **Not yet settled:** shape or barrier (these use hotEb 1.0, the uniform sites 0.5), 2.5 nm convergence, onset against Vg. All in radGauss2.
+- **Settled by radGauss2 (next section):** the capture barrier decides it (these use hotEb 1.0, the uniform sites 0.5), the first drop converges at 2.5 nm, and onset barely moves with Vg.
 
 ## Converged collapse, and what it needs (radGauss2 job 50148046, radChk2 job 50128862, radEmit3 job 50128200)
 
 All three finished with no crashes. Id in mA/mm, Vg +1 unless stated.
 
 - **The Gaussian collapse is converged.** At 2.5 nm, 0.30 eV drops near 1.2 V to 36 at 2 V and recovers to about 160 by 5 V, matching 5 nm. 0.55 eV drops at 0.3–0.4 V to 0 at 0.5 V, then creeps to 42 at 10 V, again matching 5 nm.
+- **The later drops are not converged.** HighK, 0.30 eV, 5e18 at y 1.0: on 5 nm (radGauss) two drops at 7.2–7.8 V (166 → 145) and 8.2–9.1 V (147 → 120); on 2.5 nm (radGauss2) one drop at 7.8–9.1 V (168 → 130). Id at 10 V is the same (123 and 124).
 - **The capture barrier decides it.** The same Gaussian at hotEb 0.5 (the final model's value) loses only 25 mA/mm at 1.8 V, with no collapse. A wider Gaussian (σ 0.1 µm, more charge) at hotEb 1.0 collapses at 1.4 V to about 0 and stays below 4 by 10 V.
 - **Onset barely moves with Vg** (SiN, 0.30 eV): 1.4 V at Vg −1.5, 1.3 V at −0.5 and 0, 1.2–1.3 V at +1. The level after recovery is the same at every Vg, 178–180 at 10 V. That shared, gate-independent level resembles R33. R33's onset moves later at higher Vg; this one doesn't.
-- **The deck contrast survives a fine mesh** (biased, 10 nm over y 0.3–2.0): HighK 952 at 10 V, no collapse (standard mesh 953); SiN one site 503 (standard 500). The difference comes from where the stress field puts damage, not from the mesh.
+- **The deck contrast survives a fine mesh** (biased, 10 nm over y 0.3–2.0): HighK 952 at 10 V, no collapse (standard mesh 953); SiN one site 503 (standard 500). The difference comes from where the stress field puts damage, not from the mesh (pre-fix; being rerun, [[fp-contact-fix]]).
 - **Site B's drops (8e18, hotEb 0.5) persist at 2.5 nm:** 38–102 mA/mm at 5–9.75 V depending on Vg, and they recover within a volt or two. Real, or at least not removed by refinement, but they're dips rather than drops onto a lower line.
 - **Partial release at rest (5 nm):** site A at 10–30% released starts low and rises smoothly to the limit, with no drop. Site B at 10–20% is blocked to 3–4 V, then rises. Site B at 30% and Vg +0.5 drops from 251 to 79 at 7.5 V and then rises (92, 103): the closest thing to R33's shape so far, but one curve, and at a density where dips are common.
 
 ## Open
 
-Release between 0 and 50% and the 2.5 nm check (radEmit3); what actually produces abrupt steps in the measured curves, since neither the 2D sites nor isolated tracks do.
+- Release between 30 and 50% (radEmit3 covered 10-30%).
+- Whether the later Gaussian drops (7-9 V) converge below 2.5 nm.
+- What produces abrupt steps in the measured curves, since neither the 2D sites nor isolated tracks do. The 28 V strike search continues this in [[step-search-28v]].
 
-Related: [[rad-model]], [[ron-increase]], [[rad-literature]], [[critical-strike]], [[mesh]], [[hot-electron-capture]].
+Related: [[rad-model]], [[ron-increase]], [[rad-literature]], [[critical-strike]], [[mesh]], [[hot-electron-capture]], [[step-search-28v]], [[fp-contact-fix]].

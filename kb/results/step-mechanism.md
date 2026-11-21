@@ -2,11 +2,13 @@
 title: Why the 28 V strike curves step
 tags: [results, rad-model, strikes, mechanism]
 date: 2026-11-19
-source: progress.md 2026-11-19; HPG jobs radStepDiag 51998840, radStepDiag5b 52018703, meshChkLoad_m5fix 51939192; fact-checked by three independent agents (workflow wf_0a18b21d-f13)
+source: progress.md 2026-11-19 (pre-fix marker 2026-11-20); HPG jobs radStepDiag 51998840, radStepDiag5b 52018703, meshChkLoad_m5fix 51939192; fact-checked by three independent agents (workflow wf_0a18b21d-f13)
 ---
 # Why the 28 V strike curves step (each drop is one damaged spot switching)
 
-**Setup.** Diagnostic reruns of the [[step-search-28v]] cases with `vdCuts=1` ([[levers]]). SiN deck, 28 V stress damage (scale 1.5e18), Vg +1 V, hotEb 1.0 eV. Strikes are 6e18 (σ 40 nm) at y 0.8 / 1.6 / 2.4 µm with trap level 0.30 eV, except E_lev0.4_N2 (0.40 eV) and C_n8e18_N2 (8e18).
+**Pre-fix.** Every run here loaded a 28 V stress state saved with the old FP contact box, so during the stress the drain edge of the T-gate head sat near 0 V instead of −10 V. The mechanism and numbers below are pre-fix; the stress and the key series are being rerun ([[fp-contact-fix]]).
+
+**Setup.** Diagnostic reruns of the [[step-search-28v]] cases with `vdCuts=1` ([[levers]]). SiN deck, 28 V stress damage (scale 1.5e18), Vg +1 V, hotEb 1.0 eV. Strikes are 6e18 (σ 40 nm) at y 0.8 / 1.6 / 2.4 µm with trap level 0.30 eV, except E_lev0.4_N2 (0.40 eV) and C_n8e18_N2 (8e18). Case labels (C_N0, A_N1, B_N2, A_N3, row A) and the meshes (library, m5fix) are defined in the Labels section of [[step-search-28v]].
 
 **Runs and what they cut.**
 - radStepDiag 51998840: library mesh, 0-3 strikes. Cuts along the channel at every Id-Vd point, 1 nm below the AlGaN/GaN interface (x 0.016 µm): filled traps, electrons, lateral field, TeTrap.
@@ -78,6 +80,6 @@ source: progress.md 2026-11-19; HPG jobs radStepDiag 51998840, radStepDiag5b 520
 - Why reaching ~0.5 V is sometimes not enough (2-strike stress band).
 - Why the drain-side pocket switches first.
 - Why the second-stage switch is missing on the 5 nm mesh.
-- Whether the steps converge: 2.5 nm at the strike sites needs a new stress run (~90 h). The 5 nm m5fix B_N2 and A_N3 cases have no vdCuts run.
+- Whether the steps converge at 2.5 nm. The old-box 2.5 nm stress (meshChkStress2p5 52044407) was cancelled at Vd 20 on Nov 20; fixed-box 5 nm and 2.5 nm stresses are queued (fpFixMesh 52135538). The 5 nm m5fix B_N2 and A_N3 cases have no vdCuts run.
 
-Related: [[step-search-28v]], [[hot-electron-capture]], [[trap-model]], [[rad-literature-steps]].
+Related: [[step-search-28v]], [[hot-electron-capture]], [[trap-model]], [[rad-literature-steps]], [[fp-contact-fix]].

@@ -18,6 +18,10 @@ date: 2026-10-01
   - **Trap at y 1.0:** −100% at 1.5 V on both (122 / 126 → 0.05 mA/mm), floor ~1e-5. By 10 V HighK recovers to 0.24 mA/mm and SiN to 0.012.
   - **Trap at y 2.4:** −100% at 1.7 V on both, floor ~1e-6. At 10 V: 8e-4 (HighK) vs 1.4e-5 mA/mm (SiN).
   - So the passivation changes only the post-collapse recovery above ~4 V (SiN stays 20–60× lower). It does not change whether or where the collapse happens.
-  - **The trap model cannot make SiN collapse while HighK does not.**
+  - **With hand-placed traps (the same trap set on both decks), the trap model cannot make SiN collapse while HighK does not.**
+  - The rad model gets its deck difference elsewhere: the off-state stress field puts more damage in SiN under the T-gate head's drain edge, so only SiN collapses ([[rad-model]]; strikes in [[step-search-28v]]). That result is pre-fix; being rerun, [[fp-contact-fix]].
   - At Vg +1 the onset (1.3–1.7 V) comes earlier than at Vg −2 (2.3 V for y 1.0, [[trap-sensitivity]]): the current-driven ordering of [[gate-bias]].
   - All 8 tasks completed with no `GAVE UP`, in 28–66 min each.
+- **FP contact box:** every run here used the old box, which put the top of the T-gate head's drain half on the FP contact (fixed 2026-11-20, [[fp-contact-fix]]). The head/field-plate field numbers above predate that fix.
+
+Related: [[rad-model]], [[step-search-28v]], [[fp-contact-fix]], [[trap-sensitivity]], [[gate-bias]].

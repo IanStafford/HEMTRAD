@@ -2,22 +2,36 @@
 title: Pre/post-irradiation model (HPD vs SiN, biased heavy-ion)
 tags: [results, radiation, model]
 date: 2026-10-25
-source: branch explore/rad-model, drivers/radIV.tcl, sweeps/params_rad*.txt
+source: drivers/radIV.tcl (developed on explore/rad-model, merged to main 2026-11-04); sweeps/params_rad*.txt (the Oct 24 radFine params are only in git history, commit 0fbf0ce); progress.md 2026-10-23 to 2026-11-20
 ---
-# Pre/post-irradiation model (branch `explore/rad-model`)
+# Pre/post-irradiation model (HPD vs SiN, biased heavy-ion)
 
-> **2026-11-12 (Ian): the final model moves to a 28 V stress.** The damage scale is being refitted (rad28fit, radExp3); until then the 17 V set below stands.
->
-> **Final model as of 2026-11-11 (Ian):** the radFinal8 parameter set with the hot-electron capture barrier at **1.0 eV** (was 0.5), a **10 nm** mesh from y 0.3 to 2.0 µm (`meshY`), Vd step 0.1 V, and **no hand-placed second SiN site**. Stress at **Vd 17 V** (`Vd_stress=17.0`; earlier runs stopped there because of the old occupancy overflow, and with `occSafe` the driver would otherwise go on to its 28 V target). Parameters `sweeps/params_radFinal12.txt`; results are radChk 49552956 (pre), radEB1 50411481 (nb, biased) and radEB2 50470082 (5 nm check). Figure `figures/rad/radFinalEB_IdVd.png`.
-> - Vth +0.21 V on every irradiated device. Non-biased: 0.93–0.95 of pre, gm −1%.
-> - HighK biased: 342 / 951 mA/mm at 1 / 10 V (0.93 / 0.92 of pre), no collapse, gm −2%.
-> - SiN biased: 306 at 1 V (0.83), 374 → 255 mA/mm at 1.6–1.8 V, partial recovery to about 390 at 6 V, a dip near 7–8 V, 370 at 10 V (0.36). gm −6%.
-> - Not reproduced: the measured second step, the current staying down after the drop, and onset moving later at higher Vg. The sections below are the history, and their steps (radFinal8, radFinal11) are mesh artifacts.
+> **Current model (as of 2026-11-20; pre-fix, being rerun, [[fp-contact-fix]])**
+> - **Stress:** off-state at Vg −10 / Vd 28 V (Ian, 2026-11-12), with `occSafe 1`. Runs load the saved 28 V state from the stress library instead of solving the stress again ([[stress-library]]).
+> - **Damage** ([[damage-model]]): lateral-field acceptor damage N = damPeak·(E_lat/5e5)⁴ for y ≥ 0.30 µm in the top 50 nm, at **damPeak 1.5e18**. That is the 28 V scale closest to the Nov 11 collapse (refit below) and the base scale of the step search (rounds A-M2; round A also tried 1.6-1.8e18, rad28strikeL 2e18). **No decision on the scale is recorded:** 1.6-1.8e18 was proposed on Nov 17 with no recorded answer (round A ran them stress-only: one drop each).
+> - **Traps and capture:** acceptor level 0.30 eV, hot-electron fill-only capture with **hotEb 1.0 eV** and hotTau 1e-14. The Vth shift comes from surfCharge −4e11 cm⁻² and 5e17 cm⁻³ AlGaN acceptors under the gate (dam2).
+> - **Parameters:** the library lines in `sweeps/params_stressLib.txt` and the loading runs in `sweeps/params_radStep*.txt`, all written by `analysis/genRadStudy.py`.
+> - **Results at 28 V and 1.5e18:** SiN biased drops once, 395 → 273-281 mA/mm at 1.6-2.0 V on the library, m10 and m5fix meshes, then creeps up. HighK biased does not collapse (956 mA/mm at 10 V, rad28fit). Vth +0.21 V on both decks (round S, rad28strikeL 51763582, against the pre runs).
+> - **Mesh caveat:** the stress-only drop is mesh-converged. Strike steps after the first drop move with the mesh. The mesh-robust stepped series (strikes on top of this model) is in [[step-search-28v]], the mechanism in [[step-mechanism]].
+> - **FP contact fix (2026-11-20):** every result in this note used the old FP contact box, which held the T-gate head's drain edge near 0 V during the stress instead of −10 V. The library, the step series and the Nov 11 model are being rerun with the fixed box (fpFixStress 52134552, then fpFixLoad; fpFixEB1 52134554).
+> - **Not reproduced by the stress damage alone:** a second SiN step, the current staying down after the drop, and onset moving later at higher Vg.
+
+**Superseded (kept below as history):**
+- **The two SiN steps of radFinal8 / radFinal11 (Oct 27):** mesh artifacts. On 10 nm the same set rises smoothly (radFine Nov 5, job 49735196).
+- **"Stress at 17 V" (until Nov 11):** `occSafe` removed the solver limit on Oct 29 (rad28a 48206375 reaches 28 V). The pre-occSafe final runs (radFinal8 through radEB1 / radEB2) were really stressed at about 17.6-17.7 V, radEB1 at 17.66 V.
+- **hotEb 0.5 (radFinal5 to radFinal11):** replaced by 1.0 eV on Nov 11, because 0.5 gives no collapse on a fine mesh.
+- **The hand-placed second SiN site (dam3, Oct 26):** dropped on Nov 11. Its drops are mesh-sensitive (radEB2 50470082).
+- **The n·E access-region damage (Oct 25):** dropped on Oct 26. Its band is larger in HighK, the wrong deck direction.
+- **Under-gate acceptors 1.5e17 (radFinal5):** 5e17 from radFinal8 on.
+- **The Nov 11 model (17.66 V stress, `sweeps/params_radFinal12.txt`):** replaced by the 28 V stress on Nov 12. It stays the reference curve (radEB1) in the step figures, and fpFixEB1 reruns it with the fixed box.
+- **Open points settled later:** "the final set is unchanged pending Ian's decision" (Nov 5) and "the final model stays at 0.5 unless Ian decides otherwise" (Nov 9) were settled on Nov 11. "Running (radExp2)" (Nov 12) now has its result.
+
+Below: the goal, the driver and tools, then the record of each step in date order, with numbers as found at the time.
 
 Goal (2026-10-23): one model that reproduces, **qualitatively** (Ian, 2026-10-25), the measured pre- and post-irradiation behaviour of the HPD (#11) and SiN (#35) devices, irradiated non-biased and biased (Vg −10 / Vd 28 V) with high-LET heavy ions. The measured data are kept untracked (`data/rad_y2/`, `kb/results/measured-rad-y2.md` on the workstation only), so this note gives model numbers and qualitative comparisons only.
 
 ## Driver and tools
-- `drivers/radIV.tcl` (branch only):
+- `drivers/radIV.tcl` (on main since the 2026-11-04 merge of `explore/rad-model`):
   - `radState pre|post`;
   - Id–Vg at Vd 0.1 and Id–Vd at Vg +1 V;
   - for post: an off-state stress solve, damage traps set from the stress solution, then the measurement with hot-electron fill-only capture.
@@ -29,20 +43,20 @@ Goal (2026-10-23): one model that reproduces, **qualitatively** (Ian, 2026-10-25
 ## Pre-irradiation calibration
 Rounds 1–3 (jobs 47311016, 47324103, 47327599) settled on:
 - polCharge 1e13, phiB 2.94;
-- mobNref 1e18, vsat 1.75e7 cm/s, mumax 2100 (`mobVsat`/`mobMumax`/`mobNref` levers in `model/GaN.tcl`, branch).
+- mobNref 1e18, vsat 1.75e7 cm/s, mumax 2100 (`mobVsat`/`mobMumax`/`mobNref` levers in `model/GaN.tcl`).
 
 Result: Vth within 0.03 V, Id–Vd at Vg +1 within ~4%, gm ~25% high.
 
-## Post-irradiation model (all set at the stress bias)
+## Post-irradiation model (2026-10-25, history; all set at the stress bias)
 1. **Fixed negative surface charge** `surfCharge −4e11 cm⁻²` (bias-independent): Vth +0.06 V and ~−4% current in both decks. The measured shift is a bit larger. −1.2e12 gives the size, but adds a flat ~15% loss that the data don't show.
 2. **Lateral-field damage beyond the gate edge:**
    - N = damPeak·(E_lat/5e5)⁴ for y ≥ 0.30 µm in the top 50 nm, as acceptor traps at 0.30 eV;
    - hot-electron fill-only capture (hotEb 1.0, hotTau 1e-14);
-   - SiN concentrates the stress field at y 0.35–0.65 µm (5.5e5 vs 2.9e5 V/cm in HighK at y 0.5), so only SiN collapses, and the collapse starts above the knee (radWin w2, radFine, radFit1).
+   - SiN concentrates the stress field at y 0.35–0.65 µm (5.5e5 vs 2.9e5 V/cm in HighK at y 0.5), so only SiN collapses, and the collapse starts above the knee (radWin w2, radFine Oct 24, radFit1).
 3. **n·E damage in the gate–drain access region:** N = dam2Peak·(n·E_lat / peak) for y 0.125–3.0. This gives a Ron-like loss that is largest at low Vd and recovers toward 10 V, in both decks (radNE2: HighK 0.78 → 0.94 at 3e20).
 4. **Gate–drain leakage:** a lumped `Rgd` (post-processing in `IdExt`), not physical.
 
-## Consolidated run: radFinal (job 47693156, `sweeps/params_radFinal.txt`)
+## Consolidated run: radFinal (job 47693156, `sweeps/params_radFinal.txt`; 2026-10-25, history)
 All 8 tasks COMPLETED, no GAVE UP. Figure: `figures/radFinal_model.png` (model only; the overlay with measured curves is kept untracked on the workstation, `data/rad_y2/radFinal_overlay.png`). Plot script: `analysis/plot_radFinal.py`.
 
 Ratios to each deck's pre run, Id(Vg +1) at Vd 1 / 2 / 4 / 6 / 10 V, and low-field Id(Vg −1.4, Vd 0.1):
@@ -65,7 +79,9 @@ Ratios to each deck's pre run, Id(Vg +1) at Vd 1 / 2 / 4 / 6 / 10 V, and low-fie
 | nb low-Vd loss | flat −4% | SiN has a low-Vd dip | partial |
 | off-state gate–drain leakage (biased) | lumped `Rgd` only | ~linear in Vgd, steps during irradiation | lumped |
 
-## What each run showed
+## What each run showed (2026-10-23 to 10-25)
+
+The radFine row is the Oct 24 study (job 47562303). `sweeps/params_radFine.txt` now holds a different study with the same name (Nov 5, job 49735196); the Oct 24 file is only in git history (commit 0fbf0ce).
 
 | Run (job) | Finding |
 |---|---|
@@ -73,21 +89,21 @@ Ratios to each deck's pre run, Id(Vg +1) at Vd 1 / 2 / 4 / 6 / 10 V, and low-fie
 | D2 (47356193) | m4/m6 damage: collapse, but both decks (gate-edge damage saturates equally) |
 | radWin (47458256) | Damage position matters. Gate edge (y 0.125–0.30): early collapse in both decks. y 0.30–0.65: SiN-only drop from ~4 V |
 | radIns (47458257) | Fixed charge in the SiN: same in both decks. Higher hotEb moves the onset earlier. Dropped |
-| radPost / radFine (47523721 / 47562303) | y ≥ 0.30: HighK flat, SiN collapse; depth set by damPeak (4e18 → 7.5e18) |
+| radPost / radFine Oct 24 (47523721 / 47562303; radFine params at commit 0fbf0ce: `git show 0fbf0ce:sweeps/params_radFine.txt`) | y ≥ 0.30: HighK flat, SiN collapse; depth set by damPeak (4e18 → 7.5e18) |
 | radFit1 (47593908) | surfCharge −4e11 moves the SiN onset ~1 V later than −1.2e12 |
 | radFit2 (47606666) | A second, farther damage site gives a second, later step (onset Vd rises with distance from the gate). The same uniform damage collapses HighK too, so the deck difference must come from where the stress places damage |
 | radNE1 (47628955) | n·E weighting over the whole device: contact-edge and source damage dominate; decks identical |
 | radNE2 (47662463) | n·E limited to gate–drain: Ron-like, recovering loss in both decks |
 
-## Caveats
-- The off-state stress solve stops at Vd 17 V (Vdg ≈ 27 V; NaN in the minority quasi-Fermi levels in the depleted AlGaN), not 28 V. The damage scale absorbs the field magnitude. Solving the stress without holes might reach 28 V, but that is a physics change; it needs Ian's approval.
+## Caveats (2026-10-25)
+- The off-state stress solve stopped at Vd 17 V (Vdg ≈ 27 V; NaN in the minority quasi-Fermi levels in the depleted AlGaN), not 28 V. The damage scale absorbs the field magnitude. **Fixed 2026-10-29:** with `occSafe 1` the stress reaches 28 V (below).
 - The y ≥ 0.30 µm exclusion of gate-edge damage is a fitting choice. Without it, gate-edge damage collapses both decks equally, which the data don't show. n·E weighting gives no gate-edge damage naturally (no electrons there at stress), but it can't produce the SiN late collapse.
-- The measured SiN collapse steps down twice (event-like damage); the model gives one step unless a second site is added by hand.
+- The measured SiN collapse steps down twice (event-like damage); the stress damage alone gives one step. In Oct the steps came from a second site added by hand; since Nov 17 they come from strikes ([[step-search-28v]]).
 - The leakage (Rgd) and the low-Vd contact offset (V0, from radFit) are lumped elements.
 
-Related: [[highk-vs-sin]], [[hot-electron-capture]], [[trap-model]], [[levers]].
+Related: [[highk-vs-sin]], [[hot-electron-capture]], [[trap-model]], [[levers]], [[damage-model]], [[stress-library]].
 
-## Final model (2026-10-26, radFinal2 job 47752290): n·E access term dropped
+## Final model (2026-10-26, radFinal2 job 47752290, history): n·E access term dropped
 With `dam2Peak 0` (no n·E access damage), otherwise as radFinal:
 - **Biased HighK:** 0.94 flat (Id ratios at Vd 1–10 V 0.93–0.96), gm −2%, Vth +0.057 V. Qualitatively on the measured HPD biased Id–Vd curve; the measured HPD gm is essentially unchanged.
 - **Biased SiN:** low field 0.88, then a collapse from ~2.3 V to 0.57–0.59, gm −5%, Vth +0.054 V. Measured SiN loses clearly more gm and collapses in two steps, deeper.
@@ -103,7 +119,7 @@ With `dam2Peak 0` (no n·E access damage), otherwise as radFinal:
   - The non-biased devices are different parts, and their device spread is larger than the radiation effect.
   - The biased HPD Id–Vg at Vd 0.1 loses more than its Id–Vd suggests, possibly a measurement-order or recovery effect that a static model can't reproduce.
 
-## Final parameter set (2026-10-26, radFinal5 job 47806744)
+## Final parameter set (2026-10-26, radFinal5 job 47806744, history)
 Base: round-3 calibration.
 
 **Post-irradiation:**
@@ -130,15 +146,15 @@ Base: round-3 calibration.
 - The model gm loss is similar in both decks (−8% / −12%), whereas measured shows a clear SiN > HPD difference.
 - The leakage is lumped.
 - The gate-edge exclusion is a fitting choice.
-- The stress solve stops at 17 V.
+- The stress solve stops at 17 V (fixed by `occSafe` on Oct 29).
 
-## Second discrete damage site (2026-10-26, radFinal6 job 47829928)
+## Second discrete damage site (2026-10-26, radFinal6 job 47829928, history)
 The optional third site `dam3Peak/dam3Ymin/dam3Ymax` (uniform, default off) puts an ion-strike-like damage spot at y 1.0–1.6 µm on top of the final set.
 - **SiN p6e18 + 4e18:** 0.60 at 1 V, then a *first step* near 5 V (0.53 → 0.44 at the Id–Vd level) and a *second step* near 6.3 V, followed by a slow creep up. The two-step shape, onset region and low-Vd loss now resemble the measured SiN biased curve qualitatively.
 - **SiN p7e18 + 2e18 / 4e18:** steps merge or come earlier.
 - **HighK p7e18 + 4e18:** the same uniform site collapses HighK too (0.63 → 0.39 near 6 V). So the second site is device-specific (a random strike location in that SiN device) and can't be derived from the deck. It's a fitting choice, documented as such. The leakage stepping during irradiation supports event-like damage.
 
-## Consolidated final model (2026-10-27, radFinal8 job 47887339)
+## Consolidated final model (2026-10-27, radFinal8 job 47887339, history)
 One parameter set for every device (`sweeps/params_radFinal8.txt`; pre from radFinal 47693156):
 - **pre:** polCharge 1e13, phiB 2.94, mobNref 1e18, vsat 1.75e7, mumax 2100.
 - **post (all devices):**
@@ -169,14 +185,14 @@ One parameter set for every device (`sweeps/params_radFinal8.txt`; pre from radF
 - the SiN final level is shallower than measured;
 - the lumped leakage, the gate-edge exclusion and the second-site placement are fitting choices.
 
-**Stress limit (confirmed 2026-10-26):** the off-state stress stops at Vd 17 V (Vdg ≈ 27 V).
+**Stress limit (confirmed 2026-10-26; removed by `occSafe` on 2026-10-29):** the off-state stress stopped at Vd 17 V (Vdg ≈ 27 V).
 - Ian approved `stressNoHoles` (holes removed above `stressNoHolesX`; removing them everywhere breaks the Fe buffer). It runs, but stops at 17 V with identical fields.
 - Qfn damping (`stressQfnDamp` 0.02 / 0.005) also stops at 17 V.
 - The Newton log diverges in Qfn in the depleted AlGaN/GaN, a hard solver limit. Both levers stay in, default off (smokes 47861047, 47875456).
 - radFinal9 (47908735): a stronger second site (5e18 / 6e18) deepens the SiN low-Vd loss (gm −19% / −21%), but every Id–Vd sweep gives up at Vd 3.75–4.5 V, right at the collapse step. So the deeper SiN final level couldn't be confirmed, and radFinal8 stays the final set.
 - radFinal10 (47943462): the same cases with Vd_step 0.1 and retryDepth 8 still give up at Vd 4.2 / 3.6 V, so the deeper SiN level stays unresolved and radFinal8 is final.
 
-## Final SiN biased curve (2026-10-27, radFinal11 job 47959281)
+## Final SiN biased curve (2026-10-27, radFinal11 job 47959281, history: its steps are mesh artifacts)
 Settings: radFinal8 set with damPeak 6e18 + second site `dam3Peak 4.5e18` (y 1.0–1.6), Id–Vd at `Vd_step 0.1, retryDepth 8`. It runs to 10 V:
 - Id (Vg +1) 212 / 342 / 417 / 452 mA/mm at Vd 1–4 V;
 - **steps near 4.5 V (→ 360) and 5.8 V (→ 255)**;
@@ -191,7 +207,7 @@ Other cases in the run:
 
 This replaces the radFinal8 two-site SiN curve. All other devices stay at radFinal8.
 
-## Stress at the real 28 V (2026-10-29, rad28a job 48206375)
+## Stress at the real 28 V (2026-10-29, rad28a job 48206375, history)
 With `occSafe 1` the stress reaches Vd 28 V. pre/nb with occSafe are identical to radFinal/radFinal8 (the rewrite is exact).
 - **Lateral field at 28 V** (x = 0.001 µm):
   - SiN: 7.5e5 V/cm at y = 0.5, 5.8e5 at 0.6, 3.4e5 at 0.7 (up to the field-plate edge);
@@ -232,9 +248,9 @@ Reachable size is a separate question: [[rad-literature]] finds no Vth data near
 
 Related: [[damage-region-map]], [[ron-increase]].
 
-**Correction 2026-11-05 (radFine, job 49735196): the two steps of the final SiN curve above are mesh artifacts.** With 10 nm from y 0.3 to 1.6 µm, the same parameter set gives 118 / 211 / 340 / 451 mA/mm at Vd 0.5 / 1 / 2 / 4 V, then a smooth rise to 473 at 10 V, with no step larger than 1 mA/mm. The standard mesh gave steps near 4.5 and 5.8 V and 377 at 10 V. Below the steps, the two meshes agree within 1%, so the low-Vd loss, the Vth shift and the SiN vs HighK difference stand; the late collapse does not. The model doesn't currently reproduce the measured steps. The final set is unchanged pending Ian's decision. Not yet rechecked on a fine mesh: radFinal8's other curves and the 28 V set. See [[damage-region-map]].
+**Correction 2026-11-05 (radFine Nov 5, job 49735196, the study now in `sweeps/params_radFine.txt`): the two steps of the final SiN curve above are mesh artifacts.** With 10 nm from y 0.3 to 1.6 µm, the same parameter set gives 118 / 211 / 340 / 451 mA/mm at Vd 0.5 / 1 / 2 / 4 V, then a smooth rise to 473 at 10 V, with no step larger than 1 mA/mm. The standard mesh gave steps near 4.5 and 5.8 V and 377 at 10 V. Below the steps, the two meshes agree within 1%, so the low-Vd loss, the Vth shift and the SiN vs HighK difference stand; the late collapse does not. The model doesn't currently reproduce the measured steps. The final set was left unchanged pending Ian's decision; he settled it on Nov 11 (hotEb 1.0, no second site, below). At the time radFinal8's other curves and the 28 V set had not been rechecked on a fine mesh; the 28 V refit of Nov 12-15 ran on 10 nm. See [[damage-region-map]].
 
-## Capture barrier 1.0 eV in the final set (radEB1, job 50411481, 2026-11-09, test only)
+## Capture barrier 1.0 eV in the final set (radEB1, job 50411481, 2026-11-09, history)
 
 10 nm from y 0.3 to 2.0 µm, Vd step 0.1 V, otherwise the final set. 6 tasks, no crashes. Figure `figures/rad/hotEb_final.png`. Id in mA/mm at Vg +1 V.
 
@@ -249,9 +265,17 @@ Related: [[damage-region-map]], [[ron-increase]].
 - Vth and gm are unchanged by the barrier (SiN two sites gm 55.8 against 68.0 pre, −18%, as before).
 - At hotEb 1.0 the model again collapses SiN and not HighK, on a fine mesh, with two drops when there are two sites. The drops recover partly between and after, unlike the measured slow creep.
 - **5 nm check (radEB2, job 50470082, 2 tasks, no crashes):** the one-site collapse is converged: 374 to 256 mA/mm at 1.6–1.7 V, then the same recovery, within 2 mA/mm of 10 nm everywhere. The two-site drops are not: at 5 nm they shrink to 28 mA/mm at 3.4 V and 22 at 4.9 V, with smaller wiggles, ending at 395. The second site (dam3, 4.5e18 at y 1.0–1.6) is still mesh-sensitive.
-- So hotEb 1.0 gives one real, SiN-only collapse from the field-placed damage. A converged second step isn't there yet. The final model stays at 0.5 unless Ian decides otherwise.
+- So hotEb 1.0 gives one real, SiN-only collapse from the field-placed damage. A converged second step isn't there yet. At the time the final model stayed at 0.5 pending Ian; he moved it to 1.0 on Nov 11 (next section).
 
-## Exploring from the final set (radExp1 50831893, radExp1c 50892179, 2026-11-11/12)
+## Final model of 2026-11-11 (Ian; history: replaced by the 28 V stress on Nov 12)
+
+The radFinal8 parameter set with the hot-electron capture barrier at **1.0 eV** (was 0.5), a nominal **10 nm** mesh from y 0.3 to 2.0 µm (`meshY`; the deck lines DrainT and rightFP sit inside that patch, so the real spacing is 10-16 nm over y 0.5-0.65 and ~20 nm at y 0.8, and the radEB2 '5 nm check' refined only the ends: [[mesh]]), Vd step 0.1 V, and **no hand-placed second SiN site**. Stress at **Vd 17 V** nominal (`Vd_stress=17.0`; earlier runs stopped there because of the old occupancy overflow, and with `occSafe` the driver would otherwise go on to its 28 V target). In practice radEB1 took its field at 17.66 V (found 2026-11-13, below). Parameters `sweeps/params_radFinal12.txt`; results are radChk 49552956 (pre), radEB1 50411481 (nb, biased) and radEB2 50470082 (5 nm check). Figure `figures/rad/radFinalEB_IdVd.png`.
+- Vth +0.21 V on every irradiated device. Non-biased: 0.93–0.95 of pre, gm −1%.
+- HighK biased: 342 / 951 mA/mm at 1 / 10 V (0.93 / 0.92 of pre), no collapse, gm −2%.
+- SiN biased: 306 at 1 V (0.83), 374 → 255 mA/mm at 1.6–1.8 V, partial recovery to about 390 at 6 V, a dip near 7–8 V, 370 at 10 V (0.36). gm −6%.
+- Not reproduced: the measured second step, the current staying down after the drop, and onset moving later at higher Vg. The steps of the earlier final sets (radFinal8, radFinal11) are mesh artifacts.
+
+## Exploring from the final set (radExp1 50831893, radExp1c 50892179, 2026-11-11/12, history)
 
 Figure `figures/rad/radExp1.png`. SiN biased unless stated, Vg +1 V, Id in mA/mm, hotEb 1.0, 10 nm mesh.
 
@@ -266,10 +290,9 @@ Figure `figures/rad/radExp1.png`. SiN biased unless stated, Vg +1 V, Id in mA/mm
 - **A deeper level makes SiN stay down and creep, as measured, but moves the onset earlier** (0.9 V at 0.50 eV), the wrong way; the measured SiN collapse is later. It also adds about 0.05 V to the Vth shift on both decks.
 - **A smooth strike in HighK costs it about 45% at high Vd.** The measured HPD stays flat, so a strike like that didn't land in it, or its damage was weaker.
 - **The SiN Gaussian tasks didn't finish:** two timed out in the stress solve at 12.5–15.5 V (over 200 retries), one overflowed at 17 V. None had occSafe. Rerun in radExp2 with occSafe and the stress pinned at 17 V.
-- **Running (radExp2):** SiN Gaussian second strikes again; damage scale 5e18–6e18 (does the onset move later near threshold?); level 0.40–0.50 eV with a smaller scale (later onset that still stays down?).
+- **radExp2 51020993** (true 17.0 V stress with occSafe; 8 of 9 tasks reached 10 V, the 3e18 strike at y 1.5 left no curve) **and radExp3 51021670: no route stays down.** Id at 10 V: damage scale 5e18 / 5.5e18 / 6e18 give 706 / 661 / 594 mA/mm; Gaussian second strikes (5e18 at y 1.5 or 2.4) about 490; level 0.50 eV with scale 3e18 / 5e18 820 / 501 and 0.40 eV with 5e18 596, recovering after the drop; hotTau 5e-15 / 7e-15 (radExp3) 586 / 555.
 
-
-## The "17 V" stress of the pre-occSafe runs was 17.66 V (found 2026-11-13)
+## The "17 V" stress of the pre-occSafe runs was 17.66 V (found 2026-11-13, history)
 
 Runs with `occSafe 1` and `Vd_stress=17.0` (radHV, radStrike2, radExp2/3, radStrikeN) place about 15% less peak damage than the Nov 11 final run radEB1 (peakN(GaN) 5.0e18 against 5.9e18) and give a weaker SiN collapse (457 → 370 mA/mm near 2.2 V and about 500 at 10 V, against 374 → 255 near 1.7 V and 370).
 
@@ -277,7 +300,9 @@ The cause is the stress ramp, not occSafe. Without occSafe the ramp aims for 28 
 
 `drivers/radIV.tcl` now records the last converged drain voltage and prints it ("field taken at Vd=…"); the physics and the old runs' behaviour are unchanged. It also ends the ramp at `Vd_stress` when that isn't a multiple of `stressStep` (no effect for 17.0 or 28.0), so the Nov 11 final can be reproduced with `occSafe 1` and `Vd_stress=17.66`.
 
-## Strike count, SiN vs HighK (radStrikeN 51174895, 2026-11-14)
+This also explains the small second SiN dip near 6.3-7.7 V in the Nov 9-11 final runs (Ian asked on Nov 17 why it was gone): those runs had the extra damage of 17.66 V. At a true 17 V the dip sits near 9.5 V, and any strike at y 0.8 µm removes it.
+
+## Strike count, SiN vs HighK (radStrikeN 51174895, 2026-11-14, history: 17 V stress)
 
 Final set at a true 17.0 V stress (occSafe), biased, plus 0–3 Gaussian strikes (3e18, σ 40 nm, channel) at y 0.8, 1.6, 2.4 µm. N1-N3 share a mesh with 5 nm patches at the strikes; N0 ran without the patches (meshY {0.3 0.01 2.6 0.01}), so the 0-vs-1 strike difference includes a mesh change. All 8 tasks done, no GAVE UP. Id at Vg +1 relative to pre:
 
@@ -293,4 +318,37 @@ Final set at a true 17.0 V stress (occSafe), biased, plus 0–3 Gaussian strikes
 - Both: about −0.04 of pre per strike at 1 V, gm −2–3% per strike, Vth +0.21 V unchanged.
 - Figures `figures/rad/strikeN/` (`analysis/plot_radStrikeN.py`); slides https://claude.ai/artifact/JPnVbhvJAwrKyBm2XTFFLs.
 
-At the 28 V stress, the strike-step search (rounds A-I) is in [[step-search-28v]].
+## Stress at 28 V: refit and checks (2026-11-12 to 11-15, history)
+
+Ian moved the final model to a 28 V stress on 2026-11-12. The damage scale was refitted at hotEb 1.0 on 10 nm over y 0.3-2.6 µm (occSafe, Vd step 0.1 V):
+- rad28fit 51040272 (6 tasks) and the three 28 V tasks of radExp3 51021670;
+- rad28fitB 51196550 / 51249769: rad28fit's SiN 2e18, 3e18 and 4e18 tasks rerun with a 48 h limit, after the originals ran out of time in the stress ramp.
+
+Figure `figures/rad/step28/rad28fit.png` (`analysis/plot_rad28fit.py`). Id at Vg +1 V in mA/mm, read again from the synced CSVs:
+
+| Deck, damPeak | Job | Id at 1 V | Collapse | Id at 10 V |
+|---|---|---|---|---|
+| SiN 1e18 | rad28fit | 322 | none (a 19 mA/mm sag at 2.6-3.0 V, largest step 7) | 626 |
+| SiN 1.5e18 | radExp3 | 302 | 396 → 255 mA/mm over 1.6-2.0 V (63 in one step at 1.7-1.8 V) | 392 |
+| SiN 2e18 | rad28fitB | 270 | 279 → 12 mA/mm over 1.1-1.7 V (173 in one step at 1.2-1.3 V), 16 at 2 V | 108 (slow creep up) |
+| SiN 2.5e18 | radExp3 | 8 | current gone from 1 V | ~0 |
+| SiN 3e18 | rad28fitB | 0.01 | current gone from 0.8 V | ~0 |
+| SiN 4e18 | rad28fitB (51249769) | ~0 | channel shut | 1e-7 |
+| HighK 1.5e18 / 2.5e18 / 4e18 | rad28fit, radExp3 | 343 / 338 / 332 | none | 956 / 952 / 943 |
+
+- The SiN collapse sets in between 1e18 and 2e18. 1.5e18 comes closest to the Nov 11 model's SiN curve (370 mA/mm at 10 V), so the step search uses it. No decision on the scale is recorded.
+- radExp3 solved the 28 V stress inside the run. The same 1.5e18 case loaded from saved stresses bottoms out at 273-281 mA/mm instead of 255 (library, m10 and m5fix meshes, [[step-search-28v]]).
+- HighK doesn't collapse up to 4e18, so the deck contrast holds at the full stress voltage, as rad28a found on Oct 29.
+
+**radHV 51027334** (6 tasks: the final model, pre, nb and biased, both decks; the biased stress at a true 17.0 V with occSafe): Id-Vd to 28 V at Vg +1 and 0 V in 0.2 V steps, for high-Vd figures. Figure `figures/rad/radHV_28V.png` (`analysis/plot_nov12.py`).
+- HighK biased: 959 mA/mm at 28 V, 0.93 of pre throughout.
+- SiN biased, Vg +1: 457 → 370 mA/mm over 1.8-2.4 V, a second dip 528 → 460 over 9.2-12 V, 621 at 28 V.
+- SiN biased, Vg 0: under 8 mA/mm up to 5 V, 600 at 28 V.
+- The pre SiN and non-biased Vg +1 curves stopped early (pre SiN at 17 V, nb SiN at 8.8 V, nb HighK at 10 V).
+
+**radStrike2 51027921** (8 tasks; true 17.0 V stress): the final SiN set plus one Gaussian strike (3e18, σ 40 nm, AlGaN top) at y 0.8 / 1.2 / 2.0 / 2.4 / 2.8 / 3.1 µm, each with a 5 nm patch round the strike, and two runs with the field damage cut off past y 0.7 and 1.0 µm (10 nm mesh). Figure `figures/rad/radStrike2_pos.png` (`analysis/plot_nov12.py`).
+- Strikes at y 1.2-2.8 give nearly the same curve: 401-403 mA/mm at 2.4 V and 505-506 at 10 V (y 1.2 ended at 8.1 V). At y 0.8 the curve is about 30 mA/mm higher from the drop on (429 at 2.4 V, 533 at 10 V).
+- Cutting the field damage past y 0.7 or 1.0 µm changes nothing; the two cut runs agree to 0.1 mA/mm.
+- The y 3.1 task (nearest the drain) failed in the stress ramp at 7 V (`RAMP GAVE UP`).
+
+At the 28 V stress, the strike-step search (rounds S and A-K) and the mesh-robust stepped series are in [[step-search-28v]], and why the curves step is in [[step-mechanism]]. All of it is pre-fix and being rerun ([[fp-contact-fix]]).
