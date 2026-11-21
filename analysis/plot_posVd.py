@@ -4,7 +4,7 @@ One trap set, a grid of positions (trapMeanX depth × trapMeanY lateral). For
 each chosen Vd, a surface of suppression vs the trap-free device,
 log10(Id_no-trap / Id), capped at the ~1e-8 mA/mm noise floor. A shared z-scale
 across all panels makes the frames comparable (and GIF-ready). Each point is
-also coloured on the floor by its collapse class / onset (CLAUDE.md §10.0).
+also coloured on the floor by its collapse class / onset (kb/results/collapse-classification.md).
 
 usage: python3 analysis/plot_posVd.py run_dir tag [Vd list, comma-separated]
   default Vd: 0.3,0.6,...,3.0
@@ -63,7 +63,7 @@ def supp_at(vd, idd, v):
 
 
 def onset(vd, idd, vmax):
-    """(class, onset Vd) by the §10.0 rule: largest single-step loss sets the
+    """(class, onset Vd) by the collapse-classification rule: largest single-step loss sets the
     class; onset = first step reaching the class threshold. A run that gave up
     before vmax without a recorded collapse is "stalled" at the unreached Vd."""
     m = vd > 0.05

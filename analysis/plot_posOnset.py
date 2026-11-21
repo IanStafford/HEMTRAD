@@ -2,7 +2,7 @@
 
 Same trap-position grid as plot_posVd.py (trapMeanX depth × trapMeanY lateral),
 but z is no longer the suppression at one Vd. Each position is classed once
-(CLAUDE.md §10.0 rule, as in plot_posVd.py): it collapses if its largest single
+(the kb/results/collapse-classification.md rule, as in plot_posVd.py): it collapses if its largest single
 0.1 V step loses >= 50% (deep or medium), or if it stalled at the runaway (collapse
 probably at the stall Vd). Shallow and off-at-rest positions do not collapse in
 the sweep and sit flat on the floor. Height = Vd_max + 0.1 - onset, so the

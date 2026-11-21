@@ -14,6 +14,9 @@
 # same field-dependent mobility as the current, so J.E is consistent).
 proc ElecTemperature {Mat} {
     global etTau etMob mobModel etFloor etDamp
+    # local k/q = 8.625e-5 eV/K: differs by 0.09% from masterD's kev = 8.617e-5 (and from the literal
+    # 8.617e-5 in the etConv thermoelectric term below and in Continuity.tcl). It comes with Ian's original
+    # ElecTemperature (added 2026-10-08); changing it changes eTemp 1 results (a physics change: ask Ian first).
     set keV 8.625e-5
     set tau $etTau
 

@@ -16,7 +16,7 @@ set hbar 1.054571628e-34
 set egan 7.88e-13
 
 # electron mobility model: static (constant) or field (doping/temperature/field dependent)
-if {![info exists mobModel]} { set mobModel field }  ;# calibrated vs the HfO2 device (CLAUDE.md 10m); static = old constant 600
+if {![info exists mobModel]} { set mobModel field }  ;# calibrated vs the HfO2 device (kb/device/calibration.md); static = old constant 600
 
 source [file join $modelDir GaN.tcl]
 source [file join $modelDir AlGaN.tcl]
@@ -79,7 +79,7 @@ if {$eTemp} {
     ETempContact B
 }
 
-# Is the interface charge constant everwhere all the time?
+# The interface charge is uniform along the channel unless polWinFac is set (below).
 #Add interface charge
 if {![info exists polCharge]} { set polCharge 7.0e12 } ;# net AlGaN/GaN interface (polarization) charge, cm^-2
 # polWinFac (2026-11-04): interface charge factor in polWinYmin..polWinYmax (um). Unset = uniform.
@@ -163,8 +163,8 @@ set trapConc [TrapConc_$trapShape]
 # Hot-electron trap capture (see IonizedAcceptor / HotStress in Poisson.tcl)
 if {![info exists hotEb]}   { set hotEb 0.3 }       ;# capture barrier (eV); 0 = Fermi-level occupancy
 if {![info exists hotTau]}  { set hotTau 1.0e-13 }  ;# energy relaxation time (s)
-if {![info exists hotMu]}   { set hotMu 600.0 }     ;# GaN electron mobility (cm2/Vs), matches GaN.tcl
-if {![info exists hotVsat]} { set hotVsat 1.9e7 }   ;# saturation velocity (cm/s)
+if {![info exists hotMu]}   { set hotMu 600.0 }     ;# electron mobility (cm2/Vs) of the local-field Te estimate only (HotTeExpr); the static-era GaN value, independent of mobModel
+if {![info exists hotVsat]} { set hotVsat 1.9e7 }   ;# saturation velocity (cm/s) of the same estimate; not the field mobility's vs (mobVsat, else 3.0e7 at 300 K; GaN.tcl)
 
 # Traps in the insulators (Nitride, HighK): static charge only, since no
 # carriers or Qfn are solved there. 0 = none (default, unchanged behavior);

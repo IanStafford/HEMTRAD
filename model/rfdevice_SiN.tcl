@@ -31,7 +31,7 @@ set Al_Thick 0.015 ;# 15nm AlGaN thickness
 proc HEMT_Struct { } {
     global Gate_Length Al_Thick SourceGate SourceT DrainGate DrainT FP2 FP_Offset FP_Thick Gate_Thick SiN_Thick HPD_Thick
 
-    #Structure definition (AlGaN is 25nm thick.It is below the critical thickness for relaxation ~65nm Ambacher)
+    #Structure definition (AlGaN is Al_Thick = 15 nm, below the ~65 nm critical thickness for relaxation, Ambacher)
     set Mid_Point 0.0
     set Gtl [expr {$Mid_Point - ($Gate_Length/2.0)}]
     set Gtr [expr {$Mid_Point + ($Gate_Length/2.0)}]

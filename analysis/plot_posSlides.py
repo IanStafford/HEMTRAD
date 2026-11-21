@@ -2,7 +2,7 @@
 
 usage: python3 analysis/plot_posSlides.py
 Set HEADLINE_FONT_DIR to a folder of Source Sans 3 TTFs to match the slides.
-Classes and onsets as in plot_posVd.py / plot_posOnset.py (CLAUDE.md §10.0 rule).
+Classes and onsets as in plot_posVd.py / plot_posOnset.py (kb/results/collapse-classification.md).
 Writes (sized to be shown ~1100 px wide):
   figures/posSlide_lateral.png  0.30 eV / 5e18: device strip with the trap grid, onset Vd
                                 vs lateral y per depth, suppression at Vd = 3 V vs y

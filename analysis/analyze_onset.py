@@ -1,12 +1,13 @@
 """Late-onset search (field mobility): classify each device's collapse.
 
-Collapse classes (Ian, 2026-10-01; CLAUDE.md): the largest single-step loss
+Collapse classes (Ian, 2026-10-01; kb/results/collapse-classification.md): the largest single-step loss
 1 - Id(Vd_n)/Id(Vd_n-1) over the sweep is > 95% deep, 50-95% medium, < 50%
 shallow. The collapse onset is the first step that reaches the class threshold
 (> 95% deep, >= 50% medium; shallow: the largest step). Devices below 10% of the
 trap-free current at Vd = 0.1 V are "off at rest" (no collapse to speak of).
 Runs that stop early (PULSED GAVE UP) with no recorded collapse are "stalled";
-their onset is the Vd they could not reach (the runaway, CLAUDE.md 10.5).
+their onset is the Vd they could not reach (the runaway; "stalled" in
+kb/results/collapse-classification.md).
 
 usage: python3 analysis/analyze_onset.py run_dir tag [rows cols xpar ypar]
   defaults (round 1): rows=trapLevel cols=hotEb x=hotTau y=trapPeak
@@ -75,7 +76,8 @@ for k, (vd, idd, p) in sorted(dev.items()):
     elif cls == "shallow" and vd[-1] < p.get("Vd_max", vd[-1]) - 1e-6:
         # stopped (PULSED GAVE UP) before reaching Vd_max without a recorded
         # collapse: almost always the runaway that continuation can't follow
-        # (CLAUDE.md 10.5), so the collapse is probably at the stall voltage
+        # (kb/results/collapse-classification.md, kb/numerics/te-ramp.md), so the
+        # collapse is probably at the stall voltage
         cls, onset = "stalled", float(vd[-1] + 0.1)
     rows.append({**{q: p[q] for q in (ROWS, COLS, XP, YP)},
                  "class": cls, "max_step_loss": maxloss, "onset_Vd": onset,

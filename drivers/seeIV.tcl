@@ -1,12 +1,15 @@
-# Single-event transient (heavy-ion strike) on the calibrated HEMT deck (branch
-# explore/rad-model; plan kb/results/see-plan.md).
+# Single-event transient (heavy-ion strike) on the calibrated HEMT deck (written on branch
+# explore/rad-model, merged to main 2026-11-04; plan kb/results/see-plan.md). Run per task by
+# sweeps/radIV.slurm with DRV=seeIV.
 #
-# 1. DC steady state at the strike bias (Vg_bias, then Vd_bias; traps off).
+# 1. DC steady state at the strike bias (Vg_bias, then Vd_bias; no traps: the trap model is on
+#    with an empty trap density, see the numerics note below).
 # 2. Strike along a vertical ion track at y = seeY0, two methods (seeMethod):
 #    gen (default): pair generation G = dN(x,y) * exp(-((t-t0)/tau)^2)/(tau sqrt(pi)) in both
 #      continuity equations (seeGenExpr, Continuity.tcl), t0 = 3 tau, tau = seeGenTau; the
 #      transient starts from the converged DC state and the solver builds the plasma.
-#    qf: inject the plasma at t = 0 by resetting the quasi-Fermi levels:
+#    qf (kept for the record, does not converge): inject the plasma at t = 0 by resetting the
+#      quasi-Fermi levels:
 #      n = n_ss + dN, p = p_ss + dN,  Qfn = Econd + Vt*F12inv(n/Nc), Qfp = Eval - Vt*F12inv(p/Nv)
 #    F12inv is Nilsson's closed form (<0.5% vs FLOOXS f12 for eta -30..25). Equal dN keeps
 #    the charge neutral, so Poisson is consistent at t = 0. It does not run: FLOOXS's device
@@ -19,8 +22,13 @@
 # 3. Transient to seeTend with log-growing steps; terminal currents every step.
 #
 # Outputs (prefix $tag): <tag>_see.csv (t, then Qfn/Qfp/DevPsi flux per contact, A/um),
-# <tag>_summary.txt, <tag>_cuts_<k>.txt (Elec, Hole, DevPsi along y at x 0.016 / 0.5 um).
-# seeStrike 0 runs the same transient without injection (control).
+# <tag>_summary.txt, <tag>_cuts_<k>.txt (Elec, Hole, DevPsi along y at x 0.016 / 0.5 um, one per
+# seeCutTimes entry), <tag>_map_<k>.vtk / <tag>_map_dc.vtk (+ .txt with the time; seeMapTimes, seeMapDC).
+# seeStrike 0 runs the same transient without injection (control). seeInjectOnly 1 (unset = 0)
+# stops after the injection and its checks, before the transient.
+# Log: "SEEIV DONE tag=<tag>" at the end ("SEEIV INJECT-ONLY DONE" with seeInjectOnly); a failed
+# ramp prints "RAMP GAVE UP" and stops with a Tcl error; a transient that stops early writes
+# "transient stopped: ..." to the summary and still ends in SEEIV DONE.
 
 if {![info exists tag]}        { set tag see }
 if {![info exists deviceDeck]} { set deviceDeck rfdevice.tcl }
@@ -37,11 +45,12 @@ if {![info exists seeY0]}      { set seeY0 1.0 }      ;# um, strike position alo
 if {![info exists seeSigma]}   { set seeSigma 0.05 }  ;# um, track radius (Gaussian sigma)
 if {![info exists seeWeff]}    { set seeWeff 1.0 }    ;# um, effective width of the 2D slab
 if {![info exists seePairs]}   { set seePairs 4.3e10 } ;# pairs/cm along the track (Au 2256 MeV, ~41 keV/nm, ~9.5 eV/pair)
-# um, track starts just below the AlGaN/GaN interface (x 0.015): Qfn/Qfp are continuous
-# there (an interface condition with no time term), and an injection that sets each side
-# from its own Nc/Ec breaks it, so no time step converges. Leaves out the 15 nm AlGaN (~1%).
 if {![info exists seeMethod]}  { set seeMethod gen }
 if {![info exists seeGenTau]}  { set seeGenTau 1.0e-12 } ;# s, Gaussian width of the generation pulse
+# seeXmin (um): the track's top. gen: 0, the whole AlGaN and GaN. qf: 0.0155, just below the
+# AlGaN/GaN interface (x 0.015): Qfn/Qfp are continuous there (an interface condition with no
+# time term), and an injection that sets each side from its own Nc/Ec breaks it, so no time
+# step converges. That leaves out the 15 nm AlGaN (~1% of the track).
 if {![info exists seeXmin]}    { set seeXmin [expr {$seeMethod eq "qf" ? 0.0155 : 0.0}] }
 if {![info exists seeXmax]}    { set seeXmax 1.4 }    ;# um, GaN:Fe buffer thickness (SiC below is not in the deck)
 if {![info exists seeTinit]}   { set seeTinit 1.0e-15 }
@@ -87,9 +96,12 @@ foreach m {GaN AlGaN Nitride} { pdbSetDouble $m DevPsi DampValue $dampValue }
 pdbSetDouble GaN Qfn DampValue $dampValue
 pdbSetDouble GaN Qfp DampValue $dampValue
 if {[info exists qfnAbs]} { foreach m {GaN AlGaN} { pdbSetDouble $m Qfn Abs.Error $qfnAbs } }
-# radIV gets these DevPsi tolerances from IonizedAcceptor (trap model on); with traps off
-# they stay at FLOOXS's 1e-6 default and the drain ramp crawls (job 48227316), so set
-# them here as radIV has them (read when the solver is built, i.e. before device init)
+# DevPsi tolerances 0.1 in GaN/AlGaN, as radIV has them (read when the solver is built, i.e.
+# before device init). Added for seeSmoke1 (job 48227316), whose drain ramp crawled, on the
+# reading that without traps these stay at FLOOXS's 1e-6 default. But Poisson.tcl (proc
+# Poisson, called by the model file for GaN and AlGaN) already sets 0.1 whatever trapEn is,
+# so this line looks redundant; it is kept because it is harmless. The crawl may have been the
+# trapEn-0 divergence described above (job 48241815); recheck before relying on this rationale.
 foreach m {GaN AlGaN} { pdbSetDouble $m DevPsi Abs.Error 1.0e-1; pdbSetDouble $m DevPsi Rel.Error 1.0e-1 }
 Initialize
 device init
@@ -164,6 +176,8 @@ if {$seeStrike && $seeMethod eq "gen"} {
     puts $sf "generation on: peak dN [format %.4e $N0] /cm3, t0 $seeT0 s, tau $seeGenTau s"
     flush $sf
 } elseif {$seeStrike} {
+    # qf method: kept for the record; no first transient step converges after this reset
+    # (header, kb/results/see-plan.md)
     set other "(1.0-$sem)"
     set Nc "(([pdbDelayDouble GaN Elec Nc])*Material(GaN)+([pdbDelayDouble AlGaN Elec Nc])*Material(AlGaN)+$other)"
     set Nv "(([pdbDelayDouble GaN Hole Nv])*Material(GaN)+([pdbDelayDouble AlGaN Hole Nv])*Material(AlGaN)+$other)"

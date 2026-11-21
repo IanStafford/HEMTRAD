@@ -5,7 +5,10 @@
 # Writes fp_<tag>.csv (Vd, Id mA/mm, peak |grad Qfn| in the channel region V/cm,
 # position of that peak, local-field Te) and, at Vd = 3/10/20 V, print.1d cuts
 # along the 2DEG (x = 0.016 um) of |grad Qfn| (cutE_<tag>_<Vd>.txt) and DevPsi
-# (cutPsi_<tag>_<Vd>.txt). analysis/plot_fieldPlate.py makes the figures.
+# (cutPsi_<tag>_<Vd>.txt). The field-mobility run (job 46241088, results/20261016_fieldPlate/)
+# was collected into figures/fieldPlateFM_sweep.csv and figures/fieldPlateFM_cuts.csv (the
+# conversion is not in a tracked script). analysis/plot_strikeSlides.py draws the slide figure
+# from fieldPlateFM_cuts.csv. The static-era plot script is archive/static_mobility/plot_fieldPlate.py.
 if {![info exists deviceDeck]} { set deviceDeck rfdevice.tcl }
 if {![info exists tag]}        { set tag highk }
 if {![info exists mobModel]}   { set mobModel field }

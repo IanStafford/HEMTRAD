@@ -29,16 +29,18 @@ mater add name=GaN
     pdbSetDouble GaN Elec beta3 3.02
     pdbSetDouble GaN Elec beta4 0.81
     pdbSetDouble GaN Elec Nref 1e17
-    # calibration levers (branch explore/rad-model; unset = values above)
+    # calibration levers (rad model, kb/model/levers.md; unset = values above)
     if {[info exists mobMumax]} { pdbSetDouble GaN Elec mumax $mobMumax }
     if {[info exists mobNref]}  { pdbSetDouble GaN Elec Nref $mobNref }
 
+    # reference only, lines below down to ericmob: not used by mobModel field (Heller high field below) or static.
+    # Nothing reads these GaN pdb keys or ericmob (AlGaN.tcl reads its own Farahmand keys).
     #parameters for GaN high field mobility from Farahmand (hfalpha is Farahmand's alpha)
     pdbSetDouble GaN Elec hfalpha 6.1973
     pdbSetDouble GaN Elec n1 7.2044
     pdbSetDouble GaN Elec n2 0.7857
     pdbSetDouble GaN Elec Ecmob 220893.6
-    pdbSetDouble GaN vsat (2.7e7/(1+0.8*exp(Temp/600)))   ;# Farahmand 300 K value: 1.9064e7
+    pdbSetDouble GaN vsat (2.7e7/(1+0.8*exp(Temp/600)))   ;# 1.164e7 cm/s at 300 K (the old note said 1.9064e7); unused
 
     #parameters for GaN low field mobility using Eric Heller's equations
     set ericmob "(1630)/(exp(log(Temp/300)*(1.88)))"
@@ -62,12 +64,14 @@ mater add name=GaN
         # mobDamFac (drivers/radIV.tcl): low-field mobility factor in a window, data field MobDam
         if {[info exists mobDamFac]} { set mulow "(MobDam*$mulow)" }
         set E "(abs(dot(DevPsi,y*1e-4))+1)"
+        # the active saturation velocity: mobVsat if set, else 3.0e7 cm/s at 300 K
         if {[info exists mobVsat]} { set vs "($mobVsat)" } else { set vs "(3.3e7-(3.0e6*$Tn))" }
         set b "(0.85*exp(log($Tn)*(0.4)))"
         pdbSetDouble GaN Elec mob "($mulow/exp(log(1+exp(log($mulow*$E/$vs)*$b))/$b))"
     } else {
         # set GaN mobility as a constant (Lu's results for 1um AFRL devices give 1907 cm2/V-s,
-        # decreasing 41% to 1125 with 2e14 radiation)
+        # decreasing 41% to 1125 with 2e14 radiation). 600, neither of those, is the pre-repo value
+        # used through the static era (archive/static_mobility/).
         pdbSetDouble GaN Elec mob 600
     }
 

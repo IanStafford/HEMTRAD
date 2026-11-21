@@ -1,9 +1,11 @@
-"""Static vs field-dependent mobility: the 10f Run F trap map on both models.
+"""Static vs field-dependent mobility: the Run F trap map (archive/static_mobility/RESULTS.md
+§10f) on both models.
 
-static: job 43513462 (+ retry 43515232), results/20260927_trapMapSets* (constant
-mobility 600). field: job 44342967, results/20261001_trapMapF_field (mobModel
-field, the model calibrated against the HfO2 device, CLAUDE.md 10m). Each is
-normalised to its own trap-free reference.
+static: job 43513462 (+ retry 43515232), results/archive_static_mobility/20260927_trapMapSets
+and ..._trapMapSetsRetry (constant mobility 600). field: job 44342967,
+results/20261001_trapMapF_field (+ its Retry dir if present; mobModel field, the model
+calibrated against the HfO2 device, kb/device/calibration.md). Each is normalised to its own
+trap-free reference.
 
 usage: python3 analysis/analyze_mobCompare.py [trapPeak trapLevel field_run tag]
 Writes figures/<tag>_metrics.csv, _3d.png and _compare.png.

@@ -1,28 +1,77 @@
-# Pre/post-irradiation device characterisation (branch explore/rad-model, 2026-10-23).
-# Reproduces the measured set in kb/results/measured-rad-y2.md (local note):
-#   transfer Id-Vg at Vd = Vd_lin (0.1 V), Vg Vg_hi -> Vg_lo;
-#   output Id-Vd at Vg = Vg_out (+1 V), Vd 0 -> Vd_max.
-# radState pre : trap-free device (calibration).
-# radState post: radiation damage, then the same measurements:
-#   - bias-independent part: fixed charge at the AlGaN/passivation surface
-#     (lever surfCharge, cm^-2, set by the caller; negative = acceptor-like);
-#   - biased-irradiation part (damPeak > 0): acceptor traps whose density follows the
-#     lateral field |dEpsi/dy| at the irradiation bias (Vg_stress, Vd_stress):
-#       N = min(damMax, damPeak * (E/damEref)^damM)   for 0 <= x <= damXmax (um)
-#     Trap level / hot-electron capture as in the trap model (trapLevel, hotEb, ...).
-#   - lumped gate-drain leakage Rgd (ohm*mm, 0 = none): the localized leakage paths
-#     ion strikes leave (steps in the irradiation monitor) are 3D, not in a 2D cut;
-#     Id_ext = Id_dev + (Vd - Vg)/Rgd.
-# Traps fill but never empty after the rest point (fill-only, CaptureTraps), with
-# hot-electron FillStep at each Id-Vd point.
-# damList (optional): several damage settings after ONE stress solve, e.g.
-#   set damList {{d1 {damPeak 1e17 damM 2}} {d2 {damPeak 3e17 damM 3}}}
-# each entry {suffix {lever value ...}} (damPeak/damM/damEref/damMax/damXmax/damY*/damIns*/Rgd/hotTau);
-# (insTrapSign must be set before the model is sourced, i.e. as a task lever, not in damList)
-# outputs get the prefix ${tag}_<suffix>. Traps are reset (ThawTraps) between entries.
-# Outputs (prefix $tag): <tag>_IdVg.csv (Vg, Id_dev, Id_ext mA/mm),
-# <tag>_IdVd.csv (Vd, Id_dev, Id_ext, peak Te), <tag>_cuts.txt (Estress, TrapN,
-# IonAcceptor along x = 0.001 / 0.016 um), <tag>_summary.txt.
+# Pre/post-irradiation device characterisation: the main driver of the rad-model work since
+# 2026-10-23 (written on branch explore/rad-model, merged to main 2026-11-04). Run per task by
+# sweeps/radIV.slurm. Notes: kb/results/rad-model.md (the model and its history),
+# kb/results/step-search-28v.md (28 V strike steps), kb/model/levers.md (levers),
+# kb/model/damage-model.md (damage laws), kb/workflow/stress-library.md (saved stresses).
+# Coordinates: x = depth below the AlGaN top (um; x < 0 is the passivation and metal above it),
+# y = along the channel (um; gate centre at 0, drain side positive).
+#
+# Measurements (proc Measure), the same before and after irradiation:
+#   transfer Id-Vg at Vd = Vd_lin (0.1 V), Vg Vg_hi -> Vg_lo (doIdVg);
+#   output Id-Vd at Vg = Vg_out (+1 V), Vd 0 -> Vd_max (doIdVd);
+#   then one more Id-Vd curve per entry of VgFam, in list order.
+#
+# Stages:
+#   radState pre : trap-free device (calibration): build the deck, then Measure.
+#   radState post: 1. stress state at the irradiation bias (Vg_stress, Vd_stress), by one of
+#                     - a stress solve: gate ramp, drain ramp in stressStep steps (bisected on
+#                       failure; a ramp that stops is accepted if its last full step is
+#                       >= Vd_stressMin, and the fields are taken at the furthest converged Vd),
+#                       stress fields Estress / EstressT / EstressNE, ramp back to rest;
+#                       stressSave / stressSaveEvery write the state, stressOnly 1 stops after
+#                       the ramp;
+#                     - stressLoad=<file>: load a saved state (mesh and stress fields);
+#                     - stressResume=<file>: continue a stress ramp from a state saved at bias;
+#                     - stressSkip 1: no stress, only for damage that does not read the field;
+#                  2. DamageIn at rest (Vg = Vd = 0): build TrapN from the damage levers and
+#                     switch it in at scales 0 -> 1;
+#                  3. Measure;
+#                  4. damList (optional): repeat 2-3 for several damage settings after ONE
+#                     stress, e.g.
+#                       set damList {{d1 {damPeak 1e17 damM 2}} {d2 {damPeak 3e17 damM 3}}}
+#                     each entry {suffix {lever value ...}} (damPeak/damM/damEref/damMax/damXmax/
+#                     damY*/damIns*/Rgd/hotTau); outputs get the prefix ${tag}_<suffix>, and the
+#                     traps are reset (ThawTraps) between entries. insTrapSign must be set before
+#                     the model is sourced, i.e. as a task lever, not in damList.
+#
+# Damage (post), summed into the acceptor trap density TrapN (cm^-3) unless noted:
+#   - field damage (damPeak > 0): N = min(damMax, damPeak*(E/damEref)^damM*(n/damNref)^damNexp)
+#     for 0 <= x <= damXmax and damYmin <= y <= damYmax, E = the stress field picked by damField
+#     (lat |dpsi/dy|, tot |grad psi|, ne n*|dpsi/dy| normalised), n = Elec at stress
+#     (damNexp 0 = field only);
+#   - dam2*: a second law of the same form (dam2M 0 = a uniform site); dam3*: a uniform y window;
+#   - damIns*: fixed charge in the passivation (damInsXmin <= x < 0), sign insTrapSign;
+#   - damSites {ymin ymax xmin xmax N}: uniform boxes;
+#   - damGauss / damGaussF {y x sigma N}: Gaussian strike sites, optionally field-scaled
+#     (gaussFieldM; damGaussF always, with gaussFieldMF);
+#   - 3D only (deviceDim 3, rfdevice3d.tcl): ion tracks damTube {y z sigma xmin xmax N}
+#     (field-scaled with trackFieldM) and damRod {y x sigma zmin zmax N}.
+#   Not in TrapN: surfCharge (fixed AlGaN/passivation charge, cm^-2, negative = acceptor-like,
+#   read by the model file), mobDamFac (low-field mobility factor in a window), and Rgd, a
+#   lumped gate-drain leakage (ohm*mm, 0 = none; the localized leakage paths ion strikes leave,
+#   seen as steps in the irradiation monitor, are 3D, not in a 2D cut): Id_ext = Id_dev + (Vd - Vg)/Rgd.
+# Traps fill but never empty after the rest point (fill-only, CaptureTraps), with a hot-electron
+# FillStep at each Id-Vd point; emitRest releases a fraction at rest before each Id-Vd curve.
+# Trap level and capture use this driver's own defaults (trapLevel 0.30, hotEb 1.0,
+# hotTau 1e-14), not the model file's; trapEn and trapShape are set here, not by the caller.
+#
+# Outputs (prefix $tag; with damList, ${tag}_<suffix> for the damage-dependent files):
+#   <tag>_summary.txt             every stage's settings and peaks; ends with "done";
+#   <tag>_IdVg.csv                Vg, Id_dev, Id_ext (mA/mm);
+#   <tag>_IdVd.csv                Vd, Id_dev, Id_ext (mA/mm), peak Te (K);
+#   <tag>_IdVdG<Vg>.csv           one per VgFam entry, same columns;
+#   <tag>_cuts.txt                Estress, EstressT, EstressNE, TrapN and IonAcceptor along y at
+#                                 x = -0.04, -0.01, 0.001, 0.016 um (IonAcceptor at x >= 0 only;
+#                                 3D at z = 0);
+#   <tag>_vdcuts.txt              vdCuts 1: cuts at every Id-Vd point (see VdCuts);
+#   <tag>_stressDiag.txt          stressDiag 1: one extra stress step and its Newton changes;
+#   <stressSave>, <stressSave>.txt                 stressSave: state at rest after the stress;
+#   <stressSaveDir>/<prefix>_Vd<Vd>.str.gz + .str.txt   stressSaveEvery / stressOnly: state at bias.
+# Log: "RADIV DONE tag=<tag>" at the end. Failures print "RAMP GAVE UP", "IDVG GAVE UP",
+# "IDVD GAVE UP" or "DAMAGE solve failed", or write "<tg> measurement failed" / "<tg> damage
+# failed" to the summary (damList only); a failed stress, stress ramp-down or (without damList)
+# damage stops the run with a Tcl error. A curve that gave up still ends in RADIV DONE, so check
+# the log for the failure lines too.
 
 if {![info exists radState]}  { set radState pre }
 if {![info exists tag]}       { set tag $radState }
@@ -42,6 +91,7 @@ if {![info exists Vd_max]}    { set Vd_max 10.0 }
 if {![info exists Vd_step]}   { set Vd_step 0.25 }
 if {![info exists doIdVg]}    { set doIdVg 1 }
 if {![info exists doIdVd]}    { set doIdVd 1 }
+# (VgFam, emitRest and noRampBack are set further down, after CheckFpBox; vdCuts just above VdCuts)
 # irradiation bias and damage
 if {![info exists Vg_stress]} { set Vg_stress -10.0 }
 if {![info exists Vd_stress]} { set Vd_stress 28.0 }
@@ -69,9 +119,9 @@ if {![info exists damEref]}   { set damEref 1.0e6 }   ;# V/cm
 if {![info exists damM]}      { set damM 2.0 }
 if {![info exists damMax]}    { set damMax 1.0e19 }
 if {![info exists damXmax]}   { set damXmax 0.05 }    ;# um below the AlGaN top
-if {![info exists damYmin]}   { set damYmin -1.0e3 }  ;# um; damage window along y (diagnostic,
-if {![info exists damYmax]}   { set damYmax 1.0e3 }   ;#   default = whole device)
-# passivation damage (branch, 2026-10-24): fixed charge in the insulator layer
+if {![info exists damYmin]}   { set damYmin -1.0e3 }  ;# um; y window of the field damage and of damIns*;
+if {![info exists damYmax]}   { set damYmax 1.0e3 }   ;#   default = whole device. The final model sets damYmin 0.30 (no field damage at the gate edge)
+# passivation damage (2026-10-24): fixed charge in the insulator layer
 # damInsXmin <= x < 0 (um above the AlGaN top), density from the field there at the
 # stress bias: N = min(damMax, damInsPeak*(E/damInsEref)^damInsM), charge sign
 # insTrapSign (-1 = trapped electrons). damInsField / damField pick the stress field:
@@ -84,11 +134,15 @@ if {![info exists damInsXmin]}  { set damInsXmin -0.05 } ;# um; -0.05 = the 50 n
 if {![info exists damField]}    { set damField lat }
 if {![info exists damInsField]} { set damInsField tot }
 if {$damInsPeak > 0.0 && ![info exists insTrapSign]} { set insTrapSign -1 }
-# second semiconductor damage site (branch, 2026-10-25): same law and depth as the
-# first, own peak/exponent/y-window; e.g. a second ion-strike site farther toward
-# the drain. dam2Peak 0 = none (old behaviour).
 if {![info exists damNexp]}   { set damNexp 0.0 }   ;# first site also scales with (Elec/damNref)^damNexp at stress
 if {![info exists damNref]}   { set damNref 1.0e17 } ;#   (hot-electron rate ~ n*E^m); 0 = field only (old behaviour)
+# dam2* (2026-10-25): a second semiconductor damage law of the same form as the first,
+#   N = min(damMax, dam2Peak*(E/dam2Eref)^dam2M) for 0 <= x <= dam2Xmax, dam2Ymin <= y <= dam2Ymax,
+# with its own field (dam2Field), peak, exponent and window (dam2Eref and dam2Xmax are set further
+# down, after VgFam). dam2M 0 makes it a uniform, field-independent site: the final model
+# (kb/results/rad-model.md) uses it for fixed acceptors in the AlGaN under the gate (dam2Peak 5e17,
+# y -0.125..0.125, dam2Xmax 0.014). The y defaults (0.65..1.0) are from its first use, a second
+# ion-strike site toward the drain. dam2Peak 0 = none (old behaviour).
 if {![info exists dam2Peak]}  { set dam2Peak 0.0 }
 if {![info exists dam2M]}     { set dam2M 0.0 }
 if {![info exists dam2Ymin]}  { set dam2Ymin 0.65 }
@@ -98,9 +152,7 @@ if {![info exists dam2Field]} { set dam2Field "" }   ;# "" = same field/Eref as 
 if {![info exists dam3Peak]}  { set dam3Peak 0.0 }
 if {![info exists dam3Ymin]}  { set dam3Ymin 1.0 }
 if {![info exists dam3Ymax]}  { set dam3Ymax 1.6 }
-# damSites (2026-11-04): any number of uniform acceptor sites, each {ymin ymax xmin xmax N}
-# (um, um, um below the AlGaN top, um, cm^-3), summed into TrapN. {} = none (old behaviour).
-if {![info exists damGauss]} { set damGauss {} }
+if {![info exists damGauss]} { set damGauss {} }   ;# {y x sigma N} list: Gaussian acceptor sites (um, cm^-3), semiconductor only; {} = none
 # 3D slice (2026-11-12, kb/model/3d-plan.md). deviceDim 3 with deviceDeck=rfdevice3d.tcl: the contact current is
 # divided by the slice width W3d. damTube: Gaussian columns along the depth, {y z sigma xmin xmax N} (um, cm^-3),
 # e.g. ion tracks built from TRIM (analysis/genRad3d.py). trackFieldM: tube damage times (Estress/damEref)^m,
@@ -121,7 +173,9 @@ if {![info exists gaussFieldM]} { set gaussFieldM 0.0 }
 # N * (field/damEref)^gaussFieldMF (capped at damMax), alongside an unscaled damGauss list (gaussFieldM 0), so one run
 # can mix field-scaled strikes near the gate with plain strikes further out.
 if {![info exists damGaussF]}    { set damGaussF {} }
-if {![info exists gaussFieldMF]} { set gaussFieldMF 4.0 }   ;# {y x sigma N} list: Gaussian acceptor sites (um, cm^-3), semiconductor only
+if {![info exists gaussFieldMF]} { set gaussFieldMF 4.0 }   ;# field exponent of the damGaussF strikes
+# damSites (2026-11-04): any number of uniform acceptor sites, each {ymin ymax xmin xmax N}
+# (um, um, um below the AlGaN top, um, cm^-3), summed into TrapN. {} = none (old behaviour).
 if {![info exists damSites]}  { set damSites {} }
 # stressSkip 1: no stress solve, for damage that doesn't use the stress field (damSites,
 # surfCharge, a uniform dam2/dam3 site). The stress fields are then ~0. 0 = old behaviour.
@@ -171,17 +225,19 @@ proc CheckFpBox {what info} {
     set want [expr {$::fpBoxOld ? "old" : "fixed"}]
     if {$st ne $want} { error "$what: state has the $st FP contact box, this run expects $want (fpBoxOld=$::fpBoxOld; kb/results/fp-contact-fix.md)" }
 }
-# VgFam: extra Id-Vd curves, one per Vg in the list, in that order (like the measured
-# family; fill-only traps keep their state between curves), to <tag>_IdVdG<Vg>.csv. {} = none.
+# Id-Vd curve options
 if {![info exists emitRest]} { set emitRest 0.0 }  ;# fraction of the captured charge released at rest before each Id-Vd curve
 if {![info exists noRampBack]} { set noRampBack 0 }    ;# 1: stop after the last curve, no ramp back to rest (nothing is measured after it)
+# VgFam: extra Id-Vd curves, one per Vg in the list, in that order (like the measured
+# family; fill-only traps keep their state between curves), to <tag>_IdVdG<Vg>.csv. {} = none.
 if {![info exists VgFam]}     { set VgFam {} }
 # low-field mobility factor in a window (with mobDamFac set, GaN.tcl multiplies by the
 # data field MobDam). Unset = old behaviour.
 if {![info exists mobDamYmin]} { set mobDamYmin -1.0e3 }
 if {![info exists mobDamYmax]} { set mobDamYmax 1.0e3 }
 if {![info exists mobDamXmax]} { set mobDamXmax 0.05 }
-if {![info exists dam2Eref]}  { set dam2Eref "" }
+# the rest of the dam2* levers (see the dam2 block above)
+if {![info exists dam2Eref]}  { set dam2Eref "" }    ;# V/cm; "" = damEref
 if {![info exists dam2Xmax]}  { set dam2Xmax "" }    ;# depth of the second site (um); "" = damXmax
 if {![info exists Rgd]}       { set Rgd 0.0 }
 if {![info exists damList]}   { set damList {} }

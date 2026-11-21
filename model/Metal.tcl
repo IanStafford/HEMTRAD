@@ -1,5 +1,5 @@
 # =============================================================================================================
-# New metal code with schottky contact and option for thermionic emission current as well as ohmic pGaN contact
+# New metal code: Schottky gate and field plate, ohmic source/drain/body, and an ohmic pGaN gate option
 # =============================================================================================================
 
 mater add name=Metal    
@@ -44,18 +44,19 @@ Ohmic AlGaN D
 Ohmic GaN B
 
 if {![info exists pGaN]} { set pGaN 0.0 }
-if {![info exists phiB]} { set phiB 1.65 } ;# effective gate/FP barrier vs Nitride Ec (eV); sets Vth. Placeholder for field plate when using pGaN contact
+if {![info exists phiB]} { set phiB 1.65 } ;# effective gate/FP barrier vs Nitride Ec (eV); sets Vth. With pGaN 1 it only enters InitMetal
 
 if {!$pGaN} {
     # Ambacher's formula can be applied when we have AlGaN/Metal or potentially with a thin layer of Nitride,
     # but not with pGaN/Metal, so only set phiB if we don't have a pGaN contact
-    # 1.3x+0.84, where x is the Al mole fraction, so with x=0.26, this gives 1.2255 eV, but I don't know if Ambacher's formula applies to GaN/Metal contacts,
-    # so I'm using a higher value that is more consistent with the literature for GaN/Metal schottky contacts
+    # 1.3x+0.84 eV, where x is the Al mole fraction: 1.178 eV at x = 0.26, 1.126 eV at the deck's AlN_Ratio 0.22.
+    # I don't know if Ambacher's formula applies to GaN/Metal contacts, so I'm using a higher value that is more
+    # consistent with the literature for GaN/Metal schottky contacts (phiB is a calibration lever, kb/device/calibration.md)
 
-    # Fieldplate electrostatics - Present in both the schottky and ohmic cases, but with different phiB
+    # Fieldplate electrostatics - set only in this (Schottky) branch; with pGaN 1 this file gives the FP no DevPsi equation
 
-    # Using AlGaN Ec because we aren't getting current through it anyway.
-    # If we used Nitride Ec we would have diff model for gate and FP
+    # The FP and the gate (below) both use the Nitride Ec, so phiB is the effective barrier against the
+    # Nitride Ec and the gate and FP share one model.
     pdbSetString FP DevPsi Equation "([pdbDelayDouble Nitride Elec Ec])+FP-$phiB"
     pdbSetBoolean FP DevPsi Fixed 1
     pdbSetDouble FP DevPsi Flux.Scale 1.602e-19
@@ -70,7 +71,8 @@ if {!$pGaN} {
     pdbSetBoolean G Qfp Fixed 1
 
 } else {
-    # We treat the pGaN contact as ohmic, so we pin both holes and electrons, and use the GaN Ec for the electrostatics since we are in direct contact with the GaN.
+    # We treat the pGaN contact as ohmic (proc Ohmic): Qfn and Qfp are pinned to the contact bias and DevPsi follows
+    # from charge neutrality (Doping-Elec+Hole), as at S, D and B; phiB does not enter the gate equations.
     Ohmic GaN G
 }
 
