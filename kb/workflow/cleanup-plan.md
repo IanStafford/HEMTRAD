@@ -15,6 +15,24 @@ Published page: https://claude.ai/artifact/QTDF84jNysUWQcsTfsswKp (rebuild with 
 - The three CRLF model files are fully CRLF.
 - No wikilink in the KB is broken.
 
+## Status (2026-11-20 evening)
+
+- **Decisions answered (Ian):**
+  - 1: fix the FP contact (done).
+  - 2: measured numbers become wording in tracked files (done), without a history rewrite; `drivers/trim/*NCY2*` gitignored (done).
+  - 3: guard fixed (done).
+  - 4: eTempDebug readings marked unverified (done in stage 1).
+  - 5: stressFreeze.tcl archived and bin/hpg_sbatch.sh deleted (done).
+  - 6: the October radFine params stay in git history, cited by commit 0fbf0ce.
+  - No GitHub Support request for the purged commit.
+- **Stage 1 done.** Docs, KB and comments, in commits 1a, 1b and 1c, each checked by an independent verifier. Code changes are comment-only (identical with comments stripped; Python ASTs identical; CRLF kept), and genRadStudy still reproduces every params file.
+- **Still open:**
+  - Stages 2-4.
+  - CLAUDE.md §0 ("run everything from the repo root") vs the scratch-folder advice for local radIV / seeIV runs.
+  - Whether radPlot1 (static-era-lessons) is measured.
+  - The seeGen deposited-charge unit check in see-plan.
+  - The 3d-plan on-axis density figure.
+
 ## 1. Decisions for Ian (before any clean-up)
 
 1. **DONE 2026-11-20 (Ian: fix it). FP contact covers the drain half of the T-gate head (MOD-1, confirmed locally).** Fixed in all three decks (lever `fpBoxOld`, default 0 = fixed). The 2.5 nm stress (old box) was cancelled; the stress library, the pre-irradiation curves and the Nov 11 model are being rerun ([[fp-contact-fix]]).

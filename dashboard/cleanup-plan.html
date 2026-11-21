@@ -74,7 +74,7 @@ details.slice>summary:focus-visible{outline:2px solid var(--accent);outline-offs
   <p class="lede">A staged, behaviour-preserving plan to make the code and knowledge base easier to read, plus the conflicts found in the KB. Every finding was checked by a second, independent reviewer.</p>
   <div class="stats"><span><b>156</b> findings</span><span><b>155</b> kept</span><span><b>115</b> confirmed</span><span><b>40</b> confirmed with corrections</span><span><b>1</b> refuted</span></div>
 </header>
-<nav class="rail" aria-label="Contents"><a href="#1-decisions-for-ian-before-any-clean-up">1. Decisions for Ian (before any clean-up)</a><a href="#2-stage-1-docs-kb-and-comments-no-behavi">2. Stage 1: docs, KB and comments (no behaviour change)</a><a href="#3-stage-2-safety-rails-small-behaviour-p">3. Stage 2: safety rails (small, behaviour-preserving)</a><a href="#4-stage-3-refactors-each-with-a-regressi">4. Stage 3: refactors, each with a regression test</a><a href="#5-stage-4-moves-to-archive-readme-per-fo">5. Stage 4: moves to archive/ (README per folder; update references in the same commit)</a><a href="#6-kb-issues-and-conflicts">6. KB issues and conflicts</a><a href="#7-suggested-order">7. Suggested order</a><a href="#refuted">Refuted</a><a href="#appendix">Appendix: all findings</a></nav>
+<nav class="rail" aria-label="Contents"><a href="#status-2026-11-20-evening">Status (2026-11-20 evening)</a><a href="#1-decisions-for-ian-before-any-clean-up">1. Decisions for Ian (before any clean-up)</a><a href="#2-stage-1-docs-kb-and-comments-no-behavi">2. Stage 1: docs, KB and comments (no behaviour change)</a><a href="#3-stage-2-safety-rails-small-behaviour-p">3. Stage 2: safety rails (small, behaviour-preserving)</a><a href="#4-stage-3-refactors-each-with-a-regressi">4. Stage 3: refactors, each with a regression test</a><a href="#5-stage-4-moves-to-archive-readme-per-fo">5. Stage 4: moves to archive/ (README per folder; update references in the same commit)</a><a href="#6-kb-issues-and-conflicts">6. KB issues and conflicts</a><a href="#7-suggested-order">7. Suggested order</a><a href="#refuted">Refuted</a><a href="#appendix">Appendix: all findings</a></nav>
 <main>
 <p>Published page: https://claude.ai/artifact/QTDF84jNysUWQcsTfsswKp (rebuild with <code>python3 dashboard/build_cleanup_page.py</code>, then republish <code>dashboard/cleanup-plan.html</code>).</p>
 <p><strong>How this was made.</strong> Seven readers each surveyed one slice of the repo: drivers, model, <code>analysis/genRadStudy.py</code>, the other analysis scripts, sweeps / bin / layout, the KB results notes, and the rest of the KB. A separate skeptic then re-checked every finding against the files. Of 156 findings, 155 survived (115 confirmed, 40 confirmed with corrections) and 1 was refuted. IDs (DRV-, MOD-, GEN-, AN-, LAY-, KB-R-, KBC-) refer to the appendix. <strong>Nothing has been changed yet.</strong> Every step below is behaviour-preserving unless it says otherwise, and each code stage has an acceptance test.</p>
@@ -85,6 +85,40 @@ details.slice>summary:focus-visible{outline:2px solid var(--accent);outline-offs
 <li>The three CRLF model files are fully CRLF.
 </li>
 <li>No wikilink in the KB is broken.
+</li></ul>
+<h2 id="status-2026-11-20-evening">Status (2026-11-20 evening)</h2>
+<ul>
+<li><strong>Decisions answered (Ian):</strong>
+<ul>
+<li>1: fix the FP contact (done).
+</li>
+<li>2: measured numbers become wording in tracked files (done), without a history rewrite; <code>drivers/trim/*NCY2*</code> gitignored (done).
+</li>
+<li>3: guard fixed (done).
+</li>
+<li>4: eTempDebug readings marked unverified (done in stage 1).
+</li>
+<li>5: stressFreeze.tcl archived and bin/hpg_sbatch.sh deleted (done).
+</li>
+<li>6: the October radFine params stay in git history, cited by commit 0fbf0ce.
+</li>
+<li>No GitHub Support request for the purged commit.
+</li></ul>
+</li>
+<li><strong>Stage 1 done.</strong> Docs, KB and comments, in commits 1a, 1b and 1c, each checked by an independent verifier. Code changes are comment-only (identical with comments stripped; Python ASTs identical; CRLF kept), and genRadStudy still reproduces every params file.
+</li>
+<li><strong>Still open:</strong>
+<ul>
+<li>Stages 2-4.
+</li>
+<li>CLAUDE.md §0 ("run everything from the repo root") vs the scratch-folder advice for local radIV / seeIV runs.
+</li>
+<li>Whether radPlot1 (static-era-lessons) is measured.
+</li>
+<li>The seeGen deposited-charge unit check in see-plan.
+</li>
+<li>The 3d-plan on-axis density figure.
+</li></ul>
 </li></ul>
 <h2 id="1-decisions-for-ian-before-any-clean-up">1. Decisions for Ian (before any clean-up)</h2>
 <div class="decisions"><ol>
@@ -426,7 +460,7 @@ details.slice>summary:focus-visible{outline:2px solid var(--accent);outline-offs
 <li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-20</span><span class="txt">Shared code currently lives in random leaf scripts.<span class="meta"><code>analysis/radMetrics.py, analysis/plot_radStep.py (+2)</code> · effort L · confirmed</span></span></li>
 <li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-3</span><span class="txt">The 2026-10-01 collapse-classification rule is re-implemented at least seven times, and the copies have drifted.<span class="meta"><code>analysis/analyze_onset.py:35, analysis/analyze_onset.py:75 (+10)</code> · effort M · confirmed</span></span></li>
 <li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-4</span><span class="txt">Three committed metrics CSVs have a column named onset_Vd, and it means three different things.<span class="meta"><code>analysis/analyze_trapMapSets.py:80, analysis/analyze_mobCompare.py:68 (+4)</code> · effort S · confirmed</span></span></li>
-<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-5</span><span class="txt">The tolerant CSV reader idiom <code>np.array([[float(v) for v in l.split(',') if v.strip()] for l in open(f) if l.strip()])</code> is copied into 23 scripts (24 sites;<span class="meta"><code>analysis/plot_meshSeries.py:45, analysis/plot_radStepSeries.py:65 (+8)</code> · effort M · confirmed</span></span></li>
+<li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-5</span><span class="txt">The tolerant CSV reader idiom <code>np.array([ [float(v) for v in l.split(',') if v.strip()] for l in open(f) if l.strip()])</code> is copied into 23 scripts (24 sites;<span class="meta"><code>analysis/plot_meshSeries.py:45, analysis/plot_radStepSeries.py:65 (+8)</code> · effort M · confirmed</span></span></li>
 <li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-6</span><span class="txt">Seven scripts build a label -&gt; data map from task_*/params.json: plot_meshSeries, plot_meshChkSteps, plot_radStepFS, plot_radStepH, plot_radStep, plot_radFinal and plot_deckVg1 (plus radFineFig and radMap).<span class="meta"><code>analysis/plot_meshSeries.py:30, analysis/plot_meshChkSteps.py:16 (+6)</code> · effort S · confirmed, corrected</span></span></li>
 <li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-7</span><span class="txt">The same reference curves are hard-coded again and again as results/&lt;date&gt;_&lt;run&gt; paths, some with task numbers.<span class="meta"><code>analysis/plot_lateIdVd.py:8, analysis/plot_curveTracer.py:20 (+6)</code> · effort M · confirmed</span></span></li>
 <li class="fi" data-sev="M"><span class="sev sM">Med</span><span class="fid">AN-8</span><span class="txt">Move the hard-coded, single-figure scripts (plot_gaussFine, plot_radExp1, radEBFig, radGaussFig, radFineFig, plot_nov12, plot_rad28fit, plot_rad3dFix, plot_radStepHighlights) to archive/analysis_dayfigs/ with the README table.<span class="meta"><code>analysis/plot_meshChkSteps.py, analysis/analyze_mobCompare.py (+12)</code> · effort M · confirmed, corrected</span></span></li>
