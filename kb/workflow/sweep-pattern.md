@@ -29,7 +29,7 @@ sbatch --array=0-7%8 --export=ALL,RUN=$RUN,PARAMS=$PARAMS \
 
 **What each task does** (`sweeps/radIV.slurm`):
 1. Makes `results/$RUN/task_<id>/` and reads its line from `$REPO/sweeps/$PARAMS`.
-2. Copies these model files flat from `$REPO/model/`: `GaN_modelfile_masterD`, `GaN.tcl`, `AlGaN.tcl`, `Insulator.tcl`, `Metal.tcl`, `Continuity.tcl`, `Poisson.tcl`, `rfdevice.tcl`, `rfdevice_SiN.tcl`, `rfdevice3d.tcl`. **`ETemp.tcl` is not copied**, so a line with `eTemp=1` stops at `source ETemp.tcl` with a Tcl error. That is the template, not the environment.
+2. Copies these model files flat from `$REPO/model/`: `GaN_modelfile_masterD`, `GaN.tcl`, `AlGaN.tcl`, `Insulator.tcl`, `Metal.tcl`, `Continuity.tcl`, `Poisson.tcl`, `ETemp.tcl`, `rfdevice.tcl`, `rfdevice_SiN.tcl`, `rfdevice3d.tcl`. Until 2026-11-21 `ETemp.tcl` was missing, so a radIV/seeIV line with `eTemp=1` stopped at `source ETemp.tcl`; `pulsedIV_eTemp.slurm` now also copies the SiN and 3D decks.
 3. Writes `radIV_task.tcl` (the same name for every DRV): `set tag <label>`, then one `set <lever> <value>` per pair in line order, then `drivers/${DRV:-radIV}.tcl` with its `window` lines blanked and its `chart` lines commented out. It runs that with stock HPG FLOOXS ([[flooxs-builds]]). **Never edit the repo copy in place**: a per-run change goes on the params line.
 4. Writes `params.json`: label, task_id, params file name and the pairs on the line, in order. It is not the full parameter set; the driver defaults fill in the rest ([[levers]]).
 

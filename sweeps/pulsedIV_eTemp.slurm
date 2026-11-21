@@ -35,7 +35,7 @@ export PL_LIBRARY=$(find "$CONDA_PREFIX/share" -maxdepth 3 -type d -name "tcl" |
 export PATH=$HOME/.local/flooxs/bin:$PATH
 
 mkdir -p "$TASK_DIR"
-for f in GaN_modelfile_masterD GaN.tcl AlGaN.tcl Insulator.tcl Metal.tcl Continuity.tcl Poisson.tcl ETemp.tcl rfdevice.tcl; do
+for f in GaN_modelfile_masterD GaN.tcl AlGaN.tcl Insulator.tcl Metal.tcl Continuity.tcl Poisson.tcl ETemp.tcl rfdevice.tcl rfdevice_SiN.tcl rfdevice3d.tcl; do
     cp "$REPO/model/$f" "$TASK_DIR/$f"
 done
 
