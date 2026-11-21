@@ -2310,3 +2310,13 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - **fpFixScaleEB1:** the Nov 11 biased SiN and HighK cases, pinned at 17.66 V, fixed box, damPeak 7e17 / 1e18 / 1.5e18 / 2e18 / 3e18; 10 tasks.
   - **fpFixScale28:** 28 V stress damage only on the fixed-box library, SiN and HighK, damPeak 1e17 / 2e17 / 3e17 / 5e17 / 7e17 / 1e18 / 1.5e18; 14 tasks. Submitted by the watcher once both fixed 28 V states exist; it replaces the old-scale fpFixLoad set, which was never run.
   - Both params files were written by a one-off snippet while the generator refactor runs; their block goes into analysis/genRadStudy.py afterwards.
+- **fpFixScaleEB1 is job 52223190** (10 tasks, submitted Nov 21 ~11:00).
+- **Clean-up stages 2-4 done (workflow wf_47d68225-3f1; each track re-checked by an independent verifier):**
+  - **Generator rails and library:** genRadStudy / genRad3d refuse to change a tracked params file without `--force`; `--check`; `--show`; constants in analysis/radparams.py. All 63 + 4 params files reproduce byte-for-byte, and fpFixScaleEB1/fpFixScale28 are now generator studies (identical to the hand-written files).
+  - **analysis/common.py:** 35 scripts migrated; stdout, CSVs and PNG pixels identical; radMetrics.py is a re-export shim.
+  - **radIV.tcl:** reorganised by stage; byte-identical outputs in three local runs (pre; stress + damage; stressLoad + damGauss + damGaussF + vdCuts); the no-op stressQfnDamp/Abs lines removed.
+  - **Archive:** 21 files moved to archive/{analysis_dayfigs, energy_balance, trim_smoke, static_mobility}, with READMEs and every reference updated.
+  - **sweeps/README.md:** an index of all 150 sweeps files with run dirs, job IDs, first commit, generator and status.
+  - **KB follow-ups:** analysis-scripts, levers (stressQfn), sweep-pattern (rails, index pointer), step-search-28v, collapse-classification, README, index.
+  - Stage 3d (deck fold) is held until the fix results settle.
+  - **For Ian** (in cleanup-plan): the DamageIn print1d catch; damList's foreach overwrites the global Boltzmann k; archived trapPlot output path; colour ramps; CLI convention; the unrecorded radEth1 run (52000451).

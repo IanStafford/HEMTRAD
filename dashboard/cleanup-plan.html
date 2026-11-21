@@ -107,9 +107,41 @@ details.slice>summary:focus-visible{outline:2px solid var(--accent);outline-offs
 </li>
 <li><strong>Stage 1 done.</strong> Docs, KB and comments, in commits 1a, 1b and 1c, each checked by an independent verifier. Code changes are comment-only (identical with comments stripped; Python ASTs identical; CRLF kept), and genRadStudy still reproduces every params file.
 </li>
+<li><strong>Stages 2-4 done (2026-11-21)</strong>, each track checked by an independent verifier that re-ran its acceptance test:
+<ul>
+<li>templates copy ETemp.tcl and the SiN/3D decks;
+</li>
+<li>generator rails (<code>--check</code>, <code>--force</code>, <code>--show</code>) and the <code>radparams.py</code> library; 63 + 4 params files reproduce byte-for-byte;
+</li>
+<li><code>analysis/common.py</code>, with 35 scripts migrated and identical outputs (stdout, CSVs, figure pixels);
+</li>
+<li><code>radIV.tcl</code> reorganised by stage, with byte-identical outputs in three local FLOOXS runs;
+</li>
+<li>archive moves (21 files) with READMEs;
+</li>
+<li><code>sweeps/README.md</code>, an index of every params file against its runs and job IDs.
+</li></ul>
+</li>
+<li><strong>Not done:</strong> stage 3d (fold <code>rfdevice_SiN.tcl</code> into <code>rfdevice.tcl</code> with a <code>passMat</code> lever), held until the fixed-box results settle; one retry/bisection helper (deferred, needs a template change).
+</li>
+<li><strong>For Ian (would change behaviour):</strong>
+<ul>
+<li>wrap the 2D DamageIn <code>print1d</code> in a <code>catch</code> like the other cuts;
+</li>
+<li>the damList loop <code>foreach {k v}</code> overwrites the model's global <code>k</code> (Boltzmann constant), so a future proc that reads <code>k</code> after a damList run would break;
+</li>
+<li>archived <code>trapPlot.tcl</code> still writes to the root <code>figures/</code>;
+</li>
+<li>unify the inline colour ramps (AN-14);
+</li>
+<li>one CLI convention for the scripts (AN-12).
+</li></ul>
+</li>
 <li><strong>Still open:</strong>
 <ul>
-<li>Stages 2-4.
+<li>The run <code>20261119_radEth1</code> (job 52000451, dam-threshold worktree) has no params file or progress.md entry.
+</li>
+<li>testRegister rounds stop at H.
 </li>
 <li>CLAUDE.md §0 ("run everything from the repo root") vs the scratch-folder advice for local radIV / seeIV runs.
 </li>

@@ -17,4 +17,4 @@ Classify a device by its **largest single-step loss**, 1 − Id(Vd_n)/Id(Vd_n−
 
 Also check the **pre-collapse current**: some deep collapses start from an already-sagged current and are less clean.
 
-Implemented in `analysis/analyze_onset.py` and `analysis/plot_posVd.py` ([[analysis-scripts]]). Earlier metrics (static era): collapse ratio peak/min (biased by onset) → collapse depth vs trap-free, and suppression at a fixed Vd ([[glossary]]).
+Implemented once in `analysis/common.py` as `classify_collapse(vd, idd, ref, vd_max, stall_step, empty_ok)` (2026-11-21). Callers keep their own stall policy: `analyze_onset` (vd_max from the task's Vd_max), `plot_posVd` / `plot_posOnset` / `plot_posSlides` (the run's largest Vd_max), `plot_sensitivity` (the task's Vd_max and Vd_step), `plot_strikeSlides` (no stall rule) ([[analysis-scripts]]). Earlier metrics (static era): collapse ratio peak/min (biased by onset) → collapse depth vs trap-free, and suppression at a fixed Vd ([[glossary]]).

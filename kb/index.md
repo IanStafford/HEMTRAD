@@ -46,7 +46,7 @@ Second brain for the FLOOXS model of radiation effects in an AlGaN/GaN HEMT (HfO
 
 ## Workflow and tools
 - [[hpg-workflow]] — HiPerGator connection, environment, SLURM rules
-- [[sweep-pattern]] — params.txt / task dirs / checks / rsync
+- [[sweep-pattern]] — params.txt / task dirs / checks / rsync (index of every params file: `sweeps/README.md`)
 - [[stress-library]] — saved off-state stress states: save, load, resume, the `fpBox` stamp, mesh caveat
 - [[local-runs]] — running FLOOXS on the workstation
 - [[git-conventions]] — what to commit, CRLF files, archiving
@@ -54,7 +54,7 @@ Second brain for the FLOOXS model of radiation effects in an AlGaN/GaN HEMT (HfO
 - [[cleanup-plan]] — code legibility clean-up plan and KB audit (2026-11-20): decisions for Ian, staged steps with acceptance tests, the list of KB conflicts
 - [[drivers]] — `drivers/radIV.tcl` (the rad model, all work since Oct 23), `drivers/seeIV.tcl` (transients); `drivers/pulsedIV.tcl` (the Sep–Oct curve tracer), `drivers/calibIdVg.tcl` …
 - [[analysis-scripts]] — Python analysis and plotting
-- [[notebook]] — `figures.ipynb`
+- [[notebook]] — `archive/static_mobility/figures.ipynb`, the static-era paper plots
 - [[trim]] — SRIM-2013 TRIM under Wine on the workstation, batch wrapper, HEMT template
 - [[repo-locations]] — the three repo copies, Obsidian vault, flooxs checkouts
 

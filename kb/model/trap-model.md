@@ -7,7 +7,7 @@ source: model/Poisson.tcl, model/GaN_modelfile_masterD
 
 **`IonizedAcceptor Mat Ntrap Etrap Efwhm {g 2}`** — acceptor traps, **neutral when empty, −q when filled**. `IonAcceptor = Ntrap · f`, f = Fermi–Dirac occupancy of a level at `Econd − Etrap` (degeneracy g = 2), with a Gaussian energy spread (FWHM `trapWidth`) via 3-point Gauss–Hermite. Poisson uses `− IonAcceptor`. Spatial density from `TrapConc_<trapShape>` (Gaussian or cone; [[levers]]).
 
-**Sign bug (fixed in 760b388):** the old `NeutralAcceptor` put *empty* traps in Poisson as negative charge, so trapping fed on itself and Newton diverged into NaN at Vd ≈ 1.5 V. The abrupt collapse in `radPlot.csv`/`radPlot1.csv` came from this bug, so only their onset and depth are targets, not the decay to 1e-9 after the collapse.
+**Sign bug (fixed in 760b388):** the old `NeutralAcceptor` put *empty* traps in Poisson as negative charge, so trapping fed on itself and Newton diverged into NaN at Vd ≈ 1.5 V. The abrupt collapse in `radPlot.csv`/`radPlot1.csv` (in `archive/static_mobility/figures/`) came from this bug, so only their onset and depth are targets, not the decay to 1e-9 after the collapse.
 
 **Hot-electron capture:** the trap level is lowered by `hotEb·(1 − T/TeTrap)` — see [[hot-electron-capture]].
 

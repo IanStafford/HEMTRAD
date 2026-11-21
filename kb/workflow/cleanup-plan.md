@@ -26,8 +26,23 @@ Published page: https://claude.ai/artifact/QTDF84jNysUWQcsTfsswKp (rebuild with 
   - 6: the October radFine params stay in git history, cited by commit 0fbf0ce.
   - No GitHub Support request for the purged commit.
 - **Stage 1 done.** Docs, KB and comments, in commits 1a, 1b and 1c, each checked by an independent verifier. Code changes are comment-only (identical with comments stripped; Python ASTs identical; CRLF kept), and genRadStudy still reproduces every params file.
+- **Stages 2-4 done (2026-11-21)**, each track checked by an independent verifier that re-ran its acceptance test:
+  - templates copy ETemp.tcl and the SiN/3D decks;
+  - generator rails (`--check`, `--force`, `--show`) and the `radparams.py` library; 63 + 4 params files reproduce byte-for-byte;
+  - `analysis/common.py`, with 35 scripts migrated and identical outputs (stdout, CSVs, figure pixels);
+  - `radIV.tcl` reorganised by stage, with byte-identical outputs in three local FLOOXS runs;
+  - archive moves (21 files) with READMEs;
+  - `sweeps/README.md`, an index of every params file against its runs and job IDs.
+- **Not done:** stage 3d (fold `rfdevice_SiN.tcl` into `rfdevice.tcl` with a `passMat` lever), held until the fixed-box results settle; one retry/bisection helper (deferred, needs a template change).
+- **For Ian (would change behaviour):**
+  - wrap the 2D DamageIn `print1d` in a `catch` like the other cuts;
+  - the damList loop `foreach {k v}` overwrites the model's global `k` (Boltzmann constant), so a future proc that reads `k` after a damList run would break;
+  - archived `trapPlot.tcl` still writes to the root `figures/`;
+  - unify the inline colour ramps (AN-14);
+  - one CLI convention for the scripts (AN-12).
 - **Still open:**
-  - Stages 2-4.
+  - The run `20261119_radEth1` (job 52000451, dam-threshold worktree) has no params file or progress.md entry.
+  - testRegister rounds stop at H.
   - CLAUDE.md §0 ("run everything from the repo root") vs the scratch-folder advice for local radIV / seeIV runs.
   - Whether radPlot1 (static-era-lessons) is measured.
   - The seeGen deposited-charge unit check in see-plan.

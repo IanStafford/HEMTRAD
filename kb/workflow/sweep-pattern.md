@@ -9,7 +9,7 @@ The binding rules are in `CLAUDE.md` §2: ask before `sbatch`/`scancel`, and che
 ## Params files and study names
 - One file per study, `sweeps/params_<study>.txt`, one line per array task; task N reads line N+1. The committed file is the record of what the job ran.
 - **Never edit or regenerate a params file after its job ran, and never reuse a study name.** A changed or repeated study gets a new name. What goes wrong otherwise: `params_radFine.txt` was overwritten on Nov 5 by a different study. "radFine Oct 24" (job 47562303) now exists only in git history, at commit 0fbf0ce (`git show 0fbf0ce:sweeps/params_radFine.txt`); the file on `main` is "radFine Nov 5" (job 49735196).
-- Many rad-era params files are written by `analysis/genRadStudy.py` (and `analysis/genRad3d.py` for the 3D studies, [[analysis-scripts]]). Each run of a generator rewrites every file it owns. After running one, `git diff --stat sweeps/` must list only the new study's file.
+- Many rad-era params files are written by `analysis/genRadStudy.py` (and `analysis/genRad3d.py` for the 3D studies, [[analysis-scripts]]). Since 2026-11-21 they refuse to change a tracked params file (they print the diff; `--force <name>` overrides) and `--check` writes nothing; add a study as a new function. After running one, `git diff --stat sweeps/` must list only the new study's file. **Index of every params file, its template, runs and job IDs: `sweeps/README.md`** (keep it current when you submit).
 - Commit and push the params file, then `git pull --ff-only` on HPG, before submitting. A file missing on HPG fails the job within seconds (radFine 47554718, Oct 24).
 
 ## radIV.slurm (all runs since 2026-10-23)
@@ -63,11 +63,11 @@ Use `grep`/`tail`, not `cat`. Report failures before plotting.
 **Then** `rsync -a --exclude='core*' hpg:/home/ianstafford/blue/ee1/ianstafford/HEMTRAD/results/<run>/ results/<run>/` and analyse and plot on the workstation.
 
 ## Oct-era templates (pulsedIV)
-Used with `drivers/pulsedIV.tcl` until `radIV.tcl` arrived on Oct 23. Each `pulsedIV_<study>.slurm` (and `fieldPlate.slurm`, `eTempDebug.slurm`) hard-codes its run folder and its params file (`fieldPlate.slurm` hard-codes its two decks instead): it is a finished record of one study. `pulsedIV_eTemp.slurm` is the one generic template (`PARAMS`, `RUN`, `REPO` from the environment; an optional `extra` column of `lever value;...` settings). Static-era templates are in `archive/static_mobility/`.
+Used with `drivers/pulsedIV.tcl` until `radIV.tcl` arrived on Oct 23. Each `pulsedIV_<study>.slurm` (and `fieldPlate.slurm`, and `eTempDebug.slurm`, archived in `archive/energy_balance/`) hard-codes its run folder and its params file (`fieldPlate.slurm` hard-codes its two decks instead): it is a finished record of one study. `pulsedIV_eTemp.slurm` is the one generic template (`PARAMS`, `RUN`, `REPO` from the environment; an optional `extra` column of `lever value;...` settings). Static-era templates are in `archive/static_mobility/`.
 
 1. Commit the driver, template and params file on the workstation; `git push`. On HPG: `git pull --ff-only`, then `sbatch sweeps/<template>.slurm` from the repo root. The `#SBATCH --output=results/...` paths are relative to the submit directory.
 2. Params lines are pipe-delimited columns, one line per task.
-3. Each task copies the model files flat into its own folder under `results/<YYYYMMDD>_<tag>/`, prepends `set <lever> <value>` lines, strips the GUI lines, and runs there. Only `pulsedIV_eTemp.slurm` and `eTempDebug.slurm` copy `ETemp.tcl`. The driver finds the flat model files in its own directory (`modelDir` lookup, [[drivers]]). **Never edit the repo copy in place.**
+3. Each task copies the model files flat into its own folder under `results/<YYYYMMDD>_<tag>/`, prepends `set <lever> <value>` lines, strips the GUI lines, and runs there. Only `pulsedIV_eTemp.slurm` and the archived `eTempDebug.slurm` copy `ETemp.tcl`. The driver finds the flat model files in its own directory (`modelDir` lookup, [[drivers]]). **Never edit the repo copy in place.**
 4. Per-task CSVs `pulsedIV_<tag>.csv` (never the shared `figures/pulsedIV.csv`) and a `params.json`.
 5. Format floats in names (`printf '%.2e'`).
 6. Log check and rsync as above.

@@ -8,15 +8,15 @@ tags: [workflow, reference]
 | Folder | Contents |
 |---|---|
 | `model/` | model files and device decks, sourced together: `rfdevice.tcl` (HighK/HfO2), `rfdevice_SiN.tcl`, `rfdevice3d.tcl` (3D slice, [[3d-plan]]); 3 CRLF files |
-| `drivers/` | Tcl drivers ([[drivers]]): `radIV.tcl` (all HPG runs since 2026-10-23), `seeIV.tcl`, `pulsedIV.tcl` (Sep-Oct curve tracer), `calibIdVg.tcl`, `fieldPlate.tcl`, `render3d_build.tcl`, `trapPlot.tcl`, `eTempDebug_tail.tcl`; `drivers/trim/` holds the SRIM TRIM input files ([[trim]]) |
+| `drivers/` | Tcl drivers ([[drivers]]): `radIV.tcl` (all HPG runs since 2026-10-23), `seeIV.tcl`, `pulsedIV.tcl` (Sep-Oct curve tracer), `calibIdVg.tcl`, `fieldPlate.tcl`, `render3d_build.tcl`; `drivers/trim/` holds the SRIM TRIM input files ([[trim]]) |
 | `sweeps/` | `radIV.slurm`, the Oct-era `pulsedIV_*.slurm` records and every study's `params_*.txt` ([[sweep-pattern]]) |
 | `analysis/` | Python analysis, plotting and the params generators `genRadStudy.py` / `genRad3d.py` ([[analysis-scripts]]) |
 | `data/` | tracked: the measured HfO2 Id–Vg calibration curve (`rfDeviceHFO2_Experimental.csv`, raw `.xlsx`), TRIM track tables `data/trim/*_track.json` (model input), FANGS 3D curves `data/rad3d_fangs/` (model output). Local only and gitignored: the measured radiation data `data/rad_y2/`, `data/rad_y3/` ([[git-conventions]]) |
-| `figures/` | outputs; `figures.ipynb` at the root ([[notebook]]) |
+| `figures/` | outputs: the root holds frozen October outputs, each study since November has its own folder (`figures/README.md`) |
 | `bin/` | workflow helpers: `hpg_reconnect.sh` ([[hpg-workflow]]), `trim_run.sh` ([[trim]]) |
 | `dashboard/` | artifact sources and web figures ([[dashboard]]) |
 | `kb/` | this KB |
-| `archive/` | superseded work, each folder with a README: `static_mobility/` (HEMTRAD static-mobility era; also `stressFreeze.tcl`, archived 2026-11-20); `fangs-hpg-tests/` and `fangs-hpg-first-run/` (FANGS HPG test campaigns, not HEMTRAD physics) |
+| `archive/` | superseded work, each folder with a README: `static_mobility/` (HEMTRAD static-mobility era; also `stressFreeze.tcl`, archived 2026-11-20, and `trapPlot.tcl`, `analyze_mobCompare.py` and `figures.ipynb` ([[notebook]]), archived 2026-11-21); `energy_balance/` (the eTempDebug tools and `plot_eTemp.py`, [[energy-balance]]); `trim_smoke/` (the 20-ion TRIM inputs, [[trim]]); `analysis_dayfigs/` (one-off dashboard and deck figure scripts, [[analysis-scripts]]); `fangs-hpg-tests/` and `fangs-hpg-first-run/` (FANGS HPG test campaigns, not HEMTRAD physics) |
 | `results/` | raw sweep results (gitignored) |
 
 Before 2026-10-12 everything sat flat in the root; `progress.md` and old commits use those paths. `README.md` summarises the layout.

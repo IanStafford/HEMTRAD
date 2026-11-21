@@ -2,7 +2,7 @@
 title: Drivers
 tags: [tools, driver]
 date: 2026-11-20
-source: drivers/*.tcl, drivers/trim/, model/rfdevice*.tcl, sweeps/radIV.slurm, sweeps/fieldPlate.slurm, sweeps/eTempDebug.slurm, sweeps/pulsedIV_*.slurm, progress.md
+source: drivers/*.tcl, drivers/trim/, model/rfdevice*.tcl, sweeps/radIV.slurm, sweeps/fieldPlate.slurm, sweeps/pulsedIV_*.slurm, archive/energy_balance/eTempDebug.slurm, progress.md
 ---
 # Drivers (Tcl decks that run a measurement, in `drivers/`)
 
@@ -10,7 +10,7 @@ source: drivers/*.tcl, drivers/trim/, model/rfdevice*.tcl, sweeps/radIV.slurm, s
 
 **Finding the model:** each driver sets `modelDir` (unless already set) to `.` if `GaN_modelfile_masterD` is in the current directory (a flat sweep task dir), else `model` if the current directory has a `model/` folder (running from the repo root), else `../model` relative to the driver. It then sources `$modelDir/GaN_modelfile_masterD` and `$modelDir/$deviceDeck`; the model file sources its siblings from `$modelDir` (default: its own folder). Run from the repo root: `flooxs drivers/radIV.tcl`. `drivers/render3d_build.tcl` is the exception: it sources `model/` directly, so it runs from the repo root only.
 
-**Headless runs.** pulsedIV and trapPlot have GUI lines (`window`, `chart`; trapPlot also `plot1d`) that segfault without a display. The sweep templates strip the `window` and `chart` lines with `sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /'` (CLAUDE.md §3); trapPlot has no template and its `plot1d` line is not covered by that sed.
+**Headless runs.** pulsedIV and the archived trapPlot (`archive/static_mobility/trapPlot.tcl`) have GUI lines (`window`, `chart`; trapPlot also `plot1d`) that segfault without a display. The sweep templates strip the `window` and `chart` lines with `sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /'` (CLAUDE.md §3); trapPlot has no template and its `plot1d` line is not covered by that sed.
 
 ## `drivers/radIV.tcl` (radiation study, current)
 
@@ -71,15 +71,15 @@ Builds the 3D SiN slice (`passMat Nitride`, `W3d` 1.0, `bot3d` 1.5, `yCoarse` 2.
 
 ## Older drivers
 
-- **`drivers/trapPlot.tcl`**: older dynamic-trap driver (Id-Vd plus trap profile dumps via `print1d`). It hard-codes `rfdevice.tcl` and `figures/trapOccupation2.csv` and uses the GUI.
-- **`drivers/eTempDebug_tail.tcl`** (+ `sweeps/eTempDebug.slurm`): appended after `drivers/pulsedIV.tcl` with `Vd_max 0`; meant to attempt one bias step (`dbgVd`, 0.1 V) with Newton capped at 1 and 2 iterations and dump ETemp/Qfn/Elec/DevPsi/Δ peaks and cuts ([[energy-balance]]). The cap never took effect: FLOOXS reads `Math iterLimit` once, when it builds the solver at the first solve after `device init`, and the tail sets it later. So the dumps followed full solves, and the readings drawn from them are unverified (Ian, 2026-11-20; [[flooxs-gotchas]]).
+- **`archive/static_mobility/trapPlot.tcl`** (archived 2026-11-21 from `drivers/`; README there): older dynamic-trap driver (Id-Vd plus trap profile dumps via `print1d`). It hard-codes `rfdevice.tcl` and uses the GUI. It writes its two CSVs, `radPlot2.csv` and `trapOccupation2.csv`, into the root `figures/`; the tracked copies are in `archive/static_mobility/figures/`.
+- **`archive/energy_balance/eTempDebug_tail.tcl`** (+ `archive/energy_balance/eTempDebug.slurm` and its params file; archived 2026-11-21 from `drivers/` and `sweeps/`, README there with the job list): appended after `drivers/pulsedIV.tcl` with `Vd_max 0`; meant to attempt one bias step (`dbgVd`, 0.1 V) with Newton capped at 1 and 2 iterations and dump ETemp/Qfn/Elec/DevPsi/Δ peaks and cuts ([[energy-balance]]). The cap never took effect: FLOOXS reads `Math iterLimit` once, when it builds the solver at the first solve after `device init`, and the tail sets it later. So the dumps followed full solves, and the readings drawn from them are unverified (Ian, 2026-11-20; [[flooxs-gotchas]]).
 - **`archive/static_mobility/stressFreeze.tcl`** (archived 2026-11-20): quiescent stress, `HotStress` at (VgQ, VdQ), `FreezeTraps`, measure Id-Vd at Vg -2. Static era; superseded by the stress stage of `drivers/radIV.tcl`.
 - Archived drivers (`archive/static_mobility/`): `fieldpeak.tcl` (HighK εr bug; its "SiN" run was HighK), `fieldPlateTest.tcl`, `mobilityCompare.tcl`, `IV.tcl` (sources a missing `powerdevice.tcl`).
 - A GaN starter copy (trap-free I-V focus, `quickIV.tcl`) lives in flooxs-pyplot `Test/SimpDev/GaNSuite` ([[repo-locations]]).
 
 ## `drivers/trim/` (TRIM inputs)
 
-SRIM-2013 TRIM input files, run on the workstation with `bin/trim_run.sh <TRIM.IN> <out_dir>` ([[trim]]). `TRIM_HEMT_template.IN` holds the device stack (HfO2 / Si3N4 / AlGaN / GaN). `TRIM_HighK_Au2256.IN` and `TRIM_SiN_Au2256.IN` run Au ions at 2256 MeV, 200 ions; the `_test20` copies run 20 ions. `analysis/trimTrack.py` turns a full-cascade output into per-layer track parameters, and `analysis/genRad3d.py` reads them from `data/trim/<deck>_track.json` to build `damTube` lists ([[damage-model]]). Device-specific inputs are kept untracked.
+SRIM-2013 TRIM input files, run on the workstation with `bin/trim_run.sh <TRIM.IN> <out_dir>` ([[trim]]). `TRIM_HEMT_template.IN` holds the device stack (HfO2 / Si3N4 / AlGaN / GaN). `TRIM_HighK_Au2256.IN` and `TRIM_SiN_Au2256.IN` run Au ions at 2256 MeV, 200 ions; their 20-ion `_test20` smoke-test copies are in `archive/trim_smoke/` (archived 2026-11-21). `analysis/trimTrack.py` turns a full-cascade output into per-layer track parameters, and `analysis/genRad3d.py` reads them from `data/trim/<deck>_track.json` to build `damTube` lists ([[damage-model]]). Device-specific inputs are kept untracked.
 
 ## Device decks and model files
 

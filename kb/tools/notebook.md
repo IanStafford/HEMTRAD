@@ -2,11 +2,11 @@
 title: figures.ipynb
 tags: [tools, static-era]
 date: 2026-11-20
-source: figures.ipynb (15 cells, read 2026-11-20); git log --follow figures.ipynb
+source: archive/static_mobility/figures.ipynb (15 cells, read 2026-11-20; moved from the repo root 2026-11-21); git log --follow archive/static_mobility/figures.ipynb
 ---
 # `figures.ipynb`
 
-Static-era paper plots at the repo root. Its content last changed on 2026-09-24. The 2026-10-12 reorganisation (42ecf73) only pointed its two reads of `rfDeviceHFO2_Experimental.csv` (cells 4 and 14) at `data/`. Stage 4 of [[cleanup-plan]] moves it to `archive/static_mobility/`.
+Static-era paper plots, in `archive/static_mobility/figures.ipynb` since 2026-11-21 (stage 4 of [[cleanup-plan]]; it was at the repo root before). Its content last changed on 2026-09-24. The 2026-10-12 reorganisation (42ecf73) only pointed its two reads of `rfDeviceHFO2_Experimental.csv` (cells 4 and 14) at `data/`, and the 2026-11-21 move pointed its four reads of the `radPlot` CSVs at `archive/static_mobility/figures/`.
 
 **Kernel.** The workstation's system `python3` (numpy, pandas, matplotlib, scipy). `jupyter_client` and `ipykernel` are installed; `nbformat` and `nbconvert` are not.
 
@@ -17,7 +17,7 @@ Static-era paper plots at the repo root. Its content last changed on 2026-09-24.
 - `Vt.png` appears only in a commented-out `savefig` (cells 4 and 6).
 
 **What the cells show.**
-- Cells 4 and 6 read `figures/radPlot.csv`, `radPlot1.csv` and `radPlot2.csv` (static era, [[static-era-lessons]]). Cell 6 labels radPlot and radPlot1 "x=0.14" and "x=0.16". Cell 12 plots Run F (`pulsedIV_F.csv`) against radPlot1, labelled "old model".
+- Cells 4 and 6 read `radPlot.csv`, `radPlot1.csv` and `radPlot2.csv` from `archive/static_mobility/figures/` (static era, [[static-era-lessons]]; moved from `figures/` 2026-11-21). Cell 6 labels radPlot and radPlot1 "x=0.14" and "x=0.16". Cell 12 plots Run F (`pulsedIV_F.csv`) against radPlot1, labelled "old model".
 - Cells 9 and 10 show the stress-then-freeze runs of `stressFreeze.tcl`, which was archived on 2026-11-20 to `archive/static_mobility/stressFreeze.tcl`.
 
 **To add results.** Append a cell and execute only it plus the setup cells 1 (imports) and 2 (`flooxsRead`) through `jupyter_client`, so other outputs stay untouched. Keep the JSON `indent=1` with a trailing newline. All plotting happens on the workstation; nothing on HPG touches the notebook.

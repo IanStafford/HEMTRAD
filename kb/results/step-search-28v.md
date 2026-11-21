@@ -56,7 +56,7 @@ Full 0-3 strike series of the settings that kept steps at 5 nm, rerun on m5fix a
 
 The committed figures have three mesh columns. Both scripts now add a fourth, 2.5 nm column (`M_m2p5_` runs), which stays empty until those runs exist.
 
-The table counts drops of at least 8 mA/mm (`drops` in `plot_meshSeries.py`). The deliverable figure marks only drops of at least 10 mA/mm with an arrow, so a drop of 8-10 mA/mm counts here but has no arrow. Drops for 1 / 2 / 3 strikes:
+The table counts drops of at least 8 mA/mm (`common.drop_values(..., DROP_MIN_TABLE, "hyst")`, used by `plot_meshSeries.py`). The deliverable figure marks only drops of at least 10 mA/mm with an arrow, so a drop of 8-10 mA/mm counts here but has no arrow. Drops for 1 / 2 / 3 strikes:
 
 | Setting | Library (9.5-17.2 nm at y 0.76-0.90) | m10 | m5fix |
 |---|---|---|---|

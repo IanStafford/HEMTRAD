@@ -28,7 +28,7 @@ TRIM/SRIM (Ziegler) is a Windows program. HPG has no SRIM module (the `nxtrim` m
 | `TRIM_HEMT_template.IN` | HfO2 100 nm / Si3N4 50 nm / Al0.22Ga0.78N 15 nm / GaN 7.5 µm | Au 10 MeV, 20 ions, quick (Kinchin-Pease) cascades; writes RANGE and TRANSMIT | format test (2026-10-21); not a model-deck stack |
 | `TRIM_HighK_Au2256.IN` | HfO2 250 nm / Si3N4 50 nm / AlGaN 15 nm / GaN 2 µm | Au 2256 MeV, 200 ions, full cascades, collision details with recoils (`COLLISON.txt`) | HighK deck track, `data/trim/HighK_track.json` |
 | `TRIM_SiN_Au2256.IN` | Si3N4 300 nm / AlGaN 15 nm / GaN 2 µm | as the HighK file | SiN deck track, `data/trim/SiN_track.json` |
-| `TRIM_HighK_Au2256_test20.IN`, `TRIM_SiN_Au2256_test20.IN` | as the 200-ion files | 20 ions, otherwise identical | smoke tests; nothing else refers to them |
+| `TRIM_HighK_Au2256_test20.IN`, `TRIM_SiN_Au2256_test20.IN` (in `archive/trim_smoke/` since 2026-11-21) | as the 200-ion files | 20 ions, otherwise identical | smoke tests; nothing else refers to them |
 
 - **The Au2256 stacks are the decks' passivation beside the T-gate head.** `rfdevice.tcl` has 250 nm of HighK (x −0.30 to −0.05 µm) on 50 nm of SiN. `rfdevice_SiN.tcl` has 300 nm of SiN ([[device-structure]]).
 - **Densities in all five inputs:** HfO2 9.68, Si3N4 3.17, Al0.22Ga0.78N 5.51 (linear AlN/GaN), GaN 6.15 g/cm³.

@@ -324,7 +324,7 @@ Ian moved the final model to a 28 V stress on 2026-11-12. The damage scale was r
 - rad28fit 51040272 (6 tasks) and the three 28 V tasks of radExp3 51021670;
 - rad28fitB 51196550 / 51249769: rad28fit's SiN 2e18, 3e18 and 4e18 tasks rerun with a 48 h limit, after the originals ran out of time in the stress ramp.
 
-Figure `figures/rad/step28/rad28fit.png` (`analysis/plot_rad28fit.py`). Id at Vg +1 V in mA/mm, read again from the synced CSVs:
+Figure `figures/rad/step28/rad28fit.png` (`archive/analysis_dayfigs/plot_rad28fit.py`). Id at Vg +1 V in mA/mm, read again from the synced CSVs:
 
 | Deck, damPeak | Job | Id at 1 V | Collapse | Id at 10 V |
 |---|---|---|---|---|
