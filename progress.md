@@ -2306,3 +2306,7 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - **SiN biased** collapses completely at 0.1-0.4 V (Id ~0 from there on), against 375 -> 248 at 1.4-1.8 V before; the same in all three SiN variants, free and pinned.
   - **HighK biased** drops 489 -> 409 at 2.2-2.7 V and ends at ~500 mA/mm at 10 V, against flat 951 before.
 - **Read:** the old box held the head's drain edge near 0 V and shielded the gate-edge field, so every damage scale fitted with the bug (7e18 at 17.66 V, 1.5e18 at 28 V) is ~5x too strong with the fixed geometry. The 28 V fpFixLoad set (all at scale 1.5-1.8e18) would most likely just show complete collapse. **DECISION FOR IAN:** refit the damage scale with the fixed box before the strike series.
+- **Ian: "Refit scale first"; HighK contrast "report first".**
+  - **fpFixScaleEB1:** the Nov 11 biased SiN and HighK cases, pinned at 17.66 V, fixed box, damPeak 7e17 / 1e18 / 1.5e18 / 2e18 / 3e18; 10 tasks.
+  - **fpFixScale28:** 28 V stress damage only on the fixed-box library, SiN and HighK, damPeak 1e17 / 2e17 / 3e17 / 5e17 / 7e17 / 1e18 / 1.5e18; 14 tasks. Submitted by the watcher once both fixed 28 V states exist; it replaces the old-scale fpFixLoad set, which was never run.
+  - Both params files were written by a one-off snippet while the generator refactor runs; their block goes into analysis/genRadStudy.py afterwards.
