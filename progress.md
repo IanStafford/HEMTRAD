@@ -2297,3 +2297,12 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **fpFixEB1 caveat:** params_radEB1 sets no Vd_stress (default 28) and no occSafe, so radEB1's stress stopped where the ramp failed (17.66 V). The fixed-box rerun may stop elsewhere; read "field taken at Vd=" in its summaries before comparing.
 - **fpFixEB1p 52140899** (4 tasks): the Nov 11 biased cases pinned at Vd_stress 17.66 V with the fixed box. Clean-up stage 1 committed (1a/1b/1c); plan page updated with the decisions and status.
 - **Clean-up stage 2 (Nov 21):** radIV.slurm now copies ETemp.tcl (an eTemp=1 radIV/seeIV task used to stop at source ETemp.tcl), and pulsedIV_eTemp.slurm also copies rfdevice_SiN.tcl and rfdevice3d.tcl (LAY-5). Running jobs are unaffected. HPG master was down this morning; one reconnect worked. fpFixPre 52134553, fpFixEB1 52134554 and fpFixEB1p 52140899 are done. The fixed-box library (52134552) is at Vd 12 of 28 after 16 h, so about a day to go; the fpFixLoad watcher was restarted.
+
+## 2026-11-21: first FP-fix results (pre, Nov 11 model)
+
+- **fpFixPre 52134553 and fpFixEB1 52134554 / fpFixEB1p 52140899 done** (all RADIV DONE; IDVG GAVE UP near Vg -3.5 in the deep subthreshold; nb_sin Id-Vd stopped at 8.2 V). Free-ramp stresses with the fixed box stopped at 17.77 V (SiN) and 17.93 V (HighK), against 17.66 V before; the pinned runs used 17.66 V.
+- **Pre-irradiation and non-biased: unchanged within 1%.** Vg +1, Vd 4 V: SiN 884 -> 890, HighK 875 -> 882 mA/mm; Id-Vg within 1%. The calibration holds.
+- **Biased (Nov 11 levers, damPeak 7e18): far more damage with the fixed box.** Peak acceptors at the 2DEG row, old -> fixed: SiN 5.9e18 -> 2.7e19 (AlGaN 1.2e19 -> 5.4e19); HighK 6.6e17 -> 4.2e18 (AlGaN 1.0e18 -> 6.5e18). The SiN/HighK damage ratio drops from ~9x to ~7x; both rise ~5x.
+  - **SiN biased** collapses completely at 0.1-0.4 V (Id ~0 from there on), against 375 -> 248 at 1.4-1.8 V before; the same in all three SiN variants, free and pinned.
+  - **HighK biased** drops 489 -> 409 at 2.2-2.7 V and ends at ~500 mA/mm at 10 V, against flat 951 before.
+- **Read:** the old box held the head's drain edge near 0 V and shielded the gate-edge field, so every damage scale fitted with the bug (7e18 at 17.66 V, 1.5e18 at 28 V) is ~5x too strong with the fixed geometry. The 28 V fpFixLoad set (all at scale 1.5-1.8e18) would most likely just show complete collapse. **DECISION FOR IAN:** refit the damage scale with the fixed box before the strike series.
