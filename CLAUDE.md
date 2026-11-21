@@ -45,7 +45,7 @@ When you need Ian to decide something, write it in `progress.md` **and** send a 
 - `--account=ee1`. QOS `ee1` = 19 CPUs for the whole group; burst `ee1-b` ≈ 171 CPUs. Check `squeue -A ee1` before submitting; throttle arrays with `%N`.
 - **Ask Ian before any `sbatch`** unless he approved that specific run in the current task. **Ask before any `scancel`.** Only cancel your own job IDs, never `scancel -u`.
 - Poll every 5 minutes with a background `sleep 300` loop, never a busy loop.
-- Follow the sweep pattern exactly (submit from the repo root, per-task directories with the model files copied flat, never edit the repo copy in place, `params.json` per task, check **every** task's logs for crashes/OOM/timeouts/`PULSED GAVE UP`/core files before plotting, rsync back excluding cores).
+- Follow the sweep pattern exactly (`kb/workflow/sweep-pattern.md`: submit from the repo root, per-task directories with the model files copied flat, never edit the repo copy in place, `params.json` per task, check **every** task's logs before plotting for crashes/OOM/timeouts/core files **and for the driver's failure markers in the per-driver table there** (`PULSED GAVE UP` for pulsedIV; the `GAVE UP` and `failed` lines, except the normal `RETRY … failed` bisections, Tcl errors and a missing `RADIV DONE`/`SEEIV DONE` for radIV/seeIV), rsync back excluding cores).
 
 ---
 
@@ -60,7 +60,8 @@ When you need Ian to decide something, write it in `progress.md` **and** send a 
 ## 4. Git (details: `kb/workflow/git-conventions.md`)
 
 - `git pull` at session start; commit (message names runs/levers) and push after meaningful changes.
-- Commit `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/`, `progress.md`, `kb/`, `dashboard/`, `README.md`, small final CSVs/figures. Keep new files in the matching folder. **Don't commit** `results/`, logs, meshes, build artifacts, `.obsidian/`.
+- Commit `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/` (the HfO2 calibration curve and model-side files, never measured radiation data), `progress.md`, `kb/`, `dashboard/`, `README.md`, small final CSVs/figures. Keep new files in the matching folder. **Don't commit** `results/`, logs, meshes, build artifacts, `.obsidian/`.
+- **The repo is public** (HPG pulls it anonymously). Measured radiation data and notes are never tracked (the HfO2 calibration curve in `data/`, csv and raw xlsx, is the only measured data in git), and tracked files give measured results in words only, never numbers. Their paths are in `.gitignore` (`data/rad_y2/`, `data/rad_y3/`, `kb/results/measured-*.md`, `drivers/trim/*NCY2*`). Add a new measured folder or note to `.gitignore`, and commit that, **before** creating it. **Stage by explicit path**: never `git add -A`, `git add .`, `git add data/` or `git add kb/`; check `git diff --cached --name-only` before every push.
 - **CRLF files:** `model/GaN_modelfile_masterD`, `model/Metal.tcl`, `model/Continuity.tcl` must keep CRLF. Edit from Python with `open(..., newline='')`; check `file <name>` afterwards.
 - **Commit before changing any model file** (`model/GaN_modelfile_masterD`, `model/Poisson.tcl`, `model/GaN.tcl`, `model/AlGaN.tcl`, `model/Metal.tcl`, `model/Insulator.tcl`, `model/Continuity.tcl`, `model/ETemp.tcl`, `rfdevice*.tcl`).
 - Superseded work goes to `archive/<name>/` with a README, not deleted.
@@ -81,21 +82,24 @@ When you need Ian to decide something, write it in `progress.md` **and** send a 
 - Constant data fields are folded into the equations at `device init`: initialise switch fields with a tiny spatial variation (`sel z=1.0e-30*(1.0+x*x) name=F`). Redefining a `const` solution after `device init` doesn't reach the equations.
 - Build `solution … val = (…)` expressions in a Tcl variable first (word-splitting error otherwise).
 - A solution's `DampValue` only acts if the solution has the `damp` flag.
+- **Solver parameters are read once, when the solver is built** (the first `device` after `device init`, or after a mesh change): `Math iterLimit` and each solution's `Abs.Error`, `Rel.Error`, `DampValue`, `Damp`, `Negative`. Set them before `device init`; a `pdbSetDouble` on them after the solver is built does nothing until the next `device init`.
+- **`deviceDim 3` only with the patched FLOOXS (`~/flooxs-brickfix`, local) or FANGS with the brick fix on HPG.** Stock FLOOXS, which `sweeps/radIV.slurm` runs, gets gradients wrong on 3D brick meshes (x and z scaled by (hx/hz)^±1, only y exact), so fields, Te and field-scaled damage come out wrong without any error (`kb/model/3d-plan.md`, `kb/flooxs/flooxs-builds.md`).
 
 ---
 
 ## 7. Knowledge base map (`kb/`)
 
-| Topic | Notes |
+**The full list of notes, grouped by topic, is `kb/index.md`**; every new note gets a line there (§9). Folders: `kb/` (index, project-goal, current-status, glossary), `kb/device/`, `kb/model/`, `kb/flooxs/` (the simulator, `~/flooxs`), `kb/numerics/`, `kb/workflow/`, `kb/tools/`, `kb/results/`.
+
+Read first:
+
+| For | Notes |
 |---|---|
-| Overview | `index.md`, `project-goal.md`, `current-status.md`, `glossary.md` |
-| Device | `device/device-structure.md`, `device/mesh.md`, `device/mobility-models.md`, `device/calibration.md` |
-| Model | `model/trap-model.md`, `model/hot-electron-capture.md`, `model/insulator-traps.md`, `model/energy-balance.md` (thermo term parked), `model/levers.md`, `model/model-caveats.md` |
-| FLOOXS (`~/flooxs`) | `flooxs/flooxs-overview.md`, `flooxs/flooxs-commands.md`, `flooxs/flooxs-expressions.md`, `flooxs/flooxs-solver.md`, `flooxs/flooxs-pdb.md`, `flooxs/flooxs-builds.md` |
-| Numerics | `numerics/flooxs-gotchas.md`, `numerics/munmap-crash.md`, `numerics/retry-bisection.md`, `numerics/te-ramp.md` |
-| Workflow | `workflow/hpg-workflow.md`, `workflow/sweep-pattern.md`, `workflow/local-runs.md`, `workflow/git-conventions.md`, `workflow/repo-locations.md`, `workflow/dashboard.md` |
-| Tools | `tools/drivers.md`, `tools/analysis-scripts.md`, `tools/notebook.md` |
-| Results | `results/collapse-classification.md`, `results/run-F.md`, `results/field-mobility-trap-map.md`, `results/late-onset-search.md`, `results/position-maps.md`, `results/gate-bias.md`, `results/field-driven-trapping.md`, `results/static-era-lessons.md`, `results/highk-vs-sin.md`, `results/critical-strike.md`, `results/flooxs-pyplot-regression.md` |
+| where the work stands | `current-status.md`, `project-goal.md` |
+| the model in use now | `results/rad-model.md`, `model/damage-model.md`, `model/levers.md`, `model/trap-model.md`, `results/fp-contact-fix.md` |
+| the current study | `results/step-search-28v.md`, `results/step-mechanism.md` |
+| running jobs | `workflow/sweep-pattern.md`, `workflow/hpg-workflow.md`, `workflow/stress-library.md`, `tools/drivers.md` |
+| FLOOXS behaviour that bites | `numerics/flooxs-gotchas.md` |
 
 Static-era write-ups verbatim: `archive/static_mobility/RESULTS.md`.
 
