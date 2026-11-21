@@ -2,9 +2,10 @@
 
 Same trap-position grid as plot_posVd.py (trapMeanX depth × trapMeanY lateral),
 but z is no longer the suppression at one Vd. Each position is classed once
-(the kb/results/collapse-classification.md rule, as in plot_posVd.py): it collapses if its largest single
-0.1 V step loses >= 50% (deep or medium), or if it stalled at the runaway (collapse
-probably at the stall Vd). Shallow and off-at-rest positions do not collapse in
+(the kb/results/collapse-classification.md rule: classify_collapse in analysis/common.py,
+called as in plot_posVd.py): it collapses if its largest single 0.1 V step loses
+>= 50% (deep or medium), or if it stalled at the runaway (collapse probably at the
+stall Vd). Shallow and off-at-rest positions do not collapse in
 the sweep and sit flat on the floor. Height = Vd_max + 0.1 - onset, so the
 earliest collapse is the highest peak; the z ticks are labelled in onset Vd.
 
@@ -19,15 +20,14 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.lines import Line2D
 
+from common import FP, GATE, INK_WARM, MUTED_WARM, STALL_COL, classify_collapse, seq_cmap
+
 RUN, TAG = sys.argv[1], sys.argv[2]
-INK, MUTED, FLOORC = "#1a1a19", "#6b6a63", "#e9e8e3"
-SEQ = LinearSegmentedColormap.from_list(
-    "blue_seq", ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"])
-GATE, FP = (-0.125, 0.125), (0.285, 0.725)
-STALL, OFF = "#eb6834", "#6b6a63"
+INK, MUTED, FLOORC = INK_WARM, MUTED_WARM, "#e9e8e3"
+SEQ = seq_cmap()
+STALL, OFF = STALL_COL, MUTED_WARM
 
 ref, dev, setdesc, VMAX = None, {}, "", 0.0
 for t in glob.glob(f"{RUN}/task_*") + glob.glob(f"{RUN}Retry*/task_*"):
@@ -47,32 +47,16 @@ for t in glob.glob(f"{RUN}/task_*") + glob.glob(f"{RUN}Retry*/task_*"):
         dev[k] = (d[:, 0], d[:, 1])
 if ref is None:
     raise SystemExit("trap-free reference missing")
-vr, ir = ref
 xs = sorted({k[0] for k in dev})
 ys = sorted({k[1] for k in dev})
 Y, X = np.meshgrid(ys, np.array(xs) * 1e3)
-
-
-def onset(vd, idd, vmax):
-    """(class, onset Vd), identical to plot_posVd.py."""
-    m = vd > 0.05
-    v, i = vd[m], idd[m]
-    if i[0] / np.interp(v[0], vr, ir) < 0.1:
-        return "off at rest", np.nan
-    loss = 1.0 - i[1:] / i[:-1]
-    mx = loss.max()
-    cls = "deep" if mx > 0.95 else "medium" if mx >= 0.5 else "shallow"
-    if cls == "shallow" and vd[-1] < vmax - 1e-6:
-        return "stalled", float(vd[-1] + 0.1)
-    thr = 0.95 if cls == "deep" else 0.5 if cls == "medium" else mx
-    return cls, float(v[1 + np.nonzero(loss >= thr - 1e-12)[0][0]])
-
 
 ONS = np.full(X.shape, np.nan)
 CLS = np.empty(X.shape, dtype=object)
 for (x, y), (vd, idd) in dev.items():
     i, j = xs.index(x), ys.index(y)
-    CLS[i, j], o = onset(vd, idd, VMAX)
+    c = classify_collapse(vd, idd, ref, vd_max=VMAX)   # the same call as plot_posVd.py
+    CLS[i, j], o = c.cls, c.onset
     if CLS[i, j] in ("deep", "medium", "stalled"):
         ONS[i, j] = o
 TOP = VMAX + 0.1                       # height of a collapse at Vd = 0

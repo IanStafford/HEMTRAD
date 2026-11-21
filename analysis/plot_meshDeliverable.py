@@ -1,6 +1,10 @@
-"""Goal deliverable, mesh-checked (2026-11-20): SiN 0-3 strike series at the 28 V stress on the library mesh
-(15 nm at y 0.8), 10 nm uniform and 5 nm at y 0.8, with pre-irradiation and the Nov 11 model as references and
-each drop (>= 10 mA/mm) marked by an arrow. One row per strike setting (keys of plot_meshSeries.SETS).
+"""Goal deliverable, mesh-checked (2026-11-20): SiN 0-3 strike series at the 28 V stress on the meshes of
+plot_meshSeries.MESHES (library = 15 nm at y 0.8, 10 nm uniform, 5 nm at y 0.8, and 2.5 nm at the strikes, a panel
+that says "not run yet" while it has no strike curves), with pre-irradiation and the Nov 11 model as references and
+each drop marked by an arrow.
+The arrows use the figure rule (>= 10 mA/mm, mode 'any', plot_radStepSeries.panel); the drop counts that
+plot_meshSeries prints use the table rule (>= 8 mA/mm, mode 'hyst'), so they can differ on small drops.
+One row per strike setting (keys of plot_meshSeries.SETS).
 usage: python3 analysis/plot_meshDeliverable.py <out.png> <key> [<key> ...]"""
 import sys
 
@@ -8,15 +12,14 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-sys.path.insert(0, "analysis")
-from plot_meshSeries import MESHES, SETS, find, index, load  # noqa: E402
-from plot_radStepSeries import NOV11, PRE, SIN_RAMP, panel  # noqa: E402
-from plot_radStepSeries import load as loadg  # noqa: E402
+from common import REF, read_glob
+from plot_meshSeries import MESHES, SETS, find, index, load
+from plot_radStepSeries import SIN_RAMP, panel
 
 
 def main(out, *keys):
     idx = index()
-    pre, nov = loadg(PRE["sin"]), loadg(NOV11)
+    pre, nov = read_glob(REF["pre_sin"], min_rows=3), read_glob(REF["nov11_sin"], min_rows=3)
     fig, axs = plt.subplots(len(keys), len(MESHES), figsize=(5.2 * len(MESHES), 4.2 * len(keys)), sharex=True,
                             squeeze=False)
     for r, key in enumerate(keys):

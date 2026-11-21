@@ -2,9 +2,12 @@
 
 One trap set, a grid of positions (trapMeanX depth × trapMeanY lateral). For
 each chosen Vd, a surface of suppression vs the trap-free device,
-log10(Id_no-trap / Id), capped at the ~1e-8 mA/mm noise floor. A shared z-scale
-across all panels makes the frames comparable (and GIF-ready). Each point is
-also coloured on the floor by its collapse class / onset (kb/results/collapse-classification.md).
+log10(Id_no-trap / Id), capped at 8 (the ~1e-8 mA/mm noise floor). A shared z-scale
+across all panels makes the frames comparable (and GIF-ready). A position whose run
+stopped before that Vd is marked x on the floor. The onset figure gives each
+position's collapse class and onset Vd (classify_collapse in analysis/common.py,
+kb/results/collapse-classification.md; a shallow run that ends before the largest
+Vd_max of the map is "stalled").
 
 usage: python3 analysis/plot_posVd.py run_dir tag [Vd list, comma-separated]
   default Vd: 0.3,0.6,...,3.0
@@ -18,17 +21,16 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import LinearSegmentedColormap
+
+from common import FP, GATE, INK_WARM, MUTED_WARM, STALL_COL, classify_collapse, seq_cmap
 
 RUN, TAG = sys.argv[1], sys.argv[2]
 VDS = ([float(v) for v in sys.argv[3].split(",")] if len(sys.argv) > 3
        else [round(0.3 * k, 1) for k in range(1, 11)])
 FLOOR = 8.0
-INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"
-SEQ = LinearSegmentedColormap.from_list(
-    "blue_seq", ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"])
-GATE, FP = (-0.125, 0.125), (0.285, 0.725)
-STALL = "#eb6834"
+INK, MUTED = INK_WARM, MUTED_WARM
+SEQ = seq_cmap()
+STALL = STALL_COL
 
 ref, dev, setdesc, VMAX = None, {}, "", 0.0
 for t in glob.glob(f"{RUN}/task_*") + glob.glob(f"{RUN}Retry*/task_*"):
@@ -62,23 +64,6 @@ def supp_at(vd, idd, v):
     return float(np.clip(np.log10(np.interp(v, vr, ir) / max(i, 1e-30)), 0.0, FLOOR))
 
 
-def onset(vd, idd, vmax):
-    """(class, onset Vd) by the collapse-classification rule: largest single-step loss sets the
-    class; onset = first step reaching the class threshold. A run that gave up
-    before vmax without a recorded collapse is "stalled" at the unreached Vd."""
-    m = vd > 0.05
-    v, i = vd[m], idd[m]
-    if i[0] / np.interp(v[0], vr, ir) < 0.1:
-        return "off at rest", np.nan
-    loss = 1.0 - i[1:] / i[:-1]
-    mx = loss.max()
-    cls = "deep" if mx > 0.95 else "medium" if mx >= 0.5 else "shallow"
-    if cls == "shallow" and vd[-1] < vmax - 1e-6:
-        return "stalled", float(vd[-1] + 0.1)
-    thr = 0.95 if cls == "deep" else 0.5 if cls == "medium" else mx
-    return cls, float(v[1 + np.nonzero(loss >= thr - 1e-12)[0][0]])
-
-
 Z = {v: np.full(X.shape, np.nan) for v in VDS}
 ONS = np.full(X.shape, np.nan)
 CLS = np.empty(X.shape, dtype=object)
@@ -86,7 +71,10 @@ for (x, y), (vd, idd) in dev.items():
     i, j = xs.index(x), ys.index(y)
     for v in VDS:
         Z[v][i, j] = supp_at(vd, idd, v)
-    CLS[i, j], o = onset(vd, idd, VMAX)
+    # largest single-step loss sets the class; onset = first step reaching the class threshold;
+    # a shallow run that gave up before VMAX is "stalled" at the unreached Vd
+    c = classify_collapse(vd, idd, ref, vd_max=VMAX)
+    CLS[i, j], o = c.cls, c.onset
     if CLS[i, j] in ("deep", "medium", "stalled"):
         ONS[i, j] = o
 

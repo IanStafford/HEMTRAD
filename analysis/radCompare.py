@@ -7,7 +7,7 @@ usage: python3 analysis/radCompare.py <run_or_task_dir>... [--targets t.csv] [--
   targets, --plot refuses paths under figures/ or dashboard/ (public repo).
 Per task: Vth (linear extrapolation at max gm, Vd 0.1), gm max (mS/mm), Id at
 Vg -2.6/-2.0/-1.4 (Vd 0.1), Id-Vd at Vg +1 at 1/2/4/6/10 V, Ron, the largest Id-Vd step,
-Ioff at the lowest Vg.
+Ioff at the lowest Vg. Vth and gm use Id_dev; the other currents use Id_ext (equal while Rgd = 0).
 --ref LABEL also prints each task's ratios to that task (post/pre).
 """
 import csv
@@ -18,7 +18,7 @@ import sys
 
 import numpy as np
 
-from radMetrics import guard_private_output, load_pre_scalars, ron_step, vth_gm
+from common import IDVD, IDVG, guard_private_output, load_pre_scalars, ron_step, vth_gm
 
 args = [a for a in sys.argv[1:]]
 plot = None
@@ -50,9 +50,9 @@ def metrics(t):
     f = glob.glob(os.path.join(t, "*_IdVg.csv"))
     if f and os.path.getsize(f[0]) > 0:
         d = np.loadtxt(f[0], delimiter=",", ndmin=2)
-        vg, ie = d[:, 0], d[:, 2]
+        vg, ie = d[:, IDVG["vg"]], d[:, IDVG["id_ext"]]
         if len(vg) > 5:
-            m["Vth"], m["gm"] = vth_gm(vg, d[:, 1])
+            m["Vth"], m["gm"] = vth_gm(vg, d[:, IDVG["id_dev"]])
             for v in VG_PTS:
                 m[f"Ig{v}"] = float(np.interp(v, vg[::-1], ie[::-1])) if vg.min() <= v else np.nan
             m["Ioff"] = float(ie[np.argmin(vg)])
@@ -60,10 +60,11 @@ def metrics(t):
     f = glob.glob(os.path.join(t, "*_IdVd.csv"))
     if f and os.path.getsize(f[0]) > 0:
         d = np.loadtxt(f[0], delimiter=",", ndmin=2)
+        vd, ie = d[:, IDVD["vd"]], d[:, IDVD["id_ext"]]
         for v in VD_PTS:
-            m[f"Id{v:g}"] = float(np.interp(v, d[:, 0], d[:, 2])) if d[-1, 0] >= v - 1e-6 else np.nan
+            m[f"Id{v:g}"] = float(np.interp(v, vd, ie)) if vd[-1] >= v - 1e-6 else np.nan
         m["Ron"], m["drop"], m["dropVd"] = ron_step(d)
-        m["lastVd"] = float(d[-1, 0])
+        m["lastVd"] = float(vd[-1])
         m["_IdVd"] = d
     return m
 
@@ -107,11 +108,11 @@ if plot:
     for lab, p, m in res:
         if "_IdVg" in m:
             d = m["_IdVg"]
-            axs[0].plot(d[:, 0], d[:, 1], label=lab)
-            axs[1].semilogy(d[:, 0], np.abs(d[:, 2]), label=lab)
+            axs[0].plot(d[:, IDVG["vg"]], d[:, IDVG["id_dev"]], label=lab)
+            axs[1].semilogy(d[:, IDVG["vg"]], np.abs(d[:, IDVG["id_ext"]]), label=lab)
         if "_IdVd" in m:
             d = m["_IdVd"]
-            axs[2].plot(d[:, 0], d[:, 2], label=lab)
+            axs[2].plot(d[:, IDVD["vd"]], d[:, IDVD["id_ext"]], label=lab)
     for k, v in T.items():
         if k.startswith("IdVg_"):
             axs[0].plot(*v.T, "o", ms=5, label="meas " + k[5:])

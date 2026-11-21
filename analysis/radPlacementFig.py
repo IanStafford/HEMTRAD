@@ -1,8 +1,6 @@
 """What strike placement does on a fine mesh: Id-Vd by position per deck, the current level and Vd/Id against y.
 usage: python3 analysis/radPlacementFig.py <out.png> <title> <run> <label pattern with {d} and {y}> y1 y2 ...
 """
-import glob
-import os
 import sys
 
 import matplotlib
@@ -10,15 +8,15 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
+from common import GATE, pre_ref, read_glob
+
 out, title, run, pat = sys.argv[1:5]
 Y = sys.argv[5:]
 
 
 def load(r, tag):
-    g = glob.glob(f"{r}/task_*/{tag}_IdVd.csv")
-    if not g or os.path.getsize(g[0]) == 0:
-        return None
-    return np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(g[0]) if l.strip()])
+    """radIV Id-Vd of the task labelled tag in run r, or None if there is none or it is empty."""
+    return read_glob(f"{r}/task_*/{tag}_IdVd.csv", min_rows=None, skip_empty=True)
 
 
 EXTRA = {"-0.9": ("results/20261105_radFine", "hk_y-0.9_w0.1_n1.2e19"), "1.5": ("results/20261104_radMesh", "hk_w0.1_m05"),
@@ -28,7 +26,7 @@ cm = plt.get_cmap("viridis")
 ys = [float(y) for y in Y]
 stats = {}
 for a, (d, name) in zip(ax[:2], (("hk", "HighK"), ("sin", "SiN"))):
-    r = load("results/20261104_radMap1", f"{d}_ref")
+    r = read_glob(pre_ref(d), min_rows=None, skip_empty=True)   # pre-irradiation, radMap1 (job 49570571)
     a.plot(r[:, 0], r[:, 1], color="0.65", lw=1.5, label="undamaged")
     for i, y in enumerate(Y):
         x = load(run, pat.format(d=d, y=y))
@@ -44,7 +42,7 @@ for j, (a, t, u) in enumerate(((ax[2], "Current level, 3–10 V mean", "Id (mA/m
     for d, c, name, m in (("hk", "#2a78d6", "HighK", "o"), ("sin", "#eb6834", "SiN", "s")):
         v = [stats.get((d, y), (np.nan, np.nan))[j] for y in Y]
         a.plot(ys, v, color=c, marker=m, ms=5, lw=1.5, label=name)
-    a.axvspan(-0.125, 0.125, color="0.88", zorder=0); a.set_title(t, fontsize=11); a.set_xlabel("Site centre y (µm), grey = gate"); a.set_ylabel(u); a.legend(fontsize=8); a.set_ylim(bottom=0)
+    a.axvspan(*GATE, color="0.88", zorder=0); a.set_title(t, fontsize=11); a.set_xlabel("Site centre y (µm), grey = gate"); a.set_ylabel(u); a.legend(fontsize=8); a.set_ylim(bottom=0)
 for a in ax:
     a.grid(alpha=0.3)
 fig.suptitle(title, fontsize=12, y=1.0)

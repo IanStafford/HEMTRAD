@@ -8,15 +8,16 @@ import sys
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
+
+from common import read_csv
 
 run, out = sys.argv[1], sys.argv[2]
 YS = ["-0.90", "-0.30", "0.00", "0.30", "0.90", "1.80", "3.00"]
 
 
 def load(tag):
-    g = glob.glob(f"{run}/task_*/{tag}_IdVd.csv")
-    return np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(g[0]) if l.strip()])
+    """radIV Id-Vd of the task labelled tag (columns Vd, Id_dev, ...); a missing file raises IndexError."""
+    return read_csv(glob.glob(f"{run}/task_*/{tag}_IdVd.csv")[0])
 
 
 fig, axes = plt.subplots(1, 2, figsize=(11, 4.2), sharey=True)

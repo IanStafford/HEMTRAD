@@ -7,7 +7,8 @@ shallow. The collapse onset is the first step that reaches the class threshold
 trap-free current at Vd = 0.1 V are "off at rest" (no collapse to speak of).
 Runs that stop early (PULSED GAVE UP) with no recorded collapse are "stalled";
 their onset is the Vd they could not reach (the runaway; "stalled" in
-kb/results/collapse-classification.md).
+kb/results/collapse-classification.md). The rule is classify_collapse in
+analysis/common.py, which keeps this script's version of it.
 
 usage: python3 analysis/analyze_onset.py run_dir tag [rows cols xpar ypar]
   defaults (round 1): rows=trapLevel cols=hotEb x=hotTau y=trapPeak
@@ -21,20 +22,16 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import LinearSegmentedColormap
+
+from common import GRID_WARM, INK_WARM, MUTED_WARM, classify_collapse, seq_cmap
 
 RUN, TAG = sys.argv[1], sys.argv[2]
 ROWS, COLS, XP, YP = (sys.argv[3:7] if len(sys.argv) >= 7
                       else ("trapLevel", "hotEb", "hotTau", "trapPeak"))
-INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"
-SEQ = LinearSegmentedColormap.from_list(
-    "onset", ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"])
+INK, MUTED, GRID = INK_WARM, MUTED_WARM, GRID_WARM
+SEQ = seq_cmap("onset")
 CLS = {"deep": "D", "medium": "M", "shallow": "S", "off at rest": "off", "incomplete": "?",
        "stalled": "stall"}
-
-
-def classify(loss):
-    return "deep" if loss > 0.95 else "medium" if loss >= 0.5 else "shallow"
 
 
 ref, dev = None, {}
@@ -60,25 +57,17 @@ rows = []
 for k, (vd, idd, p) in sorted(dev.items()):
     m = vd > 0.05
     v, i = vd[m], idd[m]
-    at_rest = float(i[0] / iref(v[0]))
-    loss = 1.0 - i[1:] / i[:-1]
-    maxloss = float(loss.max())
-    cls = classify(maxloss)
     # onset = the FIRST step reaching this device's class threshold (a device can
-    # drop twice, e.g. 99.9% at 1.5 V and again from the collapsed level at 2.3 V)
-    thr = 0.95 if cls == "deep" else 0.5 if cls == "medium" else maxloss
-    j = int(np.nonzero(loss >= thr - 1e-12)[0][0])
-    onset = float(v[j + 1])
-    ipre = j                               # last point before the drop
-    post_min = int(j + 1 + np.argmin(i[j + 1:]))
-    if at_rest < 0.1:
-        cls, onset = "off at rest", np.nan
-    elif cls == "shallow" and vd[-1] < p.get("Vd_max", vd[-1]) - 1e-6:
-        # stopped (PULSED GAVE UP) before reaching Vd_max without a recorded
-        # collapse: almost always the runaway that continuation can't follow
-        # (kb/results/collapse-classification.md, kb/numerics/te-ramp.md), so the
-        # collapse is probably at the stall voltage
-        cls, onset = "stalled", float(vd[-1] + 0.1)
+    # drop twice, e.g. 99.9% at 1.5 V and again from the collapsed level at 2.3 V).
+    # "stalled": stopped (PULSED GAVE UP) before reaching Vd_max without a recorded
+    # collapse, almost always the runaway that continuation can't follow
+    # (kb/results/collapse-classification.md, kb/numerics/te-ramp.md), so the
+    # collapse is probably at the stall voltage (Vd_last + 0.1). A task without
+    # Vd_max in params.json never counts as stalled.
+    c = classify_collapse(vd, idd, ref, vd_max=p.get("Vd_max", vd[-1]))
+    cls, onset, maxloss, at_rest = c.cls, c.onset, c.maxloss, c.at_rest
+    ipre = c.j                             # last point before the drop
+    post_min = int(c.j + 1 + np.argmin(i[c.j + 1:]))
     rows.append({**{q: p[q] for q in (ROWS, COLS, XP, YP)},
                  "class": cls, "max_step_loss": maxloss, "onset_Vd": onset,
                  "pre_Id": float(i[ipre]), "at_rest_frac": at_rest,

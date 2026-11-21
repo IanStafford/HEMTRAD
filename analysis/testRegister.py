@@ -1,9 +1,11 @@
 """Register of the stepped-collapse tests (2026-11-17 goal): what each HPG task varies, its job, its state and the
-drops found so far. Feeds the "Stepped-Collapse Test Register" dashboard.
+drops found so far (>= 10 mA/mm, mode 'any' of common.drop_episodes, on Id-Vd curves of at least 3 points).
+Feeds the "Stepped-Collapse Test Register" dashboard. ROUNDS lists rad28strikeL, rounds A-H and rad3dRod and has
+not been extended since 2026-11-18: rounds I-K, M-M3 and the meshChk / radStepDiag runs are not in it.
 
 usage: python3 analysis/testRegister.py <out.json> [--no-hpg]
-Reads sweeps/params_<run>.txt, local results/<dir>/task_*/ (rsync them first), and job states from HPG (sacct)
-unless --no-hpg.
+Reads sweeps/params_<run>.txt, local results/<dir>/task_*/ (rsync them first), and job states from HPG (sacct over
+ssh) unless --no-hpg.
 """
 import glob
 import json
@@ -13,8 +15,7 @@ import sys
 
 import numpy as np
 
-sys.path.insert(0, "analysis")
-from plot_radStep import drops  # noqa: E402
+from common import DROP_MIN_FIG, drop_values, read_csv
 
 # round, params file, results dir, purpose, [(job id, first task, last task)]
 ROUNDS = [
@@ -49,6 +50,9 @@ ROUNDS = [
      "Ion tracks along the gate width (3D) and their 2D references; 3D tasks stopped (3D x-gradient is wrong)",
      [("51784348", 0, 2), ("51784349", 3, 3), ("51784350", 6, 7)]),
 ]
+# Fallbacks for levers a params line does not set; not the radIV.tcl defaults (damPeak 0, Vd_step 0.25, Vd_stress 28).
+# In the ROUNDS files only Vd_max and deviceDeck are ever missing (both equal to the radIV defaults), plus damPeak and
+# Vd_stress on the stressSkip lines of rad3dRod, where they are not shown.
 BASE = {"damPeak": "7e18", "trapLevel": "0.30", "hotTau": "1e-14", "Vd_step": "0.1", "Vd_max": "10.0",
         "deviceDeck": "rfdevice.tcl", "Vd_stress": "17.0"}
 
@@ -165,13 +169,12 @@ def main(out, *flags):
             row["elapsed"] = s[1] if s else ""
             f = glob.glob(f"results/{rdir}/task_{t}/*_IdVd.csv")
             row.update({"Vd_reached": None, "Id_1V": None, "Id_end": None, "n_drops": None, "drops": ""})
-            if f:
-                d = np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(f[0]) if l.strip()])
-                if d.ndim == 2 and len(d) >= 3:
-                    ep = drops(d[:, 0], d[:, 1], 10.0)
-                    row.update({"Vd_reached": round(float(d[-1, 0]), 2), "Id_1V": round(float(np.interp(1, d[:, 0], d[:, 1])), 1),
-                                "Id_end": round(float(d[-1, 1]), 1), "n_drops": len(ep),
-                                "drops": "; ".join(f"{a:.1f}-{b:.1f} V: {ia:.0f} -> {ib:.0f}" for a, b, ia, ib in ep) or "none"})
+            d = read_csv(f[0], min_rows=3) if f else None
+            if d is not None:
+                ep = drop_values(d[:, 0], d[:, 1], DROP_MIN_FIG, "any")
+                row.update({"Vd_reached": round(float(d[-1, 0]), 2), "Id_1V": round(float(np.interp(1, d[:, 0], d[:, 1])), 1),
+                            "Id_end": round(float(d[-1, 1]), 1), "n_drops": len(ep),
+                            "drops": "; ".join(f"{a:.1f}-{b:.1f} V: {ia:.0f} -> {ib:.0f}" for a, b, ia, ib in ep) or "none"})
             rows.append(row)
     json.dump(rows, open(out, "w"), indent=1)
     print(len(rows), "tests;", {k: sum(1 for r in rows if r["state"] == k) for k in sorted({r["state"] for r in rows})})

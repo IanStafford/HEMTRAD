@@ -1,18 +1,23 @@
-"""3D trap maps at several trap concentrations/levels (job 43513462).
+"""3D trap maps over (depth, lateral y), one or more trap sets (concentration, level) per run.
+
+Default run: the Run F set (4e18 cm^-3, 0.55 eV) with field mobility, results/20261001_trapMapF_field
+(job 44342967). The static-mobility map of several sets was job 43513462.
 
 Per device: collapse depth vs trap-free (Id_no-trap / Id at the post-collapse
 minimum - the plotted collapse metric), collapse ratio (pre-collapse peak /
 post-peak min, kept for reference; it inflates late collapses), suppression
 (Id_no-trap / Id at Vd=3 V), at-rest fraction (Id / Id_no-trap at 0.1 V),
-regime, and the number of solver retries pulsedIV.tcl needed.
+regime, and the number of solver retries pulsedIV.tcl needed. The onset here is this script's own
+rule (the first Vd after the Id peak where Id < peak / 10), not the collapse classes of
+analyze_onset.py.
 
 Collapse metrics are only meaningful for devices that conduct at rest; devices
 that are off at rest (at-rest fraction < 0.1) are left as holes in the
 collapse surface and marked on the floor.
 
-Writes figures/trapMapSets_metrics.csv, one figure per set
-(figures/trapMapSets_tp<peak>_tl<level>.png) and two overviews
-(figures/trapMapSets_overview_{depth,suppression}.png).
+Writes figures/<tag>_metrics.csv, one figure per set
+(figures/<tag>_tp<peak>_tl<level>.png) and, when the run has more than one set, two
+overviews (figures/<tag>_overview_{depth,suppression}.png).
 """
 import glob
 import json
@@ -22,17 +27,16 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import LinearSegmentedColormap
+
+from common import FP, GATE, INK_WARM, MUTED_WARM, STALL_COL, seq_cmap
 
 # usage: python3 analysis/analyze_trapMapSets.py [run_dir [tag]]  (default: the 10n field-mobility
 # Run F map; the static 10f run is results/archive_static_mobility/20260927_trapMapSets)
 RUN = sys.argv[1] if len(sys.argv) > 1 else "results/20261001_trapMapF_field"
 TAG = sys.argv[2] if len(sys.argv) > 2 else "trapMapF_field"
 VD_END = 3.0
-SEQ = LinearSegmentedColormap.from_list(
-    "blue_seq", ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"])
-INK, MUTED, OFF = "#1a1a19", "#6b6a63", "#eb6834"
-GATE, FP = (-0.125, 0.125), (0.285, 0.725)
+SEQ = seq_cmap()
+INK, MUTED, OFF = INK_WARM, MUTED_WARM, STALL_COL
 
 
 def load(path):

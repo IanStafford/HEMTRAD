@@ -1,9 +1,10 @@
 """One-at-a-time trap-model sensitivity (sweeps/pulsedIV_sensitivity.slurm).
 
 Each task changes one lever from the baseline (late set at y = 1.0 um). For every
-lever: collapse onset (classes as in analyze_onset.py / [[collapse-classification]]),
-the deepest Id drop and the drop at Vd 4 V (trap-free / trapped) and the pre-collapse current relative to
-trap-free.
+lever: collapse onset (classify_collapse in analysis/common.py, the rule of analyze_onset.py and
+kb/results/collapse-classification.md, with two differences: a stalled run's onset is
+Vd_last + Vd_step, and a shallow run has no onset), the deepest Id drop and the drop at
+Vd 4 V (trap-free / trapped) and the pre-collapse current relative to trap-free.
 
 usage: python3 analysis/plot_sensitivity.py [run_dir]
   default run_dir results/20261017_sensitivity
@@ -19,19 +20,16 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
+from common import BLUE, GRID_COOL, INK_COOL, MUTED_COOL, ORANGE, classify_collapse
+
 RUN = sys.argv[1] if len(sys.argv) > 1 else "results/20261017_sensitivity"
 LEVERS = ["trapLevel", "trapWidth", "hotEb", "hotTau", "hotMu", "hotVsat",
           "fillIters", "fillRelax"]
 UNITS = {"trapLevel": "eV", "trapWidth": "eV", "hotEb": "eV", "hotTau": "s",
          "hotMu": "cm²/Vs", "hotVsat": "cm/s", "fillIters": "", "fillRelax": ""}
 LOGX = {"hotTau", "hotMu", "hotVsat"}
-INK, MUTED, GRID, BLUE, ORANGE = "#14171F", "#646B78", "#E2E4E9", "#1B4F9C", "#C2410C"
+INK, MUTED, GRID = INK_COOL, MUTED_COOL, GRID_COOL
 VD_DROP = 4.0
-
-
-def classify(loss):
-    return "deep" if loss > 0.95 else "medium" if loss >= 0.5 else "shallow"
-
 
 ref, base, dev = None, None, []
 for t in sorted(glob.glob(f"{RUN}/task_*"), key=lambda s: int(s.rsplit("_", 1)[1])):
@@ -56,19 +54,13 @@ def metrics(d, p):
     vd, idd = d[:, 0], d[:, 1]
     m = vd > 0.05
     v, i = vd[m], idd[m]
-    at_rest = float(i[0] / iref(v[0]))
-    loss = 1.0 - i[1:] / i[:-1]
-    maxloss = float(loss.max()) if len(loss) else 0.0
-    cls = classify(maxloss)
-    thr = 0.95 if cls == "deep" else 0.5 if cls == "medium" else maxloss
-    j = int(np.nonzero(loss >= thr - 1e-12)[0][0]) if len(loss) else 0
-    onset, ipre = float(v[j + 1]) if len(loss) else np.nan, float(i[j])
+    # empty_ok: a curve with one point above 0.05 V is shallow with no onset
+    c = classify_collapse(vd, idd, (ref[:, 0], ref[:, 1]), vd_max=p.get("Vd_max"),
+                          stall_step=p.get("Vd_step"), empty_ok=True)
+    cls, onset, maxloss, at_rest, j = c.cls, c.onset, c.maxloss, c.at_rest, c.j
+    ipre = float(i[j])
     pre_ratio = ipre / float(iref(v[j]))
-    if at_rest < 0.1:
-        cls, onset = "off at rest", np.nan
-    elif cls == "shallow" and vd[-1] < p["Vd_max"] - 1e-6:
-        cls, onset = "stalled", float(vd[-1] + p["Vd_step"])
-    elif cls == "shallow":
+    if cls == "shallow":
         onset = np.nan                     # no collapse to speak of
     drop = float(iref(VD_DROP) / idd[-1]) if vd[-1] >= VD_DROP - 1e-6 else np.nan
     maxdrop = float(np.max(iref(v) / i))   # deepest point vs trap-free

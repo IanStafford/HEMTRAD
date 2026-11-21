@@ -4,7 +4,6 @@ Vg +1 V, SiN and HighK side by side, the 3-strike curve drawn heavier.
 
 usage: python3 analysis/plot_rad28strike.py <run dir> <P, e.g. 2e+18> <out.png>
 """
-import glob
 import sys
 
 import matplotlib
@@ -12,22 +11,23 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-PRE = "results/20261104_radMap1/task_*/{d}_ref_IdVd.csv"
-DECKS = (("sin", "SiN passivation", ["#f2a66b", "#e0782f", "#b8460f", "#6e2606"]),
-         ("hk", "HighK passivation", ["#93bde6", "#4f8ccc", "#245fa3", "#0d376b"]))
+from common import STRIKE_HK_28, STRIKE_SIN_28, pre_ref, read_glob
+
+DECKS = (("sin", "SiN passivation", STRIKE_SIN_28),     # colour ramps by number of strikes
+         ("hk", "HighK passivation", STRIKE_HK_28))
 plt.rcParams.update({"font.size": 12, "axes.edgecolor": "#8a8f98", "axes.labelcolor": "#2b2f36",
                      "xtick.color": "#4a4f58", "ytick.color": "#4a4f58"})
 
 
 def load(p):
-    f = glob.glob(p)
-    return np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(f[0]) if l.strip()]) if f else None
+    """The first file matching the glob p (any number of rows), or None if there is none."""
+    return read_glob(p, min_rows=None)
 
 
 def main(run, p, out):
     fig, axs = plt.subplots(1, 2, figsize=(12.0, 4.8), sharey=True)
     for a, (d, name, ramp) in zip(axs, DECKS):
-        pre = load(PRE.format(d=d))
+        pre = load(pre_ref(d))
         a.plot(pre[:, 0], pre[:, 1], color="#9aa0a8", lw=1.8, ls=(0, (5, 3)), label="pre-irradiation")
         for n in range(4):
             c = load(f"{run}/task_*/{d}28_p{p}_N{n}_IdVd.csv")
@@ -41,9 +41,10 @@ def main(run, p, out):
         a.set_ylim(0, None)
         a.grid(color="#e3e5e8", lw=0.8)
         a.spines[["top", "right"]].set_visible(False)
-        # legend where the curves aren't: lower right unless the post curves sit low there (a hard SiN collapse)
-        c3 = load(f"{run}/task_*/{d}28_p{p}_N0_IdVd.csv")
-        low = c3 is not None and np.interp(8.0, c3[:, 0], c3[:, 1]) < 300.0
+        # legend where the curves aren't: lower right, unless the 0-strike curve is below 300 mA/mm at 8 V
+        # (a hard SiN collapse)
+        c0 = load(f"{run}/task_*/{d}28_p{p}_N0_IdVd.csv")
+        low = c0 is not None and np.interp(8.0, c0[:, 0], c0[:, 1]) < 300.0
         a.legend(frameon=False, fontsize=10.5, loc="center right" if low else "lower right")
     axs[0].set_ylabel("Id (mA/mm) at Vg +1 V")
     fig.suptitle(f"After biased irradiation: Vg −10 V / Vd 28 V stress, damage scale {float(p):.1e} cm⁻³, "

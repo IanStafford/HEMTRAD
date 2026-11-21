@@ -1,8 +1,9 @@
 """Damage-region maps from radIV runs with uniform sites (damSites).
 
 usage: python3 analysis/radMap.py <run_dir>... --csv out.csv [--plot out.png] [--xlabel TEXT]
-Per task: Vth, gm, Ron, Id at 1/4/10 V (Vg +1), the largest step in Id-Vd and any give-up
-Vd. Each deck's task with no damage (label *_ref) is the reference for the changes.
+Per task: Vth, gm, Ron, Id at 1/4/10 V (Vg +1), the largest step in Id-Vd and the last Vd reached
+(lastVd: where the Id-Vd stopped, at Vd_max or where it gave up). Vth and gm use Id_dev, the other currents Id_ext.
+Each deck's task with no damage (label *_ref) is the reference for the changes.
 Site position is the mean y of the task's damSites; several sites are listed in the CSV.
 """
 import csv
@@ -14,7 +15,7 @@ import sys
 
 import numpy as np
 
-from radMetrics import ron_step, vth_gm
+from common import GATE, IDVD, IDVG, ron_step, vth_gm
 
 args = sys.argv[1:]
 def opt(name):
@@ -32,15 +33,16 @@ def task_metrics(t):
     if f and os.path.getsize(f[0]) > 0:
         d = np.loadtxt(f[0], delimiter=",", ndmin=2)
         if len(d) > 5:
-            m["Vth"], m["gm"] = vth_gm(d[:, 0], d[:, 1])
-            m["Ioff"] = float(d[np.argmin(d[:, 0]), 2])
+            m["Vth"], m["gm"] = vth_gm(d[:, IDVG["vg"]], d[:, IDVG["id_dev"]])
+            m["Ioff"] = float(d[np.argmin(d[:, IDVG["vg"]]), IDVG["id_ext"]])
     f = glob.glob(os.path.join(t, "*_IdVd.csv"))
     if f and os.path.getsize(f[0]) > 0:
         d = np.loadtxt(f[0], delimiter=",", ndmin=2)
         m["Ron"], m["drop_mAmm"], m["dropVd"] = ron_step(d)
+        vd, ie = d[:, IDVD["vd"]], d[:, IDVD["id_ext"]]
         for v in (1.0, 4.0, 10.0):
-            m[f"Id{v:g}"] = float(np.interp(v, d[:, 0], d[:, 2])) if d[-1, 0] >= v - 1e-6 else np.nan
-        m["lastVd"] = float(d[-1, 0])
+            m[f"Id{v:g}"] = float(np.interp(v, vd, ie)) if vd[-1] >= v - 1e-6 else np.nan
+        m["lastVd"] = float(vd[-1])
     return m
 
 
@@ -89,7 +91,7 @@ if plot:
                 if q:
                     ax.plot([r["y"] for r in q], [r.get(k, np.nan) for r in q], STY[i % 3], color=C[deck], lw=2, marker="o", ms=4,
                             label=f"{deck}, {n:g} cm$^{{-3}}$")
-        ax.axvspan(-0.125, 0.125, color="0.9", zorder=0)
+        ax.axvspan(*GATE, color="0.9", zorder=0)   # the gate
         ax.set_title(title, fontsize=10)
         ax.spines[["top", "right"]].set_visible(False)
         ax.grid(alpha=0.2)

@@ -1,7 +1,8 @@
 """Table of the drops of vdCuts runs (drivers/radIV.tcl vdCuts=1) and what switches at each one: for every drop
-(a run of falling Id of at least 8 mA/mm) the y position and size of the largest rise of the filled traps
-mid-barrier (IonAcceptor at x 0.008 um, if cut), the barrier/2DEG electron temperature there, and the 2DEG density
-and lateral field at that spot before and after.
+(a run of falling Id of at least 8 mA/mm, mode 'hyst' of common.drop_episodes) the y position and size of the
+largest rise of the filled traps mid-barrier (IonAcceptor at x 0.008 um, if cut; otherwise the largest fall of the
+2DEG density), the barrier/2DEG electron temperature there, and the 2DEG density and lateral field at that spot
+before and after.
 usage: python3 analysis/vdcutsDropTable.py <task dir> [<task dir> ...]"""
 import glob
 import json
@@ -9,21 +10,8 @@ import sys
 
 import numpy as np
 
-sys.path.insert(0, "analysis")
-import vdcuts  # noqa: E402
-
-
-def drops(v, i, thr=8.0):
-    out, k = [], 0
-    while k < len(v) - 1:
-        if i[k + 1] < i[k] - 1.0:
-            s = k
-            while k < len(v) - 1 and i[k + 1] < i[k] - 0.5:
-                k += 1
-            if i[s] - i[k] >= thr:
-                out.append((s, k))
-        k += 1
-    return out
+import vdcuts
+from common import DROP_MIN_TABLE, drop_episodes
 
 
 def at(c, vd, lab, y0):
@@ -37,7 +25,7 @@ def table(task):
     iv = np.loadtxt(glob.glob(f"{task}/*_IdVd.csv")[0], delimiter=",", usecols=(0, 1))
     v, i = iv[:, 0], iv[:, 1]
     rows = []
-    for s, k in drops(v, i):
+    for s, k in drop_episodes(v, i, DROP_MIN_TABLE, "hyst"):
         a, b = round(v[s], 3), round(v[k], 3)
         bar = "IonAcceptor_x0.008" in c[a]
         if bar:

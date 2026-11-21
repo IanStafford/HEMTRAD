@@ -1,26 +1,24 @@
 """Deliverable for the stepped-collapse goal (2026-11-17): matched 0/1/2/3-strike series at the 28 V stress.
 One row per candidate series: SiN on the left with the Nov 11 model (radEB1, SiN biased) as a reference,
-HighK with the same levers on the right when it exists. Drops (>= 10 mA/mm) are marked.
+HighK with the same levers on the right when it exists. Drops (>= 10 mA/mm, mode 'any' of common.drop_episodes)
+are marked with arrows. A curve with fewer than 3 points is left out.
 
 usage: python3 analysis/plot_radStepSeries.py <out prefix> [key key ...]
 Writes <prefix>_<series>.png per series and <prefix>_all.png with every series; with keys, also
 <prefix>_deliverable.png with just those series, one row each (2026-11-18, Ian chose the two partial results:
 plain strikes for the SiN steps, field-scaled strikes for the SiN vs HighK contrast).
 """
-import glob
 import sys
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
 
-sys.path.insert(0, "analysis")
-from plot_radStep import drops  # noqa: E402
+from common import DROP_MIN_FIG, REF, drop_values, read_glob
 
 R = "results/20261117_"
-PRE = {"sin": "results/20261104_radMap1/task_*/sin_ref_IdVd.csv", "hk": "results/20261104_radMap1/task_*/hk_ref_IdVd.csv"}
-NOV11 = "results/20261109_radEB1/task_*/sin_b_eb1_IdVd.csv"
+PRE = {"sin": REF["pre_sin"], "hk": REF["pre_hk"]}
+NOV11 = REF["nov11_sin"]
 SIN_RAMP = ["#9aa0a8", "#f0a060", "#d0611d", "#7a2a06"]
 HK_RAMP = ["#9aa0a8", "#8db8e6", "#3f7fc4", "#123f7a"]
 
@@ -63,11 +61,8 @@ plt.rcParams.update({"font.size": 11, "axes.edgecolor": "#8a8f98", "axes.labelco
 
 
 def load(p):
-    f = glob.glob(p)
-    if not f:
-        return None
-    d = np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(f[0]) if l.strip()])
-    return d if d.ndim == 2 and len(d) >= 3 else None
+    """The first file matching the glob p, or None if there is none or it has fewer than 3 rows."""
+    return read_glob(p, min_rows=3)
 
 
 def panel(a, curves, ramp, pre, ref=None, title=""):
@@ -80,7 +75,7 @@ def panel(a, curves, ramp, pre, ref=None, title=""):
             continue
         a.plot(d[:, 0], d[:, 1], color=ramp[k], lw=2.6 if k == 3 else 1.7,
                label=f"{k} strike{'s' if k != 1 else ''}", zorder=3)
-        for s in drops(d[:, 0], d[:, 1], 10.0):
+        for s in drop_values(d[:, 0], d[:, 1], DROP_MIN_FIG, "any"):
             a.annotate("", xy=(s[1], s[3]), xytext=(s[0], s[2]),
                        arrowprops=dict(arrowstyle="-|>", color=ramp[k], lw=1.0, shrinkA=0, shrinkB=0))
     a.set_title(title, fontsize=11, loc="left")

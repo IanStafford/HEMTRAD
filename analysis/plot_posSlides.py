@@ -2,7 +2,9 @@
 
 usage: python3 analysis/plot_posSlides.py
 Set HEADLINE_FONT_DIR to a folder of Source Sans 3 TTFs to match the slides.
-Classes and onsets as in plot_posVd.py / plot_posOnset.py (kb/results/collapse-classification.md).
+Classes and onsets as in plot_posVd.py / plot_posOnset.py (classify_collapse in analysis/common.py,
+kb/results/collapse-classification.md), except that "off at rest" is called "off", a shallow
+position has no onset, and a stalled position has no suppression value.
 Writes (sized to be shown ~1100 px wide):
   figures/posSlide_lateral.png  0.30 eV / 5e18: device strip with the trap grid, onset Vd
                                 vs lateral y per depth, suppression at Vd = 3 V vs y
@@ -16,11 +18,11 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import font_manager
 from matplotlib.patches import Rectangle
 
-INK, BODY, MUTED, GRID = "#14171F", "#394150", "#646B78", "#E2E4E9"
-GATE, FP, LGD_DRAIN = (-0.125, 0.125), (0.285, 0.725), 3.285
+from common import FP, GATE, GRID_COOL, INK_COOL, MUTED_COOL, classify_collapse, use_slide_fonts
+
+INK, MUTED, GRID = INK_COOL, MUTED_COOL, GRID_COOL
 FLOOR = 8.0                     # log10 suppression cap (~1e-8 mA/mm noise floor)
 NONE_ROW, OFF_ROW = 3.45, -0.3  # where "no collapse by 3 V" / "off at rest" sit on the onset axis
 SETS = [  # weakest -> strongest trapping (onset falls monotonically down the list)
@@ -34,12 +36,7 @@ SETS = [  # weakest -> strongest trapping (onset falls monotonically down the li
 RAMP6 = ["#B9CBE6", "#8FB0DD", "#5E8BCB", "#1B4F9C", "#123D7C", "#0B2447"]
 RAMP5 = ["#9DB9E2", "#6E9BD8", "#3F73BD", "#1B4F9C", "#0B2E5E"]
 
-FONT_DIR = os.environ.get("HEADLINE_FONT_DIR")
-if FONT_DIR:
-    for f in os.listdir(FONT_DIR):
-        if f.endswith(".ttf"):
-            font_manager.fontManager.addfont(os.path.join(FONT_DIR, f))
-    plt.rcParams["font.family"] = "Source Sans 3"
+use_slide_fonts(recursive=False)   # HEADLINE_FONT_DIR, the .ttf files directly in that folder
 plt.rcParams.update({"font.size": 16, "xtick.labelsize": 15, "ytick.labelsize": 15,
                      "axes.labelsize": 16, "axes.edgecolor": MUTED, "xtick.color": MUTED,
                      "ytick.color": MUTED, "axes.labelcolor": INK})
@@ -65,23 +62,16 @@ def load(run):
     vr, ir = ref
     out = {}
     for k, (vd, idd) in dev.items():
-        m = vd > 0.05
-        v, i = vd[m], idd[m]
         sup = min(FLOOR, np.log10(np.interp(vd[-1], vr, ir) / max(idd[-1], 1e-30)))
-        if i[0] / np.interp(v[0], vr, ir) < 0.1:
+        c = classify_collapse(vd, idd, ref, vd_max=vmax)
+        if c.cls == "off at rest":
             out[k] = ("off", np.nan, sup)
-            continue
-        loss = 1.0 - i[1:] / i[:-1]
-        mx = loss.max()
-        cls = "deep" if mx > 0.95 else "medium" if mx >= 0.5 else "shallow"
-        if cls == "shallow" and vd[-1] < vmax - 1e-6:
-            out[k] = ("stalled", float(vd[-1] + 0.1), np.nan)
-            continue
-        if cls == "shallow":
+        elif c.cls == "stalled":
+            out[k] = ("stalled", c.onset, np.nan)
+        elif c.cls == "shallow":
             out[k] = ("shallow", np.nan, sup)
-            continue
-        thr = 0.95 if cls == "deep" else 0.5
-        out[k] = (cls, float(v[1 + np.nonzero(loss >= thr - 1e-12)[0][0]]), sup)
+        else:
+            out[k] = (c.cls, c.onset, sup)
     return out
 
 

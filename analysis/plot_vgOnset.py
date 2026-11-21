@@ -2,7 +2,9 @@
 
 usage: python3 analysis/plot_vgOnset.py out.png "title" label=csv [label=csv ...]
 Each csv is a pulsedIV output (Vd, Id mA/mm, peak Te). Onset = Vd of the first
-single 0.1 V step that loses >95% (deep) or, failing that, >=50% (medium).
+single 0.1 V step that loses >= 95% (deep) or, failing that, >= 50% (medium); otherwise
+"none". This is a simpler rule than classify_collapse in analysis/common.py: no "off at
+rest" or "stalled" class, and >= 95% rather than > 95% for deep.
 Prints one line per curve: label, onset, Id before and after.
 """
 import sys
@@ -10,7 +12,9 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-INK, MUTED, GRID = "#14171F", "#646B78", "#E2E4E9"
+from common import GRID_COOL, INK_COOL
+
+INK, GRID = INK_COOL, GRID_COOL
 COLS = ["#0B2E5E", "#1B4F9C", "#6E9BD8", "#A9BEDF"]
 
 

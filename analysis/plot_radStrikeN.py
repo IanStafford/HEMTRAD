@@ -5,7 +5,6 @@ usage: python3 analysis/plot_radStrikeN.py <run dir> <out dir>
   <run dir> holds task_*/{sin,hk}_N{0..3}_IdVd.csv (and _IdVg.csv); a missing case is left out.
 Writes <out dir>/{sin,hk}_IdVd.png, summary.png and metrics.json.
 """
-import glob
 import json
 import os
 import sys
@@ -15,22 +14,18 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.insert(0, os.path.dirname(__file__))
-from radMetrics import vth_gm  # noqa: E402
+from common import STRIKE_HK_28, STRIKE_SIN_28, pre_ref, read_glob, vth_gm
 
-PRE = "results/20261104_radMap1/task_*/{d}_ref_{k}.csv"
-DECKS = {"sin": ("SiN", ["#f2a66b", "#e0782f", "#b8460f", "#6e2606"]),
-         "hk": ("HighK (HPD)", ["#93bde6", "#4f8ccc", "#245fa3", "#0d376b"])}
+DECKS = {"sin": ("SiN", STRIKE_SIN_28),            # colour ramps by number of strikes
+         "hk": ("HighK (HPD)", STRIKE_HK_28)}
 YS = (0.8, 1.6, 2.4)
 plt.rcParams.update({"font.size": 13, "axes.edgecolor": "#8a8f98", "axes.labelcolor": "#2b2f36",
                      "xtick.color": "#4a4f58", "ytick.color": "#4a4f58", "font.family": "DejaVu Sans"})
 
 
 def load(p):
-    f = glob.glob(p)
-    if not f:
-        return None
-    return np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(f[0]) if l.strip()])
+    """The first file matching the glob p (any number of rows), or None if there is none."""
+    return read_glob(p, min_rows=None)
 
 
 def at(d, v):
@@ -41,7 +36,7 @@ def main(run, out):
     os.makedirs(out, exist_ok=True)
     met = {}
     for d, (name, ramp) in DECKS.items():
-        pre, preg = load(PRE.format(d=d, k="IdVd")), load(PRE.format(d=d, k="IdVg"))
+        pre, preg = load(pre_ref(d, "IdVd")), load(pre_ref(d, "IdVg"))
         vth0, gm0 = vth_gm(preg[:, 0], preg[:, 1])
         met[d] = {"pre": {"Id1": at(pre, 1.0), "Id5": at(pre, 5.0), "Id10": at(pre, 10.0), "Vth": vth0, "gm": gm0}}
         fig, ax = plt.subplots(figsize=(7.4, 5.0))

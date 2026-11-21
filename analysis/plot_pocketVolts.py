@@ -1,8 +1,8 @@
 """Why the strike curves step (2026-11-19): voltage across each damaged spot ("pocket") of the 2DEG against Vd, from
 the per-Vd lateral-field cuts of vdCuts runs (drivers/radIV.tcl vdCuts=1, cut 1 nm below the AlGaN/GaN interface).
 The voltage across a pocket is the integral of |Ey| over its y range. Top row: Id-Vd with each drop marked and
-labelled by the pocket that switches. Bottom row: the pocket voltages; a pocket switches (its barrier traps fill
-with hot electrons) when about 0.5 V sits across it.
+labelled by the pocket that switches (drops: mode 'hyst' of common.drop_episodes, at least 8 mA/mm). Bottom row:
+the pocket voltages; a pocket switches (its barrier traps fill with hot electrons) when about 0.5 V sits across it.
 usage: python3 analysis/plot_pocketVolts.py <out.png> <title>=<task dir> [<title>=<task dir> ...]
 The title's leading digit is the number of strikes (0-3): only the stress band and the first that many strike
 spots are drawn, so an undamaged stretch of channel is not shown as a pocket."""
@@ -14,8 +14,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.insert(0, "analysis")
-import vdcuts  # noqa: E402
+import vdcuts
+from common import DROP_MIN_TABLE, drop_episodes
 
 # y ranges (um) and Okabe-Ito colours, fixed order
 POCKETS = [("stress band (y 0.45-0.72)", (0.45, 0.72), "#4d4d4d"),
@@ -38,19 +38,6 @@ def pocket_volts(c):
     return np.array(vds), out
 
 
-def drops(v, i, thr=8.0):
-    out, k = [], 0
-    while k < len(v) - 1:
-        if i[k + 1] < i[k] - 1.0:
-            s = k
-            while k < len(v) - 1 and i[k + 1] < i[k] - 0.5:
-                k += 1
-            if i[s] - i[k] >= thr:
-                out.append((s, k))
-        k += 1
-    return out
-
-
 def main(out, *cols):
     cols = [a.split("=", 1) for a in cols]
     fig, axs = plt.subplots(2, len(cols), figsize=(3.6 * len(cols) + 0.6, 7.0), sharex=True,
@@ -65,7 +52,7 @@ def main(out, *cols):
         have = list(range(1 + nstr))                 # stress band + strikes 1..nstr
         ax = axs[0, j]
         ax.plot(v, i, color="#222", lw=1.8)
-        for s, k in drops(v, i):
+        for s, k in drop_episodes(v, i, DROP_MIN_TABLE, "hyst"):
             a, b = v[s], v[k]
             r = int(np.argmin(np.abs(vds - b)))
             r0 = int(np.argmin(np.abs(vds - a)))

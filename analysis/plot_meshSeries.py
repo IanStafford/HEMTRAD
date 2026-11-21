@@ -1,17 +1,17 @@
 """0-3 strike series on several meshes (2026-11-19, goal follow-up: do the steps survive mesh refinement?).
 One row per strike setting, one column per mesh (library = 15 nm at y 0.8; m10 = 10 nm uniform; m5fix = 5 nm over
-y 0.64-0.96, otherwise the library mesh). Curves: SiN, 28 V stress (scale 1.5e18) + 0-3 strikes, Vg +1 V. Prints
-the drops (falling Id of at least 8 mA/mm) of every curve. Runs: radStep A-F (library), meshChkLoad_m10/m5fix,
-radStepM 52044406.
+y 0.64-0.96, otherwise the library mesh; m2p5 = 2.5 nm at the strikes, empty until radStepM3 has run). Curves: SiN,
+28 V stress (scale 1.5e18) + 0-3 strikes, Vg +1 V. Prints the drops of every curve (mode 'hyst' of
+common.drop_episodes, at least 8 mA/mm: the counts in kb/results/step-search-28v.md). Runs: radStep A-F (library),
+meshChkLoad_m10/m5fix, radStepM 52044406, radStepM2 52072550 and radStepM3 (never submitted).
 usage: python3 analysis/plot_meshSeries.py [out.png] [set key ...]"""
-import glob
-import json
 import sys
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
+
+from common import DROP_MIN_TABLE, drop_values, label_index, read_csv
 
 # setting key -> (title, {strikes: library label})
 SETS = {
@@ -27,38 +27,18 @@ MESHES = [("library (15 nm at y 0.8)", ("",)), ("10 nm uniform", ("M_m10_", "m10
 COL = ["#9aa0a8", "#e0a060", "#c8641e", "#7a2e05"]
 
 
+PATS = ["results/2026111*_radStep[A-F]/task_*", "results/20261118_meshChkLoad_*/task_*", "results/20261119_radStepM/task_*",
+        "results/20261120_radStepM2/task_*", "results/2026112*_radStepM3/task_*"]
+
+
 def index():
-    idx = {}
-    pats = ["results/2026111*_radStep[A-F]/task_*", "results/20261118_meshChkLoad_*/task_*", "results/20261119_radStepM/task_*",
-            "results/20261120_radStepM2/task_*", "results/2026112*_radStepM3/task_*"]
-    for pat in pats:
-        for t in glob.glob(pat):
-            try:
-                lab = json.load(open(f"{t}/params.json"))["label"]
-                f = glob.glob(f"{t}/*_IdVd.csv")[0]
-            except (OSError, ValueError, IndexError):
-                continue
-            idx.setdefault(lab, f)
-    return idx
+    """{label: Id-Vd csv} over the tasks of PATS; a repeated label keeps the first task found."""
+    return label_index(PATS, min_rows=None)
 
 
 def load(f):
-    d = np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(f) if l.strip()])
-    return d[:, :2] if d.ndim == 2 and len(d) > 2 else None
-
-
-def drops(d, thr=8.0):
-    v, i = d[:, 0], d[:, 1]
-    out, k = [], 0
-    while k < len(v) - 1:
-        if i[k + 1] < i[k] - 1.0:
-            s = k
-            while k < len(v) - 1 and i[k + 1] < i[k] - 0.5:
-                k += 1
-            if i[s] - i[k] >= thr:
-                out.append((v[s], v[k], i[s], i[k]))
-        k += 1
-    return out
+    """Vd and Id columns of an Id-Vd csv, or None if it has fewer than 3 rows."""
+    return read_csv(f, min_rows=3, ncols=2)
 
 
 def find(idx, prefixes, lab):
@@ -85,7 +65,7 @@ def main(out="figures/rad/step28/mesh_series.png", *keys):
                     continue
                 ax.plot(d[:, 0], d[:, 1], color=COL[n], lw=2.0 if n else 1.5, ls="-" if n else "--",
                         label=f"{n} strike{'s' if n != 1 else ''}")
-                ds = drops(d)
+                ds = drop_values(d[:, 0], d[:, 1], DROP_MIN_TABLE, "hyst")
                 txt = "; ".join(f"{a:.1f}-{b:.1f} V {x:.0f}->{y:.0f}" for a, b, x, y in ds)
                 print(f"   {mname:26s} N{n}: {len(ds)} drops  {txt}   (to {d[-1, 0]:.1f} V)")
             ax.set_xlim(0, 12)

@@ -1,8 +1,11 @@
 """Stepped-curve search at the 28 V stress (radStep*, 2026-11-17): every Id-Vd in a run directory, one panel per
-group, plus a list of drop episodes (consecutive decreases totalling more than `min_drop` mA/mm) per curve.
+group, plus the drop episodes of each curve (runs of strictly falling Id that fall by at least `min_drop` mA/mm in
+total, default 10: mode 'any' of common.drop_episodes).
 
 usage: python3 analysis/plot_radStep.py <run dir> <out.png> [min_drop mA/mm] [group regex]
-Labels look like A_p1.5e+18_n5e+18_N3: the panel is the label without its _N<k> suffix; colour by N.
+Labels look like A_p1.5e+18_n5e+18_N3: the panel is the label without its _N<k> suffix; colour by N. Only tasks whose
+label matches the group regex and whose Id-Vd has at least 3 points are drawn. Writes out.png and
+<out>_drops.json and prints one line per curve.
 """
 import glob
 import json
@@ -15,50 +18,29 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-PRE = "results/20261104_radMap1/task_*/sin_ref_IdVd.csv"
-RAMP = {0: "#9aa0a8", 1: "#e0782f", 2: "#b8460f", 3: "#5a1d04"}
+from common import DROP_MIN_FIG, REF, STRIKE_SIN_STEP, drop_values, label_index, read_csv
 
-
-def load(p):
-    return np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(p) if l.strip()])
+PRE = REF["pre_sin"]
+RAMP = dict(enumerate(STRIKE_SIN_STEP))   # colour by number of strikes
 
 
 def drops(v, i, min_drop):
-    """Episodes of falling current: (Vd start, Vd end, Id before, Id after)."""
-    out, k = [], 1
-    while k < len(i):
-        if i[k] < i[k - 1]:
-            a = k - 1
-            while k < len(i) and i[k] < i[k - 1]:
-                k += 1
-            if i[a] - i[k - 1] >= min_drop:
-                out.append((float(v[a]), float(v[k - 1]), float(i[a]), float(i[k - 1])))
-        else:
-            k += 1
-    return out
+    """Episodes of falling current: (Vd start, Vd end, Id before, Id after), mode 'any' of common.drop_values.
+    Kept under this name because archive/analysis_dayfigs/plot_radStepHighlights.py imports it."""
+    return drop_values(v, i, min_drop, "any")
 
 
-def main(run, out, min_drop=10.0, rx=".*"):
+def main(run, out, min_drop=DROP_MIN_FIG, rx=".*"):
     min_drop = float(min_drop)
-    curves = {}
-    for t in sorted(glob.glob(f"{run}/task_*")):
-        try:
-            lab = json.load(open(f"{t}/params.json"))["label"]
-        except (OSError, ValueError):
-            continue
-        f = glob.glob(f"{t}/*_IdVd.csv")
-        if not f or not re.search(rx, lab):
-            continue
-        d = load(f[0])
-        if d.ndim < 2 or len(d) < 3:
-            continue
-        curves[lab] = d
+    # tasks in sorted order; a repeated label keeps the last task
+    tasks = label_index(f"{run}/task_*", keep="last", sort=True, match=rx)
+    curves = {lab: read_csv(f) for lab, f in tasks.items()}
     groups = {}
     for lab in curves:
         m = re.match(r"(.*)_N(\d)$", lab)
         g, n = (m.group(1), int(m.group(2))) if m else (lab, 0)
         groups.setdefault(g, []).append((n, lab))
-    pre = load(glob.glob(PRE)[0])
+    pre = read_csv(glob.glob(PRE)[0])
     nc = min(4, len(groups))
     nr = int(np.ceil(len(groups) / nc))
     fig, axs = plt.subplots(nr, nc, figsize=(4.2 * nc, 3.3 * nr), sharex=True, sharey=True, squeeze=False)

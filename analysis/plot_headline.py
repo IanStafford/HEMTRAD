@@ -12,20 +12,15 @@ import os
 import sys
 
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
 import numpy as np
 
+from common import GRID_COOL, INK_COOL, MUTED_COOL, ORANGE, REF, use_slide_fonts
+
 RUN = sys.argv[1] if len(sys.argv) > 1 else "results/20261013_eTempStd1"
-OLD = ("results/20261002_onsetField3RetryRamp/task_7/"
-       "pulsedIV_tp5.00e+18_tl0.30_ht1.00e-14_eb1.00_my2.400e+00.csv")
-INK, MUTED, GRID, MEAS = "#14171F", "#646B78", "#E2E4E9", "#C2410C"
+OLD = REF["late_y2.4"]          # local-field model (Oct 2), onsetField3RetryRamp task_7
+INK, MUTED, GRID, MEAS = INK_COOL, MUTED_COOL, GRID_COOL, ORANGE
 TAUS = [("1e-12", "τ 1 ps", "#0B2E5E"), ("3e-13", "τ 0.3 ps", "#1B4F9C"), ("1e-13", "τ 0.1 ps", "#6E9BD8")]
-FONT_DIR = os.environ.get("HEADLINE_FONT_DIR")
-if FONT_DIR:
-    for f in os.listdir(FONT_DIR):
-        if f.endswith(".ttf"):
-            font_manager.fontManager.addfont(os.path.join(FONT_DIR, f))
-    plt.rcParams["font.family"] = "Source Sans 3"
+use_slide_fonts(recursive=False)   # HEADLINE_FONT_DIR, the .ttf files directly in that folder
 
 
 def load(f):

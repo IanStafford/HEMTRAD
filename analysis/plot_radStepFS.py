@@ -10,8 +10,6 @@
 
 usage: python3 analysis/plot_radStepFS.py [out prefix] [f]
 """
-import glob
-import json
 import sys
 
 import matplotlib
@@ -19,24 +17,16 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
+from common import STRIKE_SIN_STEP, label_index, read_csv
+
 RUNS = ("results/20261117_radStepC", "results/20261118_radStepI")
-COL = {"sin": ["#9aa0a8", "#e0782f", "#b8460f", "#5a1d04"], "hk": ["#9aa0a8", "#6f9fd8", "#2f62a8", "#12305e"]}
+COL = {"sin": STRIKE_SIN_STEP, "hk": ["#9aa0a8", "#6f9fd8", "#2f62a8", "#12305e"]}   # by number of strikes
 N0 = {"sin": "C_p1.5_N0", "hk": "C_hk_p1.5_n6e18_N0"}
 
 
 def curves():
-    out = {}
-    for run in RUNS:
-        for t in glob.glob(f"{run}/task_*"):
-            try:
-                lab = json.load(open(f"{t}/params.json"))["label"]
-                f = glob.glob(f"{t}/*_IdVd.csv")[0]
-            except (OSError, ValueError, IndexError):
-                continue
-            d = np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(f) if l.strip()])
-            if d.ndim == 2 and len(d) > 2:
-                out[lab] = d
-    return out
+    """{label: Id-Vd array} over the tasks of RUNS, curves of at least 3 points; a repeated label keeps the last task."""
+    return {lab: read_csv(f) for lab, f in label_index([f"{r}/task_*" for r in RUNS], keep="last").items()}
 
 
 def series(c, out):

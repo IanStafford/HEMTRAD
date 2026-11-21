@@ -14,20 +14,16 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import font_manager
 from matplotlib.patches import Rectangle
 
-INK, BODY, MUTED, GRID = "#14171F", "#394150", "#646B78", "#E2E4E9"
-BLUE, ORANGE, PALE = "#1B4F9C", "#C2410C", "#B9CBE6"
-GATE, FP = (-0.125, 0.125), (0.285, 0.725)
+from common import (BLUE, FP, GATE, GRID_COOL, INK_COOL, MUTED_COOL, ORANGE, PALE, classify_collapse,
+                    use_slide_fonts)
+
+INK, MUTED, GRID = INK_COOL, MUTED_COOL, GRID_COOL
 RUN, DEPTH = "results/20261002_posMapLate", 0.0075   # mid AlGaN barrier (15 nm)
 OFF_ROW, NONE_ROW = -0.35, 3.45
 
-FONT_DIR = os.environ.get("HEADLINE_FONT_DIR")
-if FONT_DIR:
-    for f in glob.glob(os.path.join(FONT_DIR, "**", "*.ttf"), recursive=True):
-        font_manager.fontManager.addfont(f)
-    plt.rcParams["font.family"] = "Source Sans 3"
+use_slide_fonts(recursive=True)   # HEADLINE_FONT_DIR, its .ttf files including subfolders
 plt.rcParams.update({"font.size": 17, "xtick.labelsize": 16, "ytick.labelsize": 16,
                      "axes.labelsize": 17, "axes.edgecolor": MUTED, "xtick.color": MUTED,
                      "ytick.color": MUTED, "axes.labelcolor": INK, "mathtext.fontset": "cm"})
@@ -64,18 +60,17 @@ def load_run():
 
 
 def classify(d, ref):
-    """(class, onset, log10 drop at the last Vd) as in plot_posSlides.py."""
+    """(class, onset, log10 drop at the last Vd), class "off" (off at rest), "none" (shallow) or
+    "collapse" (deep or medium, onset at the first step reaching 95% or 50%). classify_collapse in
+    analysis/common.py with no stalled class: a run that gave up early with no collapse is "none"."""
     vd, idd = d[:, 0], d[:, 1]
-    m = vd > 0.05
-    v, i = vd[m], idd[m]
     drop = min(8.0, np.log10(np.interp(vd[-1], ref[:, 0], ref[:, 1]) / max(idd[-1], 1e-30)))
-    if i[0] / np.interp(v[0], ref[:, 0], ref[:, 1]) < 0.1:
+    c = classify_collapse(vd, idd, (ref[:, 0], ref[:, 1]))
+    if c.cls == "off at rest":
         return "off", np.nan, drop
-    loss = 1.0 - i[1:] / i[:-1]
-    if loss.max() < 0.5:
+    if c.cls == "shallow":
         return "none", np.nan, drop
-    thr = 0.95 if loss.max() > 0.95 else 0.5   # deep: first >95% step; medium: first >50%
-    return "collapse", float(v[1 + np.nonzero(loss >= thr - 1e-12)[0][0]]), drop
+    return "collapse", c.onset, drop
 
 
 ref, dev = load_run()

@@ -12,10 +12,11 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
+from common import CAT, GRID_WARM, INK_WARM, MUTED_WARM
+
 EXP = "data/rfDeviceHFO2_Experimental.csv"
 W_MM = 0.2                      # measured device gate width, 200 um
-INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"
-CAT = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]
+INK, MUTED, GRID = INK_WARM, MUTED_WARM, GRID_WARM
 
 out = sys.argv[1]
 sims = [a.split("=", 1) for a in sys.argv[2:]]

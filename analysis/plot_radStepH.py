@@ -3,37 +3,26 @@ No strike (round C), one 3e18 strike at y 0.5 um without field scaling, and with
 
 usage: python3 analysis/plot_radStepH.py [out.png]
 """
-import glob
-import json
 import sys
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
+
+from common import BLUE, ORANGE, label_index, read_csv
 
 RUNS = ("results/20261117_radStepC", "results/20261118_radStepH")
-DECKS = (("SiN", "#c2410c", {"none": "C_p1.5_N0", "nofm": "H_sin_nofm_n3e18_N1",
-                              "fm3": "H_sin_fm4_n3e18_N1", "fm2": "H_sin_fm4_n2e18_N1"}),
-         ("HighK", "#1b4f9c", {"none": "C_hk_p1.5_n6e18_N0", "nofm": "H_hk_nofm_n3e18_N1",
-                               "fm3": "H_hk_fm4_n3e18_N1", "fm2": "H_hk_fm4_n2e18_N1"}))
+DECKS = (("SiN", ORANGE, {"none": "C_p1.5_N0", "nofm": "H_sin_nofm_n3e18_N1",
+                          "fm3": "H_sin_fm4_n3e18_N1", "fm2": "H_sin_fm4_n2e18_N1"}),
+         ("HighK", BLUE, {"none": "C_hk_p1.5_n6e18_N0", "nofm": "H_hk_nofm_n3e18_N1",
+                          "fm3": "H_hk_fm4_n3e18_N1", "fm2": "H_hk_fm4_n2e18_N1"}))
 STY = {"none": ("no strike", "#9aa0a8", "--", 2.0), "nofm": ("3e18 strike, unscaled", None, ":", 2.4),
        "fm3": ("3e18 strike, × (E/E_ref)^4", None, "-", 2.6), "fm2": ("2e18 strike, × (E/E_ref)^4", None, "-", 1.6)}
 
 
 def curves():
-    out = {}
-    for run in RUNS:
-        for t in glob.glob(f"{run}/task_*"):
-            try:
-                lab = json.load(open(f"{t}/params.json"))["label"]
-                f = glob.glob(f"{t}/*_IdVd.csv")[0]
-            except (OSError, ValueError, IndexError):
-                continue
-            d = np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(f) if l.strip()])
-            if d.ndim == 2 and len(d) > 2:
-                out[lab] = d
-    return out
+    """{label: Id-Vd array} over the tasks of RUNS, curves of at least 3 points; a repeated label keeps the last task."""
+    return {lab: read_csv(f) for lab, f in label_index([f"{r}/task_*" for r in RUNS], keep="last").items()}
 
 
 def main(out="figures/rad/step28/fieldstrike_H.png"):

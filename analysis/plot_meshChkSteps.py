@@ -1,23 +1,23 @@
 """Mesh check of the 28 V strike steps (2026-11-19): each case on the library mesh (15 nm at y 0.8), m10 (10 nm
 uniform 0.3-2.6 um) and m5fix (library mesh with a true 5 nm at y 0.8). Runs: radStep A-E (library),
-meshChkLoad_m10 51939191, meshChkLoad_m5fix 51939192.
+meshChkLoad_m10 51939191, meshChkLoad_m5fix 51939192. The label index searches every results/2026111*_radStep* run
+and both meshChkLoad runs; a repeated label keeps the first task found. All six cases are also in
+plot_meshSeries.SETS, which covers more meshes.
 usage: python3 analysis/plot_meshChkSteps.py [out.png]"""
-import glob, json, sys
+import sys
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
+
+from common import label_index, read_csv
 
 CASES = [("C_p1.5_N0", "stress only"), ("A_p1.5e+18_n6e+18_N1", "1 strike (y 0.8)"),
          ("B_n6e18_N2", "2 strikes (0.8, 1.6)"), ("A_p1.5e+18_n6e+18_N3", "3 strikes (0.8, 1.6, 2.4)"),
          ("E_lev0.4_n6e18_N2", "2 strikes, trap 0.40 eV"), ("C_p1.5_n8e18_N2", "2 strikes, 8e18")]
 MESH = [("", "library (15 nm at 0.8)", "#9aa0a8"), ("m10_", "10 nm uniform", "#2f62a8"), ("m5fix_", "5 nm at 0.8", "#b8460f")]
 
-idx = {}
-for p in glob.glob("results/2026111*_radStep*/task_*/params.json") + glob.glob("results/20261118_meshChkLoad_*/task_*/params.json"):
-    f = glob.glob(p.replace("params.json", "*_IdVd.csv"))
-    if f:
-        idx.setdefault(json.load(open(p))["label"], f[0])
+idx = label_index(["results/2026111*_radStep*/task_*", "results/20261118_meshChkLoad_*/task_*"], min_rows=None)
 
 fig, axs = plt.subplots(2, 3, figsize=(14, 7.4), sharex=True)
 for ax, (lab, title) in zip(axs.ravel(), CASES):
@@ -25,7 +25,7 @@ for ax, (lab, title) in zip(axs.ravel(), CASES):
         f = idx.get(pre + lab)
         if not f:
             continue
-        d = np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(f) if l.strip()])
+        d = read_csv(f)
         ax.plot(d[:, 0], d[:, 1], color=col, lw=2.0, label=name)
     ax.set_title(title, fontsize=11)
     ax.set_xlim(0, 12)

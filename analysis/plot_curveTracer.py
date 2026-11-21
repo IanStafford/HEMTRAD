@@ -15,28 +15,23 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
+from common import GRID_WARM, INK_WARM, MUTED_WARM, REF, run_f_curve
+
 RUN = sys.argv[1] if len(sys.argv) > 1 else "results/20261003_curveTracer"
-# Vg = -2 V counterparts (all 0-4 V)
-SET = "pulsedIV_tp5.00e+18_tl0.30_ht1.00e-14_eb1.00_my"
-R3 = "results/20261002_onsetField3"
-M2 = {"notrap": f"{R3}/task_56/pulsedIV_notrap.csv",
-      "late_y1.0": f"{R3}/task_17/{SET}1.000e+00.csv",
-      "late_y2.4": f"{R3}RetryRamp/task_7/{SET}2.400e+00.csv",
-      "runF": None}
+# Vg = -2 V counterparts (all 0-4 V): onsetField3 (job 44435511) and its Te-ramp rescue
+# onsetField3RetryRamp (job 44452288); Run F is the exact Run F set in late-onset round 1
+# (onsetField1, field mobility; None if that run has no such task)
+M2 = {"notrap": REF["onset3_notrap"],
+      "late_y1.0": REF["late_y1.0"],
+      "late_y2.4": REF["late_y2.4"],
+      "runF": run_f_curve()}
 DEV = [("notrap", "trap-free", "#8a8984"),
        ("late_y1.0", "late-onset set, y = 1.0 µm", "#86b6ef"),
        ("late_y2.4", "late-onset set, y = 2.4 µm", "#1c5cab"),
        ("runF", "Run F (4e18 / 0.55 eV, y = 0.2 µm)", "#d0752a")]
-INK, MUTED = "#1a1a19", "#6b6a63"
+INK, MUTED = INK_WARM, MUTED_WARM
 plt.rcParams.update({"font.size": 10, "axes.edgecolor": MUTED, "xtick.color": MUTED,
                      "ytick.color": MUTED, "axes.labelcolor": INK})
-
-# Run F at Vg -2: the exact Run F set in late-onset round 1 (field mobility, 0-4 V)
-for t in glob.glob("results/20261002_onsetField1/task_*"):
-    p = json.load(open(f"{t}/params.json"))
-    if (p["trapPeak"] == 4e18 and p["trapLevel"] == 0.55 and p["hotTau"] == 1.3e-13
-            and p["hotEb"] == 0.5):
-        M2["runF"] = glob.glob(f"{t}/pulsedIV_*.csv")[0]
 
 
 def load(f):
@@ -70,7 +65,7 @@ for vg, devs in sorted(runs.items()):
         ax.set_xlim(0, 4)
         ax.set_xlabel("Vd (V)")
         ax.set_ylabel("Id (mA/mm)")
-        ax.grid(True, color="#e6e5df", lw=0.6)
+        ax.grid(True, color=GRID_WARM, lw=0.6)
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
     axs[1].plot([], [], "--", color=MUTED, lw=1, label="same device at Vg = −2 V")

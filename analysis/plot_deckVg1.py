@@ -5,22 +5,21 @@ usage: python3 analysis/plot_deckVg1.py [run_dir]
 Writes figures/deckVg1_IdVd.png: one panel per trap position, HighK solid, SiN
 dashed, trap-free references grey.
 """
-import glob
-import json
 import os
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+from common import BLUE, GRID_COOL, INK_COOL, MUTED_COOL, ORANGE, label_index
+
 RUN = sys.argv[1] if len(sys.argv) > 1 else "results/20261021_deckVg1"
-INK, MUTED, GRID, BLUE, ORANGE = "#14171F", "#646B78", "#E2E4E9", "#1B4F9C", "#C2410C"
+INK, MUTED, GRID = INK_COOL, MUTED_COOL, GRID_COOL
 
 D = {}
-for t in glob.glob(f"{RUN}/task_*"):
-    p = json.load(open(os.path.join(t, "params.json")))
-    d = np.loadtxt(glob.glob(os.path.join(t, "pulsedIV_*.csv"))[0], delimiter=",", ndmin=2)
-    D[p["label"]] = d[d[:, 0] > 0.05]       # drop Vd = 0 (Id 0 on a log axis)
+for lab, f in label_index(f"{RUN}/task_*", csv="pulsedIV_*.csv", min_rows=None, keep="last").items():
+    d = np.loadtxt(f, delimiter=",", ndmin=2)
+    D[lab] = d[d[:, 0] > 0.05]              # drop Vd = 0 (Id 0 on a log axis)
 
 plt.rcParams.update({"font.family": "sans-serif", "font.size": 10, "axes.edgecolor": MUTED,
                      "axes.labelcolor": INK, "xtick.color": MUTED, "ytick.color": MUTED})

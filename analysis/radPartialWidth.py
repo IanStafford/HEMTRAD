@@ -4,16 +4,18 @@ import glob
 
 import numpy as np
 
+from common import REF, read_csv
+
 
 def load(run, tag):
-    g = glob.glob(f"results/{run}/task_*/{tag}_IdVd.csv")
-    return np.array([[float(v) for v in l.split(",") if v.strip()] for l in open(g[0]) if l.strip()])
+    """radIV Id-Vd of the task labelled tag in results/<run> (columns Vd, Id_dev, ...)."""
+    return read_csv(glob.glob(f"results/{run}/task_*/{tag}_IdVd.csv")[0])
 
 
 W, L, FLU, TRACK = 200.0, 4.66, 1e7, 0.16  # um, um, cm^-2, um
 ions = W * L * 1e-8 * FLU
 print(f"ions on the device {ions:.0f}, one track covers {TRACK / W:.2%} of the width, all distinct {ions * TRACK / W:.1%}")
-ref = load("20261104_radMap1", "hk_ref")
+ref = read_csv(glob.glob(REF["pre_hk"])[0])   # HighK pre-irradiation, radMap1 (job 49570571)
 for lab, run, t in (("0.3 um 4e18", "20261104_radMesh", "hk_y1.50_m05"), ("0.1 um 1.2e19", "20261104_radMesh", "hk_w0.1_m05")):
     d = load(run, t)
     print(lab)

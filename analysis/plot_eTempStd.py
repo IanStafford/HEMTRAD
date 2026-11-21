@@ -4,28 +4,27 @@ usage: python3 analysis/plot_eTempStd.py [run_dir]   (default results/20261013_e
 Writes figures/eTempStd_IdVd.png: one panel per trap set (Run F, late set at
 y 1.0 and 2.4 µm), Id-Vd for tau 1 / 0.3 / 0.1 ps against the old local-field
 model (dashed) and the Oct 8 etStats-1 run at tau 1 ps (dotted). Prints onset,
-collapse depth and the post-collapse trend per run.
+collapse depth and the post-collapse trend per run. The onset is this script's own
+simple rule (first step losing > 95%, else the largest step), not the collapse classes
+of classify_collapse in analysis/common.py.
 """
-import glob
-import json
 import os
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.insert(0, os.path.dirname(__file__))
+from common import GRID_WARM, INK_WARM, MUTED_WARM, REF, run_f_curve
+
 RUN = sys.argv[1] if len(sys.argv) > 1 else "results/20261013_eTempStd1"
 OLDE = "results/20261008_eTemp1"
-INK, MUTED, GRID = "#1a1a19", "#6b6a63", "#e6e5df"
-SET = "pulsedIV_tp5.00e+18_tl0.30_ht1.00e-14_eb1.00_my"
-R3 = "results/20261002_onsetField3"
-OLD = {"late10": f"{R3}/task_17/{SET}1.000e+00.csv",
-       "late24": f"{R3}RetryRamp/task_7/{SET}2.400e+00.csv"}
-for t in glob.glob("results/20261002_onsetField1/task_*"):
-    p = json.load(open(f"{t}/params.json"))
-    if p["trapPeak"] == 4e18 and p["trapLevel"] == 0.55 and p["hotTau"] == 1.3e-13 and p["hotEb"] == 0.5:
-        OLD["runF"] = glob.glob(f"{t}/pulsedIV_*.csv")[0]
+INK, MUTED, GRID = INK_WARM, MUTED_WARM, GRID_WARM
+# the local-field model (Oct 2): onsetField3 and onsetField3RetryRamp, and Run F in onsetField1
+OLD = {"late10": REF["late_y1.0"],
+       "late24": REF["late_y2.4"]}
+runf = run_f_curve()
+if runf:
+    OLD["runF"] = runf
 TITLE = {"runF": "Run F (4e18, 0.55 eV, y 0.2 µm)",
          "late10": "Late set at y = 1.0 µm (5e18, 0.30 eV)",
          "late24": "Late set at y = 2.4 µm (5e18, 0.30 eV)"}
