@@ -1,6 +1,53 @@
-"""Write the sweeps/params_<name>.txt files of the 2026-11 damage-region and Vth studies.
-usage: python3 analysis/genRadStudy.py   (run from the repo root; the task order is fixed)
-Sites are {ymin ymax xmin xmax N}: um along the channel, um below the AlGaN top, cm^-3.
+"""Write the sweeps/params_<name>.txt files of the rad-model studies from 2026-11-04 on.
+
+usage: python3 analysis/genRadStudy.py     (from the repo root; it takes no arguments)
+
+What it writes. One run rewrites all 60 files below in place, also those of studies that
+have already run, so it overwrites committed records. After a run, `git diff --stat sweeps/`
+must show only the files you meant to change. In write order:
+  radChk radVth radMap1 radMesh radFam radVth2 radRon radStress radVth3 radFine radMulti
+  radEmit radEmit2 radEmit3 radChk2 radGauss radMap2 radGauss2 radEB1 radEB2 radFinal12
+  radExp1 radExp1b radExp2 radExp3 radHV radStrike2 rad28fit radStrikeN radStressIO
+  rad28strike stressLib rad28strikeL radStepA radStepB radStepC radStepD radStepE radStepF
+  radStepG radStepH radStepI meshChkStress radStepJ meshChkLoad_m10 meshChkLoad_m5fix
+  radStepK seeMap28 stressLibResume radStepDiag radStepDiag5 radStepM meshChkStress2p5
+  radStepM2 radStepM3 fpFixPre fpFixStress fpFixEB1 fpFixLoad fpFixMesh
+Each block's comment says what the study is for; results and job IDs are in progress.md and
+the KB (kb/results/damage-region-map.md, kb/results/step-search-28v.md).
+
+Order. The blocks run top to bottom and later blocks read files written by earlier ones:
+radFinal12 <- radChk, radEB1; radHV <- radFinal12; meshChkLoad_*, radStepDiag, radStepDiag5,
+radStepM, radStepM2, radStepM3 and fpFixLoad <- radStepA/B/C/E (and F, I); radStepDiag5 <-
+meshChkLoad_m5fix; stressLibResume and fpFixStress <- stressLib; meshChkStress2p5 <-
+meshChkStress; fpFixMesh <- meshChkStress, meshChkStress2p5; fpFixPre <- radMap1;
+fpFixEB1 <- radEB1. Keep that order. The task order inside a file is fixed too: SLURM array
+index i runs line i+1 into results/<RUN>/task_<i>, so reordering breaks the map from task
+directories to cases.
+
+Line format (sweeps/radIV.slurm): label|lever=value;lever=value;... Each pair becomes
+`set lever value` ahead of the driver, in order, so the last value of a lever wins (write()
+puts BASE first, then the study's common levers, the deck, and the case's own levers). The
+driver is not in the file: params_seeMap28.txt is for drivers/seeIV.tcl and must be
+submitted with DRV=seeIV; every other file here is for drivers/radIV.tcl.
+
+Damage formats: damSites {ymin ymax xmin xmax N}; damGauss and damGaussF {y x sigma N}
+(um along the channel, um below the AlGaN top, cm^-3). LIB is the stress library on /blue
+(kb/workflow/stress-library.md).
+
+FP contact fix (2026-11-20, kb/results/fp-contact-fix.md). States saved before the fix
+(radStressIO, rad28strike, stressLib, stressLibResume, meshChkStress, meshChkStress2p5) have
+the old FP contact box. radIV refuses to load or resume them unless fpBoxOld=1, so a file
+that loads them fails as written, and a file that solves its own stress now builds the fixed
+box. The fpFix* files rerun the key cases with the fixed box.
+
+radFine: the params_radFine.txt written here is the Nov 5 radFine (job 49735196). The Oct 24
+radFine (job 47562303) used a different, hand-written file of the same name, kept in git at
+commit 0fbf0ce.
+
+Not written here: the rad3d* files come from analysis/genRad3d.py. No tracked script writes
+the other sweeps/params_*.txt files (radCal*, radFinal..radFinal11, radFit*, radNE*, radWin,
+rad28a, stressAbs/Clamp/Diag/Floor/Safe*, seeGen*, seeIso1, seeSmoke1, the other rad* and
+vgEB* files, and the pulsedIV-era files); they were written by hand.
 """
 import random
 
@@ -876,3 +923,15 @@ with open("sweeps/params_fpFixMesh.txt", "w") as f:
     lab, lev = open("sweeps/params_meshChkStress2p5.txt").readline().rstrip("\n").split("|", 1)
     f.write(f"fpfix_{lab}|{lev.replace(f'{LIB}/meshchk/sin_m2p5', f'{FIXLIB}/meshchk/sin_m2p5').replace('stressSavePrefix=sin_m2p5', 'stressSavePrefix=fpfix_sin_m2p5')}\n")
 print("fpFixMesh 2")
+
+# fpFixEB1p (2026-11-20): radEB1 sets no Vd_stress or occSafe, so its stress stopped where the ramp failed (17.66 V).
+# With the fixed FP box the ramp may stop elsewhere; this copy of the biased cases pins Vd_stress at 17.66 V for a
+# like-for-like comparison with the Nov 11 curves.
+with open("sweeps/params_fpFixEB1p.txt", "w") as f:
+    for line in open("sweeps/params_radEB1.txt"):
+        lab, lev = line.rstrip("\n").split("|", 1)
+        if lab.startswith("nb_"):
+            continue
+        assert "Vd_stress" not in lev, lab
+        f.write(f"fpfix_p_{lab}|{lev};Vd_stress=17.66\n")
+print("fpFixEB1p", sum(1 for _ in open("sweeps/params_fpFixEB1p.txt")))
