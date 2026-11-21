@@ -1,7 +1,7 @@
 """3D slice after the brick-gradient fix (2026-11-18): left, a full-width ion track along the gate width in 3D
 against the same strike in 2D, before and after the fix; right, current lost to a track against the fraction of
 the width it covers. Data: data/rad3d_fangs (FANGS port runs), results/20261112_rad3dSolve task_6 (undamaged 2D
-slice, same coarsening). usage: python3 analysis/plot_rad3dFix.py <out.png>"""
+slice, same coarsening). usage: python3 archive/analysis_dayfigs/plot_rad3dFix.py <out.png>"""
 import glob
 import sys
 

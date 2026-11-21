@@ -36,7 +36,7 @@ for task in sorted(glob.glob(f"{RUN}/task_*")):
     csv = glob.glob(os.path.join(task, "pulsedIV_*.csv"))[0]
     runs[(p["trapMeanX"], p["trapMeanY"])] = load(csv)
 
-vd_t, id_t = load("figures/radPlot1.csv")
+vd_t, id_t = load("archive/static_mobility/figures/radPlot1.csv")
 
 plt.rcParams.update({"font.size": 10, "axes.edgecolor": MUTED,
                      "axes.labelcolor": INK, "xtick.color": MUTED,

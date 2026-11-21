@@ -1,5 +1,5 @@
 """Dashboard figures for Nov 12-13: high-Vd curves (radHV) and second-strike position (radStrike2).
-usage: python3 analysis/plot_nov12.py <out dir>"""
+usage: python3 archive/analysis_dayfigs/plot_nov12.py <out dir>"""
 import glob
 import os
 import sys

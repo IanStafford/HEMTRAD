@@ -13,7 +13,7 @@
 #SBATCH --error=results/eTemp_logs/dbg_%A_%a.err
 set -euo pipefail
 REPO=/home/ianstafford/blue/ee1/ianstafford/HEMTRAD
-LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/sweeps/params_eTempDebug.txt")
+LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$REPO/archive/energy_balance/params_eTempDebug.txt")
 IFS="|" read -r TAG EXTRA <<< "$LINE"
 TASK_DIR=$REPO/results/20261008_eTempDebug/$TAG
 module restore flooxsenv
@@ -36,7 +36,7 @@ done
     echo "set ivCSV dbg_iv.csv"
     if [ -n "${EXTRA:-}" ]; then echo "$EXTRA" | tr ';' '\n' | sed 's/^ */set /'; fi
     sed 's/^window.*//; s/^\(\s*\)chart /\1#chart /' "$REPO/drivers/pulsedIV.tcl"
-    cat "$REPO/drivers/eTempDebug_tail.tcl"
+    cat "$REPO/archive/energy_balance/eTempDebug_tail.tcl"
 } > "$TASK_DIR/dbg_task.tcl"
 cd "$TASK_DIR"
 "$FLXSHOME/release/flooxs" dbg_task.tcl

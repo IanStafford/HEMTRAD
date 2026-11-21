@@ -1,4 +1,4 @@
-"""Final parameter set at hotEb 0.5 and 1.0 on the 10 nm mesh. usage: python3 analysis/radEBFig.py <out.png>"""
+"""Final parameter set at hotEb 0.5 and 1.0 on the 10 nm mesh. usage: python3 archive/analysis_dayfigs/radEBFig.py <out.png>"""
 import glob
 import sys
 

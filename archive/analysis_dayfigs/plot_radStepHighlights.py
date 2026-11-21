@@ -1,6 +1,6 @@
 """Highlights of the stepped-collapse search (2026-11-17): selected SiN curves with several drops, one panel each,
 with every drop (>= 10 mA/mm) marked, the pre-irradiation curve and the Nov 11 model for reference.
-usage: python3 analysis/plot_radStepHighlights.py <out.png>"""
+usage: python3 archive/analysis_dayfigs/plot_radStepHighlights.py <out.png>"""
 import glob
 import sys
 

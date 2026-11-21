@@ -7,8 +7,11 @@ _probe_*.log
 __pycache__/
 .obsidian/
 
-# GIF frames from plot_posOnset.py (regenerate; only the GIFs are committed)
-figures/*_onset3d_frames/
+# GIF frames, at any depth under figures/ (regenerate; only the GIFs are committed;
+# figures/README.md): plot_posOnset.py *_onset3d_frames/ and the GIF recipe's
+# *_gif_frames/ (kb/tools/analysis-scripts.md). The six tracked posMap*_frames/ stay tracked.
+figures/**/*_onset3d_frames/
+figures/**/*_gif_frames/
 
 # measured device data and notes: never tracked (Ian)
 kb/results/measured-*.md

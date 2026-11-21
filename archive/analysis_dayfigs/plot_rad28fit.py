@@ -1,5 +1,5 @@
 """28 V stress damage-scale refit (rad28fit, radExp3, rad28fitB; 2026-11-12/14): Id-Vd at Vg +1 V for SiN and
-HighK against the damage scale. usage: python3 analysis/plot_rad28fit.py <out.png>"""
+HighK against the damage scale. usage: python3 archive/analysis_dayfigs/plot_rad28fit.py <out.png>"""
 import glob
 import sys
 

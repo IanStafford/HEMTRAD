@@ -1,4 +1,4 @@
-"""Final set vs deeper trap levels and a smaller damage scale, SiN biased (radExp1). usage: python3 analysis/plot_radExp1.py <out.png>"""
+"""Final set vs deeper trap levels and a smaller damage scale, SiN biased (radExp1). usage: python3 archive/analysis_dayfigs/plot_radExp1.py <out.png>"""
 import glob
 import sys
 

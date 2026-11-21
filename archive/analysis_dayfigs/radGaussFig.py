@@ -1,4 +1,4 @@
-"""Gaussian traps at y 1.0 um, standard mesh against 5 nm, log scale. usage: python3 analysis/radGaussFig.py <out.png>"""
+"""Gaussian traps at y 1.0 um, standard mesh against 5 nm, log scale. usage: python3 archive/analysis_dayfigs/radGaussFig.py <out.png>"""
 import glob
 import sys
 

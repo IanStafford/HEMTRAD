@@ -7,7 +7,7 @@ results/20261001_trapMapF_field (+ its Retry dir if present; mobModel field, the
 calibrated against the HfO2 device, kb/device/calibration.md). Each is normalised to its own
 trap-free reference.
 
-usage: python3 analysis/analyze_mobCompare.py [trapPeak trapLevel field_run tag]
+usage: python3 archive/static_mobility/analyze_mobCompare.py [trapPeak trapLevel field_run tag]
 Writes figures/<tag>_metrics.csv, _3d.png and _compare.png.
 """
 import glob

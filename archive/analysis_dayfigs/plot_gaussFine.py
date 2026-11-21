@@ -1,5 +1,5 @@
 """Oct 29 deck trap set (Gaussian, 0.30 eV, 5e18, hotEb 1.0) on 5 nm, both decks, y 1.0 and 2.4 um.
-usage: python3 analysis/plot_gaussFine.py <out.png>"""
+usage: python3 archive/analysis_dayfigs/plot_gaussFine.py <out.png>"""
 import glob
 import sys
 

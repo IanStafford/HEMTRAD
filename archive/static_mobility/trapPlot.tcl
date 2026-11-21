@@ -1,3 +1,7 @@
+# Archived 2026-11-21 from drivers/ (see README.md here). Run from the repo root
+# with a display (window, chart, plot1d). It writes its two outputs relative to
+# the repo root, into figures/; the tracked copies of both CSVs are in
+# archive/static_mobility/figures/.
 proc nearHalfVolt {V {tol 0.001}} {
     set scaled [expr {$V / 0.5}]
     set frac [expr {abs($scaled - round($scaled))}]

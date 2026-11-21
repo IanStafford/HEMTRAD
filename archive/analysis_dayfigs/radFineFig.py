@@ -1,5 +1,5 @@
 """Fine-mesh results: final SiN curve, current limit by density, gate independence, resistance per strike.
-usage: python3 analysis/radFineFig.py <out.png>   (expects results/20261105_radFine, radMulti and FINAL_REF in the env)
+usage: python3 archive/analysis_dayfigs/radFineFig.py <out.png>   (expects results/20261105_radFine, radMulti and FINAL_REF in the env)
 """
 import glob
 import json
