@@ -37,4 +37,22 @@ So during the stress the head's drain edge sat near 0 V instead of the gate pote
 | fpFixLoad (after fpFixStress) | SiN stress-only at scale 1.5 / 1.6 / 1.8e18; mesh-robust 8e18 series N1-3 (with vdCuts); row A 6e18 N1-3; field-scaled band b N1-3; HighK N0, 8e18 N1-3, band b N1-3 | Rounds A-C, I; does SiN still collapse and HighK not, and do the steps survive? |
 | fpFixEB1 | The Nov 11 model (17.66 V stress), all six cases | radEB1, the reference curve in every step figure |
 
-Results go here as they come in. Related: [[cleanup-plan]], [[levers]], [[device-structure]].
+## Results so far (2026-11-21)
+
+- **Pre-irradiation and non-biased curves: unchanged within 1%** (fpFixPre 52134553, fpFixEB1 nb cases). Vg +1, Vd 4 V: SiN 884 → 890, HighK 875 → 882 mA/mm; Id-Vg within 1%. The calibration holds.
+- **Biased, Nov 11 levers (damPeak 7e18):** the fixed box gives about 5× more damage at the 2DEG row (fpFixEB1 52134554, fpFixEB1p 52140899).
+
+| Deck | Peak acceptors, GaN side (old → fixed) | AlGaN side (old → fixed) |
+|---|---|---|
+| SiN | 5.9e18 → 2.7e19 | 1.2e19 → 5.4e19 |
+| HighK | 6.6e17 → 4.2e18 | 1.0e18 → 6.5e18 |
+
+- **The curves:**
+  - **SiN biased** now collapses completely at 0.1-0.4 V (old: a 375 → 248 mA/mm step at 1.4-1.8 V, then 370 at 10 V).
+  - **HighK biased** drops 489 → 409 at 2.2-2.7 V and ends near 500 at 10 V (old: flat, 951).
+  - The free stress ramp stopped at 17.77 V (SiN) and 17.93 V (HighK), against 17.66 V before; the pinned 17.66 V runs give the same curves.
+- **Read:** the old box held the head's drain edge near 0 V and shielded the field at the gate edge. Every damage scale fitted with the bug (7e18 at 17.66 V, 1.5e18 at 28 V) is about 5× too strong with the fixed geometry. The SiN/HighK damage ratio falls from about 9× to 7×.
+- **Next (Ian, 2026-11-21: refit the scale first; report the HighK contrast before touching other levers):**
+  - fpFixScaleEB1 52223190: Nov 11 biased SiN and HighK at 17.66 V, damPeak 7e17-3e18.
+  - fpFixScale28: 28 V stress damage only, damPeak 1e17-1.5e18, both decks, on the fixed library once it reaches 28 V.
+  - The old-scale fpFixLoad set was never run. Related: [[cleanup-plan]], [[levers]], [[device-structure]].

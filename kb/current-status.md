@@ -9,6 +9,8 @@ What is running, what is open, and the current answer on each topic, with a link
 
 **Repo:** reorganised 2026-10-12 into `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/` ([[repo-locations]]); FLOOXS internals in [[flooxs-overview]]. The repo is public, so measured numbers stay in untracked files. The code and KB clean-up follows [[cleanup-plan]]; stage 1 (docs, KB, comments) started on Nov 20.
 
+> **2026-11-21:** with the FP contact fixed, the old damage scales are about 5× too strong. The Nov 11 SiN biased curve collapses completely and HighK drops to ~500 mA/mm; pre and non-biased curves are unchanged. A damage-scale refit is running (fpFixScaleEB1 52223190; fpFixScale28 waits for the fixed-box 28 V library, 52134552). Details: [[fp-contact-fix]].
+
 ## Now
 
 **FP contact fix (Nov 20).** The FP contact box in every deck covered the drain half of the T-gate head, so during the 28 V stress the head's drain edge sat near 0 V instead of −10 V. That is where the SiN stress damage concentrates. Fixed in the decks (lever `fpBoxOld`, default 0 = fixed; Ian approved). A saved stress state carries its own contacts, so every state saved before the fix has the old box, and radIV refuses to load one into a fixed-box run. Results built on those states are marked *pre-fix* below and are being rerun ([[fp-contact-fix]]).
