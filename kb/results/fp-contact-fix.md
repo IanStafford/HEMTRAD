@@ -52,6 +52,11 @@ So during the stress the head's drain edge sat near 0 V instead of the gate pote
   - **HighK biased** drops 489 → 409 at 2.2-2.7 V and ends near 500 at 10 V (old: flat, 951).
   - The free stress ramp stopped at 17.77 V (SiN) and 17.93 V (HighK), against 17.66 V before; the pinned 17.66 V runs give the same curves.
 - **Read:** the old box held the head's drain edge near 0 V and shielded the field at the gate edge. Every damage scale fitted with the bug (7e18 at 17.66 V, 1.5e18 at 28 V) is about 5× too strong with the fixed geometry. The SiN/HighK damage ratio falls from about 9× to 7×.
+- **Refit of the Nov 11 model (fpFixScaleEB1 52223190, 2026-11-22; figure `figures/rad/fpfix_scale_eb1.png`):** damage scale 1.5e18 with the fixed box reproduces the old-box 7e18 curves.
+  - SiN biased: 376 → 223 mA/mm at 1.5-2.0 V and 397 at 10 V (old 375 → 248 at 1.4-1.8 V and 370).
+  - HighK biased: flat, 955 at 10 V (old 951). It stays flat up to 3e18 (889 at 10 V), so the SiN-vs-HighK contrast is fully back.
+  - The scale is 4.7× lower, matching the extra damage. The old curve's small second SiN dip near 7 V does not appear.
+  - By the same factor, the 28 V model's 1.5e18 should become about 3e17.
 - **Next (Ian, 2026-11-21: refit the scale first; report the HighK contrast before touching other levers):**
   - fpFixScaleEB1 52223190: Nov 11 biased SiN and HighK at 17.66 V, damPeak 7e17-3e18.
   - fpFixScale28: 28 V stress damage only, damPeak 1e17-1.5e18, both decks, on the fixed library once it reaches 28 V.

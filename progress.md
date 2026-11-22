@@ -2320,3 +2320,14 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
   - **KB follow-ups:** analysis-scripts, levers (stressQfn), sweep-pattern (rails, index pointer), step-search-28v, collapse-classification, README, index.
   - Stage 3d (deck fold) is held until the fix results settle.
   - **For Ian** (in cleanup-plan): the DamageIn print1d catch; damList's foreach overwrites the global Boltzmann k; archived trapPlot output path; colour ramps; CLI convention; the unrecorded radEth1 run (52000451).
+
+## 2026-11-22: damage-scale refit with the fixed FP box (Nov 11 model)
+
+- **fpFixScaleEB1 52223190 done** (10/10 RADIV DONE; one IDVD GAVE UP at Vd 9.6, HighK 7e17). Figure `figures/rad/fpfix_scale_eb1.png` (`analysis/plot_fpFixScale.py`).
+- **Damage scale 1.5e18 with the fixed box reproduces the Nov 11 model (old box, 7e18), the scale 4.7x lower**, matching the 4.7x extra damage the fix revealed.
+  - SiN biased: 376 -> 223 mA/mm at 1.5-2.0 V, 300 at 4 V, 397 at 10 V. Old box: 375 -> 248 at 1.4-1.8 V, 339 at 4 V, 370 at 10 V.
+  - HighK biased: flat, 955 at 10 V (old 951), so the SiN-vs-HighK contrast is fully back.
+  - HighK stays flat up to 3e18 (889 at 10 V). SiN at 1e18: one small dip (564 -> 540); at 2e18 and 3e18 it collapses to ~0.
+  - The old curve's second SiN dip at 6.4-7.7 V does not appear at 1.5e18.
+- **Next:** by the same factor the 28 V scale (old 1.5e18) should become ~3e17. fpFixScale28: the HighK half (52354341, 7 tasks) was submitted on the fixed HighK 28 V state; a watcher submits the SiN half when the SiN library reaches 28 V (at 25 V now). The fixed-box 5 nm and 2.5 nm mesh stresses (52135538) reached 28 V.
+- HPG master was down again on Nov 22; one reconnect worked.
