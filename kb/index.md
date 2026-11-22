@@ -61,6 +61,7 @@ Second brain for the FLOOXS model of radiation effects in an AlGaN/GaN HEMT (HfO
 ## Results: radiation model (since 2026-10-23, current work)
 Every result here that uses a stress state saved before 2026-11-20 predates the FP contact fix and is being rerun ([[fp-contact-fix]]).
 - [[fp-contact-fix]] — the FP contact covered the drain half of the T-gate head (head drain edge ~0 V instead of Vg during the stress); fixed 2026-11-20, tests of the effect
+- [[fpfix-rerun-list]] — every figure and published page that predates the FP fix: what to remake, what to mark pre-fix, what to spot-check (Nov 22)
 - [[step-search-28v]] — stepped SiN collapse at the 28 V stress with strikes, HighK contrast, field-scaled strikes, mesh checks and the mesh-robust series (rounds S, A-K, M, Nov 17-20)
 - [[step-mechanism]] — why the strike curves step: each damaged pocket switches at ~0.5 V across it (barrier traps fill with hot electrons); pockets in series share the drain voltage (Nov 19)
 - [[rad-model]] — pre/post-irradiation model, HPD vs SiN (qualitative); the Nov 11 model and its history

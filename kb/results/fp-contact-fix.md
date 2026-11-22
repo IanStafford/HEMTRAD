@@ -61,3 +61,5 @@ So during the stress the head's drain edge sat near 0 V instead of the gate pote
   - fpFixScaleEB1 52223190: Nov 11 biased SiN and HighK at 17.66 V, damPeak 7e17-3e18.
   - fpFixScale28: 28 V stress damage only, damPeak 1e17-1.5e18, both decks, on the fixed library once it reaches 28 V.
   - The old-scale fpFixLoad set was never run. Related: [[cleanup-plan]], [[levers]], [[device-structure]].
+
+Which figures and published pages need remaking, marking pre-fix or spot-checking: [[fpfix-rerun-list]].
