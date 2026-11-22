@@ -2332,3 +2332,13 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **Next:** by the same factor the 28 V scale (old 1.5e18) should become ~3e17. fpFixScale28: the HighK half (52354341, 7 tasks) was submitted on the fixed HighK 28 V state; a watcher submits the SiN half when the SiN library reaches 28 V (at 25 V now). The fixed-box 5 nm and 2.5 nm mesh stresses (52135538) reached 28 V.
 - HPG master was down again on Nov 22; one reconnect worked.
 - **Figure inventory for the FP fix** (workflow wf_66ec8acb-5c0, four classifiers + a completeness critic; Nov 18 deck read): kb/results/fpfix-rerun-list.md. 45 figures/data files must be rerun or retired (A1: current results to remake, in order: Nov 11 refit replot, 28 V scale, strike series, mesh series, mechanism, field-scaled strikes, round S, seeMap28; A2: superseded models to mark pre-fix), 84 need a check (one representative rerun per family: Vg -2 curve-tracer studies, field-plate cuts, calibration, Vg +1 hand sites, 3D track-only), 5 are unaffected. Published pages: dashboard days Oct 24 - Nov 20, the rad-model explainer, rad-week, the Nov 18 deck (5 slides plus the table), strike-count slides, test register.
+- **Ian: "Remake everything post Nov 11 model. Send it to HPG."**
+  - **Submitted now (commit a16dd0a; the Nov 11-based remakes use the refit scale, damPeak x 1.5/7, via radparams.rescale_damage, which rescales only field-dependent damage):**
+    - fxRadHV 52357001 (6): the Nov 11 model measured to Vd 28 V;
+    - fxRadStrike2 52357002 (8): second-strike positions;
+    - fxRadStrikeN 52357003 (8): 0-3 strikes, both decks;
+    - fxSeeMap28 52357004 (2, DRV=seeIV): 28 V strike maps;
+    - fxMeshStressM10 52357005 (1): the 10 nm uniform 28 V stress with the fixed box, for the mesh remakes.
+  - **28 V rounds (rad28strikeL, radStepA-K, meshChkLoad_m10/m5fix, radStepDiag/Diag5, radStepM/M2/M3; ~265 tasks):** wait for the 28 V scale refit. fpFixScale28: HighK half 52354341 running; the SiN half is submitted when the SiN library reaches 28 V.
+    - Rule for the scale, as for the Nov 11 refit: the fixed-box SiN stress-only curve closest to the old C_p1.5_N0 curve, then r = s_best / 1.5e18 applied to every field-dependent damage density (radparams.fx28_rows).
+    - Rows loading states above 28 V are dropped (round E vs30, 3 tasks). rad28strike (Nov 15, superseded by round S) is not remade. The m10 cases wait for fxMeshStressM10.
