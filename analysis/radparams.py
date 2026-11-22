@@ -201,6 +201,57 @@ def strikes(n, k, ys=STRIKES_Y):
     return gauss([(y, n) for y in ys[:k]]) if k else ""
 
 
+# ---- FP-fix remakes (2026-11-22, Ian: "Remake everything post Nov 11 model"). The FP contact box fixed on 2026-11-20
+# raised the stress-field damage at the gate edge ~5x at a given scale (kb/results/fp-contact-fix.md), so a remake
+# multiplies every FIELD-DEPENDENT damage density by a ratio r and leaves field-independent damage alone.
+R_NOV11 = 1.5e18 / 7e18        # Nov 11 scale refit with the fixed box (fpFixScaleEB1 52223190): 7e18 -> 1.5e18
+
+
+def _scale_braces(val, r):
+    """Scale the 4th number of every {y x sigma N} in a strike list."""
+    import re
+    def one(m):
+        y, x, sg, n = m.group(1).split()
+        return "{" + f"{y} {x} {sg} {float(n) * r:g}" + "}"
+    return re.sub(r"\{([^{}]+)\}", one, val)
+
+
+def rescale_damage(lev, r):
+    """lev plus overrides that multiply each field-dependent damage density by r (last value wins in radIV.slurm):
+    damPeak (E^damM law); dam2Peak / damInsPeak only when their exponent is non-zero; damGauss N only when
+    gaussFieldM != 0; damGaussF N always (always field-scaled). Plain strikes, uniform dam2 (dam2M 0) and damSites
+    are field-independent and unchanged. Any other damage law raises, so a remake never silently skips one."""
+    _, pairs = parse_line("x|" + lev)
+    eff, _ = effective(pairs)
+    f = lambda k, d="0": float(eff.get(k, d) or d)
+    for k in ("dam3Peak", "damList", "damTube", "damRod", "trackFieldM"):
+        if k in eff and eff[k] not in ("", "{}", "0", "0.0"):
+            raise ValueError(f"rescale_damage: {k}={eff[k]} not handled")
+    out = []
+    if "damPeak" in eff:
+        out.append(f"damPeak={f('damPeak') * r:g}")
+    if f("dam2Peak") > 0 and f("dam2M") != 0:
+        out.append(f"dam2Peak={f('dam2Peak') * r:g}")
+    if f("damInsPeak") > 0 and f("damInsM") != 0:
+        out.append(f"damInsPeak={f('damInsPeak') * r:g}")
+    if eff.get("damGauss", "{}") not in ("", "{}") and f("gaussFieldM") != 0:
+        out.append(f"damGauss={_scale_braces(eff['damGauss'], r)}")
+    if eff.get("damGaussF", "{}") not in ("", "{}"):
+        out.append(f"damGaussF={_scale_braces(eff['damGaussF'], r)}")
+    return lev + "".join(";" + o for o in out)
+
+
+def fx_rows(rows, r, path_swaps=(), prefix="fx_"):
+    """Remake rows with the fixed FP box: label prefix, saved-state paths swapped to their fixed-box versions,
+    field-dependent damage rescaled by r."""
+    out = []
+    for lab, lev in rows:
+        for old, new in path_swaps:
+            lev = lev.replace(old, new)
+        out.append((f"{prefix}{lab}", rescale_damage(lev, r)))
+    return out
+
+
 # ---- rows. A study is a list of (label, levers); a params line is f"{label}|{levers}".
 def join(*parts):
     """Join lever strings with ';', skipping empty ones."""

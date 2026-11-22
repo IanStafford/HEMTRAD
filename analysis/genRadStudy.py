@@ -55,7 +55,7 @@ from radparams import (
     NB_DECKS, NB_RADFINAL8_1026, PRE, PULSED_GAUSS_1107, SEE28_1118, SIN, SKIP, STRIKES_Y, SURF, Y_ALL, Y_GATE,
     Y_GD, Y_SD, Study, by_label, fine, fpfix_state, gauss, gauss_w, join, lib_state, load_at_1117, meshchk_state,
     rows_both_decks, rows_on_decks, run, sin_radfinal11_1027, site, site_fine, sitecase, sites, strike_mesh,
-    strikes, swap,
+    strikes, swap, R_NOV11, fx_rows,
 )
 
 # ---- shared by several studies
@@ -909,6 +909,41 @@ def fpFixScale28(load):
     return rows
 
 
+# ---------------------------------------------------------------- 2026-11-22: remakes with the fixed FP box
+# (Ian: "Remake everything post Nov 11 model. Send it to HPG"). Same rows, label prefix fx_, field-dependent damage
+# rescaled (radparams.rescale_damage), saved states swapped to their fixed-box versions. The 28 V rounds wait for
+# the 28 V scale refit (fpFixScale28); these do not depend on it.
+def fxRadHV(hv):
+    """radHV (Nov 11 model measured to Vd 28 V, Vg +1 and 0) at the refit Nov 11 scale."""
+    return fx_rows(hv, R_NOV11)
+
+
+def fxRadStrike2(s2):
+    """radStrike2 (second-strike position on the Nov 11 SiN set, true 17 V stress) at the refit Nov 11 scale."""
+    return fx_rows(s2, R_NOV11)
+
+
+def fxRadStrikeN(sn):
+    """radStrikeN (0-3 plain 3e18 strikes on the Nov 11 set, both decks) at the refit Nov 11 scale."""
+    return fx_rows(sn, R_NOV11)
+
+
+def fxSeeMap28(see):
+    """seeMap28 (strike transient maps at Vg -10 / Vd 28 V) with the fixed deck; no damage to rescale."""
+    return fx_rows(see, 1.0)
+
+
+def fxMeshStressM10(mc):
+    """The 10 nm uniform 28 V SiN stress (meshChkStress m10) with the fixed FP box, saved every volt, for the
+    three-mesh remakes (fpFixMesh already has m5fix and m2p5). stressOnly, so the damage scale is not used."""
+    row = [(lab, lev) for lab, lev in mc if lab == "mc_sin_m10"]
+    assert len(row) == 1
+    lab, lev = row[0]
+    lev = swap(lev, f"{LIB}/meshchk/sin_m10", f"{FIXLIB}/meshchk/sin_m10")
+    lev = swap(lev, "stressSavePrefix=sin_m10", "stressSavePrefix=fpfix_sin_m10")
+    return [(f"fpfix_{lab}", lev)]
+
+
 # ---------------------------------------------------------------- registry, in build (and history) order
 # base sets for --show, as (name, levers)
 B1104 = ("BASE_1104", BASE_1104)
@@ -986,6 +1021,11 @@ STUDIES = [
     Study("fpFixEB1p", fpFixEB1p, ("radEB1",), base=BCHK2),
     Study("fpFixScaleEB1", fpFixScaleEB1, ("fpFixEB1p",), base=BCHK2),
     Study("fpFixScale28", fpFixScale28, ("fpFixLoad",), base=LOADSIN),
+    Study("fxRadHV", fxRadHV, ("radHV",), base=BEB1),
+    Study("fxRadStrike2", fxRadStrike2, ("radStrike2",), base=BOS17),
+    Study("fxRadStrikeN", fxRadStrikeN, ("radStrikeN",), base=BOS17),
+    Study("fxSeeMap28", fxSeeMap28, ("seeMap28",), base=("SEE28_1118", SEE28_1118), driver="seeIV"),
+    Study("fxMeshStressM10", fxMeshStressM10, ("meshChkStress",), base=BEB1),
 ]
 
 if __name__ == "__main__":
