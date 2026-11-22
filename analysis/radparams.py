@@ -252,6 +252,32 @@ def fx_rows(rows, r, path_swaps=(), prefix="fx_"):
     return out
 
 
+R_28V = None                   # 28 V scale ratio from fpFixScale28 (set when chosen; None = 28 V remakes not built)
+FIX_MAX_VD = 28.0              # the fixed-box library is saved to 28 V only
+
+
+def fx28_rows(rows, r, prefix="fx_"):
+    """28 V round remakes: each saved-state path (library sin/hk_Vg-10 or meshchk m10/m5fix/m2p5) swapped to its
+    fixed-box version, field-dependent damage rescaled by r. Returns (rows, dropped labels): rows that load a state
+    above FIX_MAX_VD (no fixed-box state) are dropped. Every row must load a state."""
+    import re
+    lib = re.compile(r"stressLoad=" + re.escape(LIB) + r"/(sin|hk)_Vg-10/(sin|hk)_Vg-10_Vd(\d+\.\d+)\.str\.gz")
+    mch = re.compile(r"stressLoad=" + re.escape(LIB) + r"/meshchk/sin_(m10|m5fix|m2p5)/sin_(m10|m5fix|m2p5)_Vd(\d+\.\d+)\.str\.gz")
+    out, dropped = [], []
+    for lab, lev in rows:
+        vds = [float(m.group(3)) for m in lib.finditer(lev)] + [float(m.group(3)) for m in mch.finditer(lev)]
+        if not vds:
+            raise ValueError(f"fx28_rows: {lab} loads no library or meshchk state")
+        if max(vds) > FIX_MAX_VD:
+            dropped.append(lab)
+            continue
+        lev = lib.sub(lambda m: f"stressLoad={FIXLIB}/{m.group(1)}_Vg-10/fpfix_{m.group(1)}_Vg-10_Vd{m.group(3)}.str.gz", lev)
+        lev = mch.sub(lambda m: f"stressLoad={FIXLIB}/meshchk/sin_{m.group(1)}/fpfix_sin_{m.group(1)}_Vd{m.group(3)}.str.gz", lev)
+        assert f"{LIB}/sin_Vg-10/" not in lev and f"{LIB}/hk_Vg-10/" not in lev and f"{LIB}/meshchk/" not in lev, lab
+        out.append((f"{prefix}{lab}", rescale_damage(lev, r)))
+    return out, dropped
+
+
 # ---- rows. A study is a list of (label, levers); a params line is f"{label}|{levers}".
 def join(*parts):
     """Join lever strings with ';', skipping empty ones."""
