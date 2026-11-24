@@ -252,7 +252,7 @@ def fx_rows(rows, r, path_swaps=(), prefix="fx_"):
     return out
 
 
-R_28V = None                   # 28 V scale ratio from fpFixScale28 (set when chosen; None = 28 V remakes not built)
+R_28V = 6e17 / 1.5e18          # 28 V scale ratio (0.4): fpFixScale28/28b, SiN 6e17 is closest to the old C_p1.5_N0 curve (rms 12)
 FIX_MAX_VD = 28.0              # the fixed-box library is saved to 28 V only
 
 
