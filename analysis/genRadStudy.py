@@ -27,7 +27,7 @@ Studies (STUDIES, in build order; each writes sweeps/params_<name>.txt; driver r
   2026-11-20     fpFixPre fpFixStress fpFixEB1 fpFixLoad fpFixMesh fpFixEB1p
   2026-11-21/24  fpFixScaleEB1 fpFixScale28 fpFixScale28b
   2026-11-22     fxRadHV fxRadStrike2 fxRadStrikeN fxSeeMap28 (DRV=seeIV) fxMeshStressM10
-  2026-11-24     the 28 V rounds remade on the fixed box (FX28_ROUNDS; built once radparams.R_28V is set)
+  2026-11-24     fxNoCut28 fxStrikeField28 (DRV=seeIV); the 28 V rounds remade on the fixed box (FX28_ROUNDS; built once radparams.R_28V is set)
 Each function's docstring says what the study is for. Results and job IDs are in progress.md and the KB
 (kb/results/damage-region-map.md, kb/results/step-search-28v.md, kb/results/fp-contact-fix.md).
 
@@ -956,6 +956,30 @@ def fxMeshStressM10(mc):
     return [(f"fpfix_{lab}", lev)]
 
 
+def fxNoCut28(load):
+    """2026-11-24 (Ian): does the y >= 0.30 cutoff of the stress damage still matter with the fixed FP contact? The
+    28 V field at the gate foot (y 0.15) is now 3% (SiN) and 23% (HighK) of the head-edge peak to the fourth power
+    (kb/results/see-plan.md), so the cutoff is moved to y 0.0 (drain side of the gate only). Stress-only Id-Vd,
+    damPeak 6e17 and 5e17, both decks."""
+    base = by_label(load)
+    return [(f"fxnocut28_{deck}_d{dp}", f"{base[lab]};damPeak={dp};damYmin=0.0")
+            for deck, lab in (("sin", "fpfix_C_p1.5_N0"), ("hk", "fpfix_C_hk_p1.5_n6e18_N0"))
+            for dp in ("6e17", "5e17")]
+
+
+def fxStrikeField28(see):
+    """2026-11-24 (Ian): strike transients on the fixed deck, DRV=seeIV (fxSeeMap28's settings: strike y 0.2, tau
+    2 ps, Vg -10 / Vd 28 V, maps to 1 ns). Controls for the unbiased case at Vg -10 / Vd 0 (Ian's recollection of the
+    R33 unbiased condition), strikes at the head-edge field peak (y 0.53) and at y 0.8, and an effective width of
+    0.1 um (the track's, instead of 1 um) at y 0.2, both decks."""
+    rows = []
+    for (lab, lev), deck in zip(see, ("sin", "hk")):
+        assert f"fx_{deck}_" in lab and "seeY0=0.2" in lev and "Vd_bias=28" in lev, lab
+        for tag, ext in (("unb_y0.2", "Vd_bias=0"), ("y0.53", "seeY0=0.53"), ("y0.8", "seeY0=0.8"), ("w0.1_y0.2", "seeWeff=0.1")):
+            rows.append((f"fx_{deck}_{tag}_map", lev + ";" + ext))
+    return rows
+
+
 # The 28 V rounds (each study's rows on the fixed-box library and mesh states, field-dependent damage rescaled by
 # R_28V). Rows that load a state above 28 V are dropped (round E vs30). rad28strike (superseded by round S,
 # rad28strikeL) is not remade. Not built until R_28V is set, so the generator stays unchanged until then.
@@ -1052,6 +1076,8 @@ STUDIES = [
     Study("fxRadStrikeN", fxRadStrikeN, ("radStrikeN",), base=BOS17),
     Study("fxSeeMap28", fxSeeMap28, ("seeMap28",), base=("SEE28_1118", SEE28_1118), driver="seeIV"),
     Study("fxMeshStressM10", fxMeshStressM10, ("meshChkStress",), base=BEB1),
+    Study("fxNoCut28", fxNoCut28, ("fpFixLoad",), base=LOADSIN),
+    Study("fxStrikeField28", fxStrikeField28, ("fxSeeMap28",), base=("SEE28_1118", SEE28_1118), driver="seeIV"),
 ]
 if R_28V is not None:
     STUDIES += [Study("fx" + n[0].upper() + n[1:], fx28_study(n), (n,), base=LOADSIN) for n in FX28_ROUNDS]
