@@ -118,6 +118,7 @@ The model standard has been `eTemp 0` since 2026-10-16 ([[energy-balance]]).
 | `trimTrack.py`: per-ion track parameters per layer | `<trim_out_dir> <HighK\|SiN> <out.json>` | `COLLISON.txt` of a full-cascade TRIM run (`bin/trim_run.sh`) | `data/trim/<deck>_track.json` | [[trim]], [[3d-plan]] |
 | `render3d.py`: 3D slice render (render venv) | `<file.vtu> <out prefix> [track field] [iso cm^-3]` | `struct vtk=` output of `drivers/render3d_build.tcl` | `<prefix>_overview.png`, `<prefix>_track.png` (committed as `figures/rad3d/sin3d_track_{overview,closeup}.png`) | [[3d-plan]] |
 | `render3d_slice.py`: damaged 3D slice render (render venv) | `<file.vtu> <out.png> [ymin ymax um] [label]` | a radIV `damRod` slice with LogElec and LogTrap fields | e.g. `figures/rad3d/half3d_render.png` | [[3d-plan]] |
+| `plot_fpFixRemakes.py`: Nov 11-based remakes on the fixed FP box, old against new | `[out dir]` | fxRadStrikeN, fxRadStrike2, fxRadHV, fpFixScaleEB1, fpFixPre, fpFixEB1 | `figures/rad/fpfix/{nov11_IdVd,strikeN_IdVd,strike2_radHV}.png` | [[fp-contact-fix]] |
 | `plot_seeMaps.py`: current-density maps of a strike transient (render venv) | `<out.png> <row label>=<prefix> ... [--carrier p\|n] [--y ymin ymax] [--x xmin xmax] [--clim lo hi] [--strike y0] [--ncol k]` | `drivers/seeIV.tcl` snapshots (`seeMapTimes`, `seeMapDC`) | e.g. `figures/see/map28_{hole,elec}J.png`, `poc_{hole,elec}J.png` | [[see-plan]] |
 
 ## Params generators (they write sweeps/params_*.txt)

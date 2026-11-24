@@ -23,21 +23,21 @@ Every simulation before 2026-11-20 used the FP contact box that also held the dr
 
 | What | Figures | Remade by |
 |---|---|---|
-| Nov 11 model (17.66 V stress) | `figures/rad/radFinalEB_IdVd.png` | fpFixScaleEB1 done (scale 1.5e18). Replot with the refit curves: `analysis/plot_radFinalEB.py` pointed at results/20261121_fpFixScaleEB1 plus the fixed nb and pre runs (fpFixEB1, fpFixPre) |
+| Nov 11 model (17.66 V stress) | `figures/rad/radFinalEB_IdVd.png` | fpFixScaleEB1 done (scale 1.5e18); replotted as `figures/rad/fpfix/nov11_IdVd.png` |
 | 28 V scale | `figures/rad/step28/rad28fit.png` (the Nov 18 deck slide "28 V stress, no strikes") | fpFixScale28 (HighK running 52354341; SiN when the library reaches 28 V). Replot with the new scales |
 | 28 V strike series (rounds A-F) | `figures/rad/step28/series_*.png` (8 files, including `series_deliverable.png`), `step_best3.png`, `step_highlights.png` | new strike rounds at the refit 28 V scale on the fixed library (to submit after fpFixScale28) |
 | Mesh-robust series | `figures/rad/step28/mesh_series.png`, `mesh_deliverable.png`, `meshchk_steps.png` | the same strike series on the fixed m10 / m5fix / m2p5 stresses (m5fix and m2p5 fixed-box states are done; m10 needs a fixed-box stress) |
 | Step mechanism | `figures/rad/step28/diag/pocket_volts.png`, `lib_{C_N0,A_N1,B_N2,A_N3}.png` | vdCuts reruns of the chosen series on the fixed library |
 | Field-scaled strikes (rounds H, I) | `figures/rad/step28/fieldstrike_H.png`, `fieldscaled_series.png`, `fieldscaled_segments.png` | rounds H/I again on the fixed library at the refit scale (the head-edge field they rely on changed most) |
 | Round S strike count at 28 V | `figures/rad/strike28/strike28_1.5e18.png`, `strike28_2e18.png` | rad28strikeL again on the fixed library, or drop (superseded by the series) |
-| Strike transients at 28 V | `figures/see/map28_holeJ.png`, `map28_elecJ.png` | seeMap28 again with the fixed deck (2 tasks, ~6 h); no params file yet |
+| Strike transients at 28 V | `figures/see/map28_holeJ.png`, `map28_elecJ.png` | done: fxSeeMap28 52357004, `map28_fix_holeJ.png`, `map28_fix_elecJ.png` |
 
 ## A2. Superseded models: mark "pre-fix", do not rerun
 
 These plot models that were already replaced before the fix: the Oct 17 V finals, the hand-placed second site, the Nov 13 strike counts. Rerunning them adds nothing. Mark their KB and dashboard captions as pre-fix instead.
 - **Oct 17 V final models:** `figures/radFinal_model.png` (radFinal 47693156), `figures/radFinal8_model.png` (radFinal8 47887339), `figures/radMech_SiN_IdVd.png`, `figures/radMech_damage.png` (radFinal8/11).
 - **Rad-week exploration:** `figures/rad/hotEb_final.png` (radChk2 / radFine / radEB1), `figures/rad/radExp1.png` (radExp1/1c), `figures/rad/radFine.png` (radFine Nov 5, radMulti, radMesh).
-- **Nov 12-13 checks and strike counts:** `figures/rad/radHV_28V.png` (radHV 51027334), `figures/rad/radStrike2_pos.png` (radStrike2 51027921), `figures/rad/strikeN/{sin_IdVd,hk_IdVd,summary}.png` and `metrics.json` (radStrikeN 51174895).
+- **Nov 12-13 checks and strike counts (remade on request, `figures/rad/fpfix/strikeN_IdVd.png` and `strike2_radHV.png`):** `figures/rad/radHV_28V.png` (radHV 51027334), `figures/rad/radStrike2_pos.png` (radStrike2 51027921), `figures/rad/strikeN/{sin_IdVd,hk_IdVd,summary}.png` and `metrics.json` (radStrikeN 51174895).
 - **Strike-map proof of concept:** `figures/see/poc_holeJ.png`, `poc_elecJ.png` (local, Vg −5 / Vd 10 V; superseded by map28).
 
 ## B. Check: small effect expected, one representative rerun per family

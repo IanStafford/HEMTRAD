@@ -73,6 +73,7 @@ So during the stress the head's drain edge sat near 0 V instead of the gate pote
   - fxRadStrikeN 52357003: the SiN drop is 414 → 306 with no strike and 413-414 → 341-346 with 1-3 strikes, moving from 1.6-2.0 V to 1.9-2.3 V. HighK has no drops, and its 10 V currents are within 1% of the old.
   - fxRadStrike2 52357002: strikes from y 1.2 to 3.1 µm leave the drop at 414-415 → 307; at y 0.8 it is 413 → 341.
   - fxRadHV 52357001: SiN biased to 23 V has further dips at 10.2-11.4 V (456 → 413) and 12.6-14.2 V (429 → 413). Four tasks gave up early, at 10.6, 12.2, 14.8 and 23.2 V.
+  - fxSeeMap28 52357004 (figures `figures/see/map28_fix_holeJ.png`, `map28_fix_elecJ.png`): the strike transient barely changes. Drain current at 1 ns is 1.910 against 1.913 mA (SiN) and 1.947 against 1.957 (HighK), substrate hole current 0.338 in both decks. The old box showed a spurious 4.5e-5 A/µm between the gate and FP contacts through the head metal; with the fix it is ~1e-14. Figures for the rest: `figures/rad/fpfix/{nov11_IdVd,strikeN_IdVd,strike2_radHV}.png` (`analysis/plot_fpFixRemakes.py`).
 - **Next (Ian, 2026-11-21: refit the scale first; report the HighK contrast before touching other levers; 2026-11-22: remake everything after the Nov 11 model):** choose the 28 V scale, then remake the 28 V rounds ([[fpfix-rerun-list]]).
   - The old-scale fpFixLoad set was never run. Related: [[cleanup-plan]], [[levers]], [[device-structure]].
 
