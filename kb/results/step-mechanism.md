@@ -74,6 +74,14 @@ source: progress.md 2026-11-19 (pre-fix marker 2026-11-20); HPG jobs radStepDiag
 
 **The second-stage switch near 10.5 V doesn't happen on 5 nm, and the voltage share doesn't explain why.** The 5 nm y 0.8 pocket carries 5.76 V at Vd 10.0 (6.00 on the library mesh), passes 6 V at 10.4 and reaches 7.5 V at 12 V without switching. This is open.
 
+## Corrected geometry, stress band only (2026-11-24, verified from the fpFixScale28/28b cuts)
+
+SiN, stress damage only, fixed FP contact, per-Vd cuts (`vdCuts=1`, jobs 52385669 and 52585664), N0 5e17 to 7e17 cm⁻³:
+- **The ∫|Ey| over the damaged band (y 0.45-0.72 µm) when the first drop starts is 0.57 / 0.56 / 0.51 / 0.46 / 0.46 V** for N0 5 / 5.5 / 6 / 6.5 / 7e17 (0.12-0.15 V already at Vd 0.1). So the ~0.5 V threshold seen on the old geometry holds on the corrected one for the stress band, over a scale range where the drop itself changes from 60 to 212 mA/mm. At 1e18 and 1.5e18, where the curve collapses, it is 0.41 and 0.45 V.
+- At N0 6e17 the drop runs 398 → 266 mA/mm between 1.6 and 2.0 V. The GaN-side damage (5.3e18 cm⁻³) is full throughout; the barrier traps (x 0.008) at y 0.58 fill from 5.3e17 to 3.7e18, and the 2DEG there falls from 1.0e19 to 2.4e18.
+- Max TeTrap in the band: 362 K at 1.6 V, 709 K at 2.0 V, 1313 K at 12 V.
+- Not checked on the corrected geometry: discrete strikes (no cuts), the second-stage drops and the series order of switching.
+
 ## Open
 
 - Drop size per switch (some ~100 mA/mm, some under 10).
