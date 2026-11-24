@@ -909,6 +909,15 @@ def fpFixScale28(load):
     return rows
 
 
+def fpFixScale28b(load):
+    """2026-11-24: refine fpFixScale28 (52354341 / 52385669) around the target SiN drop (old C_p1.5_N0: 395 -> 281
+    mA/mm at 1.6-2.0 V; 5e17 gave 481 -> 421, 7e17 gave 332 -> 120): SiN 5.5e17 / 6e17 / 6.5e17, HighK 6e17."""
+    base = by_label(load)
+    rows = [(f"fpscale28_sin_d{dp}", f"{base['fpfix_C_p1.5_N0']};damPeak={dp}") for dp in ("5.5e17", "6e17", "6.5e17")]
+    rows += [(f"fpscale28_hk_d{dp}", f"{base['fpfix_C_hk_p1.5_n6e18_N0']};damPeak={dp}") for dp in ("6e17",)]
+    return rows
+
+
 # ---------------------------------------------------------------- 2026-11-22: remakes with the fixed FP box
 # (Ian: "Remake everything post Nov 11 model. Send it to HPG"). Same rows, label prefix fx_, field-dependent damage
 # rescaled (radparams.rescale_damage), saved states swapped to their fixed-box versions. The 28 V rounds wait for
@@ -1021,6 +1030,7 @@ STUDIES = [
     Study("fpFixEB1p", fpFixEB1p, ("radEB1",), base=BCHK2),
     Study("fpFixScaleEB1", fpFixScaleEB1, ("fpFixEB1p",), base=BCHK2),
     Study("fpFixScale28", fpFixScale28, ("fpFixLoad",), base=LOADSIN),
+    Study("fpFixScale28b", fpFixScale28b, ("fpFixLoad",), base=LOADSIN),
     Study("fxRadHV", fxRadHV, ("radHV",), base=BEB1),
     Study("fxRadStrike2", fxRadStrike2, ("radStrike2",), base=BOS17),
     Study("fxRadStrikeN", fxRadStrikeN, ("radStrikeN",), base=BOS17),
