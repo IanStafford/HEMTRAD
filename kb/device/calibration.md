@@ -54,6 +54,25 @@ The rad devices are a different device set, measured at low Vd. At Vd 0.1 V the 
 
 **Fit (qualitative):** Vth and the Id–Vd shape at Vg +1 V fit; the peak gm is still too high (the model turns on too steeply, as in the Oct 1 fit). Fit details are in [[rad-model]]. Model values: Vth −3.00 V, with the HighK and SiN pre curves within 1% of each other (radFinal, job 47693156).
 
-**FP contact fix:** all of these pre curves were run with the old FP contact box, which held the top of the T-gate head's drain half near the FP potential (0 V) instead of Vg. At Vg +1 V that is a smaller effect than during the stress. The pre curves are being rerun with the fixed box (fpFixPre, job 52134553; compare with radMap1 `hk_ref` / `sin_ref`), so the model values above are pre-fix ([[fp-contact-fix]]). The Oct 1 fit also predates the fix and has not been rechecked.
+**FP contact fix:** all of these pre curves were run with the old FP contact box, which held the top of the T-gate head's drain half near the FP potential (0 V) instead of Vg. At Vg +1 V that is a smaller effect than during the stress. The pre curves are being rerun with the fixed box (fpFixPre, job 52134553; compare with radMap1 `hk_ref` / `sin_ref`), so the model values above are pre-fix ([[fp-contact-fix]]). The Oct 1 fit also predates the fix; it was rechecked on Nov 24 (next section).
+
+## Oct 1 fit rechecked with the fixed FP contact (2026-11-24)
+
+Local runs of `drivers/calibIdVg.tcl` with the default levers (fixed contact, and `fpBoxOld 1` as a control). The control reproduces `figures/calib_IdVg_field.csv` exactly, so the contact is the only difference. Figure `figures/calib_IdVg_fpfix.png`, curve `figures/calib_IdVg_fpfix.csv`.
+
+| | Old contact | Fixed contact |
+|---|---|---|
+| rms error, Vg −2.6 to 0 V | 1.9% | 2.7% |
+| rms error, Vg −2.6 to +1 V | 1.8% | 2.6% |
+| Id error at −2.8 V | +19% | +7% |
+| −2.4 V | −1.5% | −5.5% |
+| −2.0 V | −1.5% | −3.9% |
+| −1.0 V | +1.4% | +0.5% |
+| 0 V | +2.3% | +2.3% |
+| +1.0 V | −1.0% | +0.6% |
+| gm at +1 V (experiment 159 mS/mm) | 88 | 109 |
+
+- The calibration holds (a rigid Vg shift gives no improvement: best phiB 1.65), but Id is 2-5% lower between Vg −2.5 and −1.75 V, where the Oct curve-tracer studies ran (Vg −2: −2.4% against the old contact).
+- Turn-on at −2.8 V and gm above +0.5 V are better; −2.4 to −2 V is worse. No parameter was refit.
 
 Related: [[mobility-models]], [[rad-model]], [[device-structure]], [[current-status]].

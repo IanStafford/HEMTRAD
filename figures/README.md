@@ -5,7 +5,7 @@ Tracked figures and small CSVs. Which script writes which file: `kb/tools/analys
 ## The root is frozen
 
 The files at the root are October outputs, kept as they are:
-- the field-mobility curve-tracer era (pulsedIV, 2026-10-01 to 2026-10-23): calibration `calib_IdVg*`, the Run F trap map `trapMapF_field_*` and `mobCompare_F_*`, onset maps `onsetField{1,2,3}*` and `lateOnset_IdVd.png`, position maps `posMap*`, energy balance `eTemp*`, gate bias `vgOnset_*`, `sensitivity*`, the field-plate check `fieldPlateFM_{sweep,cuts}.csv`, the talk figures `posSlide_*`, `strikeSlide_*`, `fieldSlide_highk.png` and `eTempStd_headline.png`, and `deckVg1_IdVd.png`;
+- the field-mobility curve-tracer era (pulsedIV, 2026-10-01 to 2026-10-23): calibration `calib_IdVg*` (`calib_IdVg_fpfix.*`: the fixed FP contact, 2026-11-24), the Run F trap map `trapMapF_field_*` and `mobCompare_F_*`, onset maps `onsetField{1,2,3}*` and `lateOnset_IdVd.png`, position maps `posMap*`, energy balance `eTemp*`, gate bias `vgOnset_*`, `sensitivity*`, the field-plate check `fieldPlateFM_{sweep,cuts}.csv`, the talk figures `posSlide_*`, `strikeSlide_*`, `fieldSlide_highk.png` and `eTempStd_headline.png`, and `deckVg1_IdVd.png`;
 - the first rad-model figures (2026-10-25 to 2026-10-27): `radFinal_model.png`, `radFinal8_model.png`, `radMech_*.png`;
 - `device_mesh.png`, the mesh picture.
 

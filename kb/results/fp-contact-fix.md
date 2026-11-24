@@ -45,7 +45,7 @@ So during the stress the head's drain edge sat near 0 V instead of the gate pote
   - Id-Vg at Vd 0.1 V, above 1 mA/mm: −1.2 to +0.7%. The change has the sign of Vg (negative below 0 V, positive above), as expected when the head's drain half follows Vg instead of 0 V. It is largest at Vg −2.2 (SiN −1.0%, HighK −1.2%). Vth −2.997 → −2.998 V; peak gm −0.7% (SiN) and −0.8% (HighK).
   - Off-state Id at Vg −4 (~1e-9 mA/mm): HighK unchanged, SiN 2.6e-9 → 4.3e-10.
   - **Not the same: the field in the off state.** At the 17.66 V stress (Vg −10) the peak field in the damage region (y ≥ 0.3) is about 1.5× higher on SiN and 1.6× on HighK, from the 4.7× and 6.4× damage ratios and the E⁴ scaling. The device is still unirradiated when that field is taken.
-  - Not measured yet with the fixed box: the Vd 10 V transfer curve used for the calibration, and pre-irradiation sweeps at Vg −2.
+  - The Vd 10 V transfer curve of the HfO2 calibration moves more than the Vd 0.1 V one: −2.4% at Vg −2 and +1.6% at +1 V, rms against experiment 1.8 → 2.6% ([[calibration]]). Not measured yet with the fixed box: pre-irradiation sweeps at Vg −2 (curve tracer).
   - Non-biased curves (fpFixEB1 nb cases) moved by under 1%.
 - **Biased, Nov 11 levers (damPeak 7e18):** the fixed box gives about 5× more damage at the 2DEG row (fpFixEB1 52134554, fpFixEB1p 52140899).
 
