@@ -111,4 +111,23 @@ Same strikes as seeGen1, aimed at 10 ns. Both tasks accepted one bad step (HighK
   - The drain current at 1 ns is 1.9-2.0 mA/µm in both (1.91 SiN, 1.96 HighK).
 - **Pre-fix:** these runs had the old FP contact box. Their DC snapshot is where the bug showed up: the T-gate head's drain corner sat at −0.5 to −0.6 V against the FP instead of near −10 V ([[fp-contact-fix]]). The strike at y 0.2 µm lies under the head, so the maps may change with the fixed box. No fixed-box rerun is queued yet.
 
+### The field during the strike, fixed contact (2026-11-24; fxSeeMap28 52357004, `figures/see/strike_field_28V.png`)
+
+Lateral field |Ey| on the GaN row at x 16 nm, from the snapshot potentials (`analysis/plot_seeField.py`; triangle gradients, cross-checked against finite differences to under 1%). Vg −10 / Vd 28 V, strike at y 0.2 µm. The GaN region is the highest MatID (3 on SiN, 4 on HighK, which has an extra insulator).
+
+| | SiN | HighK |
+|---|---|---|
+| Peak at the head drain edge, DC (y 0.53-0.56) | 8.8e5 (old contact 7.0e5) | 5.1e5 (old 3.5e5) |
+| 3 ps | 9.8e5 | 6.1e5 |
+| 6 / 12 / 31 ps | 6.0e5 / 3.4e5 / 4.1e4 | 4.3e5 / 3.0e5 / 7.6e4 |
+| From 100 ps | about 4e3-5e3 | about 3e3-4e3 |
+| Peak near the drain (y 3.2), DC | 1.1e4 | 1.1e4 |
+| Peak near the drain, 31 ps / 105 ps / 1 ns | 4.7e5 / 6.1e5 / 6.8e5 | 4.2e5 / 6.9e5 / 7.3e5 |
+
+- The strike adds 11% (SiN) and 19% (HighK) to the head-edge field for a few ps, then the plasma screens it away within about 30 ps. The high field moves to the drain end and stays there to 1 ns (the end of the run), with nearly the same size on both decks.
+- The head-edge DC field ratio to the fourth power is (8.82/7.01)^4 = 2.5 between the fixed and old contact on SiN: the same factor by which the 28 V damage scale was refit (1.5e18 → about 6e17). HighK: 4.3. SiN/HighK: 9.0 with the fixed contact (15 with the old).
+- The gate-foot peak (y 0.15) was as high as the head-edge peak with the old contact (7.4e5) and is 3.7e5 with the fix, so (foot/head)^4 is 3% on SiN and 23% on HighK. The `damYmin` 0.30 cutoff that keeps stress damage off the gate foot was a fitting choice; it may matter much less now. Not tested.
+- **Caveats.** The strike is a 1 µm slab (`seeWeff`), so it screens the field over the whole simulated width, which a real track (about 0.1 µm wide) would not. No traps or damage in these runs. Only one strike position; no unbiased (0 V) strike has been run. The mesh is not refined at y 3.2 or at the head edge, so peak values there are approximate.
+- If damage follows field to the fourth power times time, the drain end would outweigh the gate edge (E^4 about a third of the head peak, but lasting ~1 ns against ~10 ps). The present model takes the pre-strike DC field only.
+
 Related: [[rad-model]], [[step-search-28v]], [[fp-contact-fix]], [[flooxs-gotchas]], [[levers]].
