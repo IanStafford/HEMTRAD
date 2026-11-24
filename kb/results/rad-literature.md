@@ -7,6 +7,8 @@ date: 2026-11-04
 
 Our conditions: about 2 GeV Au, LET ~67 MeV·cm²/mg, electronic stopping far above nuclear, fluence 1e7 cm⁻², off-state bias or none ([[rad-model]]). Two research agents ran this review on 2026-11-04. Many sources could only be read as abstracts or fetch summaries; each is marked. ScienceDirect, IEEE, MDPI, Springer and DTIC pages were often blocked, so important papers remain unread.
 
+> **2026-11-24:** see [[rad-literature-paper]] for corrections from full texts: 1e7 cm⁻² data now exist (Lin 2026, Kim 2026), the 3 krad total-dose shift, Koehler 2016 (dynamic Ron) and Fleetwood 2022 (bias effects).
+
 **Bottom line: nobody has reported what we need at this fluence.** No source found gives Vth at ~1e7 cm⁻² on a D-mode HEMT, a numerical Ron for biased vs unbiased heavy-ion irradiation, or abrupt Id–Vd steps onto a gate-independent line. Everything below is an analogue or inference for our regime.
 
 ## Vth shift: mechanisms proposed

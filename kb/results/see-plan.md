@@ -94,6 +94,8 @@ Same strikes as seeGen1, aimed at 10 ns. Both tasks accepted one bad step (HighK
 
 ## Current-density maps (2026-11-18, side project after Sun et al., IEEE EDL 46, 813 (2025), Fig. 5)
 
+(The 2026-11-24 review found that this paper is a β-Ga2O3 junction barrier Schottky diode, not a GaN HEMT; [[rad-literature-paper]]. Use it only for the figure format.)
+
 - seeIV levers `seeMapTimes` (s, list) and `seeMapDC` (default off) write the 2D state at those times as `<tag>_map_<k>.vtk` (XML VTK under a .vtk name, `struct vtk=`) plus `<file>.txt` with the time. Fields added before each dump: `JnX/JnY/JnMag`, `JpX/JpY/JpMag` = q·µ·n·∇Qfn and q·µ·p·∇Qfp in A/cm² (Qfn, Qfp are Fermi levels in V, so with `tranSign 1` these are the Continuity.tcl flux terms, same mobility expressions), and `MapN`, `MapP`, the carrier densities. `struct vtk` writes the const solutions Elec and Hole as placeholders (1.0), so use MapN/MapP.
 - The mobility is built in stages (one `sel` per material): the field-dependent electron mobility for both materials in one expression overflows FLOOXS's parser buffer ("buffer overflow detected").
 - `analysis/plot_seeMaps.py` (~/venvs/render): log10 |Jp| (or |Jn|) on the cross-section, one row per run, one panel per snapshot, white arrows for the direction (probed on the semiconductor cells with VTK; matplotlib's tri-finder rejects FLOOXS's repeated interface points).

@@ -8,11 +8,13 @@ source: multi-agent literature workflow (28 sources fetched and checked; 26 unve
 
 Related: [[rad-literature]], [[rad-model]], [[damage-region-map]], [[hot-electron-capture]].
 
+> **2026-11-24:** this note is partly superseded by [[rad-literature-paper]], a full-text review that corrects several statements here (its §6). In particular: the "rises, never drops" statements hold only for the sources listed here (El Fatimy 2010 and Deng 2000 show drops, unirradiated); Rasel 2023/2024 OFF means unbiased; a biased-vs-unbiased heavy-ion comparison with output curves now exists (Lin 2026); published trap levels include 0.2-0.45 eV; Kuboyama 2011 is in our fluence and voltage range.
+
 **Bottom line.** None of the verified sources reports what we are modelling: a permanent current collapse after heavy-ion irradiation under off-state bias, in which Id–Vd drops abruptly or in steps at small-to-moderate Vd, by orders of magnitude, in SiN-passivated devices but not high-k ones. The literature gives the pieces separately:
 1. Heavy ions add traps and increase pulsed-IV collapse and gate-lag (Lin 2022; Lei 2015).
 2. Biased strikes near our stress voltage leave localized, bias-dependent damage. A TCAD study proposes hot-electron, field-driven defect generation near the drain (Zhang 2024).
 3. In simulations of unirradiated devices, high-k passivation lowers the drain-edge field and with it field-driven trapping and collapse (Satoh 2015; Hanawa 2015).
-4. Threshold-like I–V features in unirradiated HEMTs come from three proposed mechanisms: hot-electron buffer trapping, a virtual gate with a critical lateral field, and discharge of a floating buffer (Wang 2011; Kaushik 2013; Singh 2018). All the reported features are current rises (kinks), not drops.
+4. Threshold-like I–V features in unirradiated HEMTs come from three proposed mechanisms: hot-electron buffer trapping, a virtual gate with a critical lateral field, and discharge of a floating buffer (Wang 2011; Kaushik 2013; Singh 2018). In the sources listed here the reported features are current rises (kinks); drops in unirradiated HEMTs exist (El Fatimy 2010, Deng 2000; [[rad-literature-paper]]).
 
 Our model combines stress-field-placed damage with hot-electron capture. It is consistent with this literature, but the literature does not establish it. Most sources could only be read as abstracts; access is marked in the reference list.
 

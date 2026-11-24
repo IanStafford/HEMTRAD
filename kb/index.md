@@ -69,6 +69,7 @@ Every result here that uses a stress state saved before 2026-11-20 predates the 
 - [[ron-increase]] — Ron rise after biased irradiation: candidates and simulations (Nov 2026)
 - [[see-plan]] — single-event transient (ion strike): method as run and results (Oct 29 – Nov 19)
 - [[rad-literature]] — literature on Vth, Ron and steps in irradiated HEMTs; nothing at our fluence (Nov 4)
+- [[rad-literature-paper]] — full-text review for a candidate paper claim (Nov 24): novelty part by part, rivals (device/circuit instability first), width, passivation, bias, corrections to the two older notes
 - [[rad-literature-steps]] — stepped collapse after heavy ions: what is reported, proposed mechanisms, what the model can test (Nov 17)
 
 ## Results: pulsed-IV collapse (Sep 23 – Oct 23)
