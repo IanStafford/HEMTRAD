@@ -73,6 +73,6 @@ Local runs of `drivers/calibIdVg.tcl` with the default levers (fixed contact, an
 | gm at +1 V (experiment 159 mS/mm) | 88 | 109 |
 
 - The calibration holds (a rigid Vg shift gives no improvement: best phiB 1.65), but Id is 2-5% lower between Vg −2.5 and −1.75 V, where the Oct curve-tracer studies ran (Vg −2: −2.4% against the old contact).
-- Turn-on at −2.8 V and gm above +0.5 V are better; −2.4 to −2 V is worse. No parameter was refit.
+- Turn-on at −2.8 V and gm above +0.5 V are better; −2.4 to −2 V is worse. No parameter was refit: Ian (2026-11-24) judged the fit close enough, so the Oct 1 parameters stay.
 
 Related: [[mobility-models]], [[rad-model]], [[device-structure]], [[current-status]].
