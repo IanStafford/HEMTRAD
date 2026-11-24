@@ -250,6 +250,25 @@ One row per file in `sweeps/` (and per params file that exists only on an `explo
 | `params_fxRadStrikeN.txt` | `radIV.slurm` | `20261122_fxRadStrikeN` | 52357003 | `a16dd0a` 11-22 | genRadStudy | fp-contact-fix | done |
 | `params_fxSeeMap28.txt` | `radIV.slurm`, DRV=seeIV | `20261122_fxSeeMap28` | 52357004 | `a16dd0a` 11-22 | genRadStudy | fp-contact-fix | done |
 | `params_fxMeshStressM10.txt` | `radIV.slurm` | `20261122_fxMeshStressM10` (states on /blue) | 52357005 | `a16dd0a` 11-22 | genRadStudy | fp-contact-fix | done (m10 28 V state saved) |
-| `params_fpFixScale28b.txt` | `radIV.slurm` | `20261124_fpFixScale28b` | 52585664 | `efe9bcf` 11-24 | genRadStudy | fp-contact-fix | running |
+| `params_fpFixScale28b.txt` | `radIV.slurm` | `20261124_fpFixScale28b` | 52585664 | `efe9bcf` 11-24 | genRadStudy | fp-contact-fix | done (HighK 6e17 stuck at 11.0 V, cancelled; SiN 6e17 chosen) |
 | `params_fxNoCut28.txt` | `radIV.slurm` | `20261124_fxNoCut28` | 52605290 | `3d85047` 11-24 | genRadStudy | fp-contact-fix | running |
 | `params_fxStrikeField28.txt` | `radIV.slurm`, DRV=seeIV | `20261124_fxStrikeField28` | 52605291 | `3d85047` 11-24 | genRadStudy | see-plan | running |
+| `params_fxRad28strikeL.txt` | `radIV.slurm` | `20261124_fxRad28strikeL` | 52610347 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepA.txt` | `radIV.slurm` | `20261124_fxRadStepA` | 52610348 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepB.txt` | `radIV.slurm` | `20261124_fxRadStepB` | 52610349 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepC.txt` | `radIV.slurm` | `20261124_fxRadStepC` | 52610350 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepD.txt` | `radIV.slurm` | `20261124_fxRadStepD` | 52610351 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepE.txt` | `radIV.slurm` | `20261124_fxRadStepE` | 52610352 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepF.txt` | `radIV.slurm` | `20261124_fxRadStepF` | 52610353 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepG.txt` | `radIV.slurm` | `20261124_fxRadStepG` | 52610354 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepH.txt` | `radIV.slurm` | `20261124_fxRadStepH` | 52610355 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepI.txt` | `radIV.slurm` | `20261124_fxRadStepI` | 52610356 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepJ.txt` | `radIV.slurm` | `20261124_fxRadStepJ` | 52610357 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepK.txt` | `radIV.slurm` | `20261124_fxRadStepK` | 52610358 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxMeshChkLoad_m10.txt` | `radIV.slurm` | `20261124_fxMeshChkLoad_m10` | 52610359 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxMeshChkLoad_m5fix.txt` | `radIV.slurm` | `20261124_fxMeshChkLoad_m5fix` | 52610360 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepDiag.txt` | `radIV.slurm` | `20261124_fxRadStepDiag` | 52610361 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepDiag5.txt` | `radIV.slurm` | `20261124_fxRadStepDiag5` | 52610362 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepM.txt` | `radIV.slurm` | `20261124_fxRadStepM` | 52610363 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepM2.txt` | `radIV.slurm` | `20261124_fxRadStepM2` | 52610364 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |
+| `params_fxRadStepM3.txt` | `radIV.slurm` | `20261124_fxRadStepM3` | 52610365 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | running |

@@ -75,7 +75,7 @@ So during the stress the head's drain edge sat near 0 V instead of the gate pote
 
   - The old curve lies between 5e17 and 7e17 (about 6e17): a factor 2.5, not the 4.7 found at 17.66 V.
   - HighK has no drop at any of these scales; 7e17 is closest (rms 1.1), and 1.5e18 is slightly low (921 at 12 V).
-  - fpFixScale28b 52585664 adds SiN 5.5e17, 6e17 and 6.5e17 and HighK 6e17.
+  - **Refined (fpFixScale28b 52585664, 2026-11-24): the 28 V SiN scale is 6e17, a ratio of 0.4 to the old 1.5e18.** SiN 6e17 gives 398 → 266 mA/mm at 1.6-2.0 V and 428 at 11.9 V (rms 11.8 against the old curve); 5.5e17 gives 437 → 345 (rms 50.6), 6.5e17 361 → 190 (rms 78.8). HighK 6e17 is flat (961 at 11.0 V). `R_28V` in `analysis/radparams.py`. The head-edge DC field ratio to the fourth power is 2.5 on SiN ([[see-plan]]), the same factor.
 - **Nov 11-based remakes (2026-11-24, scale ×1.5/7):**
   - fxRadStrikeN 52357003: the SiN drop is 414 → 306 with no strike and 413-414 → 341-346 with 1-3 strikes, moving from 1.6-2.0 V to 1.9-2.3 V. HighK has no drops, and its 10 V currents are within 1% of the old.
   - fxRadStrike2 52357002: strikes from y 1.2 to 3.1 µm leave the drop at 414-415 → 307; at y 0.8 it is 413 → 341.

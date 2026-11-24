@@ -9,22 +9,23 @@ What is running, what is open, and the current answer on each topic, with a link
 
 **Repo:** reorganised 2026-10-12 into `model/`, `drivers/`, `sweeps/`, `analysis/`, `data/` ([[repo-locations]]); FLOOXS internals in [[flooxs-overview]]. The repo is public, so measured numbers stay in untracked files. The code and KB clean-up follows [[cleanup-plan]]; stage 1 (docs, KB, comments) started on Nov 20.
 
-> **2026-11-24:** with the FP contact fixed, the Nov 11 damage scale (17.66 V stress) is 1.5e18 instead of 7e18 and reproduces the old curves, with the SiN/HighK contrast kept. At 28 V the scale lies between 5e17 and 7e17 (old 1.5e18), refined by fpFixScale28b (52585664, queued on HPG). The Nov 11-based remakes (fxRadHV, fxRadStrike2, fxRadStrikeN, fxSeeMap28, fxMeshStressM10) are done; the 28 V rounds go out when the scale is chosen. Details: [[fp-contact-fix]].
+> **2026-11-24:** with the FP contact fixed, the Nov 11 damage scale (17.66 V stress) is 1.5e18 instead of 7e18 and reproduces the old curves, with the SiN/HighK contrast kept. At 28 V the SiN scale is 6e17 (old 1.5e18). The Nov 11-based remakes are done and the 28 V rounds (262 tasks) are running. Details: [[fp-contact-fix]].
 
 ## Now
 
 **FP contact fix (Nov 20).** The FP contact box in every deck covered the drain half of the T-gate head, so during the 28 V stress the head's drain edge sat near 0 V instead of −10 V. That is where the SiN stress damage concentrates. Fixed in the decks (lever `fpBoxOld`, default 0 = fixed; Ian approved). A saved stress state carries its own contacts, so every state saved before the fix has the old box, and radIV refuses to load one into a fixed-box run. Results built on those states are marked *pre-fix* below and are being rerun ([[fp-contact-fix]]).
 
 **On HPG (2026-11-24):**
-- **fpFixScale28b 52585664** (4 tasks, pending): SiN 5.5e17 / 6e17 / 6.5e17 and HighK 6e17, to choose the 28 V damage scale.
-- **Done since Nov 20:** the fixed-box 28 V library (fpFixStress 52134552, both decks), the mesh stresses (fpFixMesh 52135538 m5fix and m2p5; fxMeshStressM10 52357005 m10), fpFixPre, fpFixEB1 and fpFixEB1p, the Nov 11 refit (fpFixScaleEB1 52223190: scale 1.5e18), the 28 V scan (fpFixScale28) and the Nov 11-based remakes (fxRadHV 52357001, fxRadStrike2 52357002, fxRadStrikeN 52357003, fxSeeMap28 52357004). Results in [[fp-contact-fix]].
+- **28 V round remakes** (19 studies, 262 tasks, jobs 52610347-52610365, commit c77b59f): the strike rounds A-K, round S, the m10 / m5fix / 2.5 nm mesh checks and the diagnostic runs on the fixed-box library, field-dependent damage x0.4 (28 V SiN scale 6e17 instead of 1.5e18, [[fp-contact-fix]]).
+- **fxNoCut28 52605290** (4): the y >= 0.30 cutoff moved to y 0.0. **fxStrikeField28 52605291** (8, DRV=seeIV): strike transients, unbiased control at Vg -10 / Vd 0, other positions, 0.1 um width ([[see-plan]]).
+- **Done since Nov 20:** the fixed-box 28 V library, the mesh stresses, fpFixPre, fpFixEB1, the Nov 11 refit, the 28 V scan (fpFixScale28, fpFixScale28b: 6e17) and the Nov 11-based remakes. Results in [[fp-contact-fix]].
 
-**Next (Ian, Nov 22: "Remake everything post Nov 11 model. Send it to HPG"):** set `R_28V` in `analysis/radparams.py` from the scan, then generate and submit the 28 V rounds (rad28strikeL, radStepA-K, meshChkLoad_m10/m5fix, radStepDiag/Diag5, radStepM/M2/M3: 262 tasks; the generator functions are ready in `analysis/genRadStudy.py`). Three round E cases that load 30 V states are dropped (the fixed library ends at 28 V). fpFixLoad (19 tasks) was never run; the remakes replace it. Figure order: [[fpfix-rerun-list]].
+**Next:** analyse the remakes (does a stepped 1/2/3-strike SiN series with HighK flat survive on the fixed geometry and on 10 / 5 / 2.5 nm?), then remake the figures in the order of [[fpfix-rerun-list]].
 
 **Cancelled Nov 20:** the old-box 2.5 nm stress meshChkStress2p5 52044407 (it had reached Vd 20 V). The four-mesh check that was to load it (radStepM3) was never submitted. fpFixMesh redoes the stress with the fixed box; the strike series are to be loaded on it once it saves Vd 28.
 
 **Open decisions for Ian:**
-- **28 V damage scale.** The step search (rounds A-M2) used damPeak 1.5e18 with the old box. With the fixed box the scan puts it at about 6e17 (between 5e17 and 7e17); the refinement 52585664 decides it. Choosing it from the SiN target curve is the rule announced on Nov 22 ([[fp-contact-fix]], [[rad-model]]).
+- **28 V damage scale (settled 2026-11-24):** 6e17 on the fixed box, chosen by the rule announced on Nov 22 ([[fp-contact-fix]]).
 - **SiN stress at the R35 bias.** The strike transients seeGen1 and seeGen2 use the slide-legend gate bias for R35; the rad model still stresses both decks at Vg −10. Rerun the SiN stress at the R35 bias? Open since Oct 29 ([[see-plan]]).
 - Ian answered the clean-up plan's questions on Nov 20: the answers are in `progress.md` (Nov 20 evening), the questions in [[cleanup-plan]] §1.
 
