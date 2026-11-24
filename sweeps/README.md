@@ -251,3 +251,5 @@ One row per file in `sweeps/` (and per params file that exists only on an `explo
 | `params_fxSeeMap28.txt` | `radIV.slurm`, DRV=seeIV | `20261122_fxSeeMap28` | 52357004 | `a16dd0a` 11-22 | genRadStudy | fp-contact-fix | done |
 | `params_fxMeshStressM10.txt` | `radIV.slurm` | `20261122_fxMeshStressM10` (states on /blue) | 52357005 | `a16dd0a` 11-22 | genRadStudy | fp-contact-fix | done (m10 28 V state saved) |
 | `params_fpFixScale28b.txt` | `radIV.slurm` | `20261124_fpFixScale28b` | 52585664 | `efe9bcf` 11-24 | genRadStudy | fp-contact-fix | running |
+| `params_fxNoCut28.txt` | `radIV.slurm` | `20261124_fxNoCut28` | 52605290 | `3d85047` 11-24 | genRadStudy | fp-contact-fix | running |
+| `params_fxStrikeField28.txt` | `radIV.slurm`, DRV=seeIV | `20261124_fxStrikeField28` | 52605291 | `3d85047` 11-24 | genRadStudy | see-plan | running |
