@@ -56,10 +56,24 @@ So during the stress the head's drain edge sat near 0 V instead of the gate pote
   - SiN biased: 376 → 223 mA/mm at 1.5-2.0 V and 397 at 10 V (old 375 → 248 at 1.4-1.8 V and 370).
   - HighK biased: flat, 955 at 10 V (old 951). It stays flat up to 3e18 (889 at 10 V), so the SiN-vs-HighK contrast is fully back.
   - The scale is 4.7× lower, matching the extra damage. The old curve's small second SiN dip near 7 V does not appear.
-  - By the same factor, the 28 V model's 1.5e18 should become about 3e17.
-- **Next (Ian, 2026-11-21: refit the scale first; report the HighK contrast before touching other levers):**
-  - fpFixScaleEB1 52223190: Nov 11 biased SiN and HighK at 17.66 V, damPeak 7e17-3e18.
-  - fpFixScale28: 28 V stress damage only, damPeak 1e17-1.5e18, both decks, on the fixed library once it reaches 28 V.
+  - The same factor would put the 28 V scale near 3e17. The scan below shows that is wrong: it is about 6e17.
+- **28 V scale scan (fpFixScale28, HighK 52354341 and SiN 52385669, 2026-11-24).** SiN stress damage only, against the old-box C_p1.5_N0 (395 → 281 mA/mm at 1.6-2.0 V, 432 at 12 V):
+
+| damPeak | SiN drop | Id at 12 V | rms vs old |
+|---|---|---|---|
+| 1e17, 2e17, 3e17 | none | 796 at 3e17 | - |
+| 5e17 | 481 → 421 at 2.0-2.4 V | 523 | 105 (lowest) |
+| 7e17 | 332 → 120 at 1.3-1.7 V | 316 | 153 |
+| 1e18, 1.5e18 | collapse to ~0 | ~0 | - |
+
+  - The old curve lies between 5e17 and 7e17 (about 6e17): a factor 2.5, not the 4.7 found at 17.66 V.
+  - HighK has no drop at any of these scales; 7e17 is closest (rms 1.1), and 1.5e18 is slightly low (921 at 12 V).
+  - fpFixScale28b 52585664 adds SiN 5.5e17, 6e17 and 6.5e17 and HighK 6e17.
+- **Nov 11-based remakes (2026-11-24, scale ×1.5/7):**
+  - fxRadStrikeN 52357003: the SiN drop is 414 → 306 with no strike and 413-414 → 341-346 with 1-3 strikes, moving from 1.6-2.0 V to 1.9-2.3 V. HighK has no drops, and its 10 V currents are within 1% of the old.
+  - fxRadStrike2 52357002: strikes from y 1.2 to 3.1 µm leave the drop at 414-415 → 307; at y 0.8 it is 413 → 341.
+  - fxRadHV 52357001: SiN biased to 23 V has further dips at 10.2-11.4 V (456 → 413) and 12.6-14.2 V (429 → 413). Four tasks gave up early, at 10.6, 12.2, 14.8 and 23.2 V.
+- **Next (Ian, 2026-11-21: refit the scale first; report the HighK contrast before touching other levers; 2026-11-22: remake everything after the Nov 11 model):** choose the 28 V scale, then remake the 28 V rounds ([[fpfix-rerun-list]]).
   - The old-scale fpFixLoad set was never run. Related: [[cleanup-plan]], [[levers]], [[device-structure]].
 
 Which figures and published pages need remaking, marking pre-fix or spot-checking: [[fpfix-rerun-list]].

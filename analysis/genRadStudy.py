@@ -25,6 +25,9 @@ Studies (STUDIES, in build order; each writes sweeps/params_<name>.txt; driver r
                  seeMap28 (DRV=seeIV)
   2026-11-19/20  stressLibResume radStepDiag radStepDiag5 radStepM meshChkStress2p5 radStepM2 radStepM3
   2026-11-20     fpFixPre fpFixStress fpFixEB1 fpFixLoad fpFixMesh fpFixEB1p
+  2026-11-21/24  fpFixScaleEB1 fpFixScale28 fpFixScale28b
+  2026-11-22     fxRadHV fxRadStrike2 fxRadStrikeN fxSeeMap28 (DRV=seeIV) fxMeshStressM10
+  2026-11-24     the 28 V rounds remade on the fixed box (FX28_ROUNDS; built once radparams.R_28V is set)
 Each function's docstring says what the study is for. Results and job IDs are in progress.md and the KB
 (kb/results/damage-region-map.md, kb/results/step-search-28v.md, kb/results/fp-contact-fix.md).
 
@@ -55,7 +58,7 @@ from radparams import (
     NB_DECKS, NB_RADFINAL8_1026, PRE, PULSED_GAUSS_1107, SEE28_1118, SIN, SKIP, STRIKES_Y, SURF, Y_ALL, Y_GATE,
     Y_GD, Y_SD, Study, by_label, fine, fpfix_state, gauss, gauss_w, join, lib_state, load_at_1117, meshchk_state,
     rows_both_decks, rows_on_decks, run, sin_radfinal11_1027, site, site_fine, sitecase, sites, strike_mesh,
-    strikes, swap, R_NOV11, fx_rows,
+    strikes, swap, R_NOV11, R_28V, fx28_rows, fx_rows,
 )
 
 # ---- shared by several studies
@@ -953,6 +956,19 @@ def fxMeshStressM10(mc):
     return [(f"fpfix_{lab}", lev)]
 
 
+# The 28 V rounds (each study's rows on the fixed-box library and mesh states, field-dependent damage rescaled by
+# R_28V). Rows that load a state above 28 V are dropped (round E vs30). rad28strike (superseded by round S,
+# rad28strikeL) is not remade. Not built until R_28V is set, so the generator stays unchanged until then.
+FX28_ROUNDS = ("rad28strikeL", "radStepA", "radStepB", "radStepC", "radStepD", "radStepE", "radStepF", "radStepG",
+               "radStepH", "radStepI", "radStepJ", "radStepK", "meshChkLoad_m10", "meshChkLoad_m5fix", "radStepDiag",
+               "radStepDiag5", "radStepM", "radStepM2", "radStepM3")
+
+
+def fx28_study(parent):
+    """fx28 remake of study parent (a params-file name in FX28_ROUNDS)."""
+    return lambda rows: fx28_rows(rows, R_28V)[0]
+
+
 # ---------------------------------------------------------------- registry, in build (and history) order
 # base sets for --show, as (name, levers)
 B1104 = ("BASE_1104", BASE_1104)
@@ -1037,6 +1053,9 @@ STUDIES = [
     Study("fxSeeMap28", fxSeeMap28, ("seeMap28",), base=("SEE28_1118", SEE28_1118), driver="seeIV"),
     Study("fxMeshStressM10", fxMeshStressM10, ("meshChkStress",), base=BEB1),
 ]
+if R_28V is not None:
+    STUDIES += [Study("fx" + n[0].upper() + n[1:], fx28_study(n), (n,), base=LOADSIN) for n in FX28_ROUNDS]
+
 
 if __name__ == "__main__":
     sys.exit(run(STUDIES, __doc__))

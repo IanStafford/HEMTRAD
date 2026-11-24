@@ -2343,3 +2343,18 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
     - Rule for the scale, as for the Nov 11 refit: the fixed-box SiN stress-only curve closest to the old C_p1.5_N0 curve, then r = s_best / 1.5e18 applied to every field-dependent damage density (radparams.fx28_rows).
     - Rows loading states above 28 V are dropped (round E vs30, 3 tasks). rad28strike (Nov 15, superseded by round S) is not remade. The m10 cases wait for fxMeshStressM10.
 - **Fixed-box stress library complete** (52134552: SiN reached 28 V after 47.8 h, HighK earlier). The fpFixScale28 SiN half, 52385669 (7 tasks), was submitted at 18:20 by the watcher; the HighK half (52354341) is running. A completion watcher waits for all 14 tasks, then the 28 V scale is chosen and the 28 V round remakes go out.
+
+## 2026-11-24: 28 V scale scan read (3e17 was wrong); Nov 11-based remakes read; scale refinement submitted
+
+- **fpFixScale28 (HighK 52354341, SiN 52385669; 14/14 done).** SiN stress-only at 28 V with the fixed box, against the old C_p1.5_N0 (395 -> 281 mA/mm at 1.6-2.0 V, 432 at 12 V):
+  - 1e17, 2e17, 3e17: no drop (3e17: 796 at 12 V). 5e17: 481 -> 421 at 2.0-2.4 V, 523 at 12 V (rms 105, the lowest). 7e17: 332 -> 120 at 1.3-1.7 V, 316 at 12 V (rms 153). 1e18 and 1.5e18: collapse to ~0.
+  - The old curve lies between 5e17 and 7e17, so the 28 V scale is about 6e17, 2.5x lower than 1.5e18. **The 2026-11-22 expectation of ~3e17 (from the 4.7x factor at 17.66 V) was wrong.**
+  - HighK: flat with no drop at every scale; 7e17 is closest to the old 958 (rms 1.1), 1.5e18 slightly low (921 at 12 V).
+  - Five give-up lines: some runs stop at 8.8-10.1 V.
+- **fpFixScale28b 52585664 submitted** (4 tasks, commit efe9bcf): SiN 5.5e17 / 6e17 / 6.5e17 and HighK 6e17. It picks the scale before the ~265 28 V remakes. Same rule as before (lowest rms against C_p1.5_N0), but reported with the drop Vd and size, because at 5e17 the rms is lowest while the drop is too small and late.
+- **Nov 11-based remakes finished and pulled** (scale x1.5/7, fixed box):
+  - fxRadStrikeN 52357003 (8/8, no give-ups). SiN drop 414 -> 306 / 413 -> 341 / 414 -> 344 / 414 -> 346 with 0/1/2/3 strikes, at 1.6-2.0, 1.7-2.1, 1.8-2.2, 1.9-2.3 V (old 457 -> 397 / 426 / 427 / 429 at 1.8-2.5 V). Id at 10 V 454-459 (old 486-533). HighK: no drops, 956 / 812 / 770 / 744 at 10 V, within 1% of the old 953 / 817 / 772 / 746. So here too a strike adds no new SiN step; it moves the one drop later and makes it smaller.
+  - fxRadStrike2 52357002 (8/8, no give-ups). Strikes at y 1.2 to 3.1 um: drop 414-415 -> 307 at 1.7-2.1 V, 455 at 10 V, all the same; y 0.8: 413 -> 341. Cut-offs at y 0.7 and 1.0 equal the no-strike SiN. Same reading as before the fix. The old run's second dip at 9.2-10 V is gone.
+  - fxRadHV 52357001 (6 tasks; 4 IDVD GAVE UP, at 23.2, 12.2, 14.8 and 10.6 V). SiN biased to 23.0 V: 415 -> 257 at 1.6-2.2 V, 456 -> 413 at 10.2-11.4, 429 -> 413 at 12.6-14.2. HighK biased to 14.6 V: flat. Pre and nb within about 1% of the old runs where both reach. The pre curves (SiN to 10.4 V, HighK to 12.0 V) and the biased ones are shorter than the old runs; the nb ones now reach 28 V (old 8.8 and 10.0 V).
+  - fxSeeMap28 52357004 (2/2) and fxMeshStressM10 52357005 (m10 28 V state saved) pulled; maps not plotted yet.
+- **Next:** pick the 28 V scale from fpFixScale28b, set R_28V, generate and submit the 28 V rounds (including the m10 cases).
