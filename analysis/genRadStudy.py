@@ -27,6 +27,7 @@ Studies (STUDIES, in build order; each writes sweeps/params_<name>.txt; driver r
   2026-11-20     fpFixPre fpFixStress fpFixEB1 fpFixLoad fpFixMesh fpFixEB1p
   2026-11-21/24  fpFixScaleEB1 fpFixScale28 fpFixScale28b
   2026-11-22     fxRadHV fxRadStrike2 fxRadStrikeN fxSeeMap28 (DRV=seeIV) fxMeshStressM10
+  2026-11-25     fxFieldStrike1
   2026-11-24     fxNoCut28 fxStrikeField28 (DRV=seeIV); the 28 V rounds remade on the fixed box (FX28_ROUNDS; built once radparams.R_28V is set)
 Each function's docstring says what the study is for. Results and job IDs are in progress.md and the KB
 (kb/results/damage-region-map.md, kb/results/step-search-28v.md, kb/results/fp-contact-fix.md).
@@ -967,6 +968,27 @@ def fxNoCut28(load):
             for dp in ("6e17", "5e17")]
 
 
+def fxFieldStrike1(load):
+    """2026-11-25 (Ian: field-scaled strikes to get SiN steps with HighK flat). Weak stress-field damage (N0 = damPeak
+    2e17, 3e17 or 4.5e17; up to 3e17 gives no SiN drop on its own, fpFixScale28) plus 1-3 field-scaled strikes
+    (damGaussF, gaussFieldMF 4, sigma 30 nm) at y 0.55 / 0.50+0.60 / 0.47+0.56+0.65, where the SiN field at the 28 V
+    stress is 1.7-1.9 times HighK's, so the fourth-power factor is about 9 in the SiN pockets and about 1 in HighK's.
+    Base densities 2e17, 4e17, 8e17 cm^-3 at E0 (5e5 V/cm); both decks, trap 0.30; trap 0.40 for the middle case."""
+    base = by_label(load)
+    decks = (("sin", "fpfix_C_p1.5_N0"), ("hk", "fpfix_C_hk_p1.5_n6e18_N0"))
+    pos = {1: (0.55,), 2: (0.50, 0.60), 3: (0.47, 0.56, 0.65)}
+    rows = []
+    for tl, n0s, bs in ((0.30, ("2e17", "3e17", "4.5e17"), ("2e17", "4e17", "8e17")), (0.40, ("3e17",), ("2e17", "4e17", "8e17"))):
+        for deck, lab in decks:
+            for n0 in n0s:
+                for b in bs:
+                    for k in (1, 2, 3):
+                        g = "{" + " ".join("{%g 0.0 0.03 %s}" % (y, b) for y in pos[k]) + "}"
+                        tag = f"fx_fs1_{deck}_d{n0}_b{b}" + ("_lev0.4" if tl == 0.40 else "") + f"_N{k}"
+                        rows.append((tag, f"{base[lab]};damPeak={n0};damGaussF={g};gaussFieldMF=4.0;vdCuts=0" + (";trapLevel=0.40" if tl == 0.40 else "")))
+    return rows
+
+
 def fxStrikeField28(see):
     """2026-11-24 (Ian): strike transients on the fixed deck, DRV=seeIV (fxSeeMap28's settings: strike y 0.2, tau
     2 ps, Vg -10 / Vd 28 V, maps to 1 ns). Controls for the unbiased case at Vg -10 / Vd 0 (Ian's recollection of the
@@ -1078,6 +1100,7 @@ STUDIES = [
     Study("fxMeshStressM10", fxMeshStressM10, ("meshChkStress",), base=BEB1),
     Study("fxNoCut28", fxNoCut28, ("fpFixLoad",), base=LOADSIN),
     Study("fxStrikeField28", fxStrikeField28, ("fxSeeMap28",), base=("SEE28_1118", SEE28_1118), driver="seeIV"),
+    Study("fxFieldStrike1", fxFieldStrike1, ("fpFixLoad",), base=LOADSIN),
 ]
 if R_28V is not None:
     STUDIES += [Study("fx" + n[0].upper() + n[1:], fx28_study(n), (n,), base=LOADSIN) for n in FX28_ROUNDS]
