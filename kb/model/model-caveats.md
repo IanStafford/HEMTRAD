@@ -21,7 +21,7 @@ date: 2026-11-20
 
 ## Rad era (since 2026-10-23)
 - **Damage laws are phenomenological** ([[damage-model]]):
-  - stress damage N = `damPeak`·(E_lat/`damEref`)^4 in the top 50 nm, as acceptors at 0.30 eV; the y ≥ 0.30 µm window that keeps it off the gate edge is a fitting choice;
+  - stress damage N = `damPeak`·(E_lat/`damEref`)^4 in the top 50 nm, as acceptors at 0.30 eV; the y ≥ 0.30 µm window that keeps it off the gate edge was a fitting choice with the old contact; on the fixed contact it makes no difference (fxNoCut28, [[fp-contact-fix]]);
   - strikes are Gaussians (σ 40 nm) with hand-set density and position;
   - field-scaled strikes multiply by (E/E_ref)^m from the stored stress field;
   - the damage scale `damPeak` absorbs the stress field magnitude (7e18 at the 17.66 V stress of the Nov 11 model, 1.5e18 at 28 V).
