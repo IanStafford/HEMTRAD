@@ -120,6 +120,7 @@ The model standard has been `eTemp 0` since 2026-10-16 ([[energy-balance]]).
 | `render3d_slice.py`: damaged 3D slice render (render venv) | `<file.vtu> <out.png> [ymin ymax um] [label]` | a radIV `damRod` slice with LogElec and LogTrap fields | e.g. `figures/rad3d/half3d_render.png` | [[3d-plan]] |
 | `plot_fpFixRemakes.py`: Nov 11-based remakes on the fixed FP box, old against new | `[out dir]` | fxRadStrikeN, fxRadStrike2, fxRadHV, fpFixScaleEB1, fpFixPre, fpFixEB1 | `figures/rad/fpfix/{nov11_IdVd,strikeN_IdVd,strike2_radHV}.png` | [[fp-contact-fix]] |
 | `plot_fpFixPre.py`: pre-irradiation, percent change fixed against old FP box | `[out.png]` | fpFixPre, radMap1, fxRadHV, radHV | `figures/rad/fpfix/pre_contact.png` | [[fp-contact-fix]] |
+| `plot_seeFieldPositions.py`: biased vs gate-only DC field, and head / drain-end peaks over time for three strike positions (render venv) | `[out.png]` | fxStrikeField28, fxSeeMap28 | `figures/see/strike_field_bias.png` | [[see-plan]] |
 | `plot_seeField.py`: lateral field on the 2DEG row during a strike transient (render venv; `--check` cross-checks the gradient) | `[out.png]` | `drivers/seeIV.tcl` snapshots | `figures/see/strike_field_28V.png` | [[see-plan]] |
 | `plot_seeMaps.py`: current-density maps of a strike transient (render venv) | `<out.png> <row label>=<prefix> ... [--carrier p\|n] [--y ymin ymax] [--x xmin xmax] [--clim lo hi] [--strike y0] [--ncol k]` | `drivers/seeIV.tcl` snapshots (`seeMapTimes`, `seeMapDC`) | e.g. `figures/see/map28_{hole,elec}J.png`, `poc_{hole,elec}J.png` | [[see-plan]] |
 

@@ -132,4 +132,19 @@ Lateral field |Ey| on the GaN row at x 16 nm, from the snapshot potentials (`ana
 - **Caveats.** The strike is a 1 µm slab (`seeWeff`), so it screens the field over the whole simulated width, which a real track (about 0.1 µm wide) would not. No traps or damage in these runs. Only one strike position; no unbiased (0 V) strike has been run. The mesh is not refined at y 3.2 or at the head edge, so peak values there are approximate.
 - If damage follows field to the fourth power times time, the drain end would outweigh the gate edge (E^4 about a third of the head peak, but lasting ~1 ns against ~10 ps). The present model takes the pre-strike DC field only.
 
+### Gate-only bias, strike position and width (2026-11-25; fxStrikeField28 52605291, `figures/see/strike_field_bias.png`)
+
+Same method and settings as above (Vg −10 V, fixed contact); 7 of 8 runs finished to 1 ns, the gate-only HighK run stopped at 0.14 ns (maps to 104 ps). Lateral field on the 2DEG row.
+
+| | DC, head edge (y 0.3-0.725) | DC, gate foot (y 0.15) |
+|---|---|---|
+| Biased (Vd 28 V), SiN / HighK | 8.8e5 / 5.1e5 V/cm | 3.7e5 / 3.5e5 |
+| Gate-only (Vd 0), SiN / HighK | 7.8e3 / 5.4e3 | 1.9e5 / 1.9e5 |
+
+- **With the gate at −10 V and no drain bias the head-edge field is about 110 times lower on SiN and 95 times lower on HighK than with 28 V.** Under the E⁴ law that is (1/113)⁴ ≈ 6e-9 (SiN) of the biased damage; the gate foot and the source-side edge keep 1.8-1.9e5 V/cm, whose E⁴ is 0.2% of the biased head peak. So in this model a gate-only bias leaves essentially no stress damage, and an unbiased device that collapses cannot be explained by the gate field.
+- **A strike in the gate-only case raises the head field only to 2-3e4 V/cm for a few ps** and leaves about 1e4 V/cm near the drain. No field spike appears at the drain end. The gate-only control is therefore a clean control.
+- **Position (biased, y 0.2 / 0.53 / 0.8):** the head field collapses to below 7e4 V/cm within 6 ps for strikes at 0.53 and 0.8 (strike at the peak or just drainward of it); for y 0.2 it takes about 30 ps. The gate foot rises from 3.7e5 to 4.2-4.5e5 for a few ps (y 0.53, 0.8). The field that appears at the drain end is 6.8e5 / 7.5e5 / 8.2e5 V/cm at 1 ns on SiN and 7.2e5 / 7.8e5 / 8.1e5 on HighK: nearly independent of position and of deck. So strikes at any of these positions leave the same final field pattern.
+- **Width 0.1 µm instead of 1 µm (y 0.2):** the head field is similar up to about 6 ps and lower afterwards. The field near the drain reaches 1.6e6 (SiN) and 2.4e6 V/cm (HighK) at 1 ns, but at y 3.41, the edge of the mesh at the drain contact, so it is probably a boundary artefact and is not read as a result.
+- **So the passivation contrast in the field exists only before the strike** (8.8e5 against 5.1e5 at the head edge); the transients make SiN and HighK the same.
+
 Related: [[rad-model]], [[step-search-28v]], [[fp-contact-fix]], [[flooxs-gotchas]], [[levers]].
