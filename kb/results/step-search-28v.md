@@ -15,6 +15,21 @@ Goal set by Ian on 2026-11-17: reproduce stepped Id-Vd curves at the 28 V stress
 - **Field-scaled strikes** (`gaussFieldM` 4, rounds H-J) keep HighK flat but give SiN only one drop, which deepens with each strike.
 - **Pre-fix:** every run in this note loaded a 28 V stress state saved with the old FP contact box. The library (fpFixStress 52134552) and the 5 nm and 2.5 nm mesh stresses (fpFixMesh 52135538) are being redone with the fixed box, and the key series follow (fpFixLoad).
 
+## Corrected geometry (2026-11-25; fx-prefixed remakes, damage scale 6e17, 28 V library and m10 / 5 / 2.5 nm meshes)
+
+Figure `figures/rad/fpfix/step_series_fixed.png` (`analysis/plot_fxStepSeries.py`). Drops by the table rule (hyst, at least 8 mA/mm), SiN, 0 / 1 / 2 / 3 strikes:
+
+| Setting | Library (9.5-17 nm) | 10 nm | 5 nm (m5fix) | 2.5 nm (m2p5) |
+|---|---|---|---|---|
+| trap 0.40, 7e18 | 1 / 3 / 2 / 3 | 1 / 2 / 2 / 3 | **1 / 1 / 2 / 3** | **1 / 1 / 2 / 3** |
+| trap 0.30, 8e18 | 1 / 2 / 3 / 2 (3 strikes gave up at 6.6 V) | 1 / 2 / 3 / 3 | 1 / 2 / 3 / 3 | **1 / 1 / 2 / 3** |
+
+(The first number is the stress damage alone, whose single drop is at 1.6-2.0 V for 0.30 eV and 1.0-1.4 V for 0.40 eV.)
+- **Trap 0.40 eV with 7e18 strikes gives one drop per strike on both the 5 nm and the 2.5 nm mesh.** At 2.5 nm: 1 strike 173 → 40 at 0.8 V; 2 strikes 170 → 76 at 1.0 V and 119 → 84 at 2.2 V; 3 strikes 168 → 91 at 1.2 V, 163 → 123 at 3.0 V, 163 → 130 at 4.5 V. The current stays low (about 190-225 mA/mm at 12 V, against 277 without strikes).
+- **Trap 0.30 eV with 8e18** gives 1 / 2 / 3 at 2.5 nm (262 → 108; 260 → 166 and 215 → 182; 257 → 184, 256 → 229, 261 → 239) but 2 / 3 / 3 at 5 nm. The 5 nm and 2.5 nm curves agree to 6-11 mA/mm rms over 0.2-12 V (3 for no strike), so the first drops are close to converged and the later ones move by a few tenths of a volt and 10-20% in size.
+- **Contrast:** not recovered. The same plain strikes also make HighK drop (library: 6e18 2 / 1 / 1, 8e18 3 / 4 / 1); field-scaled and hybrid strikes keep HighK flat but give SiN one drop. HighK has not been run at 0.40 eV / 7e18 or on the fine meshes.
+- **Caveats:** 2D, full-width lines of damage, hand-placed at y 0.8 / 1.6 / 2.4; the drop count is a property of this spacing and density; 14 of the finished runs gave up before 12 V.
+
 ## Labels
 
 A case label is `<round>_<settings>_N<k>`. The leading letter is the HPG round in which the case first ran, not the series it belongs to. `N<k>` is the number of strikes. Plain strikes go to y 0.8, 1.6 and 2.4 µm in that order (N1: 0.8 only; N2: 0.8 and 1.6; N3: all three); rounds H-J, the field-plate-edge cases `E_fp` and the knock-out cases use the positions in the table, and `B_near` uses 0.5 / 0.8 / 1.1. Short forms in the text keep only the round, a distinguishing setting and N: A_N1 is `A_p1.5e+18_n6e+18_N1`, C_N0 is `C_p1.5_N0`, C_n8e18_N2 is `C_p1.5_n8e18_N2`, E_lev0.4_N2 is `E_lev0.4_n6e18_N2`. A matched 0-3 strike series therefore mixes rounds: **row A** (the Nov 18 deliverable's top row, set key `lev30_n6`) is C_N0, A_N1, B_N2 and A_N3. Series keys such as `lev30_n8` are defined in `SETS` of `analysis/plot_meshSeries.py`; `p15_n6` and `fs_bandb` in `analysis/plot_radStepSeries.py`. All params are in `sweeps/params_<run>.txt`.

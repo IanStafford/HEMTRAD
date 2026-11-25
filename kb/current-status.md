@@ -20,7 +20,9 @@ What is running, what is open, and the current answer on each topic, with a link
 - **fxNoCut28 52605290** (4): the y >= 0.30 cutoff moved to y 0.0. **fxStrikeField28 52605291** (8, DRV=seeIV): strike transients, unbiased control at Vg -10 / Vd 0, other positions, 0.1 um width ([[see-plan]]).
 - **Done since Nov 20:** the fixed-box 28 V library, the mesh stresses, fpFixPre, fpFixEB1, the Nov 11 refit, the 28 V scan (fpFixScale28, fpFixScale28b: 6e17) and the Nov 11-based remakes. Results in [[fp-contact-fix]].
 
-**Next:** analyse the remakes (does a stepped 1/2/3-strike SiN series with HighK flat survive on the fixed geometry and on 10 / 5 / 2.5 nm?), then remake the figures in the order of [[fpfix-rerun-list]].
+**Result (2026-11-25):** the stepped SiN series survives refinement: trap 0.40 eV / 7e18 gives 1 / 2 / 3 drops for 1 / 2 / 3 strikes on 5 nm and 2.5 nm, trap 0.30 / 8e18 at 2.5 nm. HighK also steps with the same plain strikes, so the passivation contrast is still missing ([[step-search-28v]]).
+
+**Next:** HighK at the same setting and on the fine meshes; a strike law that steps SiN and not HighK; strike-field results; figures in the order of [[fpfix-rerun-list]].
 
 **Cancelled Nov 20:** the old-box 2.5 nm stress meshChkStress2p5 52044407 (it had reached Vd 20 V). The four-mesh check that was to load it (radStepM3) was never submitted. fpFixMesh redoes the stress with the fixed box; the strike series are to be loaded on it once it saves Vd 28.
 
