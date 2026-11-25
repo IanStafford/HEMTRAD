@@ -2388,3 +2388,10 @@ Submitted **job 44441813** → `results/20261002_posMapLate/`. Polling every 5 m
 - **2026-11-25 09:22: HPG reconnected (Ian approved the Duo push).** Ian's answers: field-scaled strikes as the route to the contrast; cancel the stuck run 52605291_4 (done; gate-only HighK, frozen at 0.14 ns).
 - **All 28 V remakes finished (260 completed, 2 cancelled).** Field-scaled rounds H-K (full stress band at 6e17): SiN one drop for every strike count, HighK flat or nearly (K hyb_far4e18 and n4e18 give HighK 1/1/0).
 - **fxFieldStrike1 52761027 submitted (Ian chose field-scaled strikes; 72 tasks, 8 GB, 2 days, commit 515a9ef):** weak stress band (damPeak 2e17, 3e17, 4.5e17; trap 0.30; 0.40 at 3e17 only) so that it does not drop on its own, plus 1-3 field-scaled strikes (damGaussF, m 4, sigma 30 nm) at y 0.55 / 0.50+0.60 / 0.47+0.56+0.65, base density 2e17 / 4e17 / 8e17, SiN and HighK. The earlier field-scaled strikes sat in a full-strength stress band, which is one wide pocket.
+
+## 2026-11-25 16:12 Data pack (private, outside the repo): trimmed, checked, 28 V runs submitted
+
+- Trimmed on Ian's instruction to a snapshot of the current model: no electron-temperature equation, no fixed-trap script, no old trap shapes or static mobility. Pack stays outside the repo.
+- Local checks (SiN): stress-field run to 2 V identical to radIV.tcl (0.0–0.6 V, all digits; reload of the saved stress identical). Run from the HPG m5fix 28 V stress (untrimmed pack) identical to `fx_M_m5fix_F_lev0.4_n7e+18_N1` at all 31 points to 3 V. Trimmed pack: 2 V stress run identical, strikes-only run to 2 V equal to radIV.tcl except the 7th digit at one point (1.9 V).
+- Submitted **52800059** (2 tasks, SiN and HighK, approved by Ian; 12 GB, 4 days, `/blue/ee1/ianstafford/dataPack_11_26_run/`): pre-irradiation curve, then the full 28 V stress and 0–3 strikes with the trimmed pack.
+- Still running locally on the trimmed pack: 28 V end-to-end check, both transfer curves, field script to 50 V.
