@@ -253,7 +253,7 @@ One row per file in `sweeps/` (and per params file that exists only on an `explo
 | `params_fpFixScale28b.txt` | `radIV.slurm` | `20261124_fpFixScale28b` | 52585664 | `efe9bcf` 11-24 | genRadStudy | fp-contact-fix | done (HighK 6e17 stuck at 11.0 V, cancelled; SiN 6e17 chosen) |
 | `params_fxNoCut28.txt` | `radIV.slurm` | `20261124_fxNoCut28` | 52605290 | `3d85047` 11-24 | genRadStudy | fp-contact-fix | done (HighK 6e17 cancelled at 11.9 V) |
 | `params_fxStrikeField28.txt` | `radIV.slurm`, DRV=seeIV | `20261124_fxStrikeField28` | 52605291 | `3d85047` 11-24 | genRadStudy | see-plan | done (gate-only HighK cancelled at 0.14 ns) |
-| `params_fxFieldStrike1.txt` | `radIV.slurm` | `20261125_fxFieldStrike1` | 52761027 | `515a9ef` 11-25 | genRadStudy | step-search-28v | running |
+| `params_fxFieldStrike1.txt` | `radIV.slurm` | `20261125_fxFieldStrike1` | 52761027 | `515a9ef` 11-25 | genRadStudy | step-search-28v | done (72 completed; 25 HighK gave up at 9.2-11.9 V) |
 | `params_fxRad28strikeL.txt` | `radIV.slurm` | `20261124_fxRad28strikeL` | 52610347 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | done |
 | `params_fxRadStepA.txt` | `radIV.slurm` | `20261124_fxRadStepA` | 52610348 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | done |
 | `params_fxRadStepB.txt` | `radIV.slurm` | `20261124_fxRadStepB` | 52610349 | `c77b59f` 11-24 | genRadStudy (fx28_rows of the old study) | step-search-28v | done |
